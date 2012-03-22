@@ -1,0 +1,24 @@
+<html>
+<head>
+<script src="./static/jquery.min.js"></script>
+</head>
+<body>
+<input name="username" type="text"/>
+<button id="btn">enter</button>
+</body>
+<script>
+$(document).ready(function(){
+	$('#btn').click(function(){
+		var username = $('input[name="username"]').val();
+		$.post(
+			"./enter",
+			{room_id:1, username:username},
+			function(data){
+				console.log(data);	
+			},
+			'json'
+		);
+	});
+});
+</script>
+</html>
