@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <style>
+        div{
+            padding:8px;
+            margin-left:40px;
+        }
+        body{
+            background:grey;
+        }
+    </style>
+    <body>
+        
+        <input type="text" id="username"  placeholder="name" /><br />
+        <input type="text" id="pwd" placeholder="password" /><br />
+        <button id="login">Login</button>
+        <button id="register">Register</button>
+        <button id="showAll">showAll</button>
+
+        <div id="alluser"></div>
+        <div id="usrInfo"></div>
+        <script>
+            var q=document.querySelector,
+                xhr=new XMLHttpRequest();
+
+            var login=q.call(document,"#login"),
+                register=q.call(document,"#register"),
+                showAll=q.call(document,"#showAll"),
+                username=q.call(document,"#username"),
+                pwd=q.call(document,"#pwd");
+
+            //reset.addEventListener("click",function(){},false);
+            login.addEventListener("click",function(){
+                        xhr.open("POST","http://localhost:8889/new",true);
+                        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');  
+                        xhr.onload=function(e){
+                            if(xhr.status==200){
+                                console.log(xhr.responseText|| xhr.response,"from server");
+                            }
+                        };
+                        xhr.onerror=function(e){
+                            console.log("error",e);
+                        }
+                        //xhr.send("name=lanston&pwd=123");
+                        xhr.send("name="+username.value+"&pwd="+pwd.value)
+                                   
+            },false);
+            showAll.addEventListener("click",function(){
+
+                xhr.open("GET",
+                        "http://localhost:8889/showAll",
+                        true
+                    );
+                xhr.onload=function(e){
+                    document.querySelector("#alluser").innerHTML=xhr.response||xhr.responseText;
+                }
+                xhr.send();
+            },false);
+        </script>
+    </body>
+</html>
