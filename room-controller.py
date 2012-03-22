@@ -20,7 +20,7 @@ from pika.adapters.tornado_connection import TornadoConnection
 PORT = 8888
 
 
-class RoomController(object):
+class Channel(object):
 
     def __init__(self,queue_name,exchange):
         # Construct a queue name we'll use for this instance only
@@ -128,13 +128,31 @@ class MainHandler(tornado.web.RequestHandler):
 		self.finish(user.__repr__());
 
 class EnterAjaxHandler(tornado.web.RequestHandler):
-	def post(self):
-		room_id = self.get_argument('room_id');
 	@session
+	def post(self):
+		message		= None
+		dbConnection	= DatabaseConnection()
+		dbConnection.start_session()
+		room_id 	= self.get_argument('room_id')
+		username		= self.get_argument('username')#self.session["user"]
+		user		= dbConnection.query(User).filter_by(username = username).one()
+		room		= dbConnection.query(Room).filter_by(id = room_id).one()
+		message_queue	= dbConnection.query(MessageQueue).filter_by(room = room).filter_by(user = None).first()
+		if message_queue is not None:
+			user.queue	= message_queue
+			user.room	= room
+			user.room_id	= room.id
+			dbConnection.addItem(user)
+			dbConnection.commit_session()
+			message 	= json.dumps({'status':'success','room':user.room.exchange, 'queue': user.queue.queue_name})
+			self.session['channel']	= Channel(user.room.exchange, user.queue.queue_name)
+		else:
+			dbConnection.rollback()
+			message = json.dumps({'status':'failed'})
+		self.write(message)
+	
 	def get(self):
-		self.write("result" + self.session['username'] + self.session['room_id']);
-		
-		
+		self.render("room-test-ajax.html");
 		
 class AjaxHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
@@ -144,11 +162,16 @@ class AjaxHandler(tornado.web.RequestHandler):
 
 
 if __name__ == '__main__':
-    settings = {"debug": True,'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb"}
+    settings = {
+    	"debug": True,
+	'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
+	"static_path": os.path.join(os.path.dirname(__file__), "static"),
+	}
     application = tornado.web.Application([
         (r"/", MainHandler),
         (r"/ajax", AjaxHandler),
-	(r"/enter", EnterAjaxHandler)
+	(r"/enter", EnterAjaxHandler),
+	(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
     ], **settings)
 
 

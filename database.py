@@ -31,6 +31,8 @@ class DatabaseConnection(object):
 		return self.session.query(object)
 	def addItem(self, item):
 		self.session.add(item)
+	def rollback(self):
+		self.session.rollback()
 
 class Room(Base):
 	__tablename__	= "room"
@@ -74,21 +76,30 @@ dbConnection	= DatabaseConnection()
 dbConnection.init("sqlite:///:memory:")
 dbConnection.connect()
 dbConnection.start_session()
-print dbConnection.session
-room	= Room(exchange="room_1")
-queue1	= MessageQueue(queue_name="queue_1",room = room)
-queue2	= MessageQueue(queue_name="queue_2",room = room)
-ting	= User(username="ting", password="123")
-mile	= User(username="mile", password="123")
-'''
-ting.queue = queue1
-mile.queue = queue2
-room.owner = ting
-
-'''
+room		= Room(exchange="room_1")
+queue1		= MessageQueue(queue_name="queue_1",room = room)
+queue2		= MessageQueue(queue_name="queue_2",room = room)
+queue3		= MessageQueue(queue_name="queue_3",room = room)
+queue4		= MessageQueue(queue_name="queue_4",room = room)
+queue5		= MessageQueue(queue_name="queue_5",room = room)
+queue6		= MessageQueue(queue_name="queue_6",room = room)
+queue7		= MessageQueue(queue_name="queue_7",room = room)
+queue8		= MessageQueue(queue_name="queue_8",room = room)
+queue9		= MessageQueue(queue_name="queue_9",room = room)
+ting		= User(username="ting", password="123")
+mile		= User(username="mile", password="123")
+mamingcao	= User(username="mamingcao", password="123")
+huaqin		= User(username="huaqin", password="123")
 dbConnection.addItem(ting)
 dbConnection.addItem(mile)
+dbConnection.addItem(huaqin)
+dbConnection.addItem(mamingcao)
 dbConnection.addItem(room)
 dbConnection.addItem(queue1)
 dbConnection.addItem(queue2)
+dbConnection.addItem(queue3)
+dbConnection.addItem(queue4)
+dbConnection.addItem(queue5)
+dbConnection.addItem(queue6)
+dbConnection.addItem(queue7)
 dbConnection.commit_session()
