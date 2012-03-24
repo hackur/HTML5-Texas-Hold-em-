@@ -68,6 +68,7 @@ class Dealer(object):
         self.channel.start_consuming()
 
     def cmd_sit(self,args):
+    	print "sit received"
         """ User clicked Sit Down"""
         dbConnection	= DatabaseConnection()
         dbConnection.start_session()
@@ -79,6 +80,7 @@ class Dealer(object):
                 body="Haven't implemented")
 
     def cmd_init(self,args):
+    	print "init received"
         """ RETURN THE ROOM's status """
         routing_key = args['source']
         self.channel.basic_publish(exchange = self.exchange,
@@ -87,8 +89,6 @@ class Dealer(object):
 
 
     def on_message(self, channel, method, header, body):
-        print "receive:" + body
-        #do something
         message = "message received, thanks!"
         obj = pickle.loads(body)
         print obj['method']

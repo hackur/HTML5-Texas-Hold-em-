@@ -35,12 +35,13 @@ function listenBoardMessage(){
 		url:"./listen-board-message",
 		timeout:5000,
 		success:function(data){
+			console.log("listen board message reply success")
 			console.log(data);
-			//setTimeout("listenBoardMessage()",5000);
 			listenBoardMessage();
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
-			//setTimeout("listenBoardMessage()",5000);
+			console.log("listen board message reply error")
+			console.log(textStatus);
 			listenBoardMessage();
 		},
 		dataTye:'json',
