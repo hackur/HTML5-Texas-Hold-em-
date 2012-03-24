@@ -17,7 +17,7 @@ from database import DatabaseConnection,User,Room,MessageQueue
 from session import *
 from pika.adapters.tornado_connection import TornadoConnection
 
-PORT = 8888
+PORT = 8899
 
 class Channel(object):
     def __init__(self,queue_name,exchange):
@@ -145,14 +145,20 @@ class EnterAjaxHandler(tornado.web.RequestHandler):
     def get(self):
 
         #print "GETSESSION"
-        #getSession(self.request)
+        getSession(self)
         #print "GETSESSION2"
-        #self.request.session['hello'] = 'helloWorld'
+        if 'hello' in self.session:
+            self.session['hello'] += 1
+        else:
+            self.session['hello'] = 1
+        print self.session['hello']
+        print "!!!!"
+
         #print "GETSESSION3"
 
+        saveSession(self)
         self.render("room-test-ajax.html")
         #print "GETSESSION4"
-        #saveSession(self.request)
         #print "GETSESSION5"
 
 class BoardPostMessageHandler(tornado.web.RequestHandler):
@@ -185,9 +191,9 @@ if __name__ == '__main__':
             "debug": True,
             'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
             "static_path": os.path.join(os.path.dirname(__file__), "static"),
-            'session_storage':"file",
+            'session_storage':"dir",
             }
-    #initSession(settings)
+    initSession(settings)
     application = tornado.web.Application([
         (r"/post-board-message", BoardPostMessageHandler),
         (r"/listen-board-message", BoardListenMessageHandler),
