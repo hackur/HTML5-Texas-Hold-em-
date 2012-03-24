@@ -1,5 +1,7 @@
 MANIFEST.in
+PKG-INFO
 README
+setup.cfg
 setup.py
 demos/appengine/README
 demos/appengine/app.yaml
@@ -65,6 +67,7 @@ tornado/locale.py
 tornado/netutil.py
 tornado/options.py
 tornado/process.py
+tornado/session.py
 tornado/simple_httpclient.py
 tornado/stack_context.py
 tornado/template.py

@@ -77,6 +77,8 @@ import types
 import urllib
 import urlparse
 import uuid
+import session
+import tempfile
 
 from tornado import escape
 from tornado import locale
@@ -105,6 +107,10 @@ class RequestHandler(object):
     def __init__(self, application, request, **kwargs):
         self.application = application
         self.request = request
+        if isinstance(self, StaticFileHandler) or not self.settings.get('session_storage'):
+            self.session = None
+        else:
+            self.session = self._create_session()
         self._headers_written = False
         self._finished = False
         self._auto_finish = True
@@ -208,7 +214,7 @@ class RequestHandler(object):
         """Resets all headers and content for this response."""
         # The performance cost of tornado.httputil.HTTPHeaders is significant
         # (slowing down a benchmark with a trivial handler by more than 10%),
-        # and its case-normalization is not generally necessary for 
+        # and its case-normalization is not generally necessary for
         # headers we generate on the server side, so use a plain dict
         # and list instead.
         self._headers = {
@@ -599,7 +605,7 @@ class RequestHandler(object):
 
     def flush(self, include_footers=False, callback=None):
         """Flushes the current output buffer to the network.
-        
+
         The ``callback`` argument, if given, can be used for flow control:
         it will be run when all flushed data has been written to the socket.
         Note that only one flush callback can be outstanding at a time;
@@ -656,6 +662,17 @@ class RequestHandler(object):
             if "Content-Length" not in self._headers:
                 content_length = sum(len(part) for part in self._write_buffer)
                 self.set_header("Content-Length", content_length)
+
+        if self.session is not None and self.session._delete_cookie:
+            self.clear_cookie(self.settings.get('session_cookie_name', 'session_id'))
+        elif self.session is not None:
+            self.session.refresh() # advance expiry time and save session
+            self.set_secure_cookie(self.settings.get('session_cookie_name', 'session_id'),
+                                   self.session.session_id,
+                                   expires_days=None,
+                                   expires=self.session.expires,
+                                   path=self.settings.get('session_cookie_path', '/'),
+                                   domain=self.settings.get('session_cookie_domain'))
 
         if hasattr(self.request, "connection"):
             # Now that the request is finished, clear the callback we
@@ -733,7 +750,7 @@ class RequestHandler(object):
                 self.write(line)
             self.finish()
         else:
-            self.finish("<html><title>%(code)d: %(message)s</title>" 
+            self.finish("<html><title>%(code)d: %(message)s</title>"
                         "<body>%(code)d: %(message)s</body></html>" % {
                     "code": status_code,
                     "message": httplib.responses[status_code],
@@ -995,7 +1012,7 @@ class RequestHandler(object):
         lines = [utf8(self.request.version + " " +
                       str(self._status_code) +
                       " " + httplib.responses[self._status_code])]
-        lines.extend([(utf8(n) + b(": ") + utf8(v)) for n, v in 
+        lines.extend([(utf8(n) + b(": ") + utf8(v)) for n, v in
                       itertools.chain(self._headers.iteritems(), self._list_headers)])
         for cookie_dict in getattr(self, "_new_cookies", []):
             for cookie in cookie_dict.values():
@@ -1044,6 +1061,59 @@ class RequestHandler(object):
     def _ui_method(self, method):
         return lambda *args, **kwargs: method(self, *args, **kwargs)
 
+    def _create_session(self):
+        settings = self.application.settings # just a shortcut
+        url = settings.get('session_storage')
+        session_id = self.get_secure_cookie(settings.get('session_cookie_name', 'session_id'))
+        kw = {'security_model': settings.get('session_security_model', []),
+              'duration': settings.get('session_age', 900),
+              'ip_address': self.request.remote_ip,
+              'user_agent': self.request.headers.get('User-Agent'),
+              'regeneration_interval': settings.get('session_regeneration_interval', 240)
+              }
+        new_session = None
+        old_session = None
+
+        if url.startswith('mysql'):
+            old_session = session.MySQLSession.load(session_id, settings['_db'])
+            if old_session is None or old_session._is_expired(): # create a new session
+                new_session = session.MySQLSession(settings['_db'], **kw)
+        elif url.startswith('postgresql'):
+            raise NotImplementedError
+        elif url.startswith('sqlite'):
+            raise NotImplementedError
+        elif url.startswith('memcached'):
+            old_session = session.MemcachedSession.load(session_id, settings['_db'])
+            if old_session is None or old_session._is_expired(): # create new session
+                new_session = session.MemcachedSession(settings['_db'], **kw)
+        elif url.startswith('mongodb'):
+            old_session = session.MongoDBSession.load(session_id, settings['_db'])
+            if old_session is None or old_session._is_expired(): # create new session
+                new_session = session.MongoDBSession(settings['_db'], **kw)
+        elif url.startswith('redis'):
+            old_session = session.RedisSession.load(session_id, settings['_db'])
+            if old_session is None or old_session._is_expired(): # create new session
+                new_session = session.RedisSession(settings['_db'], **kw)
+        elif url.startswith('dir'):
+            dir_path = url[6:]
+            old_session = session.DirSession.load(session_id, dir_path)
+            if old_session is None or old_session._is_expired(): # create new session
+                new_session = session.DirSession(dir_path, **kw)
+        elif url.startswith('file'):
+            file_path = url[7:]
+            old_session = session.FileSession.load(session_id, file_path)
+            if old_session is None or old_session._is_expired(): # create new session
+                new_session = session.FileSession(file_path, **kw)
+        else:
+            return None
+
+        if old_session is not None:
+            if old_session._should_regenerate():
+                old_session.refresh(new_session_id=True)
+                # TODO: security checks
+            return old_session
+
+        return new_session
 
 def asynchronous(method):
     """Wrap request handler methods with this if they are asynchronous.
@@ -1175,6 +1245,54 @@ class Application(object):
             self.transforms.append(ChunkedTransferEncoding)
         else:
             self.transforms = transforms
+        if not settings.get('session_storage'):
+            logging.info("Sessions are globally deactivated because session_storage has not been configured")
+        elif settings.get('session_storage').startswith('file'):
+            session_file = tempfile.NamedTemporaryFile(
+                prefix='tornado_sessions_', delete=False)
+            settings['session_storage'] = 'file://'+session_file.name
+        elif settings.get('session_storage').startswith('dir'):
+            dir_path = settings['session_storage']
+            if not os.path.isdir(dir_path[6:]):
+                settings['session_storage'] = 'dir://'+tempfile.mkdtemp(
+                    prefix='tornado_sessions')
+        elif settings.get('session_storage').startswith('mysql'):
+            # create a connection to MySQL
+            import database
+            u, p, h, d = session.MySQLSession._parse_connection_details(
+                settings['session_storage'])
+            settings['_db'] = database.Connection(h, d, user=u, password=p)
+        elif settings.get('session_storage').startswith('redis'):
+            try:
+                import redis
+                pswd, h, p, db = session.RedisSession._parse_connection_details(
+                    settings['session_storage'])
+                settings['_db'] = redis.Redis(host=h, port=p, db=db)
+                if pswd:
+                    settings['_db'].auth(pswd)
+            except ImportError:
+                pass
+        elif settings.get('session_storage').startswith('mongodb'):
+            try:
+                import pymongo
+                h, p, d = session.MongoDBSession._parse_connection_details(
+                    settings['session_storage'])
+                conn = pymongo.Connection(host=h, port=p)
+                db = pymongo.database.Database(conn, d)
+                db.tornado_sessions.ensure_index('session_id', unique=True)
+                settings['_db'] = pymongo.collection.Collection(db, 'tornado_sessions')
+            except ImportError:
+                pass
+        elif settings.get('session_storage').startswith('memcached'):
+            try:
+                import pylibmc
+                servers = session.MemcachedSession._parse_connection_details(
+                    settings['session_storage'])
+                conn = pylibmc.Client(servers, binary=True)
+                conn.behaviors['no_block'] = 1 # async I/O
+                settings['_db'] = conn
+            except ImportError:
+                pass
         self.handlers = []
         self.named_handlers = {}
         self.default_host = default_host
@@ -1554,7 +1672,7 @@ class StaticFileHandler(RequestHandler):
 
         This method may be overridden in subclasses (but note that it is
         a class method rather than an instance method).
-        
+
         ``settings`` is the `Application.settings` dictionary.  ``path``
         is the static path being requested.  The url returned should be
         relative to the current host.
@@ -1652,7 +1770,7 @@ class GZipContentEncoding(OutputTransform):
     See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.11
     """
     CONTENT_TYPES = set([
-        "text/plain", "text/html", "text/css", "text/xml", "application/javascript", 
+        "text/plain", "text/html", "text/css", "text/xml", "application/javascript",
         "application/x-javascript", "application/xml", "application/atom+xml",
         "text/javascript", "application/json", "application/xhtml+xml"])
     MIN_LENGTH = 5
@@ -1806,7 +1924,7 @@ class TemplateModule(UIModule):
     inside the template and give it keyword arguments corresponding to
     the methods on UIModule: {{ set_resources(js_files=static_url("my.js")) }}
     Note that these resources are output once per template file, not once
-    per instantiation of the template, so they must not depend on 
+    per instantiation of the template, so they must not depend on
     any arguments to the template.
     """
     def __init__(self, handler):

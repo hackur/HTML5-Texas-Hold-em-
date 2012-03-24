@@ -145,7 +145,6 @@ class EnterAjaxHandler(tornado.web.RequestHandler):
     def get(self):
 
         #print "GETSESSION"
-        getSession(self)
         #print "GETSESSION2"
         if 'hello' in self.session:
             self.session['hello'] += 1
@@ -156,7 +155,6 @@ class EnterAjaxHandler(tornado.web.RequestHandler):
 
         #print "GETSESSION3"
 
-        saveSession(self)
         self.render("room-test-ajax.html")
         #print "GETSESSION4"
         #print "GETSESSION5"
@@ -193,7 +191,6 @@ if __name__ == '__main__':
             "static_path": os.path.join(os.path.dirname(__file__), "static"),
             'session_storage':"dir",
             }
-    initSession(settings)
     application = tornado.web.Application([
         (r"/post-board-message", BoardPostMessageHandler),
         (r"/listen-board-message", BoardListenMessageHandler),
