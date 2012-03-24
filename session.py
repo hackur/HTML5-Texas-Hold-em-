@@ -2,7 +2,7 @@
 
 """
 Sessions module for the Tornado framework.
-Milan Cermak <milan.cermak@gmail.com> 
+Milan Cermak <milan.cermak@gmail.com>
 
 This module implements sessions for Tornado. It can store
 session data in files or MySQL databse, Memcached, Redis
@@ -16,7 +16,7 @@ Every session object can be handled as a dictionary:
     var = self.session[key]
 
 The session data is saved automatically for you when the request
-handler finishes. 
+handler finishes.
 
 Two utility functions, invalidate() and refresh() are available to
 every session object. Read their documentation to learn more.
@@ -202,7 +202,7 @@ class BaseSession(collections.MutableMapping):
     def _is_expired(self):
         """Check if the session has expired."""
         if self.expires is None: # never expire
-            return False 
+            return False
         return datetime.datetime.utcnow() > self.expires
 
     def _expires_at(self):
@@ -255,19 +255,19 @@ class BaseSession(collections.MutableMapping):
 
         return datetime.datetime.utcnow() + self.regeneration_interval
 
-    def invalidate(self): 
+    def invalidate(self):
         """Destorys the session, both server-side and client-side.
         As a best practice, it should be used when the user logs out of
         the application."""
         self.delete() # remove server-side
         self._delete_cookie = True # remove client-side
-    
+
     def refresh(self, duration=None, new_session_id=False): # the opposite of invalidate
         """Prolongs the session validity. You can specify for how long passing a
         value in the duration argument (the same rules as for session_age apply).
         Be aware that henceforward this particular session may have different
-        expiry date, not respecting the global setting. 
-        
+        expiry date, not respecting the global setting.
+
         If new_session_id is True, a new session identifier will be generated.
         This should be used e.g. on user authentication for security reasons."""
         if duration:
@@ -325,7 +325,7 @@ class FileSession(BaseSession):
     is either specified in the session_storage setting (be sure it is writable
     to the Tornado process) or a new tempfile with 'tornado_sessions_' prefix
     is created in the OS' standard location.
-    
+
     Be aware that file-based sessions can get really slow with many stored
     session as any action (save, load, delete) has to cycle through the whole
     file. """
@@ -819,7 +819,7 @@ try:
             if self.expires is None:
                 # set expiry 30 days, max for memcache
                 # http://code.google.com/p/memcached/wiki/FAQ#What_are_the_limits_on_setting_expire_time?_%28why_is_there_a_30_d
-                self.connection.set(self.session_id, value, time=timedelta.max.seconds * 30) 
+                self.connection.set(self.session_id, value, time=timedelta.max.seconds * 30)
             else:
                 live_sec = self.expires - datetime.datetime.utcnow()
                 self.connection.set(self.session_id, value, time=live_sec.seconds)
@@ -851,3 +851,124 @@ try:
 
 except ImportError:
     pass
+
+def _create_session(request):
+    settings = request.application.settings # just a shortcut
+    url = settings.get('session_storage')
+    session_id = request.get_secure_cookie(settings.get('session_cookie_name', 'session_id'))
+    kw = {'security_model': settings.get('session_security_model', []),
+          'duration': settings.get('session_age', 900),
+          'ip_address': request.request.remote_ip,
+          'user_agent': request.request.headers.get('User-Agent'),
+          'regeneration_interval': settings.get('session_regeneration_interval', 240)
+          }
+    new_session = None
+    old_session = None
+
+    if url.startswith('mysql'):
+        old_session = session.MySQLSession.load(session_id, settings['_db'])
+        if old_session is None or old_session._is_expired(): # create a new session
+            new_session = session.MySQLSession(settings['_db'], **kw)
+    elif url.startswith('postgresql'):
+        raise NotImplementedError
+    elif url.startswith('sqlite'):
+        raise NotImplementedError
+    elif url.startswith('memcached'):
+        old_session = session.MemcachedSession.load(session_id, settings['_db'])
+        if old_session is None or old_session._is_expired(): # create new session
+            new_session = session.MemcachedSession(settings['_db'], **kw)
+    elif url.startswith('mongodb'):
+        old_session = session.MongoDBSession.load(session_id, settings['_db'])
+        if old_session is None or old_session._is_expired(): # create new session
+            new_session = session.MongoDBSession(settings['_db'], **kw)
+    elif url.startswith('redis'):
+        old_session = session.RedisSession.load(session_id, settings['_db'])
+        if old_session is None or old_session._is_expired(): # create new session
+            new_session = session.RedisSession(settings['_db'], **kw)
+    elif url.startswith('dir'):
+        dir_path = url[6:]
+        old_session = session.DirSession.load(session_id, dir_path)
+        if old_session is None or old_session._is_expired(): # create new session
+            new_session = session.DirSession(dir_path, **kw)
+    elif url.startswith('file'):
+        file_path = url[7:]
+        old_session = session.FileSession.load(session_id, file_path)
+        if old_session is None or old_session._is_expired(): # create new session
+            new_session = session.FileSession(file_path, **kw)
+    else:
+        return None
+
+    if old_session is not None:
+        if old_session._should_regenerate():
+            old_session.refresh(new_session_id=True)
+            # TODO: security checks
+        return old_session
+
+    return new_session
+def initSession(settings):
+    if not settings.get('session_storage'):
+        logging.info("Sessions are globally deactivated because session_storage has not been configured")
+    elif settings.get('session_storage').startswith('file'):
+        session_file = tempfile.NamedTemporaryFile(
+            prefix='tornado_sessions_', delete=False)
+        settings['session_storage'] = 'file://'+session_file.name
+    elif settings.get('session_storage').startswith('dir'):
+        dir_path = settings['session_storage']
+        if not os.path.isdir(dir_path[6:]):
+            settings['session_storage'] = 'dir://'+tempfile.mkdtemp(
+                prefix='tornado_sessions')
+    elif settings.get('session_storage').startswith('mysql'):
+        # create a connection to MySQL
+        import database
+        u, p, h, d = session.MySQLSession._parse_connection_details(
+            settings['session_storage'])
+        settings['_db'] = database.Connection(h, d, user=u, password=p)
+    elif settings.get('session_storage').startswith('redis'):
+        try:
+            import redis
+            pswd, h, p, db = session.RedisSession._parse_connection_details(
+                settings['session_storage'])
+            settings['_db'] = redis.Redis(host=h, port=p, db=db)
+            if pswd:
+                settings['_db'].auth(pswd)
+        except ImportError:
+            pass
+    elif settings.get('session_storage').startswith('mongodb'):
+        try:
+            import pymongo
+            h, p, d = session.MongoDBSession._parse_connection_details(
+                settings['session_storage'])
+            conn = pymongo.Connection(host=h, port=p)
+            db = pymongo.database.Database(conn, d)
+            db.tornado_sessions.ensure_index('session_id', unique=True)
+            settings['_db'] = pymongo.collection.Collection(db, 'tornado_sessions')
+        except ImportError:
+            pass
+    elif settings.get('session_storage').startswith('memcached'):
+        try:
+            import pylibmc
+            servers = session.MemcachedSession._parse_connection_details(
+                settings['session_storage'])
+            conn = pylibmc.Client(servers, binary=True)
+            conn.behaviors['no_block'] = 1 # async I/O
+            settings['_db'] = conn
+        except ImportError:
+            pass
+def getSession(request):
+    if isinstance(request, StaticFileHandler) or not request.settings.get('session_storage'):
+        request.session = None
+    else:
+        request.session = request._create_session()
+    return request.session
+
+def saveSession(request):
+    if request.session is not None and request.session._delete_cookie:
+        request.clear_cookie(request.settings.get('session_cookie_name', 'session_id'))
+    elif request.session is not None:
+        request.session.refresh() # advance expiry time and save session
+        request.set_secure_cookie(request.settings.get('session_cookie_name', 'session_id'),
+                               request.session.session_id,
+                               expires_days=None,
+                               expires=request.session.expires,
+                               path=request.settings.get('session_cookie_path', '/'),
+                               domain=request.settings.get('session_cookie_domain'))
