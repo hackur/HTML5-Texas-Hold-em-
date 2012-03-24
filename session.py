@@ -866,35 +866,35 @@ def _create_session(request):
     old_session = None
 
     if url.startswith('mysql'):
-        old_session = session.MySQLSession.load(session_id, settings['_db'])
+        old_session = MySQLSession.load(session_id, settings['_db'])
         if old_session is None or old_session._is_expired(): # create a new session
-            new_session = session.MySQLSession(settings['_db'], **kw)
+            new_session = MySQLSession(settings['_db'], **kw)
     elif url.startswith('postgresql'):
         raise NotImplementedError
     elif url.startswith('sqlite'):
         raise NotImplementedError
     elif url.startswith('memcached'):
-        old_session = session.MemcachedSession.load(session_id, settings['_db'])
+        old_session = MemcachedSession.load(session_id, settings['_db'])
         if old_session is None or old_session._is_expired(): # create new session
-            new_session = session.MemcachedSession(settings['_db'], **kw)
+            new_session = MemcachedSession(settings['_db'], **kw)
     elif url.startswith('mongodb'):
-        old_session = session.MongoDBSession.load(session_id, settings['_db'])
+        old_session = MongoDBSession.load(session_id, settings['_db'])
         if old_session is None or old_session._is_expired(): # create new session
-            new_session = session.MongoDBSession(settings['_db'], **kw)
+            new_session = MongoDBSession(settings['_db'], **kw)
     elif url.startswith('redis'):
-        old_session = session.RedisSession.load(session_id, settings['_db'])
+        old_session = RedisSession.load(session_id, settings['_db'])
         if old_session is None or old_session._is_expired(): # create new session
-            new_session = session.RedisSession(settings['_db'], **kw)
+            new_session = RedisSession(settings['_db'], **kw)
     elif url.startswith('dir'):
         dir_path = url[6:]
-        old_session = session.DirSession.load(session_id, dir_path)
+        old_session = DirSession.load(session_id, dir_path)
         if old_session is None or old_session._is_expired(): # create new session
-            new_session = session.DirSession(dir_path, **kw)
+            new_session = DirSession(dir_path, **kw)
     elif url.startswith('file'):
         file_path = url[7:]
-        old_session = session.FileSession.load(session_id, file_path)
+        old_session = FileSession.load(session_id, file_path)
         if old_session is None or old_session._is_expired(): # create new session
-            new_session = session.FileSession(file_path, **kw)
+            new_session = FileSession(file_path, **kw)
     else:
         return None
 
@@ -920,13 +920,13 @@ def initSession(settings):
     elif settings.get('session_storage').startswith('mysql'):
         # create a connection to MySQL
         import database
-        u, p, h, d = session.MySQLSession._parse_connection_details(
+        u, p, h, d = MySQLSession._parse_connection_details(
             settings['session_storage'])
         settings['_db'] = database.Connection(h, d, user=u, password=p)
     elif settings.get('session_storage').startswith('redis'):
         try:
             import redis
-            pswd, h, p, db = session.RedisSession._parse_connection_details(
+            pswd, h, p, db = RedisSession._parse_connection_details(
                 settings['session_storage'])
             settings['_db'] = redis.Redis(host=h, port=p, db=db)
             if pswd:
@@ -936,7 +936,7 @@ def initSession(settings):
     elif settings.get('session_storage').startswith('mongodb'):
         try:
             import pymongo
-            h, p, d = session.MongoDBSession._parse_connection_details(
+            h, p, d = MongoDBSession._parse_connection_details(
                 settings['session_storage'])
             conn = pymongo.Connection(host=h, port=p)
             db = pymongo.database.Database(conn, d)
@@ -947,7 +947,7 @@ def initSession(settings):
     elif settings.get('session_storage').startswith('memcached'):
         try:
             import pylibmc
-            servers = session.MemcachedSession._parse_connection_details(
+            servers = MemcachedSession._parse_connection_details(
                 settings['session_storage'])
             conn = pylibmc.Client(servers, binary=True)
             conn.behaviors['no_block'] = 1 # async I/O
@@ -955,10 +955,10 @@ def initSession(settings):
         except ImportError:
             pass
 def getSession(request):
-    if isinstance(request, StaticFileHandler) or not request.settings.get('session_storage'):
+    if not request.settings.get('session_storage'):
         request.session = None
     else:
-        request.session = request._create_session()
+        request.session = _create_session(request)
     return request.session
 
 def saveSession(request):
