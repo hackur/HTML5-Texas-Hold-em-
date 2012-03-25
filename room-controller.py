@@ -154,13 +154,10 @@ class ReceiverChannel(Channel):
 		for element in self.ready_actions:
 			element['functor'](element['argument'])
 
-prefix = 0;
 
 class EnterRoomHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	def post(self):
-		global prefix
-		prefix += 1
 		message		= None
 		dbConnection	= DatabaseConnection()
 		dbConnection.start_session()
@@ -170,13 +167,13 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		room		= dbConnection.query(Room).filter_by(id = room_id).one()
 		message_queue	= dbConnection.query(MessageQueue).filter_by(room = room).filter_by(user = None).first()
 	
-		if True or message_queue is not None:
+		if message_queue is not None:
 			user.queue	= message_queue
 			user.room	= room
 			user.room_id= room.id
 			dbConnection.addItem(user)
 			dbConnection.commit_session()
-			queue_name	= str(username) + '_init_' + str(prefix)
+			queue_name	= str(username) + '_init'
 			exchange_name	= str(user.room.exchange)
 			routing_key	= exchange_name + '_' + queue_name 
 			message 	= {'method':'init', 'user_id':user.id, 'source':routing_key}
@@ -184,11 +181,13 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 			self.channel	= Channel(queue_name, exchange_name, routing_key)
 			self.channel.add_ready_action(self.initial_call_back, arguments);
 			self.channel.connect()
-			self.session['user'] = user
+			self.session['user'] 		= user
+			self.session['messages']	= list()
 		else:
 			dbConnection.rollback()
 			message = json.dumps({'status':'failed'})
 			self.write(message)
+
 	def get(self):
 		self.render("room-test-ajax.html")
 	
@@ -200,7 +199,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		self.channel.add_message_action(self.message_call_back, None)
 
 	def message_call_back(self, argument):
-		messages = self.channel.get_messages()
+		messages= self.channel.get_messages()
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
@@ -218,30 +217,73 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			
 			queue_name	= str(user.username)+'_sit'
 			exchange_name	= str(user.room.exchange)
-			source_key	= exchange_name + '_' + queue_name + '_sit'
+			source_key	= exchange_name + '_' + queue_name
 			message 	= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key}
 			arguments	= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
 			self.channel	= Channel(queue_name, exchange_name, source_key)
-			self.channel.add_ready_action(self.sit_call_back, arguments);
+			self.channel.add_ready_action(self.sit_call_back, arguments)
 			self.channel.connect()
 	
 	def sit_call_back(self, argument):
 		if self.request.connection.stream.closed():
-			self.channel.close();
+			self.channel.close()
 			return
 		self.channel.publish_message(argument['routing_key'], argument['message'])
 		self.channel.add_message_action(self.message_call_back, None)
 
 	def message_call_back(self, argument):
 		messages = self.channel.get_messages()
-		print 'message call back'
-		print messages
 		if self.request.connection.stream.closed():
-			self.channel.close();
+			self.channel.close()
 			return
 		self.channel.close();
 		self.write(json.dumps({'status':'success', 'message':messages}))
 		self.finish()
+
+class BoardActionMessageHandler(tornado.web.RequestHandler):
+	@tornado.web.asynchronous
+	def post(self):
+		if self.session['user'] is not None:
+			user		= self.session['user']
+			action		= self.get_argument('action')
+			amount		= self.get_argument('amount')
+			offset		= self.get_argument('offset')
+			queue		= str(user.username)+'_action'
+			exchange	= str(user.room.exchange)
+			source		= exchange + '_' + queue
+			message		= {'method':'action', 'user_id':user.id, 'amount':amount, 'source':source}
+			arguments	= {'routing_key':'dealer', 'message':pickle.dumps(message)}
+			self.channel	= Channel(queue, exchange, source)
+			self.channel.add_ready_action(self.action_call_back, arguments)
+			self.channel.connect()
+			self.clean_matured_message(offset)
+
+	def clean_matured_message(self, offset):
+		for message in self.session['messages'][:]:
+			if message['index'] < offset:
+				self.session['messages'].remove(message)
+
+	def action_call_back(self, argument):
+		if self.request.connection.stream.closed():
+			self.channel.close()
+			return
+
+		self.channel.publish_message(argument['routing_key'], argument['message'])
+		self.channel.add_message_action(self.message_call_back, None)
+	
+	def message_call_back(self, argument):
+		messages= pickle.load(self.channel.get_messages())
+		user	= self.session['user']
+		for message in messages:
+			if message['user_id'] == user.id:
+				self.session['messages'].append(message)
+		
+		if self.request.connection.stream.close():
+			self.channel.close()
+		self.channel.close()
+		self.write(json.dumps({'status':'success', 'message':self.session['messages']}))
+		self.finish()
+
 
 class BoardListenMessageHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
@@ -256,7 +298,6 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 			self.channel.connect()
 
 	def message_call_back(self, argument):
-		print "time out call back"
 		messages = self.channel.get_messages()
 		if self.request.connection.stream.closed():
 			self.channel.close();
