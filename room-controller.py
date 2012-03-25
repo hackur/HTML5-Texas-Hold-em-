@@ -12,13 +12,11 @@ import pika
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
+
 from sqlalchemy.orm import sessionmaker,relationship, backref
 import database
 from database import DatabaseConnection,User,Room,MessageQueue
-#from session import *
 from pika.adapters.tornado_connection import TornadoConnection
-#from pika.adapters import select_connection
-
 try:
     import cpickle as pickle
 except:
@@ -27,12 +25,11 @@ except:
 PORT = 8888
 class Channel(object):
 	def __init__(self, queue_name, exchange, routing_key):
-# Construct a queue name we'll use for this instance only
+		# Construct a queue name we'll use for this instance only
 		self.connected		= False
 		self.connecting		= False
 		self.connection		= None
 		self.channel		= None
-		self.status		= False
 		self.exchange		= exchange
 		self.queue_name		= queue_name
 		self.routing_key	= routing_key
@@ -43,8 +40,22 @@ class Channel(object):
 		self.consumer_tag	= None
 		print "exchange [%s] queue [%s]" %( self.exchange, self.queue_name)
 
+	def connect(self):
+		if self.connecting:
+			pika.log.info('PikaClient: Already connecting to RabbitMQ')
+			return
+		pika.log.info('PikaClient: Connecting to RabbitMQ on localhost:5672')
+		
+		self.connecting = True
+		credentials = pika.PlainCredentials('guest', 'guest')
+		param = pika.ConnectionParameters(host='localhost',
+				port=5672,
+				virtual_host="/",
+				credentials=credentials)
+		self.connection = TornadoConnection(param, on_open_callback=self.on_connected)
+		self.connection.add_on_close_callback(self.on_closed)
 
-	def connect(self, connection):
+	def on_connected(self, connection):
 		pika.log.info('PikaClient: Connected to RabbitMQ on localhost:5672')
 		self.connected = True
 		self.connection = connection
@@ -52,9 +63,7 @@ class Channel(object):
 
 	def on_channel_open(self, channel):
 		pika.log.info('PikaClient: Channel Open, Declaring Exchange')
-		channel.saw = True
 		self.channel = channel
-		self.status  = True
 		self.channel.exchange_declare(exchange=self.exchange,
 				type="direct",
 				auto_delete=True,
@@ -78,12 +87,10 @@ class Channel(object):
 
 	def on_queue_bound(self, frame):
 		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
-		self.consumer_tag = self.channel.basic_consume(
-						consumer_callback=self.on_room_message,
+		self.consumer_tag = self.channel.basic_consume(consumer_callback=self.on_room_message,
 						queue=self.queue_name,
-						no_ack=True,
-						consumer_tag = self.queue_name)
-		print "consumer_tag" , self.consumer_tag
+						no_ack=True)
+
 		for element in self.ready_actions:
 			element['functor'](element['argument'])
 		
@@ -98,17 +105,24 @@ class Channel(object):
 
 	def on_basic_cancel(self, frame):
 		pika.log.info('PikaClient: Basic Cancel Ok')
+		self.channel.close()
+#		self.connection.close()
 	
 	def on_closed(self, connection):
+		print "connection cloase"
 		pass
+#		tornado.ioloop.IOLoop.instance().stop()
 	
 	def close(self):
-#		self.channel.basic_cancel(self.consumer_tag,callback=self.on_basic_cancel)
-#		self.channel.close()
+		print "close"
+	#	self.channel.close()
 		self.connection.close()
 
 	def publish_message(self, routing_key, message):
-#		print "body		=>" + message
+		print "publish "
+		print "exchange		=>" + self.exchange
+		print "rountint key	=>" + routing_key
+		print "body		=>" + message
 		self.channel.basic_publish(exchange	= self.exchange,
 					routing_key	= routing_key,
 					body		= message)
@@ -124,26 +138,34 @@ class Channel(object):
 	def add_message_action(self, functor, argument):
 		self.message_actions.append({'functor':functor, 'argument':argument})
 
-'''
+
 class SenderChannel(Channel):
 	def on_queue_bound(self, frame):
-#		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
+		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
 		for element in self.ready_actions:
 			element['functor'](element['argument'])
 
 class ReceiverChannel(Channel):
 	def on_queue_bound(self, frame):
-#		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
+		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
 		self.channel.basic_consume(consumer_callback=self.on_room_message,
 						queue=self.queue_name,
 						no_ack=True)
 		for element in self.ready_actions:
 			element['functor'](element['argument'])
-'''
+
 prefix = 0;
+
 class EnterRoomHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	def post(self):
+		if "test" in self.session:
+			self.session['test'] += 1
+		else:
+			self.session['test'] = 1
+		print "test => ", self.session['test']
+
+
 		global prefix
 		prefix += 1
 		message		= None
@@ -166,9 +188,9 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 			routing_key	= exchange_name + '_' + queue_name 
 			message 	= {'method':'init', 'user_id':user.id, 'source':routing_key}
 			arguments	= {'routing_key': 'dealer',  'message':pickle.dumps(message)}
-			self.channel	= Channel(queue_name, exchange_name, routing_key)
-			self.channel.add_ready_action(self.initial_call_back, arguments)
-			self.channel.connect(self.application.connection)
+			self.channel	= ReceiverChannel(queue_name, exchange_name, routing_key)
+			self.channel.add_ready_action(self.initial_call_back, arguments);
+			self.channel.connect()
 			self.session['user'] = user
 		else:
 			dbConnection.rollback()
@@ -178,16 +200,13 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		self.render("room-test-ajax.html")
 	
 	def initial_call_back(self, argument):
-#		print "init call back [start]"
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
 		self.channel.publish_message(argument['routing_key'], argument['message'])
 		self.channel.add_message_action(self.message_call_back, None)
-#		print "init call back [end]"
 
 	def message_call_back(self, argument):
-#		print "message call back [start]"
 		messages = self.channel.get_messages()
 		if self.request.connection.stream.closed():
 			self.channel.close();
@@ -195,7 +214,6 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		self.channel.close();
 		self.write(json.dumps({'status':'success', 'message':messages}))
 		self.finish()
-#		print "message call back [end]"
 		
 
 class SitDownBoardHandler(tornado.web.RequestHandler):
@@ -210,10 +228,9 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			source_key	= exchange_name + '_' + queue_name + '_sit'
 			message 	= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key}
 			arguments	= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
-			self.channel	= Channel(queue_name, exchange_name, source_key)
+			self.channel	= ReceiverChannel(queue_name, exchange_name, source_key)
 			self.channel.add_ready_action(self.sit_call_back, arguments);
 			self.channel.connect()
-#		print "exchange		=>" + self.exchange
 	
 	def sit_call_back(self, argument):
 		if self.request.connection.stream.closed():
@@ -224,8 +241,8 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 
 	def message_call_back(self, argument):
 		messages = self.channel.get_messages()
-#		print 'message call back'
-#		print messages
+		print 'message call back'
+		print messages
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
@@ -241,12 +258,12 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 			queue_name	= str(user.username)
 			exchange_name	= str(user.room.exchange)
 			routing_key	= exchange_name + '_' + queue_name + '_listen' 
-			self.channel	= Channel(queue_name, exchange_name, routing_key)
+			self.channel	= ReceiverChannel(queue_name, exchange_name, routing_key)
 			self.channel.add_message_action(self.message_call_back, None)
-			self.channel.connect(self.application.connection)
+			self.channel.connect()
 
 	def message_call_back(self, argument):
-#		print "time out call back"
+		print "time out call back"
 		messages = self.channel.get_messages()
 		if self.request.connection.stream.closed():
 			self.channel.close();
@@ -257,16 +274,6 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 
 
 if __name__ == '__main__':
-	def on_connected(connection):
-		print "connected"
-	def connect(application):
-		credentials = pika.PlainCredentials('guest', 'guest')
-		param = pika.ConnectionParameters(host='localhost',
-						port=5672,
-						virtual_host="/",
-						credentials=credentials)
-		application.connection = TornadoConnection(param, on_open_callback=on_connected)
-
 	settings = {
 		"debug": True,
 		'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
@@ -281,7 +288,11 @@ if __name__ == '__main__':
 		], **settings)
 
 
+	# Set our pika.log options
+	pika.log.setup(color=True)
+
 	# Start the HTTP Server
+	pika.log.info("Starting Tornado HTTPServer on port %i" % PORT)
 	http_server = tornado.httpserver.HTTPServer(application)
 	http_server.listen(PORT)
 
@@ -290,6 +301,6 @@ if __name__ == '__main__':
 
 	# Add our Pika connect to the IOLoop with a deadline in 0.1 seconds
 	#ioloop.add_timeout(time.time() + .1, application.room.connect)
-	connect(application)
+
 	# Start the IOLoop
 	ioloop.start()
