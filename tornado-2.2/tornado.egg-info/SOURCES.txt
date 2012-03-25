@@ -73,6 +73,7 @@ tornado/template.py
 tornado/testing.py
 tornado/util.py
 tornado/web.py
+tornado/session.py
 tornado/websocket.py
 tornado/wsgi.py
 tornado.egg-info/PKG-INFO
