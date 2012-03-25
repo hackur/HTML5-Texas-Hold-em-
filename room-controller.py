@@ -280,9 +280,9 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 		
 		if self.request.connection.stream.close():
 			self.channel.close()
-		self.channel.close()
 		self.write(json.dumps({'status':'success', 'message':self.session['messages']}))
 		self.finish()
+		self.channel.close()
 
 
 class BoardListenMessageHandler(tornado.web.RequestHandler):
@@ -290,21 +290,36 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 	def post(self):
 		if self.session['user'] is not None:
 			user		= self.session['user']
+			offset		= self.get_argument('offset')
 			queue_name	= str(user.username)
 			exchange_name	= str(user.room.exchange)
 			routing_key	= exchange_name + '_' + queue_name + '_listen' 
 			self.channel	= Channel(queue_name, exchange_name, routing_key)
 			self.channel.add_message_action(self.message_call_back, None)
 			self.channel.connect()
+			self.clean_matured_message(offset)
+
+	def clean_matured_message(self, offset):
+		for message in self.session['messages'][:]:
+			if message['index'] < offset:
+				self.session['messages'].remove(message)
 
 	def message_call_back(self, argument):
-		messages = self.channel.get_messages()
+		messages= pickle.load(self.channel.get_messages())
+		user	= self.session['user']
+		for message in messages:
+			if message['user_id'] == user.id:
+				self.session['messages'].append(message)
+
+
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
-		self.write(json.dumps(messages))
-		self.channel.close();
+		
+		self.write(json.dumps({'status':'success', 'message':self.session['messages']}))
 		self.finish()
+		self.finish()
+		self.channel.close();
 
 
 if __name__ == '__main__':
