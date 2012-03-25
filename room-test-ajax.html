@@ -51,8 +51,8 @@ function listenBoardMessage(){
 function postBoardMessage(message){
 	$.ajax({
 		type:'post',
-		url:"./post-board-message",
-		data:{message:message},
+		url:"./sit-down",
+		data:{seat:message},
 		success:function(data){
 			console.log(data);
 		},

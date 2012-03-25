@@ -18,7 +18,7 @@ from database import DatabaseConnection,User,Room,MessageQueue
 from session import *
 from pika.adapters.tornado_connection import TornadoConnection
 
-PORT = 8899
+PORT = 8888
 class Channel(object):
 	def __init__(self, queue_name, exchange, routing_key):
 		# Construct a queue name we'll use for this instance only
@@ -69,8 +69,8 @@ class Channel(object):
 		pika.log.info('PikaClient: Exchange Declared, Declaring Queue')
 		self.channel.queue_declare(queue=self.queue_name,
 			auto_delete=True,
-			durable=True,
-			exclusive=False,
+			durable=False,
+			exclusive=True,
 			callback=self.on_queue_declared)
 
 	def on_queue_declared(self, frame):
@@ -148,9 +148,13 @@ class ReceiverChannel(Channel):
 		for element in self.ready_actions:
 			element['functor'](element['argument'])
 
+prefix = 0;
+
 class EnterRoomHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	def post(self):
+		global prefix
+		prefix += 1
 		message		= None
 		dbConnection	= DatabaseConnection()
 		dbConnection.start_session()
@@ -160,20 +164,18 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		room		= dbConnection.query(Room).filter_by(id = room_id).one()
 		message_queue	= dbConnection.query(MessageQueue).filter_by(room = room).filter_by(user = None).first()
 	
-		if message_queue is not None:
+		if True or message_queue is not None:
 			user.queue	= message_queue
 			user.room	= room
 			user.room_id= room.id
 			dbConnection.addItem(user)
 			dbConnection.commit_session()
-			#user		= self.session['user']
-			queue_name	= str(username)
+			queue_name	= str(username) + '_init_' + str(prefix)
 			exchange_name	= str(user.room.exchange)
-			routing_key	= exchange_name + '_' + queue_name
+			routing_key	= exchange_name + '_' + queue_name 
 			message 	= {'method':'init', 'user_id':user.id, 'source':routing_key}
 			arguments	= {'routing_key': 'dealer',  'message':pickle.dumps(message)}
-
-			self.channel	= SenderChannel(queue_name, exchange_name, routing_key)
+			self.channel	= ReceiverChannel(queue_name, exchange_name, routing_key)
 			self.channel.add_ready_action(self.initial_call_back, arguments);
 			self.channel.connect()
 			self.session['user'] = user
@@ -181,7 +183,6 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 			dbConnection.rollback()
 			message = json.dumps({'status':'failed'})
 			self.write(message)
-
 	def get(self):
 		self.render("room-test-ajax.html")
 	
@@ -189,36 +190,51 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
-		
 		self.channel.publish_message(argument['routing_key'], argument['message'])
+		self.channel.add_message_action(self.message_call_back, None)
+
+	def message_call_back(self, argument):
+		messages = self.channel.get_messages()
+		if self.request.connection.stream.closed():
+			self.channel.close();
+			return
 		self.channel.close();
-		message = json.dumps({'status':'success'})
-		self.write(message)
-		
+		self.write(json.dumps({'status':'success', 'message':messages}))
 		self.finish()
+		
 
 class SitDownBoardHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	def post(self):	
 		if self.session['user'] is not None:
 			user		= self.session['user']
-			message 	= {'method':'sit', 'user_id':user.id,}
-			arguments	= {'rounting_key': 'dealer', 'message':pickle.dumps(message)}
+			seat		= self.get_argument('seat')
 			
-			queue_name	= str(user.username)
+			queue_name	= str(user.username)+'_sit'
 			exchange_name	= str(user.room.exchange)
-			routing_key	= exchange_name + '_' + queue_name
-
-			self.channel	= SenderChannel(queue_name, exchange_name, routing_key)
-			self.channel.set_action(self.sit_call_back, argument);
+			source_key	= exchange_name + '_' + queue_name + '_sit'
+			message 	= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key}
+			arguments	= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
+			self.channel	= ReceiverChannel(queue_name, exchange_name, source_key)
+			self.channel.add_ready_action(self.sit_call_back, arguments);
 			self.channel.connect()
 	
 	def sit_call_back(self, argument):
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
-		self.channel.publish_message(argument.routing_key, argument.message)
-		self.channel.close()
+		self.channel.publish_message(argument['routing_key'], argument['message'])
+		self.channel.add_message_action(self.message_call_back, None)
+
+	def message_call_back(self, argument):
+		messages = self.channel.get_messages()
+		print 'message call back'
+		print messages
+		if self.request.connection.stream.closed():
+			self.channel.close();
+			return
+		self.channel.close();
+		self.write(json.dumps({'status':'success', 'message':messages}))
 		self.finish()
 
 class BoardListenMessageHandler(tornado.web.RequestHandler):
@@ -228,7 +244,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 			user		= self.session['user']
 			queue_name	= str(user.username)
 			exchange_name	= str(user.room.exchange)
-			routing_key	= exchange_name + '_' + queue_name
+			routing_key	= exchange_name + '_' + queue_name + '_listen' 
 			self.channel	= ReceiverChannel(queue_name, exchange_name, routing_key)
 			self.channel.add_message_action(self.message_call_back, None)
 			self.channel.connect()
