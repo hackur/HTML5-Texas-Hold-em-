@@ -97,7 +97,7 @@ class Channel(object):
 	def close(self):
 		print "close [start]"
 #		self.channel.basic_cancel()
-		self.channel.close()
+#		self.channel.close()
 		print "close [end]"
 
 	def publish_message(self, routing_key, message):
