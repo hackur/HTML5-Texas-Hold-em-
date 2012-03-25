@@ -159,13 +159,6 @@ prefix = 0;
 class EnterRoomHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	def post(self):
-		if "test" in self.session:
-			self.session['test'] += 1
-		else:
-			self.session['test'] = 1
-		print "test => ", self.session['test']
-
-
 		global prefix
 		prefix += 1
 		message		= None
@@ -188,7 +181,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 			routing_key	= exchange_name + '_' + queue_name 
 			message 	= {'method':'init', 'user_id':user.id, 'source':routing_key}
 			arguments	= {'routing_key': 'dealer',  'message':pickle.dumps(message)}
-			self.channel	= ReceiverChannel(queue_name, exchange_name, routing_key)
+			self.channel	= Channel(queue_name, exchange_name, routing_key)
 			self.channel.add_ready_action(self.initial_call_back, arguments);
 			self.channel.connect()
 			self.session['user'] = user
@@ -228,7 +221,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			source_key	= exchange_name + '_' + queue_name + '_sit'
 			message 	= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key}
 			arguments	= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
-			self.channel	= ReceiverChannel(queue_name, exchange_name, source_key)
+			self.channel	= Channel(queue_name, exchange_name, source_key)
 			self.channel.add_ready_action(self.sit_call_back, arguments);
 			self.channel.connect()
 	
@@ -258,7 +251,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 			queue_name	= str(user.username)
 			exchange_name	= str(user.room.exchange)
 			routing_key	= exchange_name + '_' + queue_name + '_listen' 
-			self.channel	= ReceiverChannel(queue_name, exchange_name, routing_key)
+			self.channel	= Channel(queue_name, exchange_name, routing_key)
 			self.channel.add_message_action(self.message_call_back, None)
 			self.channel.connect()
 
