@@ -139,20 +139,20 @@ class Channel(object):
 		self.message_actions.append({'functor':functor, 'argument':argument})
 
 
-class SenderChannel(Channel):
-	def on_queue_bound(self, frame):
-		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
-		for element in self.ready_actions:
-			element['functor'](element['argument'])
+# class SenderChannel(Channel):
+# 	def on_queue_bound(self, frame):
+# 		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
+# 		for element in self.ready_actions:
+# 			element['functor'](element['argument'])
 
-class ReceiverChannel(Channel):
-	def on_queue_bound(self, frame):
-		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
-		self.channel.basic_consume(consumer_callback=self.on_room_message,
-						queue=self.queue_name,
-						no_ack=True)
-		for element in self.ready_actions:
-			element['functor'](element['argument'])
+# class ReceiverChannel(Channel):
+# 	def on_queue_bound(self, frame):
+# 		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
+# 		self.channel.basic_consume(consumer_callback=self.on_room_message,
+# 						queue=self.queue_name,
+# 						no_ack=True)
+# 		for element in self.ready_actions:
+# 			element['functor'](element['argument'])
 
 
 class EnterRoomHandler(tornado.web.RequestHandler):
@@ -290,19 +290,19 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 	def post(self):
 		if self.session['user'] is not None:
 			user		= self.session['user']
-			offset		= self.get_argument('offset')
+			# offset		= self.get_argument('offset')
 			queue_name	= str(user.username)
 			exchange_name	= str(user.room.exchange)
 			routing_key	= exchange_name + '_' + queue_name + '_listen' 
 			self.channel	= Channel(queue_name, exchange_name, routing_key)
 			self.channel.add_message_action(self.message_call_back, None)
 			self.channel.connect()
-			self.clean_matured_message(offset)
+	# 		self.clean_matured_message(offset)
 
-	def clean_matured_message(self, offset):
-		for message in self.session['messages'][:]:
-			if message['index'] < offset:
-				self.session['messages'].remove(message)
+	# def clean_matured_message(self, offset):
+	# 	for message in self.session['messages'][:]:
+	# 		if message['index'] < offset:
+	# 			self.session['messages'].remove(message)
 
 	def message_call_back(self, argument):
 		messages= pickle.load(self.channel.get_messages())
@@ -327,7 +327,8 @@ if __name__ == '__main__':
 		"debug": True,
 		'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
 		"static_path": os.path.join(os.path.dirname(__file__), "static"),
-		'session_storage':"dir",
+		# 'session_storage':"dir",
+		"session_storage":"mongodb:///db"
 	}
 	application = tornado.web.Application([
 		(r"/sit-down", SitDownBoardHandler),
