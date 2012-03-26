@@ -539,34 +539,27 @@ class PokerController(object):
 				print user.combination
 			
 			if not isinstance(winner,list):
-				print "-------- Winner has Been Determined --------"
 				winner_list.append(self.users[0])
-				text = "Winner ** "
-				for c in self.users[0].handcards:
-					text += str(c) + "  "
-				print text
 				loser_list = self.users[1:]
-				for loser in loser_list:
-					text = "Loser -- "
-					for c in loser.handcards:
-						text += str(c) + "  "
-					print text
 			else:
 				for win_id in winner:
-					winner_list.append(self.users[win_id])
-				
-				for win in winner_list:
-					text = "Winner ** "
-					for c in win.handcards:
-						text += str(c) + "  "
-					print text
-				
+					winner_list.append(self.users[win_id])	
 				loser_list = self.users[winner[len(winner)-1]+1:]
-				for loser in loser_list:
-					text = "Loser -- "
-					for c in loser.handcards:
-						text += str(c) + "  "
-					print text					
+
+
+			for win in winner_list:
+				text = "Winner ** "
+				for c in win.handcards:
+					text += str(c) + "  "
+				text += " --- " + self.poker.name_of_hand(win.combination[0])
+				print text
+			for loser in loser_list:
+				text = "Loser  -- "
+				for c in loser.handcards:
+					text += str(c) + "  "
+				text += " --- " + self.poker.name_of_hand(loser.combination[0])
+				print text
+
 			return { "winners":winner_list, "losers":loser_list }
 
 class User:
