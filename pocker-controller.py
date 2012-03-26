@@ -426,7 +426,7 @@ class Poker:
 		for user in users:
 			overall = self.score(user.handcards)
 			results.append([overall[0], overall[1]])
-			user.calResult=overall
+			user.combination=overall
             
 			if self.debug:      #Outputs the debug statements            
 				text = "Hand -- " 
@@ -451,8 +451,8 @@ class Poker:
 		#the highest score if found
 		high = 0
 		for r in results:
-			if r.calResult[0] > high:
-				high = r.calResult[0]
+			if r.combination[0] > high:
+				high = r.combination[0]
 
 			if self.debug:
 				print r
@@ -461,8 +461,8 @@ class Poker:
 		counter = 0
 		#Only the kickers of the player's hands that are tied for the win are analysed
 		for r in results:
-			if r.calResult[0] == high:
-				kicker[counter] = r.calResult[1]
+			if r.combination[0] == high:
+				kicker[counter] = r.combination[1]
                 
 			counter += 1
 		if(len(kicker) > 1):
@@ -513,8 +513,8 @@ class PokerController(object):
 		self.publicCard.extend(card)
 
 	def _hand_card_sorter(self,element_1,element_2):
-		hand_card_1 = element_1.calResult
-		hand_card_2 = element_2.calResult
+		hand_card_1 = element_1.combination
+		hand_card_2 = element_2.combination
 		if hand_card_1[0] != hand_card_2[0] :
 			return hand_card_1[0] - hand_card_2[0]
 		else:
@@ -536,7 +536,7 @@ class PokerController(object):
 			print "winner"
 			print winner
 			for user in self.users:
-				print user.calResult
+				print user.combination
 			
 			if not isinstance(winner,list):
 				print "-------- Winner has Been Determined --------"
@@ -571,7 +571,7 @@ class PokerController(object):
 
 class User:
 	def __init__(self):
-		self.calResult=[]
+		self.combination=[]
 		self.handcards=[]
 
 
