@@ -301,13 +301,13 @@ class Poker:
 		for card in hand:
 			if prev and card.value == (prev + 1):
 				counter += 1
-				if counter == 4: #A straight has been recognized
+				if counter >= 4: #A straight has been recognized
 					straight = True
 					high = card.value
-				elif prev and prev == card.value: #ignores pairs when checking for the straight
-					pass
-				else:
-					counter = 0
+			elif prev and prev == card.value: #ignores pairs when checking for the straight
+				pass
+			else:
+				counter = 0
 			prev = card.value
 
 	#If a straight has been realized and the hand has a lower score than a straight
