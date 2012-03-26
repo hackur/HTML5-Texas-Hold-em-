@@ -67,13 +67,13 @@ tornado/locale.py
 tornado/netutil.py
 tornado/options.py
 tornado/process.py
+tornado/session.py
 tornado/simple_httpclient.py
 tornado/stack_context.py
 tornado/template.py
 tornado/testing.py
 tornado/util.py
 tornado/web.py
-tornado/session.py
 tornado/websocket.py
 tornado/wsgi.py
 tornado.egg-info/PKG-INFO
