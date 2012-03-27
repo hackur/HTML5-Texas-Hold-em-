@@ -44,6 +44,9 @@ class Cards(object):
 
 class Dealer(object):
 	users = []
+	suit = ["DIAMOND", "HEART", "SPADE", "CLUB"]
+	face = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
+	number_of_players = 9
 	def __init__(self,queue,exchange,num_of_seats=9,blind=100,host='localhost',port=5672):
 		self.queue	= queue
 		self.exchange	= exchange
@@ -84,10 +87,17 @@ class Dealer(object):
 		# print user
 		user.combination = []
 		user.handcards 	= []
-		self.game_play(self.users, user)
+		if len(self.users) < self.number_of_players:
+			self.users.append(user)
+			message = {"status": "success", "seat": len(self.users)}
+		else:
+			message = {"status": "failed", "seat": -1}
 		self.channel.basic_publish(exchange = self.exchange,
 				routing_key=routing_key,
-				body="Haven't implemented")
+				body=pickle.dumps(message))
+		
+		if len(self.users)  == 3:
+			self.game_play(self.users)
 
 	def cmd_init(self,args):
 		print "init received"
@@ -105,24 +115,29 @@ class Dealer(object):
 		method = getattr(self,"cmd_" + obj['method'])
 		method(obj)
 
-	def game_play(self, users, user):
-		users.append(user)
-		print "--------------------"+str(users)
-		if 2 <= len(users) <= 4:
-			game = poker_controller.PokerController(users)
-			game.getFlop()
-			for card in game.publicCard:
-				print str(card.symbol)+"/"+str(card.value)+" ",
-			for user in users:
-				print str(user.username) + ": ",
-				for cards in user.handcards:
-					 print str(cards.symbol)+"/"+str(cards.value)+" ",
+	def game_play(self, users):
+		# print "--------------------"+str(users)
+		game = poker_controller.PokerController(users)
+		game.getFlop()
+		for card in game.publicCard:
+			print str(self.suit[card.symbol])+"/"+str(self.face[card.value-2])+" ",
+		print
+		
+		for user in users:
+			print str(user.username) + ": ",
+			for cards in user.handcards:
+				 print str(self.suit[cards.symbol])+"/"+str(self.face[cards.value-2])+" ",
+			print
+		
+		game.getOne()
+		game.getOne()
+		result = game.getWinner()
+		for winner in result["winners"]:
+			print winner.username
 			# game.getOne()
 			# game.getOne()
 			# result = game.getWinner()
 			# print result["winners"][0].username
-			return
-		else:
 			return
 
 
