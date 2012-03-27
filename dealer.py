@@ -41,20 +41,21 @@ class Cards(object):
 
 
 
-
 class Dealer(object):
-	users = []
+#	users = []
 	# waiting_list = {}
 	suit = ["DIAMOND", "HEART", "SPADE", "CLUB"]
 	face = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
-	room_list = []
+#	room_list = []
 	number_of_players = 9
 	def __init__(self,queue,exchange,num_of_seats=9,blind=100,host='localhost',port=5672):
-		self.queue	= queue
+		self.queue		= queue
 		self.exchange	= exchange
-		self.seats = {}
-		self.host = host
-		self.port = port
+		self.seats		= {}
+		self.host		= host
+		self.port		= port
+		self.room_list	= []
+		self.users		= []
 		for x in xrange(num_of_seats):
 			self.seats[x] = Seat()
 
@@ -65,63 +66,54 @@ class Dealer(object):
 									port = self.port))
 		self.channel	= self.connection.channel()
 		self.channel.exchange_declare(exchange		= self.exchange,
-				type		= 'direct',
-				auto_delete	= True,
-				durable		= False)
+										type		= 'direct',
+										auto_delete	= True,
+										durable		= False)
 		self.channel.queue_declare(queue	= self.queue,
-				auto_delete	= True,
-				durable		= False,
-				exclusive	= False)
+								auto_delete	= True,
+								durable		= False,
+								exclusive	= False)
 
 		self.channel.queue_bind(exchange	= self.exchange,
-				queue		= self.queue,
-				routing_key	= 'dealer')
+								queue		= self.queue,
+								routing_key	= 'dealer')
 		self.channel.basic_consume(self.on_message, self.queue, no_ack=True)
 		self.channel.start_consuming()
 
 	def cmd_sit(self,args):
 		print "sit received"
 		""" User clicked Sit Down"""
-		dbConnection	= DatabaseConnection()
-		dbConnection.start_session()
-		routing_key = args['source']
-		user		= dbConnection.query(User).filter_by(id=args['user_id']).one()
-		# print user
-		user.combination = []
-		user.handcards 	= []
+		db_connection	= DatabaseConnection()
+		routing_key 		= args['source']
+		user				= db_connection.query(User).filter_by(id=args['user_id']).one()
+		user.combination	= []
+		user.handcards		= []
 
 		current_room = room_list[args["room_id"]-1]
 		if current_room["status"] == "PLAY":
 			current_room["waiting_list"].append(user)
-			# message = {"status": "waiting", "user_id": user.id,"seat": len(current_room["player_list"])+}
+			message = {"status": "success", "action": "waiting","user_id": user.id,"seat": args['seat']}
 		elif current_room["status"] == "WAIT":
 			current_room["player_list"].extend(current_room["waiting_list"])
 			current_room["player_list"].append(user)
+			message = {"status": "success", "action": "start", "user_id": user.id, "seat": args['seat']}
 		
-		
-		# if len(current_room["player_list"]) < self.number_of_players:
-		# 	message = {"status": "success", "user_id": user.id,"seat": len(self.users)}
-		# else:
-		# 	message = {"status": "failed", "user_id": user.id, "seat": -1}
-		self.channel.basic_publish(exchange = self.exchange,
-				routing_key=routing_key,
-				body=pickle.dumps(message))
+		self.channel.basic_publish(	exchange	= self.exchange,
+									routing_key	= routing_key,
+									body		= pickle.dumps(message))
 		
 	
 	def cmd_init(self,args):
 		print "init received"
-		""" RETURN THE ROOM's status """
-		
 		current_room = room_list[args["room_id"]-1]
 		if len(current_room["player_list"]) > 1:
-			current_room["status"] = "PLAY"
-			current_room["audit_list"].append(args["user_id"])
+			current_room["audit_list"].append({'user':args["user_id"], 'listen_source':args['listen_source']})
 		
 		routing_key	= args['source']
 		message		= {'status':'success', 'content':'nothing'} 
-		self.channel.basic_publish(exchange = self.exchange,
-				routing_key=routing_key,
-				body=pickle.dumps(message))
+		self.channel.basic_publish(	exchange	= self.exchange,
+									routing_key	= routing_key,
+									body		= pickle.dumps(message))
 
 	
 	def cmd_create_room(self, args):
@@ -135,13 +127,12 @@ class Dealer(object):
 			"audit_list" 	: [],
 		}
 		self.room_list.append(room)
-		room["player_list"].append(room["owner"])
+		room["player_list"].append({'user':args["user_id"], 'listen_source':args['source']})
 		message = {"status": "success","room_id": room["id"]}
 		print room["player_list"]
-		# self.channel.basic_publish(
-		# 	exchange = self.exchange,
-		# 	routing_key = routing_key,
-		# 	body = pickle.dumps(message))
+		self.channel.basic_publish(	exchange	= self.exchange,
+									routing_key	= routing_key,
+									body		= pickle.dumps(message))
 
 
 	def on_message(self, channel, method, header, body):
