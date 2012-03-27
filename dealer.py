@@ -89,9 +89,9 @@ class Dealer(object):
 		user.handcards 	= []
 		if len(self.users) < self.number_of_players:
 			self.users.append(user)
-			message = {"status": "success", "seat": len(self.users)}
+			message = {"status": "success", "user_id": user.id,"seat": len(self.users)}
 		else:
-			message = {"status": "failed", "seat": -1}
+			message = {"status": "failed", "user_id": user.id, "seat": -1}
 		self.channel.basic_publish(exchange = self.exchange,
 				routing_key=routing_key,
 				body=pickle.dumps(message))
@@ -102,10 +102,11 @@ class Dealer(object):
 	def cmd_init(self,args):
 		print "init received"
 		""" RETURN THE ROOM's status """
-		routing_key = args['source']
+		routing_key	= args['source']
+		message		= {'status':'success', 'content':'nothing'} 
 		self.channel.basic_publish(exchange = self.exchange,
 				routing_key=routing_key,
-				body="Haven't implemented")
+				body=pickle.dumps(message))
 
 
 	def on_message(self, channel, method, header, body):

@@ -98,7 +98,7 @@ class Channel(object):
 
 	def on_room_message(self, channel, method, header, body):
 		pika.log.info('PikaCient: Message receive, delivery tag #%i' % method.delivery_tag)
-		self.messages.append(body)
+		self.messages.append(pickle.loads(body))
 		for element in self.message_actions:
 			element['functor'](element['argument'])
 
@@ -205,7 +205,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 			self.channel.close();
 			return
 		self.channel.close();
-		self.write(json.dumps({'status':'success', 'message':messages}))
+		self.write(json.dumps(messages))
 		self.finish()
 		
 
@@ -238,13 +238,14 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 		self.channel.add_message_action(self.message_call_back, None)
 
 	def message_call_back(self, argument):
-		messages = self.channel.get_messages()
+		user	= self.session['user']
+		messages= self.channel.get_messages()
 		if self.request.connection.stream.closed():
 			self.channel.close()
 			return
 
 		for message in messages[:]:
-			if message['user_id'] == user.id and message['status'] == success:
+			if message['user_id'] == user.id and message['status'] == 'success':
 				self.session['messages'].append(message)
 				self.session['is_site_down']	= True
 				self.session['seat']		= message['seat']
