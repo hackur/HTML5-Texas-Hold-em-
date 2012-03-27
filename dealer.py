@@ -44,8 +44,10 @@ class Cards(object):
 
 class Dealer(object):
 	users = []
+	# waiting_list = {}
 	suit = ["DIAMOND", "HEART", "SPADE", "CLUB"]
 	face = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
+	room_list = []
 	number_of_players = 9
 	def __init__(self,queue,exchange,num_of_seats=9,blind=100,host='localhost',port=5672):
 		self.queue	= queue
@@ -87,26 +89,59 @@ class Dealer(object):
 		# print user
 		user.combination = []
 		user.handcards 	= []
-		if len(self.users) < self.number_of_players:
-			self.users.append(user)
-			message = {"status": "success", "user_id": user.id,"seat": len(self.users)}
-		else:
-			message = {"status": "failed", "user_id": user.id, "seat": -1}
+
+		current_room = room_list[args["room_id"]-1]
+		if current_room["status"] == "PLAY":
+			current_room["waiting_list"].append(user)
+			# message = {"status": "waiting", "user_id": user.id,"seat": len(current_room["player_list"])+}
+		elif current_room["status"] == "WAIT":
+			current_room["player_list"].extend(current_room["waiting_list"])
+			current_room["player_list"].append(user)
+		
+		
+		# if len(current_room["player_list"]) < self.number_of_players:
+		# 	message = {"status": "success", "user_id": user.id,"seat": len(self.users)}
+		# else:
+		# 	message = {"status": "failed", "user_id": user.id, "seat": -1}
 		self.channel.basic_publish(exchange = self.exchange,
 				routing_key=routing_key,
 				body=pickle.dumps(message))
 		
-		if len(self.users)  == 3:
-			self.game_play(self.users)
-
+	
 	def cmd_init(self,args):
 		print "init received"
 		""" RETURN THE ROOM's status """
+		
+		current_room = room_list[args["room_id"]-1]
+		if len(current_room["player_list"]) > 1:
+			current_room["status"] = "PLAY"
+			current_room["audit_list"].append(args["user_id"])
+		
 		routing_key	= args['source']
 		message		= {'status':'success', 'content':'nothing'} 
 		self.channel.basic_publish(exchange = self.exchange,
 				routing_key=routing_key,
 				body=pickle.dumps(message))
+
+	
+	def cmd_create_room(self, args):
+		print "creating room"
+		room = {
+			"id" 			: len(self.room_list) + 1,
+			"owner" 		: args["user_id"],
+			"status" 		: "WAIT",
+			"player_list" 	: [],
+			"waiting_list" 	: [],
+			"audit_list" 	: [],
+		}
+		self.room_list.append(room)
+		room["player_list"].append(room["owner"])
+		message = {"status": "success","room_id": room["id"]}
+		print room["player_list"]
+		# self.channel.basic_publish(
+		# 	exchange = self.exchange,
+		# 	routing_key = routing_key,
+		# 	body = pickle.dumps(message))
 
 
 	def on_message(self, channel, method, header, body):
@@ -116,7 +151,8 @@ class Dealer(object):
 		method = getattr(self,"cmd_" + obj['method'])
 		method(obj)
 
-	def game_play(self, users):
+	
+	def game_play(self, users, current_room):
 		# print "--------------------"+str(users)
 		game = poker_controller.PokerController(users)
 		game.getFlop()
@@ -135,6 +171,7 @@ class Dealer(object):
 		result = game.getWinner()
 		for winner in result["winners"]:
 			print winner.username
+			current_room["status"] = "WAIT"
 			# game.getOne()
 			# game.getOne()
 			# result = game.getWinner()
@@ -164,6 +201,7 @@ if __name__ == "__main__":
 
 	dealer = Dealer(queue = options.queue_id, exchange = options.exchange_id)
 	dealer.start()
+
 	# print dealer.seats
 	
 
