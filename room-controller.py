@@ -30,6 +30,7 @@ class Channel(object):
 		self.connecting		= False
 		self.connection		= None
 		self.channel		= None
+		self.host		= 'localhost'
 		self.exchange		= exchange
 		self.queue_name		= queue_name
 		self.routing_key	= routing_key
@@ -48,15 +49,15 @@ class Channel(object):
 		
 		self.connecting = True
 		credentials = pika.PlainCredentials('guest', 'guest')
-		param = pika.ConnectionParameters(host='localhost',
-				port=5672,
-				virtual_host="/",
-				credentials=credentials)
+		param = pika.ConnectionParameters(host=self.host,
+						port=5672,
+						virtual_host="/",
+						credentials=credentials)
 		self.connection = TornadoConnection(param, on_open_callback=self.on_connected)
 		self.connection.add_on_close_callback(self.on_closed)
 
 	def on_connected(self, connection):
-		pika.log.info('PikaClient: Connected to RabbitMQ on localhost:5672')
+		pika.log.info('PikaClient: Connected to RabbitMQ on %s:5672' % self.host)
 		self.connected = True
 		self.connection = connection
 		self.connection.channel(self.on_channel_open)
@@ -210,19 +211,24 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 
 class SitDownBoardHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
-	def post(self):	
+	def post(self):
 		if self.session['user'] is not None:
 			user		= self.session['user']
 			seat		= self.get_argument('seat')
-			
-			queue_name	= str(user.username)+'_sit'
-			exchange_name	= str(user.room.exchange)
-			source_key	= exchange_name + '_' + queue_name
-			message 	= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key}
-			arguments	= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
-			self.channel	= Channel(queue_name, exchange_name, source_key)
-			self.channel.add_ready_action(self.sit_call_back, arguments)
-			self.channel.connect()
+			if 'is_sit_down' in self.session and \
+				self.session['is_sit_down'] == True and \
+				self.session['seat'] == seat:
+				self.write(json.dumps({'status':'success', 'message':messages}))
+				self.finish()
+			else:
+				queue_name	= str(user.username)+'_sit'
+				exchange_name	= str(user.room.exchange)
+				source_key	= exchange_name + '_' + queue_name
+				message 	= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key}
+				arguments	= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
+				self.channel	= Channel(queue_name, exchange_name, source_key)
+				self.channel.add_ready_action(self.sit_call_back, arguments)
+				self.channel.connect()
 	
 	def sit_call_back(self, argument):
 		if self.request.connection.stream.closed():
@@ -236,9 +242,16 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 		if self.request.connection.stream.closed():
 			self.channel.close()
 			return
-		self.channel.close();
-		self.write(json.dumps({'status':'success', 'message':messages}))
+
+		for message in messages[:]:
+			if message['user_id'] == user.id and message['status'] == success:
+				self.session['messages'].append(message)
+				self.session['is_site_down']	= True
+				self.session['seat']		= message['seat']
+
+		self.write(json.dumps(messages))
 		self.finish()
+		self.channel.close();
 
 class BoardActionMessageHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
@@ -290,19 +303,19 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 	def post(self):
 		if self.session['user'] is not None:
 			user		= self.session['user']
-			# offset		= self.get_argument('offset')
+			offset		= self.get_argument('offset')
 			queue_name	= str(user.username)
 			exchange_name	= str(user.room.exchange)
 			routing_key	= exchange_name + '_' + queue_name + '_listen' 
 			self.channel	= Channel(queue_name, exchange_name, routing_key)
 			self.channel.add_message_action(self.message_call_back, None)
 			self.channel.connect()
-	# 		self.clean_matured_message(offset)
+	 		self.clean_matured_message(offset)
 
-	# def clean_matured_message(self, offset):
-	# 	for message in self.session['messages'][:]:
-	# 		if message['index'] < offset:
-	# 			self.session['messages'].remove(message)
+	def clean_matured_message(self, offset):
+		for message in self.session['messages'][:]:
+	 		if message['index'] < offset:
+	 			self.session['messages'].remove(message)
 
 	def message_call_back(self, argument):
 		messages= pickle.load(self.channel.get_messages())
@@ -327,8 +340,8 @@ if __name__ == '__main__':
 		"debug": True,
 		'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
 		"static_path": os.path.join(os.path.dirname(__file__), "static"),
-		# 'session_storage':"dir",
-		"session_storage":"mongodb:///db"
+		'session_storage':"dir",
+		#"session_storage":"mongodb:///db"
 	}
 	application = tornado.web.Application([
 		(r"/sit-down", SitDownBoardHandler),

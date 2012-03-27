@@ -561,7 +561,7 @@ class PokerController(object):
 				print text
 
 			return { "winners":winner_list, "losers":loser_list }
-
+'''
 class User:
 	def __init__(self):
 		self.combination=[]
@@ -588,3 +588,4 @@ pokerController.getOne()
 print len(pokerController.users)
 r = pokerController.getWinner()
 print len(r['winners']),len(r['losers'])
+'''

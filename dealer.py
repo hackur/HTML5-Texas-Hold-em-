@@ -44,7 +44,7 @@ class Cards(object):
 
 class Dealer(object):
 	users = []
-	def __init__(self,queue,exchange,num_of_seats=9,blind=100,host='10.0.0.109',port=5672):
+	def __init__(self,queue,exchange,num_of_seats=9,blind=100,host='localhost',port=5672):
 		self.queue	= queue
 		self.exchange	= exchange
 		self.seats = {}

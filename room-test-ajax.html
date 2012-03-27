@@ -33,6 +33,7 @@ function listenBoardMessage(){
 	$.ajax({
 		type:'post',
 		url:"./listen-board-message",
+		data:{offset:1},
 		timeout:5000,
 		success:function(data){
 			console.log("listen board message reply success")
@@ -52,7 +53,7 @@ function postBoardMessage(message){
 	$.ajax({
 		type:'post',
 		url:"./sit-down",
-		data:{seat:message},
+		data:{seat:message, offset:1},
 		success:function(data){
 			console.log(data);
 		},
