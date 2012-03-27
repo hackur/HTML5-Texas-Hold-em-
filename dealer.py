@@ -2,7 +2,7 @@ import pika
 import sys
 from optparse import OptionParser
 import random
-import PokerController
+# import PokerController
 import poker_controller
 from sqlalchemy.orm import sessionmaker,relationship, backref
 from database import DatabaseConnection,User,Room,MessageQueue
@@ -44,16 +44,20 @@ class Cards(object):
 
 class Dealer(object):
 	users = []
-	def __init__(self,queue,exchange,num_of_seats=9,blind=100,host='localhost'):
+	def __init__(self,queue,exchange,num_of_seats=9,blind=100,host='10.0.0.109',port=5672):
 		self.queue	= queue
 		self.exchange	= exchange
 		self.seats = {}
+		self.host = host
+		self.port = port
 		for x in xrange(num_of_seats):
 			self.seats[x] = Seat()
 
 
 	def start(self):
-		self.connection	= pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+		self.connection	= pika.BlockingConnection(
+			pika.ConnectionParameters(host = self.host,
+									port = self.port))
 		self.channel	= self.connection.channel()
 		self.channel.exchange_declare(exchange		= self.exchange,
 				type		= 'direct',
@@ -80,8 +84,6 @@ class Dealer(object):
 		# print user
 		user.combination = []
 		user.handcards 	= []
-		# print "-----------------------------," + str(user.combination)
-		# print "-----------------------------," + str(user.handcards)
 		self.game_play(self.users, user)
 		self.channel.basic_publish(exchange = self.exchange,
 				routing_key=routing_key,
@@ -109,10 +111,16 @@ class Dealer(object):
 		if 2 <= len(users) <= 4:
 			game = poker_controller.PokerController(users)
 			game.getFlop()
-			game.getOne()
-			game.getOne()
-			result = game.getWinner()
-			print result["winners"][0].username
+			for card in game.publicCard:
+				print str(card.symbol)+"/"+str(card.value)+" ",
+			for user in users:
+				print str(user.username) + ": ",
+				for cards in user.handcards:
+					 print str(cards.symbol)+"/"+str(cards.value)+" ",
+			# game.getOne()
+			# game.getOne()
+			# result = game.getWinner()
+			# print result["winners"][0].username
 			return
 		else:
 			return
