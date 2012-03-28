@@ -45,7 +45,11 @@ def init_database():
 	print mile
 	print mamingcao
 	print huaqin
-	
+
+class IndexHandler(tornado.web.RequestHandler):
+	@tornado.web.asynchronous
+	def get(self):
+		self.render("index.html")
 
 if __name__ == '__main__':
 	settings = {
@@ -61,6 +65,7 @@ if __name__ == '__main__':
 		(r"/enter", EnterRoomHandler),
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),
+		(r"/index.html", IndexHandler),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
 		], **settings)
 

@@ -16,6 +16,7 @@ class LoginHandler(tornado.web.RequestHandler):
 		else:
 			message		= {'status':'success'}
 			self.session['user'] = user
+		self.set_header('Access-Control-Allow-Origin', '*')
 		self.write(json.dumps(message))
 		self.finish()
 
@@ -42,5 +43,6 @@ class GuestLoginHandler(tornado.web.RequestHandler):
 		else:
 			message		= {'status':'success', 'username':user.username, 'password':user.password}
 			self.session['user'] = user
+		self.set_header('Access-Control-Allow-Origin', '*')
 		self.write(json.dumps(message))
 		self.finish()
