@@ -7,25 +7,53 @@
         <!--<meta name="viewport" content="width=device-width,maximum-scale=0.5, initial-scale=0.5, user-scalable=no" /> -->
         <meta name="viewport" content="width=device-width, maximum-scale=0.5, initial-scale=0.5, user-scalable=no" /> 
 
-        <LINK href="style.css" rel="stylesheet" type="text/css">
-        <LINK href="login.css" rel="stylesheet" type="text/css">
+        <LINK href="./static/style.css" rel="stylesheet" type="text/css">
+        <LINK href="./static/login.css" rel="stylesheet" type="text/css">
 
-<script src ="./static/jquery.min.js"></script>
+		<script src ="./static/jquery.min.js"></script>
+		<script>
+			$(document).ready(function() {
+				$('#llogin').click(function() {
+					$.ajax({
+						type:'post',
+						url:"10.0.0.130:8888/login",
+						data:{seat:message, offset:1},
+						success:function(data){
+							console.log(data);
+						},
+						dataTye:'json',
+					});
+				});
+			});
+		</script>
 </head>
 <body>
 	<div>
 		<div id="login-view" class="view"> </div>
 			<div id="lbg" class="background"> </div>
-			<div id="laccount"> </div>
-			<div id="lpw"> </div>
-			<div id="linput1"> <input type="text" id="account" name="l_account" style="width:215px; height:50px" /> </div>
-			<div id="linput2"> </div>
-			<div id="lcheck"> </div>
-			<div id="lisauto"> </div>
-			<div id="lforgetpw"> </div>
-			<div id="llogin"> </div>
-			<div id="lcancel"> </div>
-			<div id="lvisitor"> </div>
+			<form method="post" action="#" >
+
+				<!-- <div id="laccount"> </div> 
+				<div id="lpw"> </div>
+				<div id="lcheck"> </div>
+				<div id="lisauto"> </div>
+				<div id="lforgetpw"> </div>
+				<div id="llogin"> </div>
+				<div id="lcancel"> </div>
+				<div id="lvisitor"> </div> -->
+				<fieldset>
+					<label for="account" id="laccount"> </label>
+						<input type="text" class="linput" id="account" style="top:150px;left:670px"/>
+					<label for="password" id="lpw"> </label>
+						<input type="password" class="linput" id="password" style="top:210px;left:670px"/>
+				</fieldset>
+				<fieldset>
+					<button type="submit" id="llogin"> </button>
+					<button type="reset" id="lcancel"> </button>
+				</fieldset>
+					
+						
+			</form>
 		</div>
 		<div id="user-center-view">
 		</div>
