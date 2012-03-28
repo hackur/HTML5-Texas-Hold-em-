@@ -60,7 +60,7 @@ if __name__ == '__main__':
 		(r"/listen-board-message", BoardListenMessageHandler),
 		(r"/enter", EnterRoomHandler),
 		(r"/guest-login", GuestLoginHandler),
-		(r"/logn", LoginHandler),
+		(r"/login", LoginHandler),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
 		], **settings)
 
