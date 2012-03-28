@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Main Room</title>
+        <link rel="stylesheet" type="text/css" href="room.css"/>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/jquery-ui-1.8.18.custom.min.js"></script>
+    </head>
+    <body>
+        <div id="setting">
+            <span >Setting</span>
+            <div class="barcontainer">
+                <div>Message here</div>
+                <div class="selection">
+                    <div class="bar"></div>
+                    <span class="button" id="bar1"></span>
+                </div>
+                <div class="bet1"><span>20</span><span>/</span><span>10</span></div>
+                <div class="bet2"><span>2</span><span>/</span><span>1</span></div>
+            </div>
+            <div class="barcontainer">
+                <div>Message here</div>
+                <div class="selection">
+                    <div class="bar"></div>
+                    <span class="button" id="bar1"></span>
+                </div>
+                <div class="bet1"><span>20</span><span>/</span><span>10</span></div>
+                <div class="bet2"><span>2</span><span>/</span><span>1</span></div>
+            </div>
+            <div class="confirm"></div>
+        </div>
+        <div id="container">
+            <div id="header">
+                <div id="backTo"></div>
+                <div id="createroom"></div>
+                <div id="refresh"></div>
+            </div>
+            <div id="grid">
+                <ul>
+                    <!--data template-->
+                    <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+
+                    </li>
+                    <!--template end-->
+                    <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+                    </li>
+                    <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+                    </li>
+                    <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+                    </li>
+                    <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+                    </li>
+                    <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+                    </li>
+                    <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+                    </li>
+                    <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+                    </li>
+
+                     
+
+                </ul>
+            </div>
+            <div id="room">
+                <ul>
+                    <li class="normalroom">
+                        <img class="roomhover" src="img/lefthover.png"/>
+                        <img src="img/normalroom.png"/>
+                    </li>  
+                    <li class="advancedroom">
+                        <img class="roomhover" src="img/middlehover.png"/>
+                        <img src="img/advancedroom.png"/>
+                    </li>  
+                    <li class="responseroom">
+                        <img class="roomhover" src="img/middlehover.png"/>
+                        <img src="img/responseroom.png"/>
+                    </li>  
+                    <li class="competitionroom">
+                        <img class="roomhover" src="img/middlehover.png"/>
+                        <img src="img/competitionroom.png"/>
+                    </li>  
+                    <li class="familybattleroom">
+                        <img class="roomhover" src="img/righthover.png"/>
+                        <img src="img/familybattleroom.png"/>
+                    </li>  
+                </ul>
+            </div>
+            
+        </div>
+        <script>
+            var num=document.querySelector(".bet1").children[2];
+            $("#bar1").draggable({ 
+                axis: 'x',
+                drag:function(e,ui){
+                    //console.log(e,ui)
+                    if(ui.offset.left>337){
+                        return false;
+                       
+                    }
+                    else if(ui.offset.left<40){
+                        
+                        return false;
+                    }
+                    else{
+                        //change the number you want
+                        num.innerText=parseInt(ui.offset.left);
+
+                    }
+                }
+            });
+
+        </script>
+        <script type="text/javascriptt">
+            var bar=document.querySelector("#bar1"),
+                isdown=false,
+                selection=document.querySelector(".selection"),
+                originalOffsetX=0
+
+            /*bar.addEventListener("mousedown",function(e){
+                console.log("mousedown");
+                isdown=true;
+                originalOffsetX=e.offsetX;
+            },false);*/
+            selection.addEventListener("mousedown",function(e){
+
+                isdown=true;
+                originalOffsetX=e.offsetX;
+            },false);
+            selection.addEventListener("mousemove",function(e){
+                if(isdown && e.target.className=="selection"){
+                    console.log(e.offsetX,originalOffsetX,bar.style.left)
+                    bar.style.left=e.offsetX+"px";    
+                }
+                
+            },false);
+            /*bar.addEventListener("mousemove",function(e){
+                if(isdown){
+                    console.log("movusemove");
+                    //delta=parseInt(this.style.left)-originalOffsetX;
+                    //o=parseInt(this.style.left);
+                    o=parseInt(window.getComputedStyle(this,null).left)
+                    this.style.left=e.offsetX-originalOffsetX+o+"px"
+                    console.log(e.offsetX,originalOffsetX,o)
+                    originalOffsetX=e.offsetX;
+                }
+                
+            },false);*/
+
+            bar.addEventListener("mouseup",function(){
+                console.log("mouseup");
+                isdown=false;
+            },false);
+        </script>
+    </body>
+</html>
