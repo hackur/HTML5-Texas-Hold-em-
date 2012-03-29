@@ -1,0 +1,129 @@
+body{
+	padding:0;
+	margin:0;
+	background:grey;
+}
+
+#container{
+    height:640px;
+    width:960px;
+    margin:20px auto;
+    background:url(img/gamebg.png);
+    //opacity:0.3;
+    position:relative;
+}
+
+#container .gametable{
+	position: relative;
+	background:url(img/table1.png);
+	height:445px;
+	width:939px;
+	margin:0 auto;
+	top:50px;
+}
+.gametable .backTo{
+	
+}
+#container .sits{
+	background:url(img/avatarframe.png);
+	width:135px;
+	height:149px;
+	position: absolute;
+	color:white;
+}
+#container .sits .avatar{
+
+}
+#container .sits .money{
+	position: relative;
+	text-align: center;
+	top: 86px;
+}
+.sits.user{
+	bottom:-18px;
+	left:403px;
+}
+.sits.player1{
+	right: 10px;
+	top: 40px;
+}
+.player1 .tablemoney{
+
+	position: absolute;
+	top: 112px;
+	left: -70px;
+}
+.player1 .chipcontainer{
+	position: absolute;
+	left: -40px;
+	bottom: -3px;
+}
+.chipcontainer img{
+	-webkit-transition:-webkit-transform 0.7s ease;
+}
+.player1 .chipcontainer:hover img{
+	-webkit-transform:scale(1.15);
+}
+.sits.player2{
+	right:10px;
+	bottom:40px;
+}
+.sits.player3{
+	left:10px;
+	bottom:40px;
+}
+.sits.player4{
+	left:10px;
+	top:40px;
+}
+.sits.player5{
+	top:-39px;
+	left:225px;
+}
+.sits.player6{
+	top:-39px;
+	right:225px;
+}
+.sits.player7{
+	bottom:-18px;
+	left:225px;
+}
+.sits.player8{
+	bottom:-18px;
+	right:225px;
+}
+/*
+* display different amount players
+  simply set sits class into groups
+  e.g
+  set 5players class display:block;
+  others display:none;
+
+  player position:;
+  4 5      6 1
+  3 7 user 8 2
+
+*/
+
+
+.footer {
+	position: relative;
+	bottom: -100px;
+}
+
+.footer .rightpart div{
+	background:url(img/gamebtnbg.png);
+	float: right;
+	width: 185px;
+	height: 67px;
+	text-align:center;
+	display:inline-block;
+	line-height:62px;
+	color:white;
+	font-size:23px;
+	font-weight:bold;
+	-webkit-transition:-webkit-transform 0.4s ease-out;
+}
+.footer .rightpart div:hover{
+	-webkit-transform:scale(1.05);
+}
