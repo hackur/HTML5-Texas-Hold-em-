@@ -2,9 +2,11 @@
 <html>
     <head>
         <title>Main Room</title>
-        <link rel="stylesheet" type="text/css" href="room.css"/>
+        <link rel="stylesheet" type="text/css" href="css/room.css"/>
+	<link rel="stylesheet" type="text/css" href="css/lionbars.css"/>
         <script src="js/jquery.min.js"></script>
         <script src="js/jquery-ui-1.8.18.custom.min.js"></script>
+	<script src="js/jquery.lionbars.0.3.js"></script>
     </head>
     <body>
         <div id="setting">
@@ -88,6 +90,36 @@
                         <span class="info2">10K</span>
                         <span class="numplaying">34</span>
                     </li>
+<li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+                    </li>
+		   <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+                    </li>
+ <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+                    </li>
+ <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+                    </li>
+ <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">asdf</span>
+                    </li>
 
                      
 
@@ -140,7 +172,15 @@
                     }
                 }
             });
-
+	    
+	    //init the bar,remains ugly
+	    //todo:
+	    /*
+  		set each li with a blue background 
+  	    */
+	    $("#grid").lionbars();
+	    $(".lb-h-scrollbar").remove();
+	    
         </script>
         <script type="text/javascriptt">
             var bar=document.querySelector("#bar1"),
