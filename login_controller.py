@@ -1,4 +1,5 @@
 import time
+import json
 import tornado.ioloop
 import tornado.httpserver
 import tornado.web
@@ -24,12 +25,10 @@ class GuestLoginHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	def post(self):
 		db_connection	= DatabaseConnection()
-		if self.get_argument('username') is None:
+		if self.get_argument('username', default=None) is None:
 			username		= str(time.time()) + '_username'
 			password		= str(time.time()) + '_password'
-			user			= User
-			user.username	= username
-			user.password	= password
+			user			= User(username = username, password= password)
 			db_connection.start_session()
 			db_connection.addItem(user)
 			db_connection.commit_session()
