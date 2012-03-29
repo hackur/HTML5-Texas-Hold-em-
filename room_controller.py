@@ -140,41 +140,32 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):	
 		db_connection	= DatabaseConnection()
-		db_connection.start_session()
 		message			= None
-		user			= db_connection.query(User).filter_by(id = self.session['user'].id).one()
+		user			= self.session['user']
 		room_id 		= self.get_argument('room_id')
 		room			= db_connection.query(Room).filter_by(id = room_id).one()
-		message_queue	= db_connection.query(MessageQueue).filter_by(room = room).filter_by(user = None).first()
-		print message_queue	
-		if message_queue is not None:
-			user.queue	= message_queue
-			user.room	= room
-			user.room_id= room.id
-			db_connection.addItem(user)
-			db_connection.commit_session()
-			queue		= str(user.username) + '_init'
-			exchange	= str(user.room.exchange)
-			routing_key	= exchange + '_' + queue
-			message 	= {	'method'	: 'init',
-							'user_id'	: user.id,
-							'source'	: routing_key,
-							'room_id'	: user.room.id,
-							'listen_source': exchange + '_' + queue + '_listen'}
-			
-			arguments	= {'routing_key': 'dealer', 'message': pickle.dumps(message)}
-			
-			self.channel= Channel(queue, exchange, routing_key)
-			self.channel.add_ready_action(self.initial_call_back, arguments);
-			self.channel.connect()
-			
-			self.session['user'] 		= user
-			self.session['messages']	= list()
-		else:
-			db_connection.rollback()
-			message = json.dumps({'status':'failed'})
-			self.write(message)
-			self.finish()
+		
+		user.room	= room
+		user.room_id= room.id
+		db_connection.addItem(user)
+		db_connection.commit_session()
+		queue		= str(user.username) + '_init'
+		exchange	= str(user.room.exchange)
+		routing_key	= exchange + '_' + queue
+		message 	= {	'method'	: 'init',
+						'user_id'	: user.id,
+						'source'	: routing_key,
+						'room_id'	: user.room.id,
+						'listen_source': exchange + '_' + queue + '_listen'}
+		
+		arguments	= {'routing_key': 'dealer', 'message': pickle.dumps(message)}
+		
+		self.channel= Channel(queue, exchange, routing_key)
+		self.channel.add_ready_action(self.initial_call_back, arguments);
+		self.channel.connect()
+		
+		self.session['user'] 		= user
+		self.session['messages']	= list()
 
 	def get(self):
 		self.render("room-test-ajax.html")
@@ -200,23 +191,23 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		if self.session['user'] is not None:
-			user		= self.session['user']
-			seat		= self.get_argument('seat')
-			if 'is_sit_down' in self.session and \
-				self.session['is_sit_down'] == True and \
-				self.session['seat'] == seat:
-				self.write(json.dumps({'status':'success', 'message':messages}))
-				self.finish()
-			else:
-				queue_name	= str(user.username)+'_sit'
-				exchange_name	= str(user.room.exchange)
-				source_key	= exchange_name + '_' + queue_name
-				message 	= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key}
-				arguments	= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
-				self.channel	= Channel(queue_name, exchange_name, source_key)
-				self.channel.add_ready_action(self.sit_call_back, arguments)
-				self.channel.connect()
+		message		= None
+		user		= self.session['user']
+		seat		= self.get_argument('seat')
+		if 'is_sit_down' in self.session and \
+			self.session['is_sit_down'] == True and \
+			self.session['seat'] == seat:
+			self.write(json.dumps({'status':'success', 'message':messages}))
+			self.finish()
+		else:
+			queue_name		= str(user.username)+'_sit'
+			exchange_name	= str(user.room.exchange)
+			source_key		= exchange_name + '_' + queue_name
+			message 		= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key, 'room_id':user.room.id}
+			arguments		= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
+			self.channel	= Channel(queue_name, exchange_name, source_key)
+			self.channel.add_ready_action(self.sit_call_back, arguments)
+			self.channel.connect()
 	
 	def sit_call_back(self, argument):
 		if self.request.connection.stream.closed():

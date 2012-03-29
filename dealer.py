@@ -48,6 +48,7 @@ class Dealer(object):
 	face = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
 #	room_list = []
 	number_of_players = 9
+
 	def __init__(self,queue,exchange,num_of_seats=9,blind=100,host='localhost',port=5672):
 		self.queue		= queue
 		self.exchange	= exchange
@@ -59,10 +60,45 @@ class Dealer(object):
 		for x in xrange(num_of_seats):
 			self.seats[x] = Seat()
 
-
+	
+	def init_database(self):
+		self.db_connection	= DatabaseConnection()
+		self.db_connection.init("sqlite:///:memory:")
+		self.db_connection.connect()
+		self.db_connection.start_session()
+		room		= Room(exchange="dealer_exchange_1")
+		queue1		= MessageQueue(queue_name="queue_1",room = room)
+		queue2		= MessageQueue(queue_name="queue_2",room = room)
+		queue3		= MessageQueue(queue_name="queue_3",room = room)
+		queue4		= MessageQueue(queue_name="queue_4",room = room)
+		queue5		= MessageQueue(queue_name="queue_5",room = room)
+		queue6		= MessageQueue(queue_name="queue_6",room = room)
+		queue7		= MessageQueue(queue_name="queue_7",room = room)
+		queue8		= MessageQueue(queue_name="queue_8",room = room)
+		queue9		= MessageQueue(queue_name="queue_9",room = room)
+		ting		= User(username="ting", password="123")
+		mile		= User(username="mile", password="123")
+		mamingcao	= User(username="mamingcao", password="123")
+		huaqin		= User(username="huaqin", password="123")
+		self.db_connection.addItem(ting)
+		self.db_connection.addItem(mile)
+		self.db_connection.addItem(huaqin)
+		self.db_connection.addItem(mamingcao)
+		self.db_connection.addItem(room)
+		self.db_connection.addItem(queue1)
+		self.db_connection.addItem(queue2)
+		self.db_connection.addItem(queue3)
+		self.db_connection.addItem(queue4)
+		self.db_connection.addItem(queue5)
+		self.db_connection.addItem(queue6)
+		self.db_connection.addItem(queue7)
+		ting.friends = [mile, mamingcao]
+		mile.friends = [ting]
+		self.db_connection.commit_session()
+	
 	def start(self):
 		self.connection	= pika.BlockingConnection(
-			pika.ConnectionParameters(host = self.host,
+		pika.ConnectionParameters(host = self.host,
 									port = self.port))
 		self.channel	= self.connection.channel()
 		self.channel.exchange_declare(exchange		= self.exchange,
@@ -83,13 +119,15 @@ class Dealer(object):
 	def cmd_sit(self,args):
 		print "sit received"
 		""" User clicked Sit Down"""
-		db_connection	= DatabaseConnection()
+		#db_connection	= DatabaseConnection()
+		self.db_connection.start_session()
 		routing_key 		= args['source']
-		user				= db_connection.query(User).filter_by(id=args['user_id']).one()
+		print args
+		user				= self.db_connection.query(User).filter_by(id=args['user_id']).first()
 		user.combination	= []
 		user.handcards		= []
 
-		current_room = room_list[args["room_id"]]
+		current_room = self.room_list[args["room_id"]]
 		if current_room["status"] == "PLAY":
 			current_room["waiting_list"].append(user)
 			message = {"status": "success", "action": "waiting","user_id": user.id,"seat": args['seat']}
@@ -194,6 +232,7 @@ if __name__ == "__main__":
 	print "queue :" + options.exchange_id
 
 	dealer = Dealer(queue = options.queue_id, exchange = options.exchange_id)
+	dealer.init_database()
 	dealer.start()
 
 	# print dealer.seats

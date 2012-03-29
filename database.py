@@ -106,4 +106,6 @@ class DatabaseConnection(object):
 		self.session.add(item)
 	def rollback(self):
 		self.session.rollback()
+	def merge(self, object):
+		self.session.merge(object)
 
