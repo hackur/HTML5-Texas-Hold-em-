@@ -3,18 +3,41 @@
 <script src="./static/jquery.min.js"></script>
 </head>
 <body>
-<input name="username" type="text"/>
-<button id="enter-btn">enter</button>
-<input name="message" type="text"/>
-<button id="message-btn">post</button>
+<div>
+<label>username:</label><input name="username" type="text"/><br />
+<label>password:</label><input name="password" type="text"/><br />
+<button id="login">login</button>
+</div>
+
+<div>
+<label>room no:</label><input name="room_id" type="text"/><br />
+<button id="enter">enter</button>
+</div>
+<div>
+<label>sit no:</label><input name="sit_no" type="text"/><br />
+<button id="sit_down">sit down</button>
+</div>
 </body>
 <script>
 $(document).ready(function(){
-	$('#enter-btn').click(function(){
+	$('#login').click(function(){
 		var username = $('input[name="username"]').val();
+		var password = $('input[name="password"]').val();
+		$.post(
+			"./login",
+			{username:username, password:password},
+			function(data){
+				console.log(data);
+			},
+			'json'
+		);
+	});
+
+	$('#enter').click(function(){
+		var room = $('input[name="room_id"]').val();
 		$.post(
 			"./enter",
-			{room_id:1, username:username},
+			{room_id:room},
 			function(data){
 				console.log(data);
 				if(data.status=='success'){
@@ -24,9 +47,18 @@ $(document).ready(function(){
 			'json'
 		);
 	});
-	$('#message-btn').click(function(){
-		var message = $('input[name="message"]').val();
-		postBoardMessage(message);
+	$('#sit_down').click(function(){
+		var seat = $('input[name="sit_no"]').val();
+//		postBoardMessage(message);
+		$.ajax({
+			type:'post',
+			url:"./sit-down",
+			data:{seat:seat, offset:1},
+			success:function(data){
+				console.log(data);
+			},
+			dataTye:'json',
+		});
 	});
 });
 function listenBoardMessage(){
@@ -50,15 +82,6 @@ function listenBoardMessage(){
 }
 
 function postBoardMessage(message){
-	$.ajax({
-		type:'post',
-		url:"./sit-down",
-		data:{seat:message, offset:1},
-		success:function(data){
-			console.log(data);
-		},
-		dataTye:'json',
-	});
 }
 </script>
 </html>

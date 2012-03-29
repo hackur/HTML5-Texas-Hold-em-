@@ -54,7 +54,7 @@ class Dealer(object):
 		self.seats		= {}
 		self.host		= host
 		self.port		= port
-		self.room_list	= []
+		self.room_list	= {}
 		self.users		= []
 		for x in xrange(num_of_seats):
 			self.seats[x] = Seat()
@@ -89,7 +89,7 @@ class Dealer(object):
 		user.combination	= []
 		user.handcards		= []
 
-		current_room = room_list[args["room_id"]-1]
+		current_room = room_list[args["room_id"]]
 		if current_room["status"] == "PLAY":
 			current_room["waiting_list"].append(user)
 			message = {"status": "success", "action": "waiting","user_id": user.id,"seat": args['seat']}
@@ -105,33 +105,36 @@ class Dealer(object):
 	
 	def cmd_init(self,args):
 		print "init received"
-		current_room = room_list[args["room_id"]-1]
-		if len(current_room["player_list"]) > 1:
-			current_room["audit_list"].append({'user':args["user_id"], 'listen_source':args['listen_source']})
+		if args['room_id'] not in self.room_list:
+			self.cmd_create_room(args)
+		else:
+			current_room = self.room_list[args["room_id"]]
+			if len(current_room["player_list"]) > 1:
+				current_room["audit_list"].append({'user':args["user_id"], 'listen_source':args['listen_source']})
 		
-		routing_key	= args['source']
-		message		= {'status':'success', 'content':'nothing'} 
-		self.channel.basic_publish(	exchange	= self.exchange,
-									routing_key	= routing_key,
-									body		= pickle.dumps(message))
+			routing_key	= args['source']
+			message		= {'status':'success', 'content':'nothing'} 
+			self.channel.basic_publish(	exchange	= self.exchange,
+										routing_key	= routing_key,
+										body		= pickle.dumps(message))
 
 	
 	def cmd_create_room(self, args):
 		print "creating room"
 		room = {
-			"id" 			: len(self.room_list) + 1,
+			"id" 			: args['room_id'],
 			"owner" 		: args["user_id"],
 			"status" 		: "WAIT",
 			"player_list" 	: [],
 			"waiting_list" 	: [],
 			"audit_list" 	: [],
 		}
-		self.room_list.append(room)
+		self.room_list[args['room_id']] = room
 		room["player_list"].append({'user':args["user_id"], 'listen_source':args['source']})
 		message = {"status": "success","room_id": room["id"]}
-		print room["player_list"]
+#		print room["player_list"]
 		self.channel.basic_publish(	exchange	= self.exchange,
-									routing_key	= routing_key,
+									routing_key	= args['source'],
 									body		= pickle.dumps(message))
 
 

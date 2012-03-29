@@ -139,26 +139,27 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):	
-		message			= None
-		user			= self.session['user']
-		room_id 		= self.get_argument('room_id')
 		db_connection	= DatabaseConnection()
 		db_connection.start_session()
+		message			= None
+		user			= db_connection.query(User).filter_by(id = self.session['user'].id).one()
+		room_id 		= self.get_argument('room_id')
 		room			= db_connection.query(Room).filter_by(id = room_id).one()
 		message_queue	= db_connection.query(MessageQueue).filter_by(room = room).filter_by(user = None).first()
-	
+		print message_queue	
 		if message_queue is not None:
 			user.queue	= message_queue
 			user.room	= room
 			user.room_id= room.id
 			db_connection.addItem(user)
 			db_connection.commit_session()
-			queue		= str(username) + '_init'
+			queue		= str(user.username) + '_init'
 			exchange	= str(user.room.exchange)
 			routing_key	= exchange + '_' + queue
 			message 	= {	'method'	: 'init',
 							'user_id'	: user.id,
 							'source'	: routing_key,
+							'room_id'	: user.room.id,
 							'listen_source': exchange + '_' + queue + '_listen'}
 			
 			arguments	= {'routing_key': 'dealer', 'message': pickle.dumps(message)}
