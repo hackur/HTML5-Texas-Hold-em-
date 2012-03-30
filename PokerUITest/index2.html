@@ -3,6 +3,7 @@
 	<head>
 		<title></title>
 	<link rel="stylesheet" type="text/css" href="css/game.css"/>
+	<script src="/js/jquery.min.js"></script>
 	</head>
 	<body>
 		<div id="container">
@@ -13,7 +14,9 @@
 					<div class="money">1000</div>
 					<div class="tablemoney">567</div>
 					<div class="chipcontainer">
-						<img src="img/chip4small.png"/>
+						<img class="original" src="img/chip4small.png"/>
+						<img class="original" src="img/chip2small.png"/>
+						<img class="original" src="img/chip3small.png"/>
 					</div>
 				</div>
 				<div class="sits player2 5players">
@@ -48,7 +51,20 @@
 					<div class="avatar">img here</div>
 					<div class="money">1000</div>
 				</div>
-
+				<div class="middleContainer">
+					<div class="moneyinfo">
+						<div>chips place here</div>
+						<div>35K</div>
+					</div>
+					<div class="poker">
+						<img class="hiddenpoker hiddenpoker0" src="/img/pokers/spade/A.png"/>
+						<img class="hiddenpoker hiddenpoker1" src="/img/pokers/spade/K.png"/>
+						<img class="hiddenpoker hiddenpoker2" src="/img/pokers/spade/J.png"/>
+						<img class="hiddenpoker hiddenpoker3" src="/img/pokers/heart/2.png"/>
+						<img class="hiddenpoker hiddenpoker4" src="/img/pokers/heart/5.png"/>
+					</div>
+					<div class="message">Message here</div>
+				</div>
 			</div>
 			<div class="footer">
 				<div class="leftpart"></div>
@@ -59,5 +75,49 @@
 				</div>
 			</div>
 		</div>
+		<script>
+			
+			var Animation=(function(document,$){
+				var document=document,
+					$=$,
+					chipsOnTable=[];
+
+
+				var
+				sendchip=function(elem){
+					$(elem).removeClass('original');
+					var len=$(elem).length;
+					while(len--){
+						$($(elem).get(len)).addClass('show'+len)
+					}
+
+				}
+				,sendpoker=function(elem){
+					$(elem).removeClass('hiddenpoker');
+					var len=$(elem).length;
+					while(len--){
+						$($(elem).get(len)).addClass('show'+len)
+					}
+				}
+				,sendchiptomiddle=function(){
+
+				}
+
+
+				return {
+					sendchip:sendchip,
+					sendpoker:sendpoker
+				}
+			})(document,$,undefined);
+
+
+			setTimeout(function(){Animation.sendchip(
+				$(".chipcontainer img")
+			);},2000);
+			setTimeout(function(){
+				Animation.sendpoker($(".middleContainer img"))
+			},5000);
+			
+		</script>
 	</body>
 </html>

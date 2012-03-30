@@ -24,7 +24,7 @@
                 <div>Message here</div>
                 <div class="selection">
                     <div class="bar"></div>
-                    <span class="button" id="bar1"></span>
+                    <span class="button" id="bar2"></span>
                 </div>
                 <div class="bet1"><span>20</span><span>/</span><span>10</span></div>
                 <div class="bet2"><span>2</span><span>/</span><span>1</span></div>
@@ -90,31 +90,31 @@
                         <span class="info2">10K</span>
                         <span class="numplaying">34</span>
                     </li>
-<li class="roomitem">
+                    <li class="roomitem">
                         <span class="roomid">12</span>
                         <span class="info1">300</span>
                         <span class="info2">10K</span>
                         <span class="numplaying">34</span>
                     </li>
-		   <li class="roomitem">
+		            <li class="roomitem">
                         <span class="roomid">12</span>
                         <span class="info1">300</span>
                         <span class="info2">10K</span>
                         <span class="numplaying">34</span>
                     </li>
- <li class="roomitem">
+                    <li class="roomitem">
                         <span class="roomid">12</span>
                         <span class="info1">300</span>
                         <span class="info2">10K</span>
                         <span class="numplaying">34</span>
                     </li>
- <li class="roomitem">
+                    <li class="roomitem">
                         <span class="roomid">12</span>
                         <span class="info1">300</span>
                         <span class="info2">10K</span>
                         <span class="numplaying">34</span>
                     </li>
- <li class="roomitem">
+                     <li class="roomitem">
                         <span class="roomid">12</span>
                         <span class="info1">300</span>
                         <span class="info2">10K</span>
@@ -152,6 +152,7 @@
             
         </div>
         <script>
+            //use jquery UI to enable draggble
             var num=document.querySelector(".bet1").children[2];
             $("#bar1").draggable({ 
                 axis: 'x',
@@ -161,7 +162,7 @@
                         return false;
                        
                     }
-                    else if(ui.offset.left<40){
+                    else if(ui.offset.left<38){
                         
                         return false;
                     }
@@ -172,7 +173,35 @@
                     }
                 }
             });
-	    
+	       //self-implement of button draggble
+            var bar2=document.querySelector("#bar2"),
+                barcontainer=document.querySelectorAll(".barcontainer")[1],
+                ison=false,
+                current;
+
+            bar2.style.left=window.getComputedStyle(bar2,null).left;
+           
+            $(barcontainer).on("mousedown",function(e){
+                if(e.target.id=='bar2'){//just hard code test
+                    ison=true;
+                    current=e.offsetX;
+                    console.log("inner")
+                }
+                console.log("outter")
+            });
+            $(barcontainer).on("mousemove",function(e){
+                if(ison){
+
+                    var _x=e.offsetX+parseInt(bar2.style.left);
+                    bar2.style.left=_x-current+"px"
+                }
+            });
+            $(barcontainer).on("mouseup",function(e){
+                ison=false;
+            })
+
+
+
 	    //init the bar,remains ugly
 	    //todo:
 	    /*
@@ -182,46 +211,6 @@
 	    $(".lb-h-scrollbar").remove();
 	    
         </script>
-        <script type="text/javascriptt">
-            var bar=document.querySelector("#bar1"),
-                isdown=false,
-                selection=document.querySelector(".selection"),
-                originalOffsetX=0
-
-            /*bar.addEventListener("mousedown",function(e){
-                console.log("mousedown");
-                isdown=true;
-                originalOffsetX=e.offsetX;
-            },false);*/
-            selection.addEventListener("mousedown",function(e){
-
-                isdown=true;
-                originalOffsetX=e.offsetX;
-            },false);
-            selection.addEventListener("mousemove",function(e){
-                if(isdown && e.target.className=="selection"){
-                    console.log(e.offsetX,originalOffsetX,bar.style.left)
-                    bar.style.left=e.offsetX+"px";    
-                }
-                
-            },false);
-            /*bar.addEventListener("mousemove",function(e){
-                if(isdown){
-                    console.log("movusemove");
-                    //delta=parseInt(this.style.left)-originalOffsetX;
-                    //o=parseInt(this.style.left);
-                    o=parseInt(window.getComputedStyle(this,null).left)
-                    this.style.left=e.offsetX-originalOffsetX+o+"px"
-                    console.log(e.offsetX,originalOffsetX,o)
-                    originalOffsetX=e.offsetX;
-                }
-                
-            },false);*/
-
-            bar.addEventListener("mouseup",function(){
-                console.log("mouseup");
-                isdown=false;
-            },false);
-        </script>
+       
     </body>
 </html>

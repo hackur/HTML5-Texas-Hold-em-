@@ -24,6 +24,12 @@ body{
 .gametable .backTo{
 	
 }
+
+.gametable .middleContainer{
+	position: relative;
+	left: 253px;
+	top: 113px;
+}
 #container .sits{
 	background:url(/img/avatarframe.png);
 	width:135px;
@@ -47,23 +53,19 @@ body{
 	right: 10px;
 	top: 40px;
 }
-.player1 .tablemoney{
-
-	position: absolute;
-	top: 112px;
-	left: -70px;
-}
-.player1 .chipcontainer{
-	position: absolute;
-	left: -40px;
-	bottom: -3px;
-}
 .chipcontainer img{
-	-webkit-transition:-webkit-transform 0.7s ease;
+	-webkit-transition:-webkit-transform 0.7s ease,
+						left 0.4s ease,
+						top 0.4s ease,
+						opacity 0.4s ease;
+	position: absolute;
 }
-.player1 .chipcontainer:hover img{
+.chipcontainer img:hover{
 	-webkit-transform:scale(1.15);
 }
+
+
+
 .sits.player2{
 	right:10px;
 	bottom:40px;
@@ -92,6 +94,111 @@ body{
 	bottom:-18px;
 	right:225px;
 }
+
+
+/*
+table position config
+.tablemoney is the money text
+.chipcontainer is where chip's in
+*/
+.player1 .tablemoney{
+	position: absolute;
+	top: 112px;
+	left: -70px;
+}
+.player1 .chipcontainer{
+	position: relative;
+	left: -40px;
+	bottom: -3px;
+	height:50px;
+	width:50px;
+}
+.player1 .chipcontainer .original{
+	left: 59px;
+	top: 40px;
+	opacity:0;
+	
+}
+.player1 .chipcontainer img.show0{
+	left:1px;
+	top:1px;
+	opacity:1;
+}
+.player1 .chipcontainer img.show1{
+	left:1px;
+	top:15px;
+	opacity:1;
+}
+.player1 .chipcontainer img.show2{
+	left:1px;
+	top:30px;
+	opacity:1;
+}
+
+
+/*
+table poker config
+
+*/
+.middleContainer,.poker{
+	position: relative;
+}
+.middleContainer img{
+	position: relative;
+}
+.middleContainer .hiddenpoker{
+	opacity:0;
+	top:-90px;
+}
+.middleContainer .hiddenpoker0{
+	left: 176px;
+}
+.middleContainer .hiddenpoker1{
+	left: 90px;
+}
+.middleContainer .hiddenpoker2{
+	
+}
+.middleContainer .hiddenpoker3{
+	left: -90px;
+}
+.middleContainer .hiddenpoker4{
+	left: -176px;
+}
+
+.middleContainer img{
+	-webkit-transition:left 0.4s ease,
+					top 0.4s ease,
+					opacity 0.4s ease;
+}
+.middleContainer img.show0{
+	opacity:1;
+	left:1px;
+	top:15px;
+}
+.middleContainer img.show1{
+	opacity:1;
+	left:1px;
+	top:15px;
+}
+.middleContainer img.show2{
+	opacity:1;
+	left:1px;
+	top:15px;
+}
+.middleContainer img.show3{
+	opacity:1;
+	left:1px;
+	top:15px;
+}
+.middleContainer img.show4{
+	opacity:1;
+	left:1px;
+	top:15px;
+}
+
+
+
 /*
 * display different amount players
   simply set sits class into groups
@@ -123,6 +230,7 @@ body{
 	font-size:23px;
 	font-weight:bold;
 	-webkit-transition:-webkit-transform 0.4s ease-out;
+	cursor:pointer;
 }
 .footer .rightpart div:hover{
 	-webkit-transform:scale(1.05);

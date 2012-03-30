@@ -168,6 +168,7 @@ body{
 }
 #setting .barcontainer{
     clear:both;
+    position: relative;
 }
 #setting >span{
     display: block;
@@ -197,6 +198,11 @@ body{
     width:61px;
     position: absolute;
     left:40px;
+    -webkit-transition:-webkit-transform 0.3s ease-out;
+}
+
+#setting .button:hover{
+    -webkit-transform:scale(1.05);
 }
 
 #setting .bet1{
