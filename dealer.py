@@ -140,6 +140,8 @@ class Dealer(object):
 									body		= pickle.dumps(message))
 
 	def broadcast(self, routing_key, msg):
+		print routing_key
+		print msg
 		self.channel.basic_publish(exchange		= self.exchange,
 									routing_key	= routing_key,
 									body		= pickle.dumps(msg))

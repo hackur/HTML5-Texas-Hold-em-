@@ -291,6 +291,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		if self.session['user'] is not None:
 			user		= self.session['user']
 			print  user
+			print self.session['broadcast_key']
 			timestamp	= self.get_argument('timestamp')
 			queue		= str(user.username)
 			exchange	= str(user.room.exchange)
@@ -310,8 +311,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		messages= self.channel.get_messages()
 		print messages
 		user	= self.session['user']
-		for message in messages:
-			self.session['messages'].append(message)
+		self.session['messages'].append(messages)
 
 
 		if self.request.connection.stream.closed():
@@ -320,7 +320,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		print "x" *100
 		print "id=>", self.session['user'].id
 		print messages
-		self.write(json.dumps(messages));#{'status':'success', 'message':self.session['messages']}))
+		self.write(json.dumps(self.session['messages']));#{'status':'success', 'message':self.session['messages']}))
 		self.finish()
 		self.channel.close();
 
