@@ -76,11 +76,12 @@ function listenBoardMessage(){
 		type:'post',
 		url:"./listen-board-message",
 		data:{offset:1,username:username,timestamp:1},
-		timeout:5000,
+		timeout:2000,
 		success:function(data){
 			console.log("listen board message reply success")
 			console.log(data);
 			listenBoardMessage();
+			$("#msg").append(JSON.stringify(data) + "<br>");
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
 			console.log("listen board message reply error")
