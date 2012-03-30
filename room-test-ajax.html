@@ -43,7 +43,7 @@ $(document).ready(function(){
 		var room = $('input[name="room_id"]').val();
 		$.post(
 			"./enter",
-			{room_id:room,username:username},
+			{room_id:room,username:username, timestamp:1},
 			function(data){
 				console.log(data);
 				console.log(data["status"]);
@@ -62,7 +62,7 @@ $(document).ready(function(){
 		$.ajax({
 			type:'post',
 			url:"./sit-down",
-			data:{seat:seat, offset:1,username:username},
+			data:{seat:seat, offset:1,username:username, timestamp:1},
 			success:function(data){
 				console.log(data);
 				$("#msg").append(JSON.stringify(data) + "<br>");
@@ -75,7 +75,7 @@ function listenBoardMessage(){
 	$.ajax({
 		type:'post',
 		url:"./listen-board-message",
-		data:{offset:1,username:username},
+		data:{offset:1,username:username,timestamp:1},
 		timeout:5000,
 		success:function(data){
 			console.log("listen board message reply success")
@@ -85,9 +85,9 @@ function listenBoardMessage(){
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
 			console.log("listen board message reply error")
 			console.log(textStatus);
-//			if(index < 4){
+			if(index < 6){
 				listenBoardMessage();
-//			}
+			}
 			index++;
 		},
 		dataTye:'json',

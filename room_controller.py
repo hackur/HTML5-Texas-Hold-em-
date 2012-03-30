@@ -63,7 +63,7 @@ class Channel(object):
 		pika.log.info('PikaClient: Channel Open, Declaring Exchange')
 		self.channel = channel
 		self.channel.exchange_declare(exchange=self.exchange,
-				type="direct",
+				type="topic",
 				auto_delete=True,
 				durable=False,
 				callback=self.on_exchange_declared)
@@ -96,6 +96,7 @@ class Channel(object):
 	def on_room_message(self, channel, method, header, body):
 		pika.log.info('PikaCient: Message receive, delivery tag #%i' % method.delivery_tag)
 		self.messages.append(pickle.loads(body))
+		print pickle.loads(body)
 		for element in self.message_actions:
 			element['functor'](element['argument'])
 
@@ -153,7 +154,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		exchange		= str(user.room.exchange)
 		routing_key		= exchange + '_' + queue
 		broadcast_queue	= str(user.username) + '_broadcast'
-		broadcast_key	= ('broadcast_'+exchange+'_%d_%d')% (room.id, user.id)
+		broadcast_key	= ('broadcast_'+exchange+'_%d.*')% (room.id)
 		message 		= {	'method'	: 'init',
 							'user_id'	: user.id,
 							'source'	: routing_key,
@@ -167,9 +168,9 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		self.channel= Channel(queue, exchange, routing_key)
 		self.channel.add_ready_action(self.initial_call_back, arguments);
 		self.channel.connect()
-
-		self.session['user'] 		= user
-		self.session['messages']	= list()
+		self.session['broadcast_key']	= broadcast_key
+		self.session['user'] 			= user
+		self.session['messages']		= list()
 
 	def get(self):
 		self.render("room-test-ajax.html")
@@ -245,7 +246,7 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 			user		= self.session['user']
 			action		= self.get_argument('action')
 			amount		= self.get_argument('amount')
-			offset		= self.get_argument('offset')
+			timestamp	= self.get_argument('timestamp')
 			queue		= str(user.username)+'_action'
 			exchange	= str(user.room.exchange)
 			source		= exchange + '_' + queue
@@ -254,11 +255,11 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 			self.channel	= Channel(queue, exchange, source)
 			self.channel.add_ready_action(self.action_call_back, arguments)
 			self.channel.connect()
-			self.clean_matured_message(offset)
+			self.clean_matured_message(timestamp)
 
-	def clean_matured_message(self, offset):
+	def clean_matured_message(self, timestamp):
 		for message in self.session['messages'][:]:
-			if message['index'] < offset:
+			if message['timestamp'] < timestamp:
 				self.session['messages'].remove(message)
 
 	def action_call_back(self, argument):
@@ -270,7 +271,7 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 		self.channel.add_message_action(self.message_call_back, None)
 
 	def message_call_back(self, argument):
-		messages= pickle.load(self.channel.get_messages())
+		messages= self.channel.get_messages()
 		user	= self.session['user']
 		for message in messages:
 			if message['user_id'] == user.id:
@@ -290,22 +291,24 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		if self.session['user'] is not None:
 			user		= self.session['user']
 			print  user
-			offset		= self.get_argument('offset')
+			timestamp	= self.get_argument('timestamp')
 			queue		= str(user.username)
 			exchange	= str(user.room.exchange)
-			routing_key	= exchange + '_' + queue + '_listen'
-			self.channel= Channel(queue, exchange, routing_key)
+			self.channel= Channel(queue, exchange, self.session['broadcast_key'])
 			self.channel.add_message_action(self.message_call_back, None)
 			self.channel.connect()
-	 		self.clean_matured_message(offset)
+	 		self.clean_matured_message(timestamp)
 
-	def clean_matured_message(self, offset):
+	def clean_matured_message(self, timestamp):
 		for message in self.session['messages'][:]:
-	 		if message['index'] < offset:
+	 		if message['timestamp'] < timestamp:
 	 			self.session['messages'].remove(message)
 
 	def message_call_back(self, argument):
-		messages= pickle.load(self.channel.get_messages())
+		print "channel message"
+		print self.channel.get_messages()
+
+		messages= self.channel.get_messages()
 		user	= self.session['user']
 		for message in messages:
 			if message['user_id'] == user.id:

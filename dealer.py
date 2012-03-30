@@ -1,3 +1,4 @@
+import time
 import pika
 import sys
 from optparse import OptionParser
@@ -103,7 +104,7 @@ class Dealer(object):
 									port = self.port))
 		self.channel	= self.connection.channel()
 		self.channel.exchange_declare(exchange		= self.exchange,
-										type		= 'direct',
+										type		= 'topic',
 										auto_delete	= True,
 										durable		= False)
 		self.channel.queue_declare(queue	= self.queue,
@@ -130,16 +131,16 @@ class Dealer(object):
 		(status, msg) = current_room.sit(user, args["seat"])
 
 		if status:
-			message = {"status": "success"}
+			message = {"status": "success", "timestamp":time.time()}
 		else:
-			message = {"status": "failed", "msg": msg}
+			message = {"status": "failed", "msg": msg, "timestamp":time.time()}
 
 		self.channel.basic_publish(	exchange	= self.exchange,
 									routing_key	= routing_key,
 									body		= pickle.dumps(message))
 
 	def broadcast(self, routing_key, msg):
-		self.channel.basic_publish(exchange	= self.exchange,
+		self.channel.basic_publish(exchange		= self.exchange,
 									routing_key	= routing_key,
 									body		= pickle.dumps(msg))
 
@@ -153,7 +154,7 @@ class Dealer(object):
 		current_room.add_audit({'user':args["user_id"], 'listen_source':args['listen_source']})
 
 		routing_key	= args['source']
-		message		= {'status':'success', 'content':'nothing'}
+		message		= {'status':'success', 'content':'nothing', 'timestamp':time.time()}
 		self.channel.basic_publish(	exchange	= self.exchange,
 									routing_key	= routing_key,
 									body		= pickle.dumps(message))
@@ -165,7 +166,7 @@ class Dealer(object):
 		self.room_list[args['room_id']] = GameRoom(args["room_id"], args["user_id"], self)
 		# self.db_connection.start_session()
 
-		message = {"status": "success","room_id": args["room_id"]}
+		message = {"status": "success","room_id": args["room_id"], 'timestampe':time.time()}
 #		print room["player_list"]
 		self.channel.basic_publish(	exchange	= self.exchange,
 									routing_key	= args['source'],
