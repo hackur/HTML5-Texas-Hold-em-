@@ -24,7 +24,7 @@ except:
     import pickle
 
 class Channel(object):
-	def __init__(self, queue_name, exchange, routing_key, host='localhost', durable_queue = False):
+	def __init__(self, queue_name, exchange, routing_key,  durable_queue = False,host='localhost'):
 		# Construct a queue name we'll use for this instance only
 		self.connected		= False
 		self.connecting		= False
@@ -149,16 +149,20 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		user.room_id= room.id
 		db_connection.addItem(user)
 		db_connection.commit_session()
-		queue		= str(user.username) + '_init'
-		exchange	= str(user.room.exchange)
-		routing_key	= exchange + '_' + queue
-		message 	= {	'method'	: 'init',
-						'user_id'	: user.id,
-						'source'	: routing_key,
-						'room_id'	: user.room.id,
-						'listen_source': exchange + '_' + queue + '_listen'}
+		queue			= str(user.username) + '_init'
+		exchange		= str(user.room.exchange)
+		routing_key		= exchange + '_' + queue
+		broadcast_queue	= str(user.username) + '_broadcast'
+		broadcast_key	= 'broadcast_'+exchange + '_' + room.id + '_' + user.id
+		message 		= {	'method'	: 'init',
+							'user_id'	: user.id,
+							'source'	: routing_key,
+							'room_id'	: user.room.id,
+							'listen_source': broadcast_key}
 		
 		arguments	= {'routing_key': 'dealer', 'message': pickle.dumps(message)}
+		broadcast_channel = Channel(broadcast_queue, exchange, broadcast_key, True)
+		broadcast_connect()
 		
 		self.channel= Channel(queue, exchange, routing_key)
 		self.channel.add_ready_action(self.initial_call_back, arguments);
