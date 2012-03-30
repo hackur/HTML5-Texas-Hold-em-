@@ -14,15 +14,37 @@
 		<script>
 			$(document).ready(function() {
 				$('#llogin').click(function() {
+
 					$.ajax({
 						type:'post',
-						url:"10.0.0.130:8888/login",
-						data:{seat:message, offset:1},
+						url:"login",
+						data:{username:$('#account').val(), password:$('#password').val()},
 						success:function(data){
 							console.log(data);
 						},
 						dataTye:'json',
 					});
+					return false;
+				});
+
+				$('#lvisitor').click(function() {
+					var data = {};
+
+					$.ajax({
+						type:'post',
+						url:"guest-login",
+						data:data,
+						success:function(data){
+							result = JSON.parse(data)
+							console.log( data);
+							localStorage.setItem('username', result.username);
+							localStorage.setItem('password', result.password);
+							console.log(localStorage.getItem('username'));
+							console.log(localStorage.getItem('password'));
+						},
+						dataTye:'json',
+					});					
+					return false;
 				});
 			});
 		</script>
@@ -31,7 +53,6 @@
 	<div>
 		<div id="login-view" class="view"> </div>
 			<div id="lbg" class="background"> </div>
-			<form method="post" action="#" >
 
 				<!-- <div id="laccount"> </div> 
 				<div id="lpw"> </div>
@@ -41,19 +62,17 @@
 				<div id="llogin"> </div>
 				<div id="lcancel"> </div>
 				<div id="lvisitor"> </div> -->
-				<fieldset>
-					<label for="account" id="laccount"> </label>
-						<input type="text" class="linput" id="account" style="top:150px;left:670px"/>
-					<label for="password" id="lpw"> </label>
-						<input type="password" class="linput" id="password" style="top:210px;left:670px"/>
-				</fieldset>
-				<fieldset>
-					<button type="submit" id="llogin"> </button>
-					<button type="reset" id="lcancel"> </button>
-				</fieldset>
-					
-						
-			</form>
+				
+			<label for="account" id="laccount"> </label>
+			<input type="text" class="linput" id="account" style="top:150px;left:670px"/>
+			<label for="password" id="lpw"> </label>
+			<input type="password" class="linput" id="password" style="top:210px;left:670px"/>
+			<input type="checkbox" checked="checked" id="lcheck">
+			<div id="lisauto"> </div>
+			<a id ="lforgetpw" href="#">忘记密码</a>
+			<input type="submit" id="llogin" value='登陆'/>
+			<input type="reset" id="lcancel" value='取消'/>
+			<input type="button" id="lvisitor" value='游客登陆'/>
 		</div>
 		<div id="user-center-view">
 		</div>
@@ -61,6 +80,6 @@
 		</div>
 		<div id="game-center-view">
 		</div>
-	</div
+	</div>
 </body>
 </html>
