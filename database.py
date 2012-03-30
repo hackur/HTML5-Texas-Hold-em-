@@ -39,7 +39,7 @@ class User(Base):
 	queue_id	= Column(Integer, ForeignKey(MessageQueue.id))
 	queue		= relationship(MessageQueue, uselist=False,backref=backref('user', uselist = False))
 	room_id		= Column(Integer, ForeignKey("room.id"))
-	room		= relationship("Room", backref=backref('owner', uselist=False))
+	room		= relationship("Room", backref=backref('users'))
 	family_id  	= Column(Integer,ForeignKey('family.id'))
 	family		= relationship("Family",backref=backref('members',order_by=id))
 	email		= Column(String(100))
@@ -93,10 +93,10 @@ class DatabaseConnection(object):
 
 	def connect(self):
 		self.connection = self.engine.connect()
-	
+
 	def start_session(self):
 		self.session	= self.Session()
-	
+
 	def commit_session(self):
 		self.session.commit()
 

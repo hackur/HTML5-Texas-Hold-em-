@@ -5,9 +5,12 @@
 <body>
 <div>
 
+	<!--
 <label>username:</label><input name="username" type="text" value="{{ username }}"/><br />
 <label>password:</label><input name="password" type="password" value="123" /><br />
 <button id="login">login</button>
+-->
+{{ username }}
 </div>
 
 <div>
@@ -18,10 +21,11 @@
 	<label>sit no:</label><input name="sit_no" type="text" value="{{ sitno }}"/><br />
 <button id="sit_down">sit down</button>
 </div>
+<div id="msg"> </div>
 </body>
 <script>
+var username= "{{  username }}";
 $(document).ready(function(){
-	var username= "{{  username }}";
 	$('#login').click(function(){
 		var username = $('input[name="username"]').val();
 		var password = $('input[name="password"]').val();
@@ -42,9 +46,12 @@ $(document).ready(function(){
 			{room_id:room,username:username},
 			function(data){
 				console.log(data);
+				console.log(data["status"]);
 				if(data.status=='success'){
+					$("#msg").append( "Enter Success<br>");
 					listenBoardMessage();
 				}
+				$("#msg").append(JSON.stringify(data) + "<br>");
 			},
 			'json'
 		);
@@ -55,9 +62,10 @@ $(document).ready(function(){
 		$.ajax({
 			type:'post',
 			url:"./sit-down",
-			data:{seat:seat, offset:1},
+			data:{seat:seat, offset:1,username:username},
 			success:function(data){
 				console.log(data);
+				$("#msg").append(JSON.stringify(data) + "<br>");
 			},
 			dataTye:'json',
 		});
@@ -67,7 +75,7 @@ function listenBoardMessage(){
 	$.ajax({
 		type:'post',
 		url:"./listen-board-message",
-		data:{offset:1},
+		data:{offset:1,username:username},
 		timeout:5000,
 		success:function(data){
 			console.log("listen board message reply success")
@@ -77,12 +85,16 @@ function listenBoardMessage(){
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
 			console.log("listen board message reply error")
 			console.log(textStatus);
-			listenBoardMessage();
+//			if(index < 4){
+				listenBoardMessage();
+//			}
+			index++;
 		},
 		dataTye:'json',
 	});
 }
 
+var index =1;
 function postBoardMessage(message){
 }
 </script>

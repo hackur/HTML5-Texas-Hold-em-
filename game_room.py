@@ -1,5 +1,5 @@
 from threading import Timer
-from poker_controller import PokerController
+#from poker_controller import PokerController
 
 class Seat(object):
 	(SEAT_EMPTY,SEAT_WAITING,SEAT_PLAYING) = (0,1,2)
@@ -14,11 +14,11 @@ class Seat(object):
 		pass
 
 	def is_empty(self):
-		return self._status == SEAT_EMPTY
+		return self._status == Seat.SEAT_EMPTY
 
 	def sit(self, user):
 		self._user = user
-		self._status = SEAT_WAITING
+		self._status = Seat.SEAT_WAITING
 
 
 class GameRoom(object):
@@ -36,19 +36,21 @@ class GameRoom(object):
 		for x in xrange(num_of_seats):
 			self.seats.append(Seat())
 		self.occupied_seat = 0
+		self.dealer = dealer
 
 	def sit(self,player,seat_no):
+		seat_no = int(seat_no)
 		if seat_no > len(self.seats):
-			return (False, "Seat number is too large")
+			return (False, "Seat number is too large: %s we have %s" % (seat_no,len(self.seats)))
 		if not self.seats[seat_no].is_empty():
 			return (False, "Seat Occupied")
 		self.seats[seat_no].sit(player)
-		dealer.broadcast(self.broadcast_key, self.msg_broadcast)
+		self.dealer.broadcast(self.broadcast_key, self.msg_broadcast)
 		self.msg_broadcast += 1
 		self.occupied_seat += 1
 
 		if self.occupied_seat == 2:
-			t = Timer(5, start_game)
+			t = Timer(5, self.start_game)
 			t.start()
 		return (True, "")
 

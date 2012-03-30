@@ -13,15 +13,6 @@ except:
 	import pickle
 
 
-class Seat(object):
-	(SEAT_EMPTY,SEAT_WAITING,SEAT_PLAYING) = (0,1,2)
-
-	def __init__(self):
-		self._user = None
-		self._cards = None
-		self._inAmount = 0
-		self._status = Seat.SEAT_EMPTY
-		pass
 
 
 class Cards(object):
@@ -65,15 +56,12 @@ class Dealer(object):
 	def __init__(self,queue,exchange,num_of_seats=9,blind=100,host='localhost',port=5672):
 		self.queue		= queue
 		self.exchange	= exchange
-		self.seats		= {}
 		self.host		= host
 		self.port		= port
 		self.room_list	= {}
 		self.users		= []
-		for x in xrange(num_of_seats):
-			self.seats[x] = Seat()
 
-	
+
 	def init_database(self):
 		self.db_connection	= DatabaseConnection()
 		self.db_connection.init("sqlite:///:memory:")
@@ -108,7 +96,7 @@ class Dealer(object):
 		# ting.friends = [mile, mamingcao]
 		# mile.friends = [ting]
 		self.db_connection.commit_session()
-	
+
 	def start(self):
 		self.connection	= pika.BlockingConnection(
 		pika.ConnectionParameters(host = self.host,
@@ -149,28 +137,28 @@ class Dealer(object):
 		self.channel.basic_publish(	exchange	= self.exchange,
 									routing_key	= routing_key,
 									body		= pickle.dumps(message))
-	
+
 	def broadcast(self, routing_key, msg):
 		self.channel.basic_publish(exchange	= self.exchange,
 									routing_key	= routing_key,
 									body		= pickle.dumps(msg))
-	
+
 	def cmd_init(self,args):
 		print "init received"
 		if args['room_id'] not in self.room_list:
 			self.cmd_create_room(args)
 			print "Room created"
-		
+
 		current_room = self.room_list[args["room_id"]]
 		current_room.add_audit({'user':args["user_id"], 'listen_source':args['listen_source']})
-	
+
 		routing_key	= args['source']
-		message		= {'status':'success', 'content':'nothing'} 
+		message		= {'status':'success', 'content':'nothing'}
 		self.channel.basic_publish(	exchange	= self.exchange,
 									routing_key	= routing_key,
 									body		= pickle.dumps(message))
 
-	
+
 	def cmd_create_room(self, args):
 		print "creating room"
 
@@ -191,7 +179,7 @@ class Dealer(object):
 		method = getattr(self,"cmd_" + obj['method'])
 		method(obj)
 
-	
+
 	def game_play(self, users, current_room):
 		# print "--------------------"+str(users)
 		print "users in game_play, ", users
@@ -201,13 +189,13 @@ class Dealer(object):
 		for card in game.publicCard:
 			print str(self.suit[card.symbol])+"/"+str(self.face[card.value-2])+" ",
 		print
-		
+
 		for user in users:
 			print str(user.username) + ": ",
 			for cards in user.handcards:
 				 print str(self.suit[cards.symbol])+"/"+str(self.face[cards.value-2])+" ",
 			print
-		
+
 		game.getOne()
 		game.getOne()
 		result = game.getWinner()
@@ -253,7 +241,7 @@ if __name__ == "__main__":
 	dealer.start()
 
 	# print dealer.seats
-	
+
 
 	# db = DatabaseConnection()
 
@@ -274,7 +262,7 @@ if __name__ == "__main__":
 	# PokerController.PokerController.init(players)
 	# PokerController.PokerController.getFlop()
 
-	# #get the next one 
+	# #get the next one
 	# PokerController.PokerController.getOne()
 
 	# #get the next final card
