@@ -65,6 +65,7 @@
 	/*background-image: url('./images/login/nocheck.png');*/
 	margin-left:10px;
     vertical-align:middle;
+    cursor:pointer;
 }
 /*#lcheck:hover {
 	background-image: url('./images/login/check.png');	
