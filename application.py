@@ -49,7 +49,11 @@ def init_database():
 class IndexHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	def get(self):
-		self.render("index.html")
+		self.render("test.html")
+
+class IndexTestHandler(tornado.web.RequestHandler):
+	def get(self):
+		self.render("room-test-ajax.html",username=self.get_argument('username'),sitno=self.get_argument('sitno'))
 
 if __name__ == '__main__':
 	settings = {
@@ -57,15 +61,16 @@ if __name__ == '__main__':
 		'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
 		"static_path": os.path.join(os.path.dirname(__file__), "static"),
 		'session_storage':"dir",
-		#"session_storage":"mongodb:///db"
 	}
 	application = tornado.web.Application([
+		(r"/test", IndexTestHandler),
+		(r"/test.html", IndexHandler),
 		(r"/sit-down", SitDownBoardHandler),
 		(r"/listen-board-message", BoardListenMessageHandler),
 		(r"/enter", EnterRoomHandler),
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),
-		(r"/index.html", IndexHandler),
+		(r"/(.*.html)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
 		], **settings)
 

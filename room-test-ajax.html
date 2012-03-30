@@ -4,22 +4,24 @@
 </head>
 <body>
 <div>
-<label>username:</label><input name="username" type="text"/><br />
-<label>password:</label><input name="password" type="text"/><br />
+
+<label>username:</label><input name="username" type="text" value="{{ username }}"/><br />
+<label>password:</label><input name="password" type="password" value="123" /><br />
 <button id="login">login</button>
 </div>
 
 <div>
-<label>room no:</label><input name="room_id" type="text"/><br />
+<label>room no:</label><input name="room_id" type="text" value="1" /><br />
 <button id="enter">enter</button>
 </div>
 <div>
-<label>sit no:</label><input name="sit_no" type="text"/><br />
+	<label>sit no:</label><input name="sit_no" type="text" value="{{ sitno }}"/><br />
 <button id="sit_down">sit down</button>
 </div>
 </body>
 <script>
 $(document).ready(function(){
+	var username= "{{  username }}";
 	$('#login').click(function(){
 		var username = $('input[name="username"]').val();
 		var password = $('input[name="password"]').val();
@@ -37,7 +39,7 @@ $(document).ready(function(){
 		var room = $('input[name="room_id"]').val();
 		$.post(
 			"./enter",
-			{room_id:room},
+			{room_id:room,username:username},
 			function(data){
 				console.log(data);
 				if(data.status=='success'){
