@@ -11,41 +11,10 @@
         <LINK href="./static/login.css" rel="stylesheet" type="text/css">
 
 		<script src ="./static/jquery.min.js"></script>
+		<script src="./static/login.js"></script>
 		<script>
 			$(document).ready(function() {
-				$('#llogin').click(function() {
-
-					$.ajax({
-						type:'post',
-						url:"login",
-						data:{username:$('#account').val(), password:$('#password').val()},
-						success:function(data){
-							console.log(data);
-						},
-						dataTye:'json',
-					});
-					return false;
-				});
-
-				$('#lvisitor').click(function() {
-					var data = {};
-
-					$.ajax({
-						type:'post',
-						url:"guest-login",
-						data:data,
-						success:function(data){
-							result = JSON.parse(data)
-							console.log( data);
-							localStorage.setItem('username', result.username);
-							localStorage.setItem('password', result.password);
-							console.log(localStorage.getItem('username'));
-							console.log(localStorage.getItem('password'));
-						},
-						dataTye:'json',
-					});					
-					return false;
-				});
+				$(login_check);
 			});
 		</script>
 </head>
@@ -62,17 +31,18 @@
 				<div id="llogin"> </div>
 				<div id="lcancel"> </div>
 				<div id="lvisitor"> </div> -->
-				
-			<label for="account" id="laccount"> </label>
-			<input type="text" class="linput" id="account" style="top:150px;left:670px"/>
-			<label for="password" id="lpw"> </label>
-			<input type="password" class="linput" id="password" style="top:210px;left:670px"/>
-			<input type="checkbox" checked="checked" id="lcheck">
-			<div id="lisauto"> </div>
-			<a id ="lforgetpw" href="#">忘记密码</a>
-			<input type="submit" id="llogin" value='登陆'/>
-			<input type="reset" id="lcancel" value='取消'/>
-			<input type="button" id="lvisitor" value='游客登陆'/>
+			<form>
+				<label for="account" id="laccount"> </label>
+				<input type="text" class="linput" id="account" style="top:150px;left:670px"/>
+				<label for="password" id="lpw"> </label>
+				<input type="password" class="linput" id="password" style="top:210px;left:670px"/>
+				<input type="checkbox" checked="checked" id="lcheck">
+				<div id="lisauto"> </div>
+				<a id ="lforgetpw" href="#">忘记密码</a>
+				<input type="submit" id="llogin" value='登陆'/>
+				<button type="reset" id="lcancel">取消</button>
+				<input type="button" id="lvisitor" value='游客登陆'/>
+			</form>
 		</div>
 		<div id="user-center-view">
 		</div>
