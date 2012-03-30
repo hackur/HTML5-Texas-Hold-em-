@@ -4,6 +4,7 @@ from optparse import OptionParser
 import random
 # import PokerController
 import poker_controller
+from game_room import GameRoom
 from sqlalchemy.orm import sessionmaker,relationship, backref
 from database import DatabaseConnection,User,Room,MessageQueue
 try:
@@ -39,6 +40,18 @@ class Cards(object):
 				self._cardCount -= 1
 				return self._cards[i][ram]
 
+
+# class Room(object):
+# 	def __init__(args):
+# 		print "Creating Room"
+# 		self.id = args['room_id']
+# 		self.owner = args["user_id"]
+# 		self.status = "WAIT"
+# 		self.player_list = []
+# 		self.audit_list = []
+
+	# def create_fdbk():
+	# 	message = {"status": "success","room_id": room["id"]}
 
 
 class Dealer(object):
@@ -92,8 +105,8 @@ class Dealer(object):
 		self.db_connection.addItem(queue5)
 		self.db_connection.addItem(queue6)
 		self.db_connection.addItem(queue7)
-		ting.friends = [mile, mamingcao]
-		mile.friends = [ting]
+		# ting.friends = [mile, mamingcao]
+		# mile.friends = [ting]
 		self.db_connection.commit_session()
 	
 	def start(self):
@@ -122,53 +135,63 @@ class Dealer(object):
 		#db_connection	= DatabaseConnection()
 		self.db_connection.start_session()
 		routing_key 		= args['source']
-		print args
+		# print args
 		user				= self.db_connection.query(User).filter_by(id=args['user_id']).first()
-		user.combination	= []
-		user.handcards		= []
-
 		current_room = self.room_list[args["room_id"]]
+
+		(status,message) = current_room.sit(user)
+
 		if current_room["status"] == "PLAY":
-			current_room["waiting_list"].append(user)
-			message = {"status": "success", "action": "waiting","user_id": user.id,"seat": args['seat']}
-		elif current_room["status"] == "WAIT":
-			current_room["player_list"].extend(current_room["waiting_list"])
-			current_room["player_list"].append(user)
-			message = {"status": "success", "action": "start", "user_id": user.id, "seat": args['seat']}
-		
+			if len(current_room["waiting_list"])+len(current_room["player_list"]) < self.number_of_players:
+				
+				if user not in current_room["waiting_list"]:
+					current_room["waiting_list"].append(user)
+					message = {"status": "success", "action": "waiting","user_id": user.id,"seat": args['seat']}
+				else:
+					message = {"status": "failed", "action": "audit", "user_id": user.id, "seat": -1}
+			else: return
+
+		if current_room["status"] == "WAIT":
+			if len(current_room["waiting_list"])+len(current_room["player_list"]) < self.number_of_players:
+				current_room["player_list"].extend(current_room["waiting_list"])
+				print user in current_room["player_list"]
+				if user.id not in current_room["player_list"] and user not in current_room["waiting_list"]:
+					current_room["player_list"].append(user)
+					print current_room["player_list"]
+					message = {"status": "success", "action": "start", "user_id": user.id, "seat": args['seat']}
+				else:
+					message = {"status": "failed", "action": "audit", "user_id": user.id, "seat": -1}
+			else: return
+
 		self.channel.basic_publish(	exchange	= self.exchange,
 									routing_key	= routing_key,
 									body		= pickle.dumps(message))
-		
+		if len(current_room["player_list"]) > 1:
+			self.game_play(current_room["player_list"], current_room)	
+	
 	
 	def cmd_init(self,args):
 		print "init received"
 		if args['room_id'] not in self.room_list:
 			self.cmd_create_room(args)
-		else:
-			current_room = self.room_list[args["room_id"]]
-			if len(current_room["player_list"]) > 1:
-				current_room["audit_list"].append({'user':args["user_id"], 'listen_source':args['listen_source']})
+			print "Room created"
 		
-			routing_key	= args['source']
-			message		= {'status':'success', 'content':'nothing'} 
-			self.channel.basic_publish(	exchange	= self.exchange,
-										routing_key	= routing_key,
-										body		= pickle.dumps(message))
+		current_room = self.room_list[args["room_id"]]
+		current_room.add_audit({'user':args["user_id"], 'listen_source':args['listen_source']})
+	
+		routing_key	= args['source']
+		message		= {'status':'success', 'content':'nothing'} 
+		self.channel.basic_publish(	exchange	= self.exchange,
+									routing_key	= routing_key,
+									body		= pickle.dumps(message))
 
 	
 	def cmd_create_room(self, args):
 		print "creating room"
-		room = {
-			"id" 			: args['room_id'],
-			"owner" 		: args["user_id"],
-			"status" 		: "WAIT",
-			"player_list" 	: [],
-			"waiting_list" 	: [],
-			"audit_list" 	: [],
-		}
-		self.room_list[args['room_id']] = room
-		room["player_list"].append({'user':args["user_id"], 'listen_source':args['source']})
+
+		self.room_list[args['room_id']] = GameRoom(args["room_id"], args["user_id"])
+		self.db_connection.start_session()
+
 		message = {"status": "success","room_id": room["id"]}
 #		print room["player_list"]
 		self.channel.basic_publish(	exchange	= self.exchange,
@@ -186,6 +209,8 @@ class Dealer(object):
 	
 	def game_play(self, users, current_room):
 		# print "--------------------"+str(users)
+		print "users in game_play, ", users
+		current_room["status"] = "PLAY"
 		game = poker_controller.PokerController(users)
 		game.getFlop()
 		for card in game.publicCard:
@@ -203,13 +228,20 @@ class Dealer(object):
 		result = game.getWinner()
 		for winner in result["winners"]:
 			print winner.username
-			current_room["status"] = "WAIT"
+		current_room["status"] = "WAIT"
 			# game.getOne()
 			# game.getOne()
 			# result = game.getWinner()
 			# print result["winners"][0].username
-			return
+		return
 
+	def same_str(str1, str2):
+		if len(str1) != len(str2):
+			return False
+		else:
+			for i in xrange(len(str1)):
+				if str1[i] != str2[i]:
+					return False
 
 	def close(self):
 		self.connection.close()
