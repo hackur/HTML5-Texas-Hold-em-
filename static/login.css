@@ -28,6 +28,7 @@
 	-moz-border-radius: .4em;
 	border-radius: .4em;
 	outline: none;
+	border: 1px;
 
 	background-color: black;
 	color: white;
