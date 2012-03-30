@@ -1,4 +1,5 @@
 from threading import Timer
+from poker_controller import PokerController
 
 class Seat(object):
 	(SEAT_EMPTY,SEAT_WAITING,SEAT_PLAYING) = (0,1,2)
@@ -25,7 +26,7 @@ class GameRoom(object):
 	def __init__(self, room_id, owner, dealer, num_of_seats = 9):
 		self.room_id = room_id
 		self.owner = owner
-		self.status = GAME_WAIT
+		self.status = GameRoom.GAME_WAIT
 		self.broadcast_key = "broadcast_" + dealer.exchange + "_" + str(self.room_id) + "_" + "*"
 		self.msg_broadcast = 0
 		self.player_list = []
@@ -45,12 +46,13 @@ class GameRoom(object):
 		dealer.broadcast(self.broadcast_key, self.msg_broadcast)
 		self.msg_broadcast += 1
 		self.occupied_seat += 1
+
 		if self.occupied_seat == 2:
 			t = Timer(5, start_game)
 			t.start()
 		return (True, "")
 
-	def start_game(self):
+	def start_game(self, player):
 		pass
 
 	def add_audit(self, player):
