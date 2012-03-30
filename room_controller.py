@@ -306,21 +306,17 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 
 	def message_call_back(self, argument):
 		print "channel message"
-		print self.channel.get_messages()
 
 		messages= self.channel.get_messages()
 		user	= self.session['user']
 		for message in messages:
-			if message['user_id'] == user.id:
-				self.session['messages'].append(message)
+			self.session['messages'].append(message)
 
 
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
-
-		self.write(json.dumps({'status':'success', 'message':self.session['messages']}))
-		self.finish()
+		self.write(json.dumps(messages));#{'status':'success', 'message':self.session['messages']}))
 		self.finish()
 		self.channel.close();
 
