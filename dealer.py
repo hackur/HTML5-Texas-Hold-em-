@@ -139,36 +139,21 @@ class Dealer(object):
 		user				= self.db_connection.query(User).filter_by(id=args['user_id']).first()
 		current_room = self.room_list[args["room_id"]]
 
-		(status,message) = current_room.sit(user)
+		(status, msg) = current_room.sit(user, args["seat"])
 
-		if current_room["status"] == "PLAY":
-			if len(current_room["waiting_list"])+len(current_room["player_list"]) < self.number_of_players:
-				
-				if user not in current_room["waiting_list"]:
-					current_room["waiting_list"].append(user)
-					message = {"status": "success", "action": "waiting","user_id": user.id,"seat": args['seat']}
-				else:
-					message = {"status": "failed", "action": "audit", "user_id": user.id, "seat": -1}
-			else: return
-
-		if current_room["status"] == "WAIT":
-			if len(current_room["waiting_list"])+len(current_room["player_list"]) < self.number_of_players:
-				current_room["player_list"].extend(current_room["waiting_list"])
-				print user in current_room["player_list"]
-				if user.id not in current_room["player_list"] and user not in current_room["waiting_list"]:
-					current_room["player_list"].append(user)
-					print current_room["player_list"]
-					message = {"status": "success", "action": "start", "user_id": user.id, "seat": args['seat']}
-				else:
-					message = {"status": "failed", "action": "audit", "user_id": user.id, "seat": -1}
-			else: return
+		if status:
+			message = {"status": "success"}
+		else:
+			message = {"status": "failed", "msg": msg}
 
 		self.channel.basic_publish(	exchange	= self.exchange,
 									routing_key	= routing_key,
 									body		= pickle.dumps(message))
-		if len(current_room["player_list"]) > 1:
-			self.game_play(current_room["player_list"], current_room)	
 	
+	def broadcast(self, routing_key, msg):
+		self.channel.basic_publish(exchange	= self.exchange,
+									routing_key	= routing_key,
+									body		= pickle.dumps(msg))
 	
 	def cmd_init(self,args):
 		print "init received"
@@ -189,10 +174,10 @@ class Dealer(object):
 	def cmd_create_room(self, args):
 		print "creating room"
 
-		self.room_list[args['room_id']] = GameRoom(args["room_id"], args["user_id"])
-		self.db_connection.start_session()
+		self.room_list[args['room_id']] = GameRoom(args["room_id"], args["user_id"], self)
+		# self.db_connection.start_session()
 
-		message = {"status": "success","room_id": room["id"]}
+		message = {"status": "success","room_id": args["room_id"]}
 #		print room["player_list"]
 		self.channel.basic_publish(	exchange	= self.exchange,
 									routing_key	= args['source'],
