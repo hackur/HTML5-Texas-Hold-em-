@@ -26,7 +26,7 @@ class GameRoom(object):
 		self.room_id = room_id
 		self.owner = owner
 		self.status = GAME_WAIT
-		self.broadcast_key = "broadcast_" + dealer.exchange + "_" + self.room_id + "_" + "*"
+		self.broadcast_key = "broadcast_" + dealer.exchange + "_" + str(self.room_id) + "_" + "*"
 		self.msg_broadcast = 0
 		self.player_list = []
 		self.waiting_list= []
