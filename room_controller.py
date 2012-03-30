@@ -153,7 +153,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		exchange		= str(user.room.exchange)
 		routing_key		= exchange + '_' + queue
 		broadcast_queue	= str(user.username) + '_broadcast'
-		broadcast_key	= 'broadcast_'+exchange + '_' + room.id + '_' + user.id
+		broadcast_key	= ('broadcast_'+exchange+'_%d_%d')% (room.id, user.id)
 		message 		= {	'method'	: 'init',
 							'user_id'	: user.id,
 							'source'	: routing_key,
@@ -162,7 +162,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		
 		arguments	= {'routing_key': 'dealer', 'message': pickle.dumps(message)}
 		broadcast_channel = Channel(broadcast_queue, exchange, broadcast_key, True)
-		broadcast_connect()
+		broadcast_channel.connect()
 		
 		self.channel= Channel(queue, exchange, routing_key)
 		self.channel.add_ready_action(self.initial_call_back, arguments);
