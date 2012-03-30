@@ -1,5 +1,6 @@
 import sys,random
 from random import shuffle
+from dealer import Dealer
 
 class Card:
 	def __init__(self, symbol, value):
@@ -493,10 +494,11 @@ class Poker:
 		return kicker.keys()
 
 class PokerController(object):
-	def __init__(self,users,debug=False):
+	def __init__(self, users, debug=False):
 		number_of_players	= len(users)
 		self.publicCard		= []
 		self.users		= users
+		print self.users[0]
 		self.poker		= Poker(number_of_players,debug)
 		self.poker.shuffle()
 		self.players_hands	= self.poker.distribute()

@@ -60,7 +60,8 @@ if __name__ == '__main__':
 		"debug": True,
 		'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
 		"static_path": os.path.join(os.path.dirname(__file__), "static"),
-		'session_storage':"dir",
+		# 'session_storage':"dir",
+		"session_storage":"mongodb:///db"
 	}
 	application = tornado.web.Application([
 		(r"/test", IndexTestHandler),

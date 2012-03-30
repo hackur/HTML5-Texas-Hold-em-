@@ -50,7 +50,8 @@ class GameRoom(object):
 			t.start()
 		return (True, "")
 
-	def start_game(self)
+	def start_game(self):
+		pass
 
 	def add_audit(self, player):
 		self.audit_list.append(player)
