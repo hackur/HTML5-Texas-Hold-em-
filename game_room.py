@@ -27,6 +27,7 @@ class GameRoom(object):
 		self.owner = owner
 		self.status = GAME_WAIT
 		self.broadcast_key = "broadcast_" + dealer.exchange + "_" + self.room_id + "_" + "*"
+		self.msg_broadcast = 0
 		self.player_list = []
 		self.waiting_list= []
 		self.audit_list = []
@@ -41,6 +42,8 @@ class GameRoom(object):
 		if not self.seats[seat_no].is_empty():
 			return (False, "Seat Occupied")
 		self.seats[seat_no].sit(player)
+		dealer.broadcast(self.broadcast_key, self.msg_broadcast)
+		self.msg_broadcast += 1
 		self.occupied_seat += 1
 		if self.occupied_seat == 2:
 			t = Timer(5, start_game)
