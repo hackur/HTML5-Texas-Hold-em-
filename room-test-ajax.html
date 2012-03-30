@@ -76,7 +76,6 @@ function listenBoardMessage(){
 		type:'post',
 		url:"./listen-board-message",
 		data:{offset:1,username:username,timestamp:1},
-		timeout:2000,
 		success:function(data){
 			console.log("listen board message reply success")
 			console.log(data);

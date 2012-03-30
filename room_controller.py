@@ -229,7 +229,6 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			return
 
 		if messages['status'] == 'success':
-			print "SUCCESS!!!"
 			self.session['messages'].append(messages)
 			self.session['is_site_down']	= True
 			#self.session['seat']		= message['seat']
@@ -258,9 +257,10 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 			self.clean_matured_message(timestamp)
 
 	def clean_matured_message(self, timestamp):
-		for message in self.session['messages'][:]:
-			if message['timestamp'] < timestamp:
-				self.session['messages'].remove(message)
+		pass
+#		for message in self.session['messages'][:]:
+#			if message['timestamp'] < timestamp:
+#				self.session['messages'].remove(message)
 
 	def action_call_back(self, argument):
 		if self.request.connection.stream.closed():
@@ -271,11 +271,10 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 		self.channel.add_message_action(self.message_call_back, None)
 
 	def message_call_back(self, argument):
-		messages= self.channel.get_messages()
+		messages= self.channel.get_messages()[0]
 		user	= self.session['user']
 		for message in messages:
-			if message['user_id'] == user.id:
-				self.session['messages'].append(message)
+			self.session['messages'].append(message)
 
 		if self.request.connection.stream.close():
 			self.channel.close()
@@ -295,6 +294,11 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 			timestamp	= self.get_argument('timestamp')
 			queue		= str(user.username)
 			exchange	= str(user.room.exchange)
+			if len(self.session['messages']) > 0:
+				messages = self.session['messages']
+				self.session['messages'] = []
+				self.finish(json.dumps(messages))
+				return
 			self.channel= Channel(queue, exchange, self.session['broadcast_key'])
 			self.channel.add_message_action(self.message_call_back, None)
 			self.channel.connect()
@@ -308,19 +312,14 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 
 	def message_call_back(self, argument):
 		print "\n\n\n\n\nchannel message"
-		messages= self.channel.get_messages()
-		print messages
+		messages= self.channel.get_messages()[0]
 		user	= self.session['user']
 		self.session['messages'].append(messages)
-
-
 		if self.request.connection.stream.closed():
-			self.channel.close();
+			self.channel.close()
 			return
-		print "x" *100
-		print "id=>", self.session['user'].id
-		print messages
+		
+		self.channel.close();
 		self.write(json.dumps(self.session['messages']));#{'status':'success', 'message':self.session['messages']}))
 		self.finish()
-		self.channel.close();
 
