@@ -187,9 +187,9 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
-		self.channel.close();
 		self.write(json.dumps(messages))
 		self.finish()
+		self.channel.close();
 
 
 class SitDownBoardHandler(tornado.web.RequestHandler):
@@ -300,14 +300,15 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 	 		self.clean_matured_message(timestamp)
 
 	def clean_matured_message(self, timestamp):
-		for message in self.session['messages'][:]:
-	 		if message['timestamp'] < timestamp:
-	 			self.session['messages'].remove(message)
+		pass
+#		for message in self.session['messages'][:]:
+#	 		if message['timestamp'] < timestamp:
+#	 			self.session['messages'].remove(message)
 
 	def message_call_back(self, argument):
-		print "channel message"
-
+		print "\n\n\n\n\nchannel message"
 		messages= self.channel.get_messages()
+		print messages
 		user	= self.session['user']
 		for message in messages:
 			self.session['messages'].append(message)
@@ -316,6 +317,9 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
+		print "x" *100
+		print "id=>", self.session['user'].id
+		print messages
 		self.write(json.dumps(messages));#{'status':'success', 'message':self.session['messages']}))
 		self.finish()
 		self.channel.close();
