@@ -33,7 +33,7 @@ class GameRoom(object):
 		self.owner			= owner
 		self.status			= GameRoom.GAME_WAIT
 		self.dealer			= dealer
-		self.broadcast_key	= "broadcast_" + self.dealer.exchange + "_" + str(self.room_id) + ".testing" 
+		self.broadcast_key	= "broadcast_%s_%d.testing" %(self.dealer.exchange, self.room_id)
 		self.player_list	= []
 		# self.waiting_list	= []
 		self.audit_list		= []

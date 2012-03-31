@@ -24,7 +24,7 @@ except:
     import pickle
 
 class Channel(object):
-	def __init__(self, queue_name, exchange, routing_key, request, durable_queue = False, host='localhost'):
+	def __init__(self, queue_name, exchange, routing_key, request=None, durable_queue = False, host='localhost'):
 		# Construct a queue name we'll use for this instance only
 		self.connected		= False
 		self.connecting		= False
@@ -44,7 +44,6 @@ class Channel(object):
 
 	def connect(self):
 		pika.log.info('PikaClient: Connecting to RabbitMQ on localhost:5672')
-
 		self.connecting = True
 		credentials = pika.PlainCredentials('guest', 'guest')
 		param = pika.ConnectionParameters(host=self.host,
@@ -108,21 +107,17 @@ class Channel(object):
 	def on_basic_cancel(self, frame):
 		pika.log.info('PikaClient: Basic Cancel Ok')
 		self.channel.close()
-#		self.connection.close()
 
 	def on_closed(self, connection):
 		print "connection cloase"
-		self.request.finish()
+		if self.request is not None:
+			self.request.finish()
 
 	def close(self):
 		print "close"
 		self.connection.close()
 
 	def publish_message(self, routing_key, message):
-		#print "publish "
-		#print "exchange		=>" + self.exchange
-		#print "rountint key	=>" + routing_key
-		#print "body		=>" + message
 		self.channel.basic_publish(exchange	= self.exchange,
 					routing_key	= routing_key,
 					body		= message)
@@ -153,22 +148,22 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		user.room_id= room.id
 		db_connection.addItem(user)
 		db_connection.commit_session()
-		queue			= str(user.username) + '_init'
-		exchange		= str(user.room.exchange)
-		routing_key		= exchange + '_' + queue
-		broadcast_queue	= str(user.username) + '_broadcast'
-		broadcast_key	= ('broadcast_'+exchange+'_%d.*')% (room.id)
-		message 		= {	'method'	: 'init',
-							'user_id'	: user.id,
-							'source'	: routing_key,
-							'room_id'	: user.room.id,
-							'listen_source': broadcast_key}
+		queue				= str(user.username) + '_init'
+		exchange			= str(user.room.exchange)
+		routing_key			= exchange + '_' + queue
+		broadcast_queue		= str(user.username) + '_broadcast'
+		broadcast_key		= ( 'broadcast_%s_%d.*')% (exchange, room.id)
+		message 			= {	'method'		: 'init',
+								'user_id'		: user.id,
+								'source'		: routing_key,
+								'room_id'		: user.room.id,
+								'listen_source'	: broadcast_key}
 
-		arguments	= {'routing_key': 'dealer', 'message': pickle.dumps(message)}
-		broadcast_channel = Channel(broadcast_queue, exchange, broadcast_key, True)
+		arguments			= {'routing_key': 'dealer', 'message': pickle.dumps(message)}
+		broadcast_channel	= Channel(broadcast_queue, exchange, broadcast_key, durable_queue = True)
 		broadcast_channel.connect()
 
-		self.channel= Channel(queue, exchange, routing_key, self)
+		self.channel		= Channel(queue, exchange, routing_key, self)
 		self.channel.add_ready_action(self.initial_call_back, arguments);
 		self.channel.connect()
 		self.session['broadcast_key']	= broadcast_key
@@ -191,8 +186,8 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 			self.channel.close();
 			return
 		self.write(json.dumps(messages))
-		self.finish()
 		self.channel.close();
+#		self.finish()
 
 
 class SitDownBoardHandler(tornado.web.RequestHandler):
@@ -237,8 +232,8 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			#self.session['seat']		= messages['seat']
 
 		self.write(json.dumps(messages))
-		self.finish()
 		self.channel.close();
+#		self.finish()
 
 #class BoardActionMessageHandler(tornado.web.RequestHandler):
 #	@tornado.web.asynchronous
@@ -289,7 +284,6 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 
 
 class BoardListenMessageHandler(tornado.web.RequestHandler):
-	
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
@@ -314,32 +308,24 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 			self.channel= Channel(queue, exchange, self.session['broadcast_key'], self)
 			self.channel.add_message_action(self.message_call_back, None)
 			self.channel.connect()
-	 		self.clean_matured_message(timestamp)
-
+	
 	def clean_matured_message(self, timestamp):
-		print "-------------------------------------------------", self.session["messages"]
 		self.session['messages'] = filter(lambda x: int(x['timestamp']) > timestamp,self.session['messages'])
-#		for message in self.session['messages'][:]:
-#	 		if message['timestamp'] < timestamp:
-#	 			self.session['messages'].remove(message)
 
 	def on_connection_close(self):
-		print self.session['user'].username,"CLOSED connection" * 10,self
 		self.channel.close()
 
 	def message_call_back(self, argument):
-		self.counter += 1
-		print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@   ", self.counter
-		print "\n\n\n\n\nchannel message"
 		messages= self.channel.get_messages()
-		user	= self.session['user']
-		print "MESSAGES IN ROOM CONTROLLER!!!!!!!! ", messages
+		print "------message receive start------"
+		print "counter => ",  self.counter
+		print messages
+		print "------message receive end------"
 		self.session['messages'].extend(messages)
+		self.counter += 1
 		if self.request.connection.stream.closed():
 			self.channel.close()
 			return
 
 		self.channel.close();
-		self.write(json.dumps(self.session['messages']));#{'status':'success', 'message':self.session['messages']}))
-		# self.finish()
-
+		self.write(json.dumps(self.session['messages']));
