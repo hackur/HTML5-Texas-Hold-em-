@@ -1,3 +1,5 @@
+
+<!DOCTYPE HTML>
 <html>
 <head>
 <script src="./static/jquery.min.js"></script>
@@ -25,19 +27,10 @@
 </body>
 <script>
 var username= "{{  username }}";
-$(document).ready(function(){
+$(function(){
 	var username = " {{ username }}";
 	var password = "123";
-	$.post(
-		"./login",
-		{username:username, password:password},
-		function(data){
-			$('#login').append(JSON.stringify(data));
-		},
-		'json'
-	);
-
-	$('#enter').click(function(){
+	var enter = function(){
 		var room = $('input[name="room_id"]').val();
 		$.post(
 			"./enter",
@@ -53,7 +46,17 @@ $(document).ready(function(){
 			},
 			'json'
 		);
-	});
+	};
+	$.post(
+		"./login",
+		{username:username, password:password},
+		function(data){
+			$('#login').append(JSON.stringify(data));
+			enter();
+		},
+		'json'
+	);
+
 	$('#sit_down').click(function(){
 		var seat = $('input[name="sit_no"]').val();
 //		postBoardMessage(message);
@@ -65,7 +68,7 @@ $(document).ready(function(){
 				console.log(data);
 				$("#msg").append(JSON.stringify(data) + "<br>");
 			},
-			dataTye:'json',
+			dataTye:'json'
 		});
 	});
 });
@@ -88,7 +91,7 @@ function listenBoardMessage(){
 			}
 			index++;
 		},
-		dataTye:'json',
+		dataTye:'json'
 	});
 }
 
