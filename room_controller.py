@@ -118,10 +118,10 @@ class Channel(object):
 		self.connection.close()
 
 	def publish_message(self, routing_key, message):
-		print "publish "
-		print "exchange		=>" + self.exchange
-		print "rountint key	=>" + routing_key
-		print "body		=>" + message
+		#print "publish "
+		#print "exchange		=>" + self.exchange
+		#print "rountint key	=>" + routing_key
+		#print "body		=>" + message
 		self.channel.basic_publish(exchange	= self.exchange,
 					routing_key	= routing_key,
 					body		= message)
@@ -142,7 +142,6 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		print "ENTER!!!!!!!!!!!!!"
 		db_connection	= DatabaseConnection()
 		message			= None
 		user			= self.session['user']
@@ -232,59 +231,59 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			return
 
 		if messages['status'] == 'success':
-			self.session['messages'].append(messages)
+			#self.session['messages'].append(messages)
 			self.session['is_site_down']	= True
-			#self.session['seat']		= message['seat']
+			#self.session['seat']		= messages['seat']
 
 		self.write(json.dumps(messages))
 		self.finish()
 		self.channel.close();
 
-class BoardActionMessageHandler(tornado.web.RequestHandler):
-	@tornado.web.asynchronous
-	@authenticate
-	def post(self):
-		if self.session['user'] is not None:
-			user		= self.session['user']
-			action		= self.get_argument('action')
-			amount		= self.get_argument('amount')
-			timestamp	= self.get_argument('timestamp')
-			queue		= str(user.username)+'_action'
-			exchange	= str(user.room.exchange)
-			source		= exchange + '_' + queue
-			message		= {'method':'action', 'user_id':user.id, 'amount':amount, 'source':source}
-			arguments	= {'routing_key':'dealer', 'message':pickle.dumps(message)}
-			self.channel	= Channel(queue, exchange, source)
-			self.channel.add_ready_action(self.action_call_back, arguments)
-			self.channel.connect()
-			self.clean_matured_message(timestamp)
-
-	def clean_matured_message(self, timestamp):
-		pass
-#		for message in self.session['messages'][:]:
-#			if message['timestamp'] < timestamp:
-#				self.session['messages'].remove(message)
-
-	def action_call_back(self, argument):
-		if self.request.connection.stream.closed():
-			self.channel.close()
-			return
-
-		self.channel.publish_message(argument['routing_key'], argument['message'])
-		self.channel.add_message_action(self.message_call_back, None)
-
-	def message_call_back(self, argument):
-		messages= self.channel.get_messages()[0]
-		user	= self.session['user']
-		for message in messages:
-			self.session['messages'].append(message)
-
-		if self.request.connection.stream.close():
-			self.channel.close()
-		self.write(json.dumps({'status':'success', 'message':self.session['messages']}))
-		self.finish()
-		self.channel.close()
-
+#class BoardActionMessageHandler(tornado.web.RequestHandler):
+#	@tornado.web.asynchronous
+#	@authenticate
+#	def post(self):
+#		if self.session['user'] is not None:
+#			user		= self.session['user']
+#			action		= self.get_argument('action')
+#			amount		= self.get_argument('amount')
+#			timestamp	= self.get_argument('timestamp')
+#			queue		= str(user.username)+'_action'
+#			exchange	= str(user.room.exchange)
+#			source		= exchange + '_' + queue
+#			message		= {'method':'action', 'user_id':user.id, 'amount':amount, 'source':source}
+#			arguments	= {'routing_key':'dealer', 'message':pickle.dumps(message)}
+#			self.channel	= Channel(queue, exchange, source)
+#			self.channel.add_ready_action(self.action_call_back, arguments)
+#			self.channel.connect()
+#			self.clean_matured_message(timestamp)
+#
+#	def clean_matured_message(self, timestamp):
+#		pass
+##		for message in self.session['messages'][:]:
+##			if message['timestamp'] < timestamp:
+##				self.session['messages'].remove(message)
+#
+#	def action_call_back(self, argument):
+#		if self.request.connection.stream.closed():
+#			self.channel.close()
+#			return
+#
+#		self.channel.publish_message(argument['routing_key'], argument['message'])
+#		self.channel.add_message_action(self.message_call_back, None)
+#
+#	def message_call_back(self, argument):
+#		messages= self.channel.get_messages()[0]
+#		user	= self.session['user']
+#		for message in messages:
+#			self.session['messages'].append(message)
+#
+#		if self.request.connection.stream.close():
+#			self.channel.close()
+#		self.write(json.dumps({'status':'success', 'message':self.session['messages']}))
+#		self.finish()
+#		self.channel.close()
+#
 
 
 
@@ -294,14 +293,19 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 	def post(self):
 		if self.session['user'] is not None:
 			user		= self.session['user']
-			print  user
+			print  user.username
 			print self.session['broadcast_key']
-			timestamp	= self.get_argument('timestamp')
+			timestamp	= int(self.get_argument('timestamp'))
 			queue		= str(user.username)
 			exchange	= str(user.room.exchange)
+
+			for msg in self.session['messages']:
+				print "x" * 10,timestamp
+				print msg
+	 		self.clean_matured_message(timestamp)
+
 			if len(self.session['messages']) > 0:
 				messages = self.session['messages']
-				self.session['messages'] = []
 				self.finish(json.dumps(messages))
 				return
 			self.channel= Channel(queue, exchange, self.session['broadcast_key'])
@@ -310,24 +314,25 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 	 		self.clean_matured_message(timestamp)
 
 	def clean_matured_message(self, timestamp):
-		pass
+		self.session['messages'] = filter(lambda x: int(x['timestamp']) > timestamp,self.session['messages'])
 #		for message in self.session['messages'][:]:
 #	 		if message['timestamp'] < timestamp:
 #	 			self.session['messages'].remove(message)
 
 	def on_connection_close(self):
-		print "CLOSE!!" * 10
+		print self.session['user'].username,"CLOSED connection"
 		self.channel.close()
 
 	def message_call_back(self, argument):
 		print "\n\n\n\n\nchannel message"
-		messages= self.channel.get_messages()[0]
+		messages= self.channel.get_messages()
 		user	= self.session['user']
-		self.session['messages'].append(messages)
+		print messages
+		self.session['messages'].extend(messages)
 		if self.request.connection.stream.closed():
 			self.channel.close()
 			return
-		
+
 		self.channel.close();
 		self.write(json.dumps(self.session['messages']));#{'status':'success', 'message':self.session['messages']}))
 		self.finish()

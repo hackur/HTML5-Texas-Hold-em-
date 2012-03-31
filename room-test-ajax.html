@@ -17,7 +17,8 @@
 
 <div>
 <label>room no:</label><input name="room_id" type="text" value="1" /><br />
-<button id="enter">enter</button>
+<!-- <button id="enter">enter</button> -->
+
 </div>
 <div>
 	<label>sit no:</label><input name="sit_no" type="text" value="{{ sitno }}"/><br />
@@ -72,16 +73,24 @@ $(function(){
 		});
 	});
 });
-function listenBoardMessage(){
+function listenBoardMessage(timestamp){
+	if(!timestamp) timestamp = -1;
+
 	$.ajax({
 		type:'post',
 		url:"./listen-board-message",
-		data:{offset:1,username:username,timestamp:1},
+		data:{offset:1,username:username,timestamp:timestamp},
 		success:function(data){
 			console.log("listen board message reply success")
 			console.log(data);
-			listenBoardMessage();
+			data = JSON.parse(data);
+			for(i = 0; i < data.length; i++){
+				timestamp = data[i].timestamp;
+				console.log(data[i]);
+			}
+			listenBoardMessage(timestamp);
 			$("#msg").append(JSON.stringify(data) + "<br>");
+			$("#msg").append(timestamp + "<br>");
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
 			console.log("listen board message reply error")
