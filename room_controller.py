@@ -73,7 +73,7 @@ class Channel(object):
 		self.channel.queue_declare(	queue		= self.queue_name,
 									auto_delete	= not self.durable_queue,
 									durable		= self.durable_queue,
-									exclusive	= True,
+									exclusive	= False,
 									callback	= self.on_queue_declared)
 		pika.log.info('PikaClient: Exchange Declared, Declaring Queue Finish')
 
@@ -293,7 +293,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 	def post(self):
 		if self.session['user'] is not None:
 			user		= self.session['user']
-			print  user.username
+			print  user.username, self
 			print self.session['broadcast_key']
 			timestamp	= int(self.get_argument('timestamp'))
 			queue		= str(user.username)
@@ -320,7 +320,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 #	 			self.session['messages'].remove(message)
 
 	def on_connection_close(self):
-		print self.session['user'].username,"CLOSED connection"
+		print self.session['user'].username,"CLOSED connection" * 10,self
 		self.channel.close()
 
 	def message_call_back(self, argument):
