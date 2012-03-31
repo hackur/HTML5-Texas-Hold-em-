@@ -8,14 +8,14 @@ body{
     height:640px;
     width:960px;
     margin:20px auto;
-    background:url(/img/gamebg.png);
+    background:url(../img/gamebg.png);
     //opacity:0.3;
     position:relative;
 }
 
 #container .gametable{
 	position: relative;
-	background:url(/img/table1.png);
+	background:url(../img/table1.png);
 	height:445px;
 	width:939px;
 	margin:0 auto;
@@ -31,7 +31,7 @@ body{
 	top: 113px;
 }
 #container .sits{
-	background:url(/img/avatarframe.png);
+	background:url(../img/avatarframe.png);
 	width:135px;
 	height:149px;
 	position: absolute;
@@ -219,7 +219,7 @@ table poker config
 }
 
 .footer .rightpart div{
-	background:url(/img/gamebtnbg.png);
+	background:url(../img/gamebtnbg.png);
 	float: right;
 	width: 185px;
 	height: 67px;

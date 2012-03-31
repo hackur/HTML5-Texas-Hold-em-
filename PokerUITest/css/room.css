@@ -6,7 +6,7 @@ body{
     height:640px;
     width:960px;
     margin:20px auto;
-    background:url(/img/room.png);
+    background:url(../img/room.png);
     //opacity:0.3;
     position:relative;
 }
@@ -22,22 +22,22 @@ body{
     line-height:40px;
 }
 #header #backTo{
-    background:url(/img/backTo.png);
+    background:url(../img/backTo.png);
     height:46px;
     width:78px;
     float:left;
 }
 #header #backTo:hover{
-    background:url(/img/backTohoversuck.png);
+    background:url(../img/backTohoversuck.png);
 }
 #header #createroom{
-    background:url(/img/createroom.png);
+    background:url(../img/createroom.png);
     height:48px;
     width:127px;
     float:right;
 }
 #header #refresh{
-    background:url(/img/createroom.png);
+    background:url(../img/createroom.png);
     height:48px;
     width:127px;
     float:right;
@@ -52,7 +52,7 @@ body{
     list-style:none;
     width:932px;
     height:62px;
-    background:url(/img/framebackground.png);
+    background:url(../img/framebackground.png);
     position: relative;
     top: 5px;
     margin-left:15px;
@@ -192,7 +192,7 @@ body{
     -o-border-radius: 5px;
 }
 #setting .button{
-    background:url(/img/slidebar.png);
+    background:url(../img/slidebar.png);
     display: block;
     height:39px;
     width:61px;
@@ -213,14 +213,14 @@ body{
 }
 
 #setting .confirm{
-    background:url(/img/confirm.png);
+    background:url(../img/confirm.png);
     float:right;
     height:41px;
     width:79px;
     clear:both;
 }
 #setting .confirm:hover{
-    background:url(/img/confirmhoversuck.png);
+    background:url(../img/confirmhoversuck.png);
 }
 
 
