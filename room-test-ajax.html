@@ -3,7 +3,7 @@
 <script src="./static/jquery.min.js"></script>
 </head>
 <body>
-<div>
+<div id="login">
 
 	<!--
 <label>username:</label><input name="username" type="text" value="{{ username }}"/><br />
@@ -26,18 +26,16 @@
 <script>
 var username= "{{  username }}";
 $(document).ready(function(){
-	$('#login').click(function(){
-		var username = $('input[name="username"]').val();
-		var password = $('input[name="password"]').val();
-		$.post(
-			"./login",
-			{username:username, password:password},
-			function(data){
-				console.log(data);
-			},
-			'json'
-		);
-	});
+	var username = " {{ username }}";
+	var password = "123";
+	$.post(
+		"./login",
+		{username:username, password:password},
+		function(data){
+			$('#login').append(JSON.stringify(data));
+		},
+		'json'
+	);
 
 	$('#enter').click(function(){
 		var room = $('input[name="room_id"]').val();

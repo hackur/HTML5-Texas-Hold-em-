@@ -28,16 +28,21 @@ class GameRoom(object):
 		self.room_id		= room_id
 		self.owner			= owner
 		self.status			= GameRoom.GAME_WAIT
-		self.broadcast_key	= "broadcast_" + dealer.exchange + "_" + str(self.room_id) + ".testing" 
-		self.msg_broadcast	= {'status':'success', 'no_player':0, 'timestamp':time.time()}
+		self.broadcast_key	= "broadcast_" + dealer.exchange + "_" + str(self.room_id) + ".testing"
 		self.player_list	= []
 		self.waiting_list	= []
 		self.audit_list		= []
-		self.seats			= [] 
+		self.seats			= []
 		for x in xrange(num_of_seats):
 			self.seats.append(Seat())
 		self.occupied_seat	= 0
 		self.dealer			= dealer
+		self.msg_count= 0
+
+	def broadcast(self,msg):
+		self.msg_count += 1
+		msg['timestamp'] = self.msg_count
+		self.dealer.broadcast(self.broadcast_key, msg)
 
 	def sit(self,player,seat_no):
 		seat_no = int(seat_no)
@@ -47,9 +52,10 @@ class GameRoom(object):
 		if not self.seats[seat_no].is_empty():
 			return (False, "Seat Occupied")
 		self.seats[seat_no].sit(player)
-		self.dealer.broadcast(self.broadcast_key, self.msg_broadcast)
-		self.msg_broadcast['no_player'] += 1
 		self.occupied_seat += 1
+
+		msg_broadcast	= {'status':'success', 'no_player': self.occupied_seat}
+		self.broadcast(msg_broadcast)
 
 		if self.occupied_seat == 2:
 			t = Timer(5, self.start_game,args=[])

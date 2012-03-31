@@ -75,6 +75,7 @@ class Channel(object):
 									durable		= self.durable_queue,
 									exclusive	= True,
 									callback	= self.on_queue_declared)
+		pika.log.info('PikaClient: Exchange Declared, Declaring Queue Finish')
 
 	def on_queue_declared(self, frame):
 		pika.log.info('PikaClient: Queue Declared, Binding Queue')
@@ -88,6 +89,7 @@ class Channel(object):
 		self.consumer_tag = self.channel.basic_consume(consumer_callback=self.on_room_message,
 						queue=self.queue_name,
 						no_ack=True)
+		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume Finish')
 
 		for element in self.ready_actions:
 			element['functor'](element['argument'])
@@ -140,6 +142,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
+		print "ENTER!!!!!!!!!!!!!"
 		db_connection	= DatabaseConnection()
 		message			= None
 		user			= self.session['user']
@@ -283,6 +286,8 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 		self.channel.close()
 
 
+
+
 class BoardListenMessageHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
@@ -309,6 +314,10 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 #		for message in self.session['messages'][:]:
 #	 		if message['timestamp'] < timestamp:
 #	 			self.session['messages'].remove(message)
+
+	def on_connection_close(self):
+		print "CLOSE!!" * 10
+		self.channel.close()
 
 	def message_call_back(self, argument):
 		print "\n\n\n\n\nchannel message"

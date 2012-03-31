@@ -131,9 +131,9 @@ class Dealer(object):
 		(status, msg) = current_room.sit(user, args["seat"])
 
 		if status:
-			message = {"status": "success", "timestamp":time.time()}
+			message = {"status": "success" }
 		else:
-			message = {"status": "failed", "msg": msg, "timestamp":time.time()}
+			message = {"status": "failed", "msg": msg}
 
 		self.channel.basic_publish(	exchange	= self.exchange,
 									routing_key	= routing_key,
@@ -168,11 +168,11 @@ class Dealer(object):
 		self.room_list[args['room_id']] = GameRoom(args["room_id"], args["user_id"], self)
 		# self.db_connection.start_session()
 
-		message = {"status": "success","room_id": args["room_id"], 'timestampe':time.time()}
+		#message = {"status": "success","room_id": args["room_id"], 'timestampe':time.time()}
 #		print room["player_list"]
-		self.channel.basic_publish(	exchange	= self.exchange,
-									routing_key	= args['source'],
-									body		= pickle.dumps(message))
+		#self.channel.basic_publish(	exchange	= self.exchange,
+		#							routing_key	= args['source'],
+		#							body		= pickle.dumps(message))
 
 
 	def on_message(self, channel, method, header, body):
