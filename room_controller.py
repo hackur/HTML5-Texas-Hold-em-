@@ -112,7 +112,7 @@ class Channel(object):
 
 	def on_closed(self, connection):
 		print "connection cloase"
-		request.finish()
+		self.request.finish()
 
 	def close(self):
 		print "close"

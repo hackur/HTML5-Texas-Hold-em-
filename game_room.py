@@ -87,13 +87,13 @@ class GameRoom(object):
 		self.broadcast(msg_broadcast)	
 
 		for seat in players:
-			print "self.get_direct_key ............................. ", seat.get_direct_key()
+			# print "self.get_direct_key ............................. ", seat.get_direct_key()
 			print str(seat._user.username) + ": "
 			for cards in seat.handcards:
 				# print str(self.suit[cards.symbol])+"/"+str(self.face[cards.value-2])+" ",
 				card = str(self.suit[cards.symbol])+"/"+str(self.face[cards.value-2])
 				msg_sent = {"Cards": card}
-				self.broadcast(msg_sent)
+				self.dealer.broadcast(seat.get_direct_key(), msg_sent)
 
 	def add_audit(self, player):
 		self.audit_list.append(player)
