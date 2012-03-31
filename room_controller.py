@@ -24,7 +24,7 @@ except:
     import pickle
 
 class Channel(object):
-	def __init__(self, queue_name, exchange, routing_key, request=None, durable_queue = False, host='localhost'):
+	def __init__(self, queue_name, exchange, binding_keys, request=None, durable_queue = False, host='localhost'):
 		# Construct a queue name we'll use for this instance only
 		self.connected		= False
 		self.connecting		= False
@@ -33,7 +33,7 @@ class Channel(object):
 		self.host			= host
 		self.exchange		= exchange
 		self.queue_name		= queue_name
-		self.routing_key	= routing_key
+		self.binding_keys	= binding_keys
 		self.durable_queue	= durable_queue
 		self.messages		= list()
 		self.ready_actions	= list()
@@ -79,10 +79,11 @@ class Channel(object):
 
 	def on_queue_declared(self, frame):
 		pika.log.info('PikaClient: Queue Declared, Binding Queue')
-		self.channel.queue_bind(exchange=self.exchange,
-					queue=self.queue_name,
-					routing_key=self.routing_key,
-					callback=self.on_queue_bound)
+		for key in self.binding_keys:
+			self.channel.queue_bind(exchange	= self.exchange,
+									queue		= self.queue_name,
+									routing_key	= key,
+									callback	= self.on_queue_bound)
 
 	def on_queue_bound(self, frame):
 		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
@@ -111,6 +112,8 @@ class Channel(object):
 	def on_closed(self, connection):
 		print "connection cloase"
 		if self.request is not None:
+			if len(self.request.session['messages']) > 0:
+				self.request.write(json.dumps(self.request.session['messages']));
 			self.request.finish()
 
 	def close(self):
@@ -151,24 +154,28 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		queue				= str(user.username) + '_init'
 		exchange			= str(user.room.exchange)
 		routing_key			= exchange + '_' + queue
+		
 		broadcast_queue		= str(user.username) + '_broadcast'
-		broadcast_key		= ( 'broadcast_%s_%d.*')% (exchange, room.id)
+		public_key			= ('broadcast_%s_%d.*')% (exchange, room.id)
+		private_key			= ('direct.%s.%d.%d') % (exchange, room.id, user.id)
 		message 			= {	'method'		: 'init',
 								'user_id'		: user.id,
 								'source'		: routing_key,
 								'room_id'		: user.room.id,
-								'listen_source'	: broadcast_key}
+								'private_key'	: private_key}
 
 		arguments			= {'routing_key': 'dealer', 'message': pickle.dumps(message)}
-		broadcast_channel	= Channel(broadcast_queue, exchange, broadcast_key, durable_queue = True)
+		broadcast_channel	= Channel(broadcast_queue, exchange, [private_key, public_key], durable_queue = True)
 		broadcast_channel.connect()
 
-		self.channel		= Channel(queue, exchange, routing_key, self)
+		self.channel		= Channel(queue, exchange, [routing_key], self)
 		self.channel.add_ready_action(self.initial_call_back, arguments);
 		self.channel.connect()
-		self.session['broadcast_key']	= broadcast_key
-		self.session['user'] 			= user
-		self.session['messages']		= list()
+		self.session['public_key']	= public_key
+		self.session['private_key']	= private_key
+		self.session['user'] 		= user
+		self.session['messages']	= list()
+	
 
 	def get(self):
 		self.render("room-test-ajax.html")
@@ -206,9 +213,9 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			queue_name		= str(user.username)+'_sit'
 			exchange_name	= str(user.room.exchange)
 			source_key		= exchange_name + '_' + queue_name
-			message 		= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key, 'room_id':user.room.id}
+			message 		= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key, 'room_id':user.room.id, 'private_key':self.session['private_key']}
 			arguments		= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
-			self.channel	= Channel(queue_name, exchange_name, source_key, self)
+			self.channel	= Channel(queue_name, exchange_name, [source_key], self)
 			self.channel.add_ready_action(self.sit_call_back, arguments)
 			self.channel.connect()
 
@@ -290,22 +297,18 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		self.counter = 0
 		if self.session['user'] is not None:
 			user		= self.session['user']
-			print  user.username, self
-			print self.session['broadcast_key']
 			timestamp	= int(self.get_argument('timestamp'))
 			queue		= str(user.username)
 			exchange	= str(user.room.exchange)
-
-			for msg in self.session['messages']:
-				print "x" * 10, timestamp
-				print msg
 	 		self.clean_matured_message(timestamp)
 
 			if len(self.session['messages']) > 0:
 				messages = self.session['messages']
 				self.finish(json.dumps(messages))
 				return
-			self.channel= Channel(queue, exchange, self.session['broadcast_key'], self)
+
+			binding_keys= [self.session['public_key'], self.session['private_key']]
+			self.channel= Channel(queue, exchange, binding_keys, self)
 			self.channel.add_message_action(self.message_call_back, None)
 			self.channel.connect()
 	
@@ -328,4 +331,3 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 			return
 
 		self.channel.close();
-		self.write(json.dumps(self.session['messages']));

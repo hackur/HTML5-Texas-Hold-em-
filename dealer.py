@@ -107,16 +107,15 @@ class Dealer(object):
 	def cmd_sit(self, args):
 		print "sit received"
 		""" User clicked Sit Down"""
-		#db_connection	= DatabaseConnection()
 		self.db_connection.start_session()
-		routing_key 		= args['source']
+		source 			= args['source']
+		private_key		= args['private_key']
 		# print args
-		user				= self.db_connection.query(User).filter_by(id=args['user_id']).first()
-		current_room = self.room_list[args["room_id"]]
+		user			= self.db_connection.query(User).filter_by(id=args['user_id']).first()
+		current_room	= self.room_list[args["room_id"]]
 
-		(status, msg) = current_room.sit(user, args["seat"], routing_key)
-		print "routing_key in cmd_sit+++++++++++++++++++++++", routing_key
-		# print (status, msg)
+		(status, msg)	= current_room.sit(user, args["seat"], source, private_key)
+		print "source in cmd_sit+++++++++++++++++++++++", source
 
 		if status:
 			message = {"status": "success" }
@@ -124,7 +123,7 @@ class Dealer(object):
 			message = {"status": "failed", "msg": msg}
 
 		self.channel.basic_publish(	exchange	= self.exchange,
-									routing_key	= routing_key,
+									routing_key	= source,
 									body		= pickle.dumps(message))
 
 	

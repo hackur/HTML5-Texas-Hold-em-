@@ -18,13 +18,17 @@ class Seat(object):
 	def is_empty(self):
 		return self._status == Seat.SEAT_EMPTY
 
-	def sit(self, user, direct_key):
+	def sit(self, user, direct_key, private_key):
 		self._user = user
 		self._status = Seat.SEAT_WAITING
 		self._direct_key = direct_key
+		self._private_key= private_key
 
 	def get_direct_key(self):
 		return self._direct_key
+	
+	def get_private_key(self):
+		return self._private_key
 
 class GameRoom(object):
 	(GAME_WAIT,GAME_PLAY) = (0,1)
@@ -45,13 +49,16 @@ class GameRoom(object):
 		self.face = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
 		self.msg_count= 0
 
-	def broadcast(self,msg):
+	def broadcast(self,msg,route_key=None):
 		self.msg_count += 1
 		msg['timestamp'] = self.msg_count
 		print msg["timestamp"]
-		self.dealer.broadcast(self.broadcast_key, msg)
+		if not route_key:
+			route_key = self.broadcast_key
+			
+		self.dealer.broadcast(route_key, msg)
 
-	def sit(self, player, seat_no, direct_key):
+	def sit(self, player, seat_no, direct_key,private_key):
 		print "direct_key.........................................", direct_key
 		seat_no = int(seat_no)
 		print "seat request =>%d\n" % (seat_no)
@@ -59,7 +66,7 @@ class GameRoom(object):
 			return (False, "Seat number is too large: %s we have %s" % (seat_no,len(self.seats)))
 		if not self.seats[seat_no].is_empty():
 			return (False, "Seat Occupied")
-		self.seats[seat_no].sit(player, direct_key)
+		self.seats[seat_no].sit(player, direct_key, private_key)
 
 		self.player_list.append(self.seats[seat_no])
 
@@ -93,7 +100,7 @@ class GameRoom(object):
 				# print str(self.suit[cards.symbol])+"/"+str(self.face[cards.value-2])+" ",
 				card = str(self.suit[cards.symbol])+"/"+str(self.face[cards.value-2])
 				msg_sent = {"Cards": card}
-				self.dealer.broadcast(seat.get_direct_key(), msg_sent)
+				self.broadcast(msg_sent,seat.get_private_key())
 
 	def add_audit(self, player):
 		self.audit_list.append(player)
