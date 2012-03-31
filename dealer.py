@@ -32,20 +32,6 @@ class Cards(object):
 				self._cardCount -= 1
 				return self._cards[i][ram]
 
-
-# class Room(object):
-# 	def __init__(args):
-# 		print "Creating Room"
-# 		self.id = args['room_id']
-# 		self.owner = args["user_id"]
-# 		self.status = "WAIT"
-# 		self.player_list = []
-# 		self.audit_list = []
-
-	# def create_fdbk():
-	# 	message = {"status": "success","room_id": room["id"]}
-
-
 class Dealer(object):
 #	users = []
 	# waiting_list = {}
@@ -118,7 +104,7 @@ class Dealer(object):
 		self.channel.basic_consume(self.on_message, self.queue, no_ack=True)
 		self.channel.start_consuming()
 
-	def cmd_sit(self,args):
+	def cmd_sit(self, args):
 		print "sit received"
 		""" User clicked Sit Down"""
 		#db_connection	= DatabaseConnection()
@@ -128,7 +114,9 @@ class Dealer(object):
 		user				= self.db_connection.query(User).filter_by(id=args['user_id']).first()
 		current_room = self.room_list[args["room_id"]]
 
-		(status, msg) = current_room.sit(user, args["seat"])
+		(status, msg) = current_room.sit(user, args["seat"], routing_key)
+		print "routing_key in cmd_sit+++++++++++++++++++++++", routing_key
+		# print (status, msg)
 
 		if status:
 			message = {"status": "success" }
@@ -139,6 +127,7 @@ class Dealer(object):
 									routing_key	= routing_key,
 									body		= pickle.dumps(message))
 
+	
 	def broadcast(self, routing_key, msg):
 		print routing_key
 		print msg
@@ -153,7 +142,8 @@ class Dealer(object):
 			print "Room created"
 
 		current_room = self.room_list[args["room_id"]]
-		current_room.add_audit({'user':args["user_id"], 'listen_source':args['listen_source']})
+		current_room.add_audit({'user':args["user_id"]})
+			# , 'listen_source':args['listen_source']})
 
 		routing_key	= args['source']
 		message		= {'status':'success', 'content':'nothing', 'timestamp':time.time()}
@@ -166,13 +156,7 @@ class Dealer(object):
 		print "creating room"
 
 		self.room_list[args['room_id']] = GameRoom(args["room_id"], args["user_id"], self)
-		# self.db_connection.start_session()
 
-		#message = {"status": "success","room_id": args["room_id"], 'timestampe':time.time()}
-#		print room["player_list"]
-		#self.channel.basic_publish(	exchange	= self.exchange,
-		#							routing_key	= args['source'],
-		#							body		= pickle.dumps(message))
 
 
 	def on_message(self, channel, method, header, body):
@@ -183,33 +167,33 @@ class Dealer(object):
 		method(obj)
 
 
-	def game_play(self, users, current_room):
-		# print "--------------------"+str(users)
-		print "users in game_play, ", users
-		current_room["status"] = "PLAY"
-		game = poker_controller.PokerController(users)
-		game.getFlop()
-		for card in game.publicCard:
-			print str(self.suit[card.symbol])+"/"+str(self.face[card.value-2])+" ",
-		print
+	# def game_play(self, users, current_room):
+	# 	# print "--------------------"+str(users)
+	# 	print "users in game_play, ", users
+	# 	current_room["status"] = "PLAY"
+	# 	game = poker_controller.PokerController(users)
+	# 	game.getFlop()
+	# 	for card in game.publicCard:
+	# 		print str(self.suit[card.symbol])+"/"+str(self.face[card.value-2])+" ",
+	# 	print
 
-		for user in users:
-			print str(user.username) + ": ",
-			for cards in user.handcards:
-				 print str(self.suit[cards.symbol])+"/"+str(self.face[cards.value-2])+" ",
-			print
+	# 	for user in users:
+	# 		print str(user.username) + ": ",
+	# 		for cards in user.handcards:
+	# 			 print str(self.suit[cards.symbol])+"/"+str(self.face[cards.value-2])+" ",
+	# 		print
 
-		game.getOne()
-		game.getOne()
-		result = game.getWinner()
-		for winner in result["winners"]:
-			print winner.username
-		current_room["status"] = "WAIT"
-			# game.getOne()
-			# game.getOne()
-			# result = game.getWinner()
-			# print result["winners"][0].username
-		return
+	# 	game.getOne()
+	# 	game.getOne()
+	# 	result = game.getWinner()
+	# 	for winner in result["winners"]:
+	# 		print winner.username
+	# 	current_room["status"] = "WAIT"
+	# 		# game.getOne()
+	# 		# game.getOne()
+	# 		# result = game.getWinner()
+	# 		# print result["winners"][0].username
+	# 	return
 
 	def same_str(str1, str2):
 		if len(str1) != len(str2):

@@ -24,7 +24,7 @@ except:
     import pickle
 
 class Channel(object):
-	def __init__(self, queue_name, exchange, routing_key,  durable_queue = False,host='localhost'):
+	def __init__(self, queue_name, exchange, routing_key, request, durable_queue = False, host='localhost'):
 		# Construct a queue name we'll use for this instance only
 		self.connected		= False
 		self.connecting		= False
@@ -39,6 +39,7 @@ class Channel(object):
 		self.ready_actions	= list()
 		self.message_actions= list()
 		self.consumer_tag	= None
+		self.request 		= request
 		print "exchange [%s] queue [%s]" %( self.exchange, self.queue_name)
 
 	def connect(self):
@@ -111,7 +112,7 @@ class Channel(object):
 
 	def on_closed(self, connection):
 		print "connection cloase"
-		pass
+		request.finish()
 
 	def close(self):
 		print "close"
@@ -167,7 +168,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		broadcast_channel = Channel(broadcast_queue, exchange, broadcast_key, True)
 		broadcast_channel.connect()
 
-		self.channel= Channel(queue, exchange, routing_key)
+		self.channel= Channel(queue, exchange, routing_key, self)
 		self.channel.add_ready_action(self.initial_call_back, arguments);
 		self.channel.connect()
 		self.session['broadcast_key']	= broadcast_key
@@ -212,7 +213,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			source_key		= exchange_name + '_' + queue_name
 			message 		= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key, 'room_id':user.room.id}
 			arguments		= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
-			self.channel	= Channel(queue_name, exchange_name, source_key)
+			self.channel	= Channel(queue_name, exchange_name, source_key, self)
 			self.channel.add_ready_action(self.sit_call_back, arguments)
 			self.channel.connect()
 
@@ -288,9 +289,11 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 
 
 class BoardListenMessageHandler(tornado.web.RequestHandler):
+	
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
+		self.counter = 0
 		if self.session['user'] is not None:
 			user		= self.session['user']
 			print  user.username, self
@@ -300,7 +303,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 			exchange	= str(user.room.exchange)
 
 			for msg in self.session['messages']:
-				print "x" * 10,timestamp
+				print "x" * 10, timestamp
 				print msg
 	 		self.clean_matured_message(timestamp)
 
@@ -308,12 +311,13 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 				messages = self.session['messages']
 				self.finish(json.dumps(messages))
 				return
-			self.channel= Channel(queue, exchange, self.session['broadcast_key'])
+			self.channel= Channel(queue, exchange, self.session['broadcast_key'], self)
 			self.channel.add_message_action(self.message_call_back, None)
 			self.channel.connect()
 	 		self.clean_matured_message(timestamp)
 
 	def clean_matured_message(self, timestamp):
+		print "-------------------------------------------------", self.session["messages"]
 		self.session['messages'] = filter(lambda x: int(x['timestamp']) > timestamp,self.session['messages'])
 #		for message in self.session['messages'][:]:
 #	 		if message['timestamp'] < timestamp:
@@ -324,10 +328,12 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		self.channel.close()
 
 	def message_call_back(self, argument):
+		self.counter += 1
+		print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@   ", self.counter
 		print "\n\n\n\n\nchannel message"
 		messages= self.channel.get_messages()
 		user	= self.session['user']
-		print messages
+		print "MESSAGES IN ROOM CONTROLLER!!!!!!!! ", messages
 		self.session['messages'].extend(messages)
 		if self.request.connection.stream.closed():
 			self.channel.close()
@@ -335,5 +341,5 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 
 		self.channel.close();
 		self.write(json.dumps(self.session['messages']));#{'status':'success', 'message':self.session['messages']}))
-		self.finish()
+		# self.finish()
 
