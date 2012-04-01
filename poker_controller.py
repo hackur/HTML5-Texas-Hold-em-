@@ -1,6 +1,7 @@
 import sys,random
 from random import shuffle
 from dealer import Dealer
+from game_room import Seat
 
 class Card:
 	def __init__(self, symbol, value):
@@ -495,11 +496,13 @@ class Poker:
 
 class PokerController(object):
 	def __init__(self, seats, debug=False):
-		users = filter(lambda seat: seat.status == Seat.SEAT_PLAYING,seats)
+		users = filter(lambda seat: seat.status == Seat.SEAT_WAITING, seats)
 		number_of_players	= len(users)
 		self.publicCard		= []
 		self.users		= users
-		print self.users[0]
+		for u in users:
+			print u
+		# print self.users[0]
 		self.poker		= Poker(number_of_players,debug)
 		self.poker.shuffle()
 		self.players_hands	= self.poker.distribute()
@@ -591,4 +594,4 @@ pokerController.getOne()
 print len(pokerController.users)
 r = pokerController.getWinner()
 print len(r['winners']),len(r['losers'])
-'''
+))'''
