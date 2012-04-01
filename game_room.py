@@ -31,18 +31,24 @@ class Seat(object):
 
 	def get_direct_key(self):
 		return self._direct_key
-	
+
 	def get_private_key(self):
 		return self._private_key
 
-	def set_status(self, status):
+
+	@property
+	def status(self, status):
 		self._status = status
+
+	@status.setter
+	def status(self):
+		return self._status
 
 	def get_role(self):
 		return self._role
 	def set_role(self, role):
 		self._role = role
-	
+
 
 class GameRoom(object):
 	(GAME_WAIT,GAME_PLAY) = (0,1)
@@ -75,7 +81,7 @@ class GameRoom(object):
 		print msg["timestamp"]
 		if not route_key:
 			route_key = self.broadcast_key
-			
+
 		self.dealer.broadcast(route_key, msg)
 
 	def sit(self, player, seat_no, direct_key, private_key):
@@ -89,10 +95,10 @@ class GameRoom(object):
 		if self.status == GameRoom.GAME_PLAY:
 			return (False, "Game Ongoing")
 		self.seats[seat_no].sit(player, direct_key, private_key)
-		
+
 		self.player_stake[seat_no] = player.stake	# read user's money
 		print player.stake
-		
+
 		self.player_list.append(self.seats[seat_no])
 
 		self.occupied_seat += 1
@@ -111,7 +117,7 @@ class GameRoom(object):
 		i = 0
 		for counter in xrange(9):
 			if not self.seats[index].is_empty():
-				if i == 0:		
+				if i == 0:
 					self.current_dealer = index % len(self.seats)
 				elif i == 1:
 					self.small_blind = index % len(self.seats)
@@ -123,24 +129,24 @@ class GameRoom(object):
 		print "small_blind: ", self.small_blind
 		print "big_blind: ", self.big_blind
 
-	
+
 	def start_game(self):
 		self.status = GameRoom.GAME_PLAY
 		game = poker_controller.PokerController(self.player_list)
 		game.getFlop()
 		table_card_list = []
 		self.assign_role()
-		
+
 		print "-------------------------------------------------------------------"
 		#Distribute cards to each player
 		for seat in self.player_list:
-			seat.set_status = Seat.SEAT_PLAYING
+			seat.status = Seat.SEAT_PLAYING
 			card_list = []
 			for card in seat.handcards:
 				card_list.append(str(card))
 			msg_sent = {"Cards in hand": card_list}
 			self.broadcast(msg_sent,seat.get_private_key())
-		
+
 		# bet in big blind and small blind by default
 		print self.player_stake[self.small_blind]
 		if self.player_stake[self.small_blind] < self.blind/2:
@@ -148,31 +154,31 @@ class GameRoom(object):
 		else:
 			self.player_stake[self.small_blind] -= self.blind/2
 			print "small_blind stake: ", self.player_stake[self.small_blind]
-		if isinstance(self.big_blind, int):		
+		if isinstance(self.big_blind, int):
 			if self.player_stake[self.big_blind] < self.blind:
 				self.player_stake[self.big_blind] = 0
 			else:
 				self.player_stake[self.big_blind] -= self.blind
 				print "big_blind stake: ", self.player_stake[self.big_blind]
-		
 
-		
+
+
 
 		#waiting for bet
-		
+
 
 		# Distribute cards on table
 		for card in game.publicCard:
 			table_card_list.append(str(card))
 		msg_broadcast = {"Cards on Table": table_card_list}
-		self.broadcast(msg_broadcast)	
+		self.broadcast(msg_broadcast)
 
 		#
 		game.getOne()
 		table_card_list.append(str(game.publicCard[-1]))
 		msg_broadcast = {"Cards on Table": table_card_list}
 		self.broadcast(msg_broadcast)
-		
+
 		game.getOne()
 		table_card_list.append(str(game.publicCard[-1]))
 		msg_broadcast = {"Cards on Table": table_card_list}
@@ -180,7 +186,7 @@ class GameRoom(object):
 
 		win_lose_dict = game.getWinner()
 		win_list = win_lose_dict["winners"]
-		for winner in win_list: 
+		for winner in win_list:
 			msg_broadcast = {"winner":winner.get_user().username}
 			self.broadcast(msg_broadcast)
 
@@ -196,12 +202,12 @@ class GameRoom(object):
 				self.player_stake[seat_no] -= amount
 
 	def discard_game(self, seat_no):
-		self.seats[seat_no].set_status = Seat.SEAT_EMPTY	# set the status of this seat to empty
+		self.seats[seat_no].status = Seat.SEAT_EMPTY	# set the status of this seat to empty
 		self.player_list.remove(self.seats[seat_no])		# remove the player from player list
 		user = self.seats[seat_no].get_user()			# get user info from database
 		user.stake = self.player_stake[seat_no]			# update user's stake
 		self.add_audit(user)					# add the user to audit list
-		
+
 
 
 	def add_audit(self, player):
