@@ -68,6 +68,7 @@ if __name__ == '__main__':
 		(r"/test.html", IndexHandler),
 		(r"/sit-down", SitDownBoardHandler),
 		(r"/listen-board-message", BoardListenMessageHandler),
+		(r"/post-board-message", BoardActionMessageHandler),
 		(r"/enter", EnterRoomHandler),
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),

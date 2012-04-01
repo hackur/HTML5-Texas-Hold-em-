@@ -79,12 +79,15 @@ class Channel(object):
 
 	def on_queue_declared(self, frame):
 		pika.log.info('PikaClient: Queue Declared, Binding Queue')
-		for key in self.binding_keys:
-			self.channel.queue_bind(exchange	= self.exchange,
-									queue		= self.queue_name,
-									routing_key	= key,
-									callback	= self.on_queue_bound)
-
+		if len(self.binding_keys) > 0:
+			for key in self.binding_keys:
+				self.channel.queue_bind(exchange	= self.exchange,
+										queue		= self.queue_name,
+										routing_key	= key,
+										callback	= self.on_queue_bound)
+		else:
+			for element in self.ready_actions:
+				element['functor'](element['argument'])
 	def on_queue_bound(self, frame):
 		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
 		self.consumer_tag = self.channel.basic_consume(consumer_callback=self.on_room_message,
@@ -111,13 +114,12 @@ class Channel(object):
 
 	def on_closed(self, connection):
 		print "connection cloase"
-		if self.request is not None:
+		if self.request:
 			if len(self.request.session['messages']) > 0:
 				self.request.write(json.dumps(self.request.session['messages']));
 			self.request.finish()
 
 	def close(self):
-		print "close"
 		self.connection.close()
 
 	def publish_message(self, routing_key, message):
@@ -194,7 +196,6 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 			return
 		self.write(json.dumps(messages))
 		self.channel.close();
-#		self.finish()
 
 
 class SitDownBoardHandler(tornado.web.RequestHandler):
@@ -234,83 +235,58 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			return
 
 		if messages['status'] == 'success':
-			#self.session['messages'].append(messages)
 			self.session['is_site_down']	= True
-			#self.session['seat']		= messages['seat']
 
 		self.write(json.dumps(messages))
 		self.channel.close();
-#		self.finish()
 
-#class BoardActionMessageHandler(tornado.web.RequestHandler):
-#	@tornado.web.asynchronous
-#	@authenticate
-#	def post(self):
-#		if self.session['user'] is not None:
-#			user		= self.session['user']
-#			action		= self.get_argument('action')
-#			amount		= self.get_argument('amount')
-#			timestamp	= self.get_argument('timestamp')
-#			queue		= str(user.username)+'_action'
-#			exchange	= str(user.room.exchange)
-#			source		= exchange + '_' + queue
-#			message		= {'method':'action', 'user_id':user.id, 'amount':amount, 'source':source}
-#			arguments	= {'routing_key':'dealer', 'message':pickle.dumps(message)}
-#			self.channel	= Channel(queue, exchange, source)
-#			self.channel.add_ready_action(self.action_call_back, arguments)
-#			self.channel.connect()
-#			self.clean_matured_message(timestamp)
-#
-#	def clean_matured_message(self, timestamp):
-#		pass
-##		for message in self.session['messages'][:]:
-##			if message['timestamp'] < timestamp:
-##				self.session['messages'].remove(message)
-#
-#	def action_call_back(self, argument):
-#		if self.request.connection.stream.closed():
-#			self.channel.close()
-#			return
-#
-#		self.channel.publish_message(argument['routing_key'], argument['message'])
-#		self.channel.add_message_action(self.message_call_back, None)
-#
-#	def message_call_back(self, argument):
-#		messages= self.channel.get_messages()[0]
-#		user	= self.session['user']
-#		for message in messages:
-#			self.session['messages'].append(message)
-#
-#		if self.request.connection.stream.close():
-#			self.channel.close()
-#		self.write(json.dumps({'status':'success', 'message':self.session['messages']}))
-#		self.finish()
-#		self.channel.close()
-#
+class BoardActionMessageHandler(tornado.web.RequestHandler):
+	@tornado.web.asynchronous
+	@authenticate
+	def post(self):
+		user				= self.session['user']
+		message				= json.loads(self.get_argument('message'))
+		queue				= '%s_action_queue' % (str(user.username))
+		exchange			= str(user.room.exchange)
+		message['user_id']	= user.id
+		message['method']	= 'action'
+		arguments			= {'routing_key':'dealer', 'message':pickle.dumps(message)}
+		self.channel		= Channel(queue, exchange, [])
+		self.channel.add_ready_action(self.action_call_back, arguments)
+		self.channel.connect()
 
+	def on_connection_close(self):
+		self.channel.close()
+
+	def action_call_back(self, argument):
+		if self.request.connection.stream.closed():
+			self.channel.close()
+			return
+		print pickle.loads(argument['message'])
+		self.channel.publish_message(argument['routing_key'], argument['message'])
+		self.write(json.dumps({"status":"success"}))
+		self.channel.close()
 
 
 class BoardListenMessageHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		self.counter = 0
-		if self.session['user'] is not None:
-			user		= self.session['user']
-			timestamp	= int(self.get_argument('timestamp'))
-			queue		= str(user.username)
-			exchange	= str(user.room.exchange)
-	 		self.clean_matured_message(timestamp)
+		user		= self.session['user']
+		timestamp	= int(self.get_argument('timestamp'))
+		queue		= str(user.username)
+		exchange	= str(user.room.exchange)
+	 	self.clean_matured_message(timestamp)
 
-			if len(self.session['messages']) > 0:
-				messages = self.session['messages']
-				self.finish(json.dumps(messages))
-				return
+		if len(self.session['messages']) > 0:
+			messages = self.session['messages']
+			self.finish(json.dumps(messages))
+			return
 
-			binding_keys= [self.session['public_key'], self.session['private_key']]
-			self.channel= Channel(queue, exchange, binding_keys, self)
-			self.channel.add_message_action(self.message_call_back, None)
-			self.channel.connect()
+		binding_keys= [self.session['public_key'], self.session['private_key']]
+		self.channel= Channel(queue, exchange, binding_keys, self)
+		self.channel.add_message_action(self.message_call_back, None)
+		self.channel.connect()
 	
 	def clean_matured_message(self, timestamp):
 		self.session['messages'] = filter(lambda x: int(x['timestamp']) > timestamp,self.session['messages'])
@@ -321,13 +297,10 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 	def message_call_back(self, argument):
 		messages= self.channel.get_messages()
 		print "------message receive start------"
-		print "counter => ",  self.counter
 		print messages
 		print "------message receive end------"
 		self.session['messages'].extend(messages)
-		self.counter += 1
 		if self.request.connection.stream.closed():
 			self.channel.close()
 			return
-
 		self.channel.close();

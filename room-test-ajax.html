@@ -17,18 +17,61 @@
 
 <div>
 <label>room no:</label><input name="room_id" type="text" value="1" /><br />
-<!-- <button id="enter">enter</button> -->
-
 </div>
 <div>
 	<label>sit no:</label><input name="sit_no" type="text" value="{{ sitno }}"/><br />
 <button id="sit_down">sit down</button>
+</div>
+<div>
+<input name="stake" type="text" /> <button id="put_stake_btn">下注</button> <br />
+<button id="call_stake_btn">跟注</button> <br />
+<input name="raise_stake" type="text" /> <button id="raise_stake_btn">加注</button> <br />
+<button id="check_btn">看牌</button> <br />
+<button id="give_up_btn">放弃</button> <br />
+
 </div>
 <div id="msg"> </div>
 </body>
 <script>
 var username= "{{  username }}";
 $(function(){
+	$('#put_stake_btn').click(function(){
+		var stake	= $('#stack').val();
+		var message = {amount:stake, action:1};
+		postMessage(JSON.stringify(message));
+	});
+
+	$('#call_stake_btn').click(function(){
+		var message = {action:2};
+		postMessage(JSON.stringify(message));
+	});
+
+	$('#raise_stake_btn').click(function(){
+		var amount	= $('#raise_stake').val();
+		var message = {amount:amount, action:3};
+		postMessage(JSON.stringify(message));
+	});
+
+	$('#check_btn').click(function(){
+		var message = {action:4};
+		postMessage(JSON.stringify(message));
+	});
+
+	$('#give_up_btn').click(function(){
+		var message = {action:5};
+		postMessage(JSON.stringify(message));
+	});
+
+	var postMessage = function(message){
+		$.post(
+			"./post-board-message",
+			{message:message},
+			function(data){
+				$("#msg").append(JSON.stringify(data) + "<br>");
+			},
+			'json'
+		);
+	};
 	var username = " {{ username }}";
 	var password = "123";
 	var enter = function(){
