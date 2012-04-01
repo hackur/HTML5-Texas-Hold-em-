@@ -111,7 +111,11 @@ class Dealer(object):
 		private_key = args["private_key"]
 		user = self.db_connection.query(User).filter_by(id=args["user_id"]).first()
 		current_room = self.room_list[args["room_id"]]
-		(status, msg) = current_room.bet(user, args["bet"], source, private_key)
+		command = args["command"]
+		seat_no = args["seat_no"]
+
+		if command == 1:
+			(status, msg) = current_room.bet(amount, seat_no, user)
 
 	
 	def cmd_sit(self, args):

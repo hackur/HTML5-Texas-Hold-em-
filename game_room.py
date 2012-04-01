@@ -84,6 +84,7 @@ class GameRoom(object):
 		self.small_blind = 0
 		self.big_blind = 0
 		self.next = None
+		self.current_seat = None
 
 	def broadcast(self,msg,route_key=None):
 		self.msg_count += 1
@@ -180,10 +181,7 @@ class GameRoom(object):
 				self.player_stake[self.big_blind] -= self.blind
 				print "big_blind stake: ", self.player_stake[self.big_blind]
 		
-		self.next = self.check_next(self.big_blind)
-		self.seats[self.next].rights = [2,3,5] 
-		countdown = Timer(10, disard_game, args=[seat_no])
-		countdown.start()
+		self.current_seat = self.info_next(self.big_blind, [2,3,5])
 		#waiting for bet
 
 
@@ -213,27 +211,31 @@ class GameRoom(object):
 		self.status = GameRoom.GAME_WAIT
 
 	def bet(self, amount, seat_no, player):
-		command = 1
 		if self.next == seat_no:
-			countdown.cancel()
+			self.countdown.cancel()
 			if amount <= player.stake:
 				self.player_stake[seat_no] = 0
 			else:
 				self.player_stake[seat_no] -= amount
 		self.min_amount = amount
-		self.next = self.check_next(self.next)
-		countdown = Timer(10, discard_game)
+		self.current_seat = self.info_next(self.current_seat, [2,3,5])
+
 		
 
 	def call(self, amount, seat_no, player):
-		command = 2
-		if self.next == seat_no:
-			countdown.cancel()
-		pass
+		if self.current_seat == seat_no:
+			self.countdown.cancel()
+		self.current_seat = self.info_next(self.current_seat, [2,3,5])
 
 	def raise(self, amount, seat_no, player):
-		command = 3
-		pass
+		if self.current_seat == seat_no:
+			self.countdown.cancel()
+		self.current_seat = self.info_next(self.current_seat, [2,3,5])
+
+	def check(self):
+		if self.current_seat == seat_no:
+			self.countdown.cancel()
+		self.current_seat = self.info_next(self.current_seat, [2,3,4,5])
 
 	def discard_game(self, seat_no):
 		self.seats[seat_no].status = Seat.SEAT_WAITING	# set the status of this seat to empty
@@ -241,6 +243,7 @@ class GameRoom(object):
 		user = self.seats[seat_no].get_user()			# get user info from database
 		user.stake = self.player_stake[seat_no]			# update user's stake
 		self.add_audit(user)							# add the user to audit list
+		self.info_next(self.current_seat, self.seat[self.next].rights)
 
 	def proper_amount(self, amount, seat_no):
 		max_amount = min(max(self.player_stake), self.player_stake[seat_no])
@@ -258,10 +261,11 @@ class GameRoom(object):
 				next = (next + 1) % len(self.seats)
 		return next
 
-	def check_rights(self, command):
-		if command == 1:
-
-
+	def info_next(self, current_position, rights):
+		self.next = self.check_next(current_position)
+		self.seats[self.next].rights = rights
+		self.countdown = Timer(10, discard_game, args=[self.next])
+		self.countdown.start()
 
 	def add_audit(self, player):
 		self.audit_list.append(player)
