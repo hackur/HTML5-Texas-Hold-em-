@@ -37,12 +37,13 @@ class Seat(object):
 
 
 	@property
+	def status(self):
+		return self._status
+
+	@status.setter
 	def status(self, status):
 		self._status = status
 
-	@status.setter
-	def status(self):
-		return self._status
 
 	def get_role(self):
 		return self._role
