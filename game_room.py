@@ -4,13 +4,13 @@ import poker_controller
 
 class Seat(object):
 	(SEAT_EMPTY,SEAT_WAITING,SEAT_PLAYING) = (0,1,2)
-	(DEALER, SMALL_BLIND, BIG_BLIND) = (0,1,2)
 
 	def __init__(self):
 		self._user = None
 		self._cards = None
 		self._inAmount = 0
 		self._status = Seat.SEAT_EMPTY
+		self._rights = []
 		self._direct_key = None
 		self._role = None
 		self.combination = []
@@ -44,6 +44,13 @@ class Seat(object):
 	def status(self, status):
 		self._status = status
 
+	@property
+	def rights(self):
+		return self._rights
+
+	@rights.setter
+	def rights(self, rights):
+		self._rights = rights
 
 	def get_role(self):
 		return self._role
@@ -72,9 +79,11 @@ class GameRoom(object):
 		self.face = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
 		self.msg_count= 0
 		self.blind = blind
+		self.min_amount = 0
 		self.current_dealer = 0
 		self.small_blind = 0
-		self.big_blind = None
+		self.big_blind = 0
+		self.next = None
 
 	def broadcast(self,msg,route_key=None):
 		self.msg_count += 1
@@ -100,7 +109,7 @@ class GameRoom(object):
 		self.player_stake[seat_no] = player.stake	# read user's money
 		print player.stake
 
-		self.player_list.append(self.seats[seat_no])
+		# self.player_list.append(self.seats[seat_no])
 
 		self.occupied_seat += 1
 
@@ -116,14 +125,19 @@ class GameRoom(object):
 	def assign_role(self):
 		index = (self.current_dealer + 1) % len(self.seats)
 		i = 0
+		number = 0
 		for counter in xrange(9):
 			if not self.seats[index].is_empty():
+				number += 1
 				if i == 0:
-					self.current_dealer = index % len(self.seats)
-				elif i == 1:
 					self.small_blind = index % len(self.seats)
-				elif len(self.player_list) > 2 and i == 2:
+					self.current_dealer = self.small_blind
+				elif i == 1:
 					self.big_blind = index % len(self.seats)
+				elif number > 2 and i == 2:
+					self.small_blind = self.big_blind
+					self.big_blind = index % len(self.seats)
+
 				i += 1
 			index = (index + 1) % len(self.seats)
 		print "current_dealer: ", self.current_dealer
@@ -133,14 +147,18 @@ class GameRoom(object):
 
 	def start_game(self):
 		self.status = GameRoom.GAME_PLAY
-		game = poker_controller.PokerController(self.player_list)
+		for s in self.seats:
+			print s.status
+		game = poker_controller.PokerController(self.seats)
 		game.getFlop()
 		table_card_list = []
 		self.assign_role()
 
 		print "-------------------------------------------------------------------"
 		#Distribute cards to each player
-		for seat in self.player_list:
+		for seat in self.seats:
+			if seat.status == Seat.SEAT_EMPTY:
+				continue
 			seat.status = Seat.SEAT_PLAYING
 			card_list = []
 			for card in seat.handcards:
@@ -161,10 +179,11 @@ class GameRoom(object):
 			else:
 				self.player_stake[self.big_blind] -= self.blind
 				print "big_blind stake: ", self.player_stake[self.big_blind]
-
-
-
-
+		
+		self.next = self.check_next(self.big_blind)
+		self.seats[self.next].rights = [2,3,5] 
+		countdown = Timer(10, disard_game, args=[seat_no])
+		countdown.start()
 		#waiting for bet
 
 
@@ -193,21 +212,54 @@ class GameRoom(object):
 
 		self.status = GameRoom.GAME_WAIT
 
-	def user_bet(self, command, amount, seat_no, player):
-		t = Timer(10, disard_game)
-		t.start()
-		if command == 1 or command == 2 or command == 3:
+	def bet(self, amount, seat_no, player):
+		command = 1
+		if self.next == seat_no:
+			countdown.cancel()
 			if amount <= player.stake:
 				self.player_stake[seat_no] = 0
 			else:
 				self.player_stake[seat_no] -= amount
+		self.min_amount = amount
+		self.next = self.check_next(self.next)
+		countdown = Timer(10, discard_game)
+		
+
+	def call(self, amount, seat_no, player):
+		command = 2
+		if self.next == seat_no:
+			countdown.cancel()
+		pass
+
+	def raise(self, amount, seat_no, player):
+		command = 3
+		pass
 
 	def discard_game(self, seat_no):
-		self.seats[seat_no].status = Seat.SEAT_EMPTY	# set the status of this seat to empty
-		self.player_list.remove(self.seats[seat_no])		# remove the player from player list
+		self.seats[seat_no].status = Seat.SEAT_WAITING	# set the status of this seat to empty
+		# self.player_list.remove(self.seats[seat_no])	# remove the player from player list
 		user = self.seats[seat_no].get_user()			# get user info from database
 		user.stake = self.player_stake[seat_no]			# update user's stake
-		self.add_audit(user)					# add the user to audit list
+		self.add_audit(user)							# add the user to audit list
+
+	def proper_amount(self, amount, seat_no):
+		max_amount = min(max(self.player_stake), self.player_stake[seat_no])
+		min_amount = max(self.blind, )
+		if amount > max_amount
+			return max_amount
+		
+
+	def check_next(self, current_position):
+		next = (current_position + 1) % len(self.seats)
+		for x in xrange(9):
+			if self.seat[next].status == SEAT_PLAYING:
+				break
+			else:
+				next = (next + 1) % len(self.seats)
+		return next
+
+	def check_rights(self, command):
+		if command == 1:
 
 
 
