@@ -1,7 +1,7 @@
 import sys,random
 from random import shuffle
-from dealer import Dealer
-from game_room import Seat
+#from dealer import Dealer
+#from game_room import Seat
 
 class Card:
 	def __init__(self, symbol, value):
@@ -468,7 +468,7 @@ class Poker:
 
 			counter += 1
 		if(len(kicker) > 1):
-	       		print "high", high
+			print "high", high
 			print kicker
 			number_of_kickers = len(kicker[kicker.keys().pop()])
 			print "number of kickers",number_of_kickers
@@ -496,18 +496,18 @@ class Poker:
 
 class PokerController(object):
 	def __init__(self, seats, debug=False):
-		users = filter(lambda seat: seat.status == Seat.SEAT_WAITING, seats)
-		number_of_players	= len(users)
+		self.seats	= seats
+		self.debug	= debug
+
+	def start(self):
+		self.users = filter(lambda seat: seat.is_waiting(), self.seats)
+		number_of_players	= len(self.users)
 		self.publicCard		= []
-		self.users		= users
-		for u in users:
-			print u
-		# print self.users[0]
-		self.poker		= Poker(number_of_players,debug)
+		self.poker			= Poker(number_of_players, self.debug)
 		self.poker.shuffle()
 		self.players_hands	= self.poker.distribute()
 		for i in range(number_of_players):
-			users[i].handcards = self.players_hands[i]
+			self.users[i].handcards = self.players_hands[i]
 
 
 	def getFlop(self):

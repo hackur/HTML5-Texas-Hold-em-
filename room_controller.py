@@ -146,7 +146,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		db_connection	= DatabaseConnection()
 		message			= None
 		user			= self.session['user']
-		room_id 		= self.get_argument('room_id')
+		room_id			= self.get_argument('room_id')
 		room			= db_connection.query(Room).filter_by(id = room_id).one()
 
 		user.room	= room
@@ -156,11 +156,11 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		queue				= str(user.username) + '_init'
 		exchange			= str(user.room.exchange)
 		routing_key			= exchange + '_' + queue
-		
+
 		broadcast_queue		= str(user.username) + '_broadcast'
 		public_key			= ('broadcast_%s_%d.*')% (exchange, room.id)
 		private_key			= ('direct.%s.%d.%d') % (exchange, room.id, user.id)
-		message 			= {	'method'		: 'init',
+		message				= {	'method'		: 'init',
 								'user_id'		: user.id,
 								'source'		: routing_key,
 								'room_id'		: user.room.id,
@@ -175,9 +175,8 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		self.channel.connect()
 		self.session['public_key']	= public_key
 		self.session['private_key']	= private_key
-		self.session['user'] 		= user
+		self.session['user']		= user
 		self.session['messages']	= list()
-	
 
 	def get(self):
 		self.render("room-test-ajax.html")
@@ -202,19 +201,18 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		message		= None
 		user		= self.session['user']
 		seat		= self.get_argument('seat')
 		if False and 'is_sit_down' in self.session and \
 			self.session['is_sit_down'] == True and \
 			self.session['seat'] == seat:
-			self.write(json.dumps({'status':'success', 'message':messages}))
+			self.write(json.dumps({'status':'success'}))
 			self.finish()
 		else:
 			queue_name		= str(user.username)+'_sit'
 			exchange_name	= str(user.room.exchange)
 			source_key		= exchange_name + '_' + queue_name
-			message 		= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key, 'room_id':user.room.id, 'private_key':self.session['private_key']}
+			message			= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key, 'room_id':user.room.id, 'private_key':self.session['private_key']}
 			arguments		= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
 			self.channel	= Channel(queue_name, exchange_name, [source_key], self)
 			self.channel.add_ready_action(self.sit_call_back, arguments)
@@ -244,14 +242,16 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		user				= self.session['user']
-		message				= json.loads(self.get_argument('message'))
-		queue				= '%s_action_queue' % (str(user.username))
-		exchange			= str(user.room.exchange)
-		message['user_id']	= user.id
-		message['method']	= 'action'
-		arguments			= {'routing_key':'dealer', 'message':pickle.dumps(message)}
-		self.channel		= Channel(queue, exchange, [])
+		user					= self.session['user']
+		message					= json.loads(self.get_argument('message'))
+		queue					= '%s_action_queue' % (str(user.username))
+		exchange				= str(user.room.exchange)
+		message['user_id']		= user.id
+		message['method']		= 'action'
+		message['private_key']	= self.session['private_key']
+		message['room_id']		= user.room.id
+		arguments				= {'routing_key':'dealer', 'message':pickle.dumps(message)}
+		self.channel			= Channel(queue, exchange, [])
 		self.channel.add_ready_action(self.action_call_back, arguments)
 		self.channel.connect()
 
@@ -276,7 +276,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		timestamp	= int(self.get_argument('timestamp'))
 		queue		= str(user.username)
 		exchange	= str(user.room.exchange)
-	 	self.clean_matured_message(timestamp)
+		self.clean_matured_message(timestamp)
 
 		if len(self.session['messages']) > 0:
 			messages = self.session['messages']
@@ -287,7 +287,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		self.channel= Channel(queue, exchange, binding_keys, self)
 		self.channel.add_message_action(self.message_call_back, None)
 		self.channel.connect()
-	
+
 	def clean_matured_message(self, timestamp):
 		self.session['messages'] = filter(lambda x: int(x['timestamp']) > timestamp,self.session['messages'])
 

@@ -104,25 +104,22 @@ class Dealer(object):
 		self.channel.basic_consume(self.on_message, self.queue, no_ack=True)
 		self.channel.start_consuming()
 
-	def cmd_bet(self, args):
+	def cmd_action(self, args):
 		print "user trying to bet"
 		self.db_connection.start_session()
-		source = args["source"]
-		private_key = args["private_key"]
-		user = self.db_connection.query(User).filter_by(id=args["user_id"]).first()
-		current_room = self.room_list[args["room_id"]]
-		command = args["command"]
-		seat_no = args["seat_no"]
+		action			= args["action"]
+		private_key		= args["private_key"]
+		amount			= args['amount']
+		user_id			= args["user_id"]
+		current_room	= self.room_list[args["room_id"]]
+		if action == 1:
+			(status, msg)	= current_room.bet_stake(user_id, private_key, amount)
 
-		if command == 1:
-			(status, msg) = current_room.bet(amount, seat_no, user)
 
-	
 	def cmd_sit(self, args):
 		print "sit received"
-		""" User clicked Sit Down"""
 		self.db_connection.start_session()
-		source 			= args['source']
+		source			= args['source']
 		private_key		= args['private_key']
 		user			= self.db_connection.query(User).filter_by(id=args['user_id']).first()
 		current_room	= self.room_list[args["room_id"]]
@@ -137,8 +134,6 @@ class Dealer(object):
 									body		= pickle.dumps(message))
 
 	def broadcast(self, routing_key, msg):
-		print routing_key
-		print msg
 		self.channel.basic_publish(exchange		= self.exchange,
 									routing_key	= routing_key,
 									body		= pickle.dumps(msg))
@@ -173,42 +168,6 @@ class Dealer(object):
 		method = getattr(self,"cmd_" + obj['method'])
 		method(obj)
 
-
-	# def game_play(self, users, current_room):
-	# 	# print "--------------------"+str(users)
-	# 	print "users in game_play, ", users
-	# 	current_room["status"] = "PLAY"
-	# 	game = poker_controller.PokerController(users)
-	# 	game.getFlop()
-	# 	for card in game.publicCard:
-	# 		print str(self.suit[card.symbol])+"/"+str(self.face[card.value-2])+" ",
-	# 	print
-
-	# 	for user in users:
-	# 		print str(user.username) + ": ",
-	# 		for cards in user.handcards:
-	# 			 print str(self.suit[cards.symbol])+"/"+str(self.face[cards.value-2])+" ",
-	# 		print
-
-	# 	game.getOne()
-	# 	game.getOne()
-	# 	result = game.getWinner()
-	# 	for winner in result["winners"]:
-	# 		print winner.username
-	# 	current_room["status"] = "WAIT"
-	# 		# game.getOne()
-	# 		# game.getOne()
-	# 		# result = game.getWinner()
-	# 		# print result["winners"][0].username
-	# 	return
-
-	def same_str(str1, str2):
-		if len(str1) != len(str2):
-			return False
-		else:
-			for i in xrange(len(str1)):
-				if str1[i] != str2[i]:
-					return False
 
 	def close(self):
 		self.connection.close()

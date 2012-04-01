@@ -36,7 +36,7 @@
 var username= "{{  username }}";
 $(function(){
 	$('#put_stake_btn').click(function(){
-		var stake	= $('#stack').val();
+		var stake	= $('input[name="stake"]').val();
 		var message = {amount:stake, action:1};
 		postMessage(JSON.stringify(message));
 	});
