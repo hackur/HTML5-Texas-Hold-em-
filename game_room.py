@@ -189,8 +189,6 @@ class GameRoom(object):
 	def user_bet(self, command, amount, seat_no, player):
 		t = Timer(10, disard_game)
 		t.start()
-		#start betting
-		# 
 		if command == 1 or command == 2 or command == 3:
 			if amount <= player.stake:
 				self.player_stake[seat_no] = 0
