@@ -64,10 +64,10 @@ class Dealer(object):
 		queue7		= MessageQueue(queue_name="queue_7",room = room)
 		queue8		= MessageQueue(queue_name="queue_8",room = room)
 		queue9		= MessageQueue(queue_name="queue_9",room = room)
-		ting		= User(username="ting", password="123")
-		mile		= User(username="mile", password="123")
-		mamingcao	= User(username="mamingcao", password="123")
-		huaqin		= User(username="huaqin", password="123")
+		ting		= User(username="ting", password="123", stake = 100)
+		mile		= User(username="mile", password="123", stake = 100)
+		mamingcao	= User(username="mamingcao", password="123", stake = 100)
+		huaqin		= User(username="huaqin", password="123", stake = 100)
 		self.db_connection.addItem(ting)
 		self.db_connection.addItem(mile)
 		self.db_connection.addItem(huaqin)
@@ -104,29 +104,34 @@ class Dealer(object):
 		self.channel.basic_consume(self.on_message, self.queue, no_ack=True)
 		self.channel.start_consuming()
 
+	def cmd_bet(self, args):
+		print "user trying to bet"
+		self.db_connection.start_session()
+		source = args["source"]
+		private_key = args["private_key"]
+		user = self.db_connection.query(User).filter_by(id=args["user_id"]).first()
+		current_room = self.room_list[args["room_id"]]
+		(status, msg) = current_room.bet(user, args["bet"], source, private_key)
+
+	
 	def cmd_sit(self, args):
 		print "sit received"
 		""" User clicked Sit Down"""
 		self.db_connection.start_session()
 		source 			= args['source']
 		private_key		= args['private_key']
-		# print args
 		user			= self.db_connection.query(User).filter_by(id=args['user_id']).first()
 		current_room	= self.room_list[args["room_id"]]
-
 		(status, msg)	= current_room.sit(user, args["seat"], source, private_key)
-		print "source in cmd_sit+++++++++++++++++++++++", source
 
 		if status:
 			message = {"status": "success" }
 		else:
 			message = {"status": "failed", "msg": msg}
-
 		self.channel.basic_publish(	exchange	= self.exchange,
 									routing_key	= source,
 									body		= pickle.dumps(message))
 
-	
 	def broadcast(self, routing_key, msg):
 		print routing_key
 		print msg
@@ -153,7 +158,6 @@ class Dealer(object):
 
 	def cmd_create_room(self, args):
 		print "creating room"
-
 		self.room_list[args['room_id']] = GameRoom(args["room_id"], args["user_id"], self)
 
 

@@ -52,10 +52,13 @@ class User(Base):
 					secondary=friendShip,
 					primaryjoin=id==friendShip.c.leftFriendId,
 					secondaryjoin=id==friendShip.c.rightFriendId
-				)
-	def __init__(self, username, password,**kwargs):
+					)
+	stake		= Column(Integer)
+
+	def __init__(self, username, password, stake, **kwargs):
 		self.username = username
 		self.password = password
+		self.stake = stake
 
 	def __repr__(self):
 		return "<User('%s','%s', '%s', '%s', '%s')>" % (self.id, self.username, self.password, self.queue, self.friends)

@@ -22,10 +22,10 @@ def init_database():
 	queue7		= MessageQueue(queue_name="queue_7",room = room)
 	queue8		= MessageQueue(queue_name="queue_8",room = room)
 	queue9		= MessageQueue(queue_name="queue_9",room = room)
-	ting		= User(username="ting", password="123")
-	mile		= User(username="mile", password="123")
-	mamingcao	= User(username="mamingcao", password="123")
-	huaqin		= User(username="huaqin", password="123")
+	ting		= User(username="ting", password="123", stake = 100)
+	mile		= User(username="mile", password="123", stake = 100)
+	mamingcao	= User(username="mamingcao", password="123", stake = 100)
+	huaqin		= User(username="huaqin", password="123", stake = 100)
 	db_connection.addItem(ting)
 	db_connection.addItem(mile)
 	db_connection.addItem(huaqin)
@@ -60,8 +60,8 @@ if __name__ == '__main__':
 		"debug": True,
 		'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
 		"static_path": os.path.join(os.path.dirname(__file__), "static"),
-		'session_storage':"dir"
-		#"session_storage":"mongodb:///db"
+		# 'session_storage':"dir"
+		"session_storage":"mongodb:///db"
 	}
 	application = tornado.web.Application([
 		(r"/test", IndexTestHandler),
