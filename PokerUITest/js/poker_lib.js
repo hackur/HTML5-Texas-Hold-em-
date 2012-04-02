@@ -20,7 +20,10 @@
 				break;
 		}
 
-		_rank = rank;
+		if(rank == "T")
+			_rank = "10";
+		else
+			_rank = rank;
 
 		return "/img/pokers/" + _suit + "/" + _rank + ".png";
 	};
