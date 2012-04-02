@@ -2,6 +2,7 @@ import pika
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
+import tornado.process
 from room_controller import *
 from login_controller import *
 from database import *
@@ -13,15 +14,6 @@ def init_database():
 	db_connection.connect()
 	db_connection.start_session()
 	room		= Room(exchange="dealer_exchange_1")
-	queue1		= MessageQueue(queue_name="queue_1",room = room)
-	queue2		= MessageQueue(queue_name="queue_2",room = room)
-	queue3		= MessageQueue(queue_name="queue_3",room = room)
-	queue4		= MessageQueue(queue_name="queue_4",room = room)
-	queue5		= MessageQueue(queue_name="queue_5",room = room)
-	queue6		= MessageQueue(queue_name="queue_6",room = room)
-	queue7		= MessageQueue(queue_name="queue_7",room = room)
-	queue8		= MessageQueue(queue_name="queue_8",room = room)
-	queue9		= MessageQueue(queue_name="queue_9",room = room)
 	ting		= User(username="ting", password="123", stake = 100)
 	mile		= User(username="mile", password="123", stake = 100)
 	mamingcao	= User(username="mamingcao", password="123", stake = 100)
@@ -31,20 +23,9 @@ def init_database():
 	db_connection.addItem(huaqin)
 	db_connection.addItem(mamingcao)
 	db_connection.addItem(room)
-	db_connection.addItem(queue1)
-	db_connection.addItem(queue2)
-	db_connection.addItem(queue3)
-	db_connection.addItem(queue4)
-	db_connection.addItem(queue5)
-	db_connection.addItem(queue6)
-	db_connection.addItem(queue7)
 	ting.friends = [mile, mamingcao]
 	mile.friends = [ting]
 	db_connection.commit_session()
-	print ting
-	print mile
-	print mamingcao
-	print huaqin
 
 class IndexHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
@@ -55,6 +36,15 @@ class IndexTestHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.render("room-test-ajax.html",username=self.get_argument('username'),sitno=self.get_argument('sitno'))
 
+application = None
+def on_channel_open(channel):
+	pika.log.info('PikaClient: Channel Open')
+	application.channel = channel
+
+def on_connected(connection):
+	print "pika connected"
+	connection.channel(on_channel_open)
+
 if __name__ == '__main__':
 	settings = {
 		"debug": True,
@@ -63,6 +53,13 @@ if __name__ == '__main__':
 		#'session_storage':"dir"
 		"session_storage":"mongodb:///db"
 	}
+
+
+
+	init_database()
+	# Set our pika.log options
+	pika.log.setup(color=True)
+	pika.log.info("Starting Tornado HTTPServer on port %i" % PORT)
 	application = tornado.web.Application([
 		(r"/$", IndexHandler),
 		(r"/test", IndexTestHandler),
@@ -76,13 +73,24 @@ if __name__ == '__main__':
 		(r"/(.*.html)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
 		], **settings)
-
-
-	init_database()
-	# Set our pika.log options
-	pika.log.setup(color=True)
-	pika.log.info("Starting Tornado HTTPServer on port %i" % PORT)
 	http_server = tornado.httpserver.HTTPServer(application)
-	http_server.listen(PORT)
+	http_server.bind(PORT)
+	#http_server.start(8)
+	http_server.start()
+
+	pika.log.info('PikaClient: Connecting to RabbitMQ on localhost:5672')
+	credentials = pika.PlainCredentials('guest', 'guest')
+	param = pika.ConnectionParameters(host="localhost",
+					port=5672,
+					virtual_host="/",
+					credentials=credentials)
+
+	application.connection = TornadoConnection(param, on_open_callback=on_connected)
+
+	#If we publishing message's speed is much faster than msg processed.
+	# "TCP back pressure" will happen, set a huge multiplier to avoid that
+	application.connection.set_backpressure_multiplier(100000)
+
 	ioloop = tornado.ioloop.IOLoop.instance()
+
 	ioloop.start()
