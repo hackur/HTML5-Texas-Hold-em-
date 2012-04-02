@@ -114,10 +114,13 @@ class Channel(object):
 
 	def on_closed(self, connection):
 		print "connection cloase"
-		if self.request:
+		if self.request and not self.request.request.connection.stream.closed():
 			if len(self.request.session['messages']) > 0:
 				self.request.write(json.dumps(self.request.session['messages']));
-			self.request.finish()
+			try:
+				self.request.finish()
+			except:
+				print "Client connection closed"
 
 	def close(self):
 		self.connection.close()
