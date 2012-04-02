@@ -47,7 +47,7 @@ $(function(){
 	});
 
 	$('#raise_stake_btn').click(function(){
-		var amount	= $('#raise_stake').val();
+		var amount	= $('input[name="raise_stake"]').val();
 		var message = {amount:amount, action:3};
 		postMessage(JSON.stringify(message));
 	});
