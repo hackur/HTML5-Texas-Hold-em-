@@ -25,7 +25,7 @@
 		else
 			_rank = rank;
 
-		return "/img/pokers/" + _suit + "/" + _rank + ".png";
+		return "./img/pokers/" + _suit + "/" + _rank + ".png";
 	};
 
 	poker_lib.getCard = getCard;
