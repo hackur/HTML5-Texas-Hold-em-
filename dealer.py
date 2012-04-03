@@ -148,14 +148,12 @@ class Dealer(object):
                                     body        = pickle.dumps(msg))
 
     def cmd_init(self,args):
-        print "init received"
         if args['room_id'] not in self.room_list:
             self.cmd_create_room(args)
             print "Room created"
 
         current_room = self.room_list[args["room_id"]]
         current_room.add_audit({'user':args["user_id"]})
-            # , 'listen_source':args['listen_source']})
 
         routing_key = args['source']
         message     = {'status':'success', 'content':'nothing', 'timestamp':time.time()}

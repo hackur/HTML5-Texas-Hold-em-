@@ -39,7 +39,7 @@ class Channel(object):
 		self.channel		= channel
 		self.host			= host
 		self.exchange		= exchange
-		self.queue_name		= None if durable_queue else queue_name
+		self.queue_name		= queue_name
 		self.binding_keys	= binding_keys
 		self.durable_queue	= durable_queue
 		self.messages		= list()
@@ -52,9 +52,15 @@ class Channel(object):
 
 	def connect(self):
 		pika.log.info('Declaring Queue')
-		self.channel.queue_declare(
-								#We don't need a specified queue name unless the queue is durable
-								queue		= self.queue_name if self.durable_queue else '',
+		if self.durable_queue:
+			self.channel.queue_declare(
+								queue		= self.queue_name,
+								auto_delete	= not self.durable_queue,
+								durable		= self.durable_queue,
+								exclusive	= not self.durable_queue, # durable_queue may be shared
+								callback	= self.on_queue_declared)
+		else:
+			self.channel.queue_declare(
 								auto_delete	= not self.durable_queue,
 								durable		= self.durable_queue,
 								exclusive	= not self.durable_queue, # durable_queue may be shared
@@ -64,8 +70,8 @@ class Channel(object):
 
 	def on_queue_declared(self, frame):
 		pika.log.info('PikaClient: Queue Declared, Binding Queue')
-		if not self.queue_name:
-			self.queue_name = frame.method.queue
+		#if not self.queue_name:
+		self.queue_name = frame.method.queue
 
 		if len(self.binding_keys) > 0:
 			for key in self.binding_keys:
@@ -73,6 +79,7 @@ class Channel(object):
 										queue		= self.queue_name,
 										routing_key	= key,
 										callback	= self.on_queue_bound)
+
 		else:
 			for element in self.ready_actions:
 				element['functor'](element['argument'])
@@ -174,8 +181,12 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 								'private_key'	: private_key}
 
 		arguments			= {'routing_key': 'dealer', 'message': pickle.dumps(message)}
-		broadcast_channel	= Channel(self.application.channel,broadcast_queue, exchange,
-										(private_key, public_key), durable_queue = True,
+		print broadcast_queue
+		broadcast_channel	= Channel(	self.application.channel,
+										broadcast_queue,
+										exchange,
+										(private_key, public_key),
+										durable_queue = True,
 										declare_queue_only=True)
 
 		broadcast_channel.connect()
@@ -192,6 +203,9 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		self.render("room-test-ajax.html")
 
 	def initial_call_back(self, argument):
+		print "init call back"
+		print argument['routing_key']
+		print argument['message']
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
@@ -200,6 +214,8 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 
 	def message_call_back(self, argument):
 		messages= self.channel.get_messages()[0]
+		print "=====message====="
+		print messages
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
@@ -226,9 +242,12 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			self.write(json.dumps({'status':'success'}))
 			self.finish()
 		else:
-			queue_name		= str(user.username)+'_sit'
+			queue_name		= str(user.username) + '_sit'
 			exchange_name	= str(user.room.exchange)
 			source_key		= "%s_%s" % (exchange_name, queue_name)
+			print '=============================keys==================================='
+			print self.session['private_key']
+			print self.session['public_key']
 			message			= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key, 'room_id':user.room.id, 'private_key':self.session['private_key']}
 			arguments		= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
 			self.channel	= Channel(self.application.channel,queue_name, exchange_name, [source_key])
