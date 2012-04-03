@@ -31,3 +31,4 @@
 	poker_lib.getCard = getCard;
 
 }(window.poker_lib = window.poker_lib || {}, jQuery));
+
