@@ -6,6 +6,8 @@
 	<script src="./js/jquery.min.js"></script>
 	<script src="./js/poker_lib.js"></script>
 	<script src="./js/index.js"> </script>
+	<script src="http://ricostacruz.com/jquery.transit/jquery.transit.js"></script>
+	<script src="http://ricostacruz.com/jquery.transit/jquery.transit.min.js"></script>
 	<script>
 		$(table_init);
 	</script>
@@ -18,6 +20,14 @@
 					<div class="avatar">img here</div>
 					<div class="money">1000</div>
 					<div class="tablemoney">567</div>
+						<div class="hover panel">
+							<div class="front">
+							<image src="img/pokers/back.png" />
+						</div>
+						<div class="back">
+							<image src="img/pokers/heart/3.png" />
+						</div>
+					</div>
 					<div class="chipcontainer">
 						<img class="original" src="img/chip4small.png"/>
 						<img class="original" src="img/chip2small.png"/>
@@ -85,5 +95,13 @@
 				</div>
 			</div>
 		</div>
+		<script type="text/javascript">
+			$("#image").mouseover(function (argument) {
+				$('#image').transition({
+    				perspective: '100px',
+    				rotateY: '180deg'
+				});
+			});
+		</script>
 	</body>
 </html>
