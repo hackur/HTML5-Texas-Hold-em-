@@ -24,12 +24,15 @@
 				}
 				,sendchiptomiddle=function(){
 
-				}
+				},pokerturn=function(){
+					$('.hover').addClass('flip');
+				};
 
 
 				return {
 					sendchip:sendchip,
-					sendpoker:sendpoker
+					sendpoker:sendpoker,
+					pokerturn:pokerturn
 				}
 			})(document,$,undefined);
 
@@ -45,6 +48,8 @@
 					send_three_cards();
 					Animation.sendpoker($(".middleContainer img"));
 				});
+
+				setTimeout(function(){Animation.pokerturn();}, 100);
 			
 			};
 			
