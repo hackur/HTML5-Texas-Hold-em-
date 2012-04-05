@@ -500,7 +500,7 @@ class PokerController(object):
 		self.debug	= debug
 
 	def start(self):
-		self.users = filter(lambda seat: seat.is_waiting(), self.seats)
+		self.users			= filter(lambda seat: seat.is_waiting(), self.seats)
 		number_of_players	= len(self.users)
 		self.publicCard		= []
 		self.poker			= Poker(number_of_players, self.debug)
@@ -518,7 +518,7 @@ class PokerController(object):
 		card = self.poker.getOne()
 		self.publicCard.extend(card)
 
-	def _hand_card_sorter(self,element_1,element_2):
+	def _compare(self, element_1, element_2):
 		hand_card_1 = element_1.combination
 		hand_card_2 = element_2.combination
 		if hand_card_1[0] != hand_card_2[0] :
@@ -527,23 +527,32 @@ class PokerController(object):
 			for i in range(len(hand_card_1[1])):
 				if hand_card_1[1][i] != hand_card_2[1][i]:
 					return hand_card_1[1][i] - hand_card_2[1][i]
-
 		return 0
 
-	def getWinner(self):
+	def rank_users(self):
+		rank	= []
+		matured	= False
+		self.poker.determine_score(self.publicCard, self.users)
+		self.users.sort(self._hand_card_sorter, reverse=True)
+		for i in xrange(len(self.users)):
+			matured = False
+			for k in xrange(len(rank)):
+				if self._compare(self.users[i], rank[k][0]) == 0:
+					rank[k].append(self.users[i])
+					matured = True
+					break
+			if not matured:
+				rank.append( [self.users[i]])
+		return rank
+
+	def get_winner(self):
 		winner_list	= []
 		loser_list	= []
 		if self.poker:
-			score_list	= self.poker.determine_score(self.publicCard, self.users)
-			self.users.sort(self._hand_card_sorter, reverse=True)
-			print score_list
+			#score_list	= self.poker.determine_score(self.publicCard, self.users)
+			self.users.sort(self._compare, reverse=True)
 			winner	= self.poker.determine_winner(self.users)
-			tie	= True
-			print "winner"
-			print winner
-			for user in self.users:
-				print user.combination
-
+			tie		= True
 			if not isinstance(winner,list):
 				winner_list.append(self.users[0])
 				loser_list = self.users[1:]
@@ -581,7 +590,7 @@ debug = False
 #generate 2 cards for each users
 #get it from PokerController.player_hands
 pokerController = PokerController(users)
-
+pokerController.start()
 #get the first 3 cards
 pokerController.getFlop()
 
@@ -590,8 +599,7 @@ pokerController.getOne()
 
 #get the next final card
 pokerController.getOne()
-
-print len(pokerController.users)
-r = pokerController.getWinner()
+print pokerController.rank_users()
+r = pokerController.get_winner()
 print len(r['winners']),len(r['losers'])
-))'''
+'''
