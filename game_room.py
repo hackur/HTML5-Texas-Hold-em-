@@ -111,6 +111,7 @@ class GameRoom(object):
 		self.pot = {}
 		self.num_of_checks = 0
 		self.action_counter = 0
+		self.amount_limits = {}
 		self.t = None
 
 		for x in xrange(num_of_seats):
@@ -187,9 +188,13 @@ class GameRoom(object):
 			self.seats[self.big_blind].table_amount = self.blind
 			print "big_blind stake: ", self.player_stake[self.big_blind]
 
+		print self.seats[self.big_blind].get_user().username
+		print self.seats[self.small_blind].get_user().username
+		print self.seats[self.current_dealer].get_user().username
+
+		self.min_amount = self.blind
 		self.current_seat = self.info_next(self.big_blind, [1,2,3,5])
 		print "next seat in action =>", self.current_seat
-		self.min_amount = self.blind
 
 	def get_seat(self, user_id):
 		return filter(lambda seat: seat.get_user() != None and seat.get_user().id == user_id, self.seats)[0]
@@ -235,7 +240,7 @@ class GameRoom(object):
 				pass
 			else:
 				amount = self.min_amount - self.seats[seat_no].table_amount
-			if self.is_proper_amount(2, amount, seat_no):
+			if self.is_proper_amount(amount, command):
 				print "call amount: :", amount
 				self.player_stake[seat_no] -= amount
 				print "player stake: ", self.player_stake[seat_no]
@@ -247,17 +252,20 @@ class GameRoom(object):
 					if self.no_more_stake():
 						self.round_finish()
 					elif self.same_amount_on_table():
-						self.current_seat = self.info_next(seat_no, [1,3,4,5])        # final choice goes to the person who gives the first raise
+						if self.check_next(seat_no) == seat_no:
+							self.round_finish()
+						else:
+							self.current_seat = self.info_next(seat_no, [1,3,4,5])        # final choice goes to the person who gives the first raise
 					else:
 						self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
 				else:
 					if self.same_amount_on_table():                 # all players have put down equal amount of money, next round
-						self.poker_controller.getOne()
 						self.round_finish()
 					else:
 						if all_in_flag == False:
 							self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
 						else:
+							print "-----------sb before you has called all in---------------"
 							self.current_seat = self.info_next(seat_no, [2,5])      # cannot re-raise after sb's all-in
 				print "--------------------self.min_amount in call_stake: ", self.min_amount
 
@@ -284,7 +292,7 @@ class GameRoom(object):
 		seat_no         = self.current_seat
 		if self.is_valid_seat(user_id, seat_no) and self.is_valid_rights(command, seat_no):
 			self.countdown.cancel()
-			if self.is_proper_amount(3, amount, seat_no):
+			if self.is_proper_amount(amount, command):
 				print "This is a proper amount"
 				self.player_stake[seat_no] -= amount
 				self.seats[seat_no].table_amount += amount
@@ -319,7 +327,6 @@ class GameRoom(object):
 					self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
 				else:
 					self.num_of_checks = 0
-					self.poker_controller.getOne()
 					self.round_finish()
 
 			card_list = []
@@ -334,6 +341,7 @@ class GameRoom(object):
 			self.direct_message(next_player_message, self.seats[self.current_seat].get_private_key())
 
 	def discard_game(self, private_key):
+		print "FOLD!!"
 		self.countdown.cancel()
 		seat_no = self.current_seat
 		print self.current_seat
@@ -360,9 +368,9 @@ class GameRoom(object):
 		if self.num_of_checks != 0:
 			self.num_of_checks = 0
 		print "num_of_checks: ", self.num_of_checks
-		command         = 1
-		seat_no         = self.current_seat
-		amount          = min(self.player_stake[seat_no], max(self.player_stake))
+		command  = 1
+		seat_no  = self.current_seat
+		amount  = min(self.player_stake[seat_no], max(self.player_stake))
 		print "self.min_amount before all in: ", self.min_amount
 		print "----------------",self.min_amount == amount + self.seats[seat_no].table_amount
 
@@ -397,6 +405,7 @@ class GameRoom(object):
 		self.seats[next].rights = rights
 		self.countdown = Timer(20, self.discard_game, args=[self.seats[next].get_private_key()])
 		print "seat no. for next player: ", self.seats[next].get_user().username
+		self.calculate_proper_amount(next, rights)
 		self.countdown.start()
 		return next
 
@@ -463,8 +472,10 @@ class GameRoom(object):
 		else:
 			self.create_pot(player_list)
 			self.min_amount = self.blind/2
+			self.poker_controller.getOne()
 			self.current_seat = self.info_next(self.current_dealer, [1,3,4,5])
 			return
+
 	def distribute_ante(self):
 		ante_dict = {}
 		rank_list = self.poker_controller.rank_users()
@@ -474,7 +485,7 @@ class GameRoom(object):
 				print item.get_user().id;
 
 			for owner, ante in self.pot.iteritems():
-				share_list = filter(lambda user: user.get_user().id in owner, rank_list[i])
+				share_list = filter(lambda seat: seat.get_user().id in owner and seat.status != Seat.SEAT_WAITING, rank_list[i])
 				for user in share_list:
 					if user in ante_dict:
 						ante_dict[user] += math.floor(ante/len(share_list))
@@ -513,26 +524,41 @@ class GameRoom(object):
 		print self.pot
 		self.create_pot(player_list)
 
-	def is_proper_amount(self, command, amount, seat_no):
+	def calculate_proper_amount(self, seat_no, rights):
 		total_amount_list = []
-		if command == 3:
-			print "self.min_amount in proper amount: ", self.min_amount
-			min_amount = 2 * self.min_amount - self.seats[seat_no].table_amount
-		else:
-			min_amount = max(self.min_amount - self.seats[seat_no].table_amount, self.big_blind)
 		for x in xrange(len(self.player_stake)):
 			total_amount_list.append(None)
 			if self.player_stake[x] != None:
 				total_amount_list[x] = self.player_stake[x] + self.seats[x].table_amount
-		max_amount = min(self.player_stake[seat_no], max(total_amount_list) - self.seats[seat_no].table_amount)
-		print "---------------amount: ", amount
-		print "---------------min_amount: ", min_amount
-		print "---------------max_amount: ", max_amount
-		if amount > max_amount:
+		total_amount_list.sort(reverse = True)
+		max_amount = min(self.player_stake[seat_no], total_amount_list[1] - self.seats[seat_no].table_amount)
+		min_amount = max(self.min_amount - self.seats[seat_no].table_amount, self.big_blind)
+		if 2 in self.seats[seat_no].rights:
+			if self.player_stake[seat_no] < min_amount:
+				self.seats[seat_no].rights.remove(2)
+			else:
+				self.amount_limits.update({2: (min_amount, max_amount)})
+
+
+		min_amount = 2 * self.min_amount - self.seats[seat_no].table_amount
+		if 3 in self.seats[seat_no].rights:
+			if self.player_stake[seat_no] < min_amount:
+				self.seats[seat_no].rights.remove(3)
+			else:
+				self.amount_limits.update({3: (min_amount, max_amount)})
+		print self.amount_limits
+		return self.amount_limits
+
+
+	def is_proper_amount(self, amount, command):
+		if amount > self.amount_limits[command][1]:
+			self.amount_limits.clear()
 			return False
-		elif amount < min_amount:
+		elif amount < self.amount_limits[command][0]:
+			self.amount_limits.clear()
 			return False
 		else:
+			self.amount_limits.clear()
 			return True
 
 

@@ -524,7 +524,7 @@ class PokerController(object):
 		if hand_card_1[0] != hand_card_2[0] :
 			return hand_card_1[0] - hand_card_2[0]
 		else:
-			for i in range(len(hand_card_1[1])):
+			for i in xrange(len(hand_card_1[1])):
 				if hand_card_1[1][i] != hand_card_2[1][i]:
 					return hand_card_1[1][i] - hand_card_2[1][i]
 		return 0
