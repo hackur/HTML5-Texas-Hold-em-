@@ -1,6 +1,7 @@
 import time
 from threading import Timer
 from poker_controller import PokerController
+from operator import attrgetter
 import sys
 
 class Seat(object):
@@ -448,54 +449,33 @@ class GameRoom(object):
 
     def create_pot(self, player_list):
         pot_owner = []
-        for seat in player_list:
-            if seat.table_amount == 0:
-                player_list.remove(seat)
+        seat_to_remove = []
         if len(player_list) == 0:
             return
+        for x in xrange(len(player_list)):
+            if player_list[x].table_amount == 0:
+                seat_to_remove.append(x)
+        for index in seat_to_remove:
+            try:
+                player_list.remove(player_list[index])
+            except IndexError:
+                return
+        
 
         player_list = sorted(player_list, key = attrgetter("table_amount"))
         min_bet = player_list[0].table_amount
         for x in xrange(len(player_list)):
             pot_owner.append(player_list[x].get_user().id)
+            print ":::::::::::::::::: ", player_list[x].get_user().id
             player_list[x].table_amount -= min_bet
+            print ":::::::::::::::::: ", player_list[x].table_amount
         pot_owner = tuple(pot_owner)
         if pot_owner not in self.pot:
             self.pot[pot_owner] = 0
         self.pot[pot_owner] += min_bet * len(player_list)
+        print self.pot
         self.create_pot(player_list)
 
-"""
-        if has_all_in == True:
-            for x in xrange(len(player_list)):
-                pot_owner.append(player_list[x].get_user().id)
-                if player_list[x].table_amount <= min_bet:
-                    min_bet = player_list[x].table_amount
-                    seat_to_remove.append(x)
-            pot_owner = tuple(pot_owner)
-            if pot_owner not in self.pot:
-                self.pot[pot_owner] = 0
-            self.pot[pot_owner] += min_bet * len(player_list)
-            for index in seat_to_remove:
-                player_list.pop(index)
-            for seat in player_list:
-                seat.table_amount -= min_bet
-                print "++++++++++++++++++++++++++++ ", seat.table_amount
-            self.create_pot(player_list)
-        else:
-            min_bet = player_list[0].table_amount
-            print "min_bet in create_pot: ", min_bet
-            for seat in player_list:
-                pot_owner.append(seat.get_user().id)
-                seat.table_amount = 0
-            pot_owner = tuple(pot_owner)
-            print "Pot owners are ", pot_owner
-            if pot_owner not in self.pot:
-                self.pot[pot_owner] = 0
-            self.pot[pot_owner] += min_bet * len(player_list)
-            print self.pot
-            return
-"""
     def is_proper_amount(self, command, amount, seat_no):
         total_amount_list = []
         if command == 3:
