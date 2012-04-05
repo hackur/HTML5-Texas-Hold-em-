@@ -293,6 +293,7 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 		arguments				= {'routing_key':'dealer', 'message':pickle.dumps(message)}
 		self.channel			= Channel(self.application.channel,queue, exchange, [])
 		self.channel.publish_message("dealer", pickler.dummps(message));
+		self.finish("{\'status\':\'success\'}");
 
 
 class BoardListenMessageHandler(tornado.web.RequestHandler):

@@ -9,9 +9,9 @@ except:
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
 channel = connection.channel()
 channel.exchange_declare(exchange	= 'dealer_exchange_1',
-                    			type		= 'direct',
-                    			auto_delete     = True,
-                    			durable         = False)
+						type		= 'direct',
+						auto_delete = True,
+						durable		= False)
 result = channel.queue_declare(exclusive=True)
 queue_name = result.method.queue
 channel.queue_bind(exchange='dealer_exchange_1',
