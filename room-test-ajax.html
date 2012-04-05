@@ -23,7 +23,7 @@
 <button id="sit_down">sit down</button>
 </div>
 <div>
-<input name="stake" type="text" /> <button id="put_stake_btn">下注</button> <br />
+<button id="put_stake_btn">ALL IN!</button> <br />
 <button id="call_stake_btn">跟注</button> <br />
 <input name="raise_stake" type="text" /> <button id="raise_stake_btn">加注</button> <br />
 <button id="check_btn">看牌</button> <br />
@@ -36,8 +36,7 @@
 var username= "{{  username }}";
 $(function(){
 	$('#put_stake_btn').click(function(){
-		var stake	= $('input[name="stake"]').val();
-		var message = {amount:stake, action:1};
+		var message = {action:1};
 		postMessage(JSON.stringify(message));
 	});
 

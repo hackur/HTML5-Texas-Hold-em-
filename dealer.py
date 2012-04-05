@@ -65,9 +65,9 @@ class Dealer(object):
         queue8      = MessageQueue(queue_name="queue_8",room = room)
         queue9      = MessageQueue(queue_name="queue_9",room = room)
         ting        = User(username="ting", password="123", stake = 100)
-        mile        = User(username="mile", password="123", stake = 100)
-        mamingcao   = User(username="mamingcao", password="123", stake = 100)
-        huaqin      = User(username="huaqin", password="123", stake = 100)
+        mile        = User(username="mile", password="123", stake = 500)
+        mamingcao   = User(username="mamingcao", password="123", stake = 200)
+        huaqin      = User(username="huaqin", password="123", stake = 500)
         self.db_connection.addItem(ting)
         self.db_connection.addItem(mile)
         self.db_connection.addItem(huaqin)
@@ -111,10 +111,9 @@ class Dealer(object):
         private_key     = args["private_key"]
         user_id         = args["user_id"]
         current_room    = self.room_list[args["room_id"]]
-       # if action == 1:
-    #    amount = args['amount']
-     #       current_room.bet_stake(user_id, private_key, amount)
-        if action == 2:
+        if action == 1:
+            current_room.all_in(user_id, private_key)
+        elif action == 2:
             current_room.call_stake(user_id, private_key)
         elif action == 3:
             amount = args['amount']
@@ -132,7 +131,7 @@ class Dealer(object):
         private_key     = args['private_key']
         user            = self.db_connection.query(User).filter_by(id=args['user_id']).first()
         current_room    = self.room_list[args["room_id"]]
-        (status, msg)   = current_room.sit(user, args["seat"], source, private_key)
+        (status, msg)   = current_room.sit(user, int(args["seat"])-1, source, private_key)
 
         if status:
             message = {"status": "success" }
