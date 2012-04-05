@@ -124,6 +124,8 @@ class GameRoom(object):
 		if self.t:
 			print "CANCEL!!"
 			self.t.cancel()
+		if self.countdown:
+			self.countdown.cancel()
 
 
 	def broadcast(self,msg):
@@ -252,18 +254,18 @@ class GameRoom(object):
 					if self.no_more_stake():
 						self.round_finish()
 					elif self.same_amount_on_table():
-						if self.check_next(seat_no) == seat_no:
+						if len(filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)) < 2:
 							self.round_finish()
 						else:
 							self.current_seat = self.info_next(seat_no, [1,3,4,5])        # final choice goes to the person who gives the first raise
 					else:
-						self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
+						self.current_seat = self.info_next(seat_no, [1,2,3,5])
 				else:
 					if self.same_amount_on_table():                 # all players have put down equal amount of money, next round
 						self.round_finish()
 					else:
 						if all_in_flag == False:
-							self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
+							self.current_seat = self.info_next(seat_no, [1,2,3,5])
 						else:
 							print "-----------sb before you has called all in---------------"
 							self.current_seat = self.info_next(seat_no, [2,5])      # cannot re-raise after sb's all-in
@@ -324,7 +326,7 @@ class GameRoom(object):
 				self.num_of_checks += 1
 				print "num_of_checks: ", self.num_of_checks
 				if self.num_of_checks < len(player_list):
-					self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
+					self.current_seat = self.info_next(seat_no, [1,3,4,5])
 				else:
 					self.num_of_checks = 0
 					self.round_finish()
@@ -401,13 +403,13 @@ class GameRoom(object):
 
 
 	def info_next(self, current_position, rights):
-		next = self.check_next(current_position)
-		self.seats[next].rights = rights
-		self.countdown = Timer(20, self.discard_game, args=[self.seats[next].get_private_key()])
-		print "seat no. for next player: ", self.seats[next].get_user().username
-		self.calculate_proper_amount(next, rights)
+		next_seat = self.check_next(current_position)
+		self.seats[next_seat].rights = rights
+		self.countdown = Timer(20, self.discard_game, args=[self.seats[next_seat].get_private_key()])
+		print "seat no. for next player: ", self.seats[next_seat].get_user().username
+		self.calculate_proper_amount(next_seat, rights)
 		self.countdown.start()
-		return next
+		return next_seat
 
 
 	def add_audit(self, player):
@@ -564,15 +566,16 @@ class GameRoom(object):
 
 	def check_next(self, current_position):
 		num_of_players = 0
-		next = (current_position + 1) % len(self.seats)
+		print "------------------------------", current_position
+		next_seat = (current_position + 1) % len(self.seats)
 		for x in xrange(9):
-			if self.seats[next].status == Seat.SEAT_PLAYING:
+			if self.seats[next_seat].status == Seat.SEAT_PLAYING:
 				num_of_players += 1
 				break
 			else:
-				next = (next + 1) % len(self.seats)
-
-		return next
+				next_seat = (next_seat + 1) % len(self.seats)
+		print "+++++++++++++++++++++++++++++++++", next_seat
+		return next_seat
 
 	def assign_role(self):
 		number      = 0
