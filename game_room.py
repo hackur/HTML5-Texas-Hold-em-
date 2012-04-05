@@ -199,6 +199,8 @@ class GameRoom(object):
 
     def no_more_stake(self):
         for x in xrange(len(self.player_stake)):
+            print "----player stake-----"
+            print self.player_stake[x]
             if self.seats[x].status == Seat.SEAT_PLAYING:
                 if self.player_stake[x] != None and self.player_stake[x] != 0:
                     return False
@@ -420,17 +422,21 @@ class GameRoom(object):
     def round_finish(self):
         print "ROUND FINISHED!!!!"
         self.countdown.cancel()
-        #for x in xrange(len(self.player_stake)):
-        #   if self.player_stake[x] == 0:
-        #       self.seats[x].status == Seat.SEAT_ALL_IN
         player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING or seat.status == Seat.SEAT_ALL_IN, self.seats)
         playing_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)
-        if self.no_more_stake or len(playing_list) < 2 or len(self.poker_controller.publicCard) == 5:
+        print "-----------no more stake------------"
+        print self.no_more_stake
+        print "__________len(playing_list)_________"
+        print len(playing_list)
+        print "_____len(public card)---------------"
+        print len(self.poker_controller.publicCard)
+
+        if self.no_more_stake() or len(playing_list) < 2 or len(self.poker_controller.publicCard) == 5:
             if len(self.poker_controller.publicCard) < 3:
                 self.poker_controller.getFlop()
                 self.poker_controller.getOne()
                 self.poker_controller.getOne()
-            elif len(self.poker_controller.publicCard) <= 5:
+            elif len(self.poker_controller.publicCard) < 5:
                 for x in xrange(5 - len(self.poker_controller.publicCard)):
                     self.poker_controller.getOne()
 
@@ -450,16 +456,14 @@ class GameRoom(object):
     def create_pot(self, player_list):
         pot_owner = []
         seat_to_remove = []
-        if len(player_list) == 0:
-            return
+
         for x in xrange(len(player_list)):
             if player_list[x].table_amount == 0:
-                seat_to_remove.append(x)
-        for index in seat_to_remove:
-            try:
-                player_list.remove(player_list[index])
-            except IndexError:
-                return
+                seat_to_remove.append(player_list[x])
+        for element in seat_to_remove:
+            player_list.remove(element)
+        if len(player_list) == 0:
+            return
         
 
         player_list = sorted(player_list, key = attrgetter("table_amount"))
