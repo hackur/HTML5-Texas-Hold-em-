@@ -533,7 +533,7 @@ class PokerController(object):
 		rank	= []
 		matured	= False
 		self.poker.determine_score(self.publicCard, self.users)
-		self.users.sort(self._hand_card_sorter, reverse=True)
+		self.users.sort(self._compare, reverse=True)
 		for i in xrange(len(self.users)):
 			matured = False
 			for k in xrange(len(rank)):

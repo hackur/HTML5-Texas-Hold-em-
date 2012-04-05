@@ -9,7 +9,7 @@ class Seat(object):
 	(SEAT_EMPTY,SEAT_WAITING,SEAT_PLAYING,SEAT_ALL_IN) = (0,1,2,3)
 
 	def __init__(self, seat_id = -1):
-		self.seat_id= seat_id
+		self._seat_id= seat_id
 		self._user	= None
 		self._cards	= None
 		self._inAmount = 0
@@ -22,6 +22,10 @@ class Seat(object):
 		self.table_amount = 0
 		self.player_stake = 0
 		pass
+	def __str__(self):
+		return "seat[%d], user[%d]"%(self._seat_id, self._user.id)
+	def __repr__(self):
+		return "seat[%d], user[%d]"%(self._seat_id, self._user.id)
 
 	def is_empty(self):
 		return self._status == Seat.SEAT_EMPTY
@@ -43,10 +47,10 @@ class Seat(object):
 
 	@property
 	def seat_id(self):
-		return self.seat_id
+		return self._seat_id
 	@seat_id.setter
 	def seat_id(self, seatId):
-		self.seat_id = seateId
+		self._seat_id = seatId
 
 	@property
 	def status(self):
@@ -461,13 +465,19 @@ class GameRoom(object):
 		ante_dict = {}
 		rank_list = self.poker_controller.rank_users()
 		for i in xrange(len(rank_list)):
-			for owner, ante in self.pot:
-				share_list = filter(lambda user: user.id in owner, rank_list[i])
+			print "rank list"
+			for item in rank_list[i]:
+				print item.get_user().id;
+
+			for owner, ante in self.pot.iteritems():
+				share_list = filter(lambda user: user.get_user().id in owner, rank_list[i])
 				for user in share_list:
 					if user in ante_dict:
 						ante_dict[user] += math.floor(ante/len(share_list))
 					else:
 						ante_dict[user] = math.floor(ante/len(share_list))
+				if len(share_list) > 0 :
+					self.pot[owner] = 0
 
 		print ante_dict
 
