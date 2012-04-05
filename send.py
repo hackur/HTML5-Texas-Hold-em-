@@ -24,6 +24,7 @@ def callback(ch, method, properties, body):
 
 	if len(pKeys) == 3:
 		for user in users:
+			print "all in!!!!!!!!!!!!!!!!!!!"
 			channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
 						body=pickle.dumps({'method':'action','action':1,'user_id':user.user_id,

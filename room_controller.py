@@ -288,7 +288,7 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 		message['room_id']		= user.room.id
 		arguments				= {'routing_key':'dealer', 'message':pickle.dumps(message)}
 		self.channel			= Channel(self.application.channel,queue, exchange, [])
-		self.channel.publish_message("dealer", pickler.dummps(message));
+		self.channel.publish_message("dealer", pickle.dumps(message));
 		self.finish("{\'status\':\'success\'}");
 
 
