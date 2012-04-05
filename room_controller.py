@@ -292,21 +292,7 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 		message['room_id']		= user.room.id
 		arguments				= {'routing_key':'dealer', 'message':pickle.dumps(message)}
 		self.channel			= Channel(self.application.channel,queue, exchange, [])
-		self.channel.add_ready_action(self.action_call_back, arguments)
-		self.channel.connect()
-
-	def on_connection_close(self):
-		self.channel.close()
-
-	def action_call_back(self, argument):
-		if self.request.connection.stream.closed():
-			self.channel.close()
-			return
-		print pickle.loads(argument['message'])
-		self.channel.publish_message(argument['routing_key'], argument['message'])
-		self.write(json.dumps({"status":"success"}))
-		self.channel.close()
-		self.finish()
+		self.channel.publish_message("dealer", pickler.dummps(message));
 
 
 class BoardListenMessageHandler(tornado.web.RequestHandler):
