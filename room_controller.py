@@ -30,14 +30,9 @@ class Channel(object):
 	def __init__(self, channel, queue_name, exchange, binding_keys,
 					request=None,
 					durable_queue = False,
-					host='localhost',
 					declare_queue_only = False):
 		# Construct a queue name we'll use for this instance only
-		self.connected		= False
-		self.connecting		= False
-		self.connection		= None
 		self.channel		= channel
-		self.host			= host
 		self.exchange		= exchange
 		self.queue_name		= queue_name
 		self.binding_keys	= binding_keys
@@ -48,6 +43,7 @@ class Channel(object):
 		self.request		= request
 		self.closing		= False
 		self.declare_queue_only = declare_queue_only
+		self.consumer_tag   = None
 		print "exchange [%s] queue [%s]" %( self.exchange, queue_name)
 
 	def connect(self):
@@ -172,7 +168,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		routing_key			= exchange + '_' + queue
 
 		broadcast_queue		= str(user.username) + '_broadcast'
-		public_key			= ('broadcast_%s_%d.*')% (exchange, room.id)
+		public_key			= ('broadcast_%s_%d.testing')% (exchange, room.id)
 		private_key			= ('direct.%s.%d.%d') % (exchange, room.id, user.id)
 		message				= {	'method'		: 'init',
 								'user_id'		: user.id,

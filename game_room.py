@@ -111,6 +111,7 @@ class GameRoom(object):
 		self.pot = {}
 		self.num_of_checks = 0
 		self.action_counter = 0
+		self.t = None
 
 		for x in xrange(num_of_seats):
 			self.seats.append(Seat(x))
@@ -118,6 +119,11 @@ class GameRoom(object):
 		self.current_seat = None
 
 		self.poker_controller = PokerController(self.seats)
+	def stop(self):
+		if self.t:
+			print "CANCEL!!"
+			self.t.cancel()
+
 
 	def broadcast(self,msg):
 		self.msg_count += 1
@@ -136,8 +142,6 @@ class GameRoom(object):
 			return (False, "Seat number is too large: %s we have %s" % (seat_no,len(self.seats)))
 		if not self.seats[seat_no].is_empty():
 			return (False, "Seat Occupied")
-		if self.status == GameRoom.GAME_PLAY:
-			return (False, "Game Ongoing")
 
 
 		self.seats[seat_no].sit(player, direct_key, private_key)
@@ -147,8 +151,8 @@ class GameRoom(object):
 		self.broadcast(message)
 
 		if self.occupied_seat == 3:
-			t = Timer(5, self.start_game)
-			t.start()
+			self.t = Timer(5, self.start_game)
+			self.t.start()
 		return ( True, "" )
 
 
