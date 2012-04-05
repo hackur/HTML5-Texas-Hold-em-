@@ -8,6 +8,8 @@ import poker_controller
 from game_room import GameRoom
 from sqlalchemy.orm import sessionmaker,relationship, backref
 from database import DatabaseConnection,User,Room,MessageQueue
+import tornado.ioloop
+from pika.adapters.tornado_connection import TornadoConnection
 try:
 	import cpickle as pickle
 except:
@@ -101,25 +103,47 @@ class Dealer(object):
 		# mile.friends = [ting]
 		self.db_connection.commit_session()
 
-	def start(self):
-		self.connection = pika.BlockingConnection(
-				pika.ConnectionParameters(host = self.host,
-					port = self.port))
-		self.channel    = self.connection.channel()
-		self.channel.exchange_declare(exchange      = self.exchange,
-				type        = 'topic',
-				auto_delete = True,
-				durable     = False)
+	def on_queue_bound(self, frame):
+		self.channel.basic_consume(consumer_callback=self.on_message, queue=self.queue, no_ack=True)
+
+
+	def on_queue_declared(self, frame):
+		self.channel.queue_bind(exchange    = self.exchange,
+				queue       = self.queue,
+				routing_key = 'dealer',
+				callback=self.on_queue_bound)
+
+
+	def on_exchange_declared(self,frame):
 		self.channel.queue_declare(queue    = self.queue,
 				auto_delete = True,
 				durable     = False,
-				exclusive   = False)
+				exclusive   = False,
+				callback=self.on_queue_declared)
 
-		self.channel.queue_bind(exchange    = self.exchange,
-				queue       = self.queue,
-				routing_key = 'dealer')
-		self.channel.basic_consume(self.on_message, self.queue, no_ack=True)
-		self.channel.start_consuming()
+
+	def on_channel_open(self,channel):
+		self.channel    = channel
+
+		self.channel.exchange_declare(exchange = self.exchange,
+				type        = 'topic',
+				auto_delete = True,
+				durable     = False,
+				callback=self.on_exchange_declared
+				)
+
+	def on_connected(self,connection):
+		connection.channel(self.on_channel_open)
+
+	def start(self):
+		credentials = pika.PlainCredentials('guest', 'guest')
+		param = pika.ConnectionParameters(host="localhost",
+						port=5672,
+						virtual_host="/",
+						credentials=credentials)
+
+		self.connection = TornadoConnection(param, on_open_callback=self.on_connected)
+		self.connection.set_backpressure_multiplier(100000)
 
 	def cmd_action(self, args):
 		print "-------------------------------------------------user trying to bet"
@@ -214,8 +238,12 @@ if __name__ == "__main__":
 
 	dealer = Dealer(queue = options.queue_id, exchange = options.exchange_id)
 	dealer.init_database()
-	dealer.start()
 
+
+	dealer.start()
+	ioloop = tornado.ioloop.IOLoop.instance()
+
+	ioloop.start()
 	# print dealer.seats
 
 
