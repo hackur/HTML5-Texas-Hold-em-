@@ -81,23 +81,24 @@ class Dealer(object):
 		self.connection.set_backpressure_multiplier(100000)
 
 	def cmd_action(self, args):
-		print "-------------------------------------------------user trying to bet"
-		self.db_connection.start_session()
-		action          = args["action"]
-		private_key     = args["private_key"]
-		user_id         = args["user_id"]
+		print "-------user trying to bet"
+		#self.db_connection.start_session()
+		#action          = args["action"]
+		#private_key     = args["private_key"]
+		#user_id         = args["user_id"]
 		current_room    = self.room_list[args["room_id"]]
-		if action == 1:
-			current_room.all_in(user_id, private_key)
-		elif action == 2:
-			current_room.call_stake(user_id, private_key)
-		elif action == 3:
-			amount = args['amount']
-			current_room.raise_stake(user_id, private_key, amount)
-		elif action == 4:
-			current_room.check(user_id, private_key)
-		elif action == 5:
-			current_room.discard_game(private_key)
+		current_room.user_action(args)
+		#if action == 1:
+		#	current_room.all_in(user_id, private_key)
+		#elif action == 2:
+		#	current_room.call_stake(user_id, private_key)
+		#elif action == 3:
+		#	amount = args['amount']
+		#	current_room.raise_stake(user_id, private_key, amount)
+		#elif action == 4:
+		#	current_room.check(user_id, private_key)
+		#elif action == 5:
+		#	current_room.discard_game(private_key)
 
 
 	def cmd_sit(self, args):
