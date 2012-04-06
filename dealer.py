@@ -51,16 +51,16 @@ class Dealer(object):
 		self.room_list  = {}
 		self.users      = []
 
-		try:
-			signal.signal(signal.CTRL_C_EVENT,self.keyboardInterrupt)
-		except:
-			pass
-
-		try:
-			signal.signal(signal.SIGINT,self.keyboardInterrupt)
-		except:
-			pass
-
+#		try:
+#			signal.signal(signal.CTRL_C_EVENT,self.keyboardInterrupt)
+#		except:
+#			pass
+#
+#		try:
+#			signal.signal(signal.SIGINT,self.keyboardInterrupt)
+#		except:
+#			pass
+#
 
 	def keyboardInterrupt(self,x,y):
 		for room in self.room_list.keys():
