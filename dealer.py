@@ -37,6 +37,7 @@ class Dealer(object):
 
 	def init_database(self):
 		database.init_database()
+		self.db_connection = DatabaseConnection()
 
 	def on_queue_bound(self, frame):
 		self.channel.basic_consume(consumer_callback=self.on_message, queue=self.queue, no_ack=True)
@@ -117,6 +118,7 @@ class Dealer(object):
 				body        = pickle.dumps(message))
 
 	def broadcast(self, routing_key, msg):
+		print "++++++++broadcasting in dealer++++++++++++++++++++"
 		self.channel.basic_publish(exchange     = self.exchange,
 				routing_key = routing_key,
 				body        = pickle.dumps(msg))

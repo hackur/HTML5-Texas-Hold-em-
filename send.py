@@ -70,7 +70,7 @@ if __name__ == "__main__":
 	for user in users:
 		channel.basic_publish(exchange='dealer_exchange_1',
 							routing_key="dealer",
-							body=pickle.dumps({'method':'init','source':'IAMGOD', "room_id":1, "user_id":user.user_id}))
+							body=pickle.dumps({'method':'enter','source':'IAMGOD', "room_id":1, "user_id":user.user_id}))
 
 	for user in users:
 		channel.basic_publish(exchange='dealer_exchange_1',

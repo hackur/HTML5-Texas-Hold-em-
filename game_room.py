@@ -134,6 +134,7 @@ class GameRoom(object):
 	def broadcast(self,msg):
 		self.msg_count += 1
 		msg['timestamp'] = self.msg_count
+		print "```````````````````````broadcasting`````````````````````"
 		self.dealer.broadcast(self.broadcast_key, msg)
 
 	def direct_message(self, msg, destination):
@@ -484,12 +485,20 @@ class GameRoom(object):
 			self.create_pot(player_list)
 #			self.poker_controller.get_winner()
 			winner_dict = {}
-			player_dict = self.distribute_ante()
-			winner_dict = filter(lambda seat: winner_dict[seat] != 0, winner_dict)
-			if len(winner_dict) > 1:
-				for seat in winner_dict:
-					broadcast_msg = {"winner": seat.get_user().username, "handcards": seat.handcards}
+			ante_dict = self.distribute_ante()
+			winner_dict = {k:v for k, v in ante_dict.items() if v >0 } #filter(lambda seat: winner_dict[seat] != 0, ante_dict)
+			print winner_dict
+			if True or len(winner_dict) > 1:
+				print "============================="
+				for seat in winner_dict.keys():
+					print "seat: ", seat.get_user().username
+					card_list = []
+					for card in seat.handcards:
+						card_list.append(str(card))
+					print card_list
+					broadcast_msg = {"winner": seat.get_user().username, "handcards": card_list}
 					self.broadcast(broadcast_msg)
+					print "=================msg broadcasted============="
 
 			sys.exit()
 		else:
