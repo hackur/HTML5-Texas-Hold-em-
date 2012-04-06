@@ -60,6 +60,7 @@ class Tester(object):
 								body=pickle.dumps({'method':'enter','source':'IAMGOD', "room_id":1, "user_id":user.user_id}))
 
 		for user in self.users:
+			print "USER SIT == ",user.seat
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 								routing_key="dealer",
 								body=pickle.dumps({'method':'sit','source':'IAMGOD','user_id':user.user_id, "room_id":1, "seat":user.seat,"private_key":user.private_key}))
@@ -124,6 +125,7 @@ class Tester(object):
 			self.pKeys[method.routing_key] = 1
 
 		if len(self.pKeys) == 3:
+			self.pKeys = {}
 			for user in self.users:
 			#	print "all in!!!!!!!!!!!!!!!!!!!"
 				self.channel.basic_publish(exchange='dealer_exchange_1',
