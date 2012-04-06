@@ -108,7 +108,7 @@ class Dealer(object):
 		private_key     = args['private_key']
 		user            = self.db_connection.query(User).filter_by(id=args['user_id']).first()
 		current_room    = self.room_list[args["room_id"]]
-		(status, msg)   = current_room.sit(user, int(args["seat"])-1, source, private_key)
+		(status, msg)   = current_room.sit(user, int(args["seat"]), source, private_key)
 
 		if status:
 			message = {"status": "success" }
