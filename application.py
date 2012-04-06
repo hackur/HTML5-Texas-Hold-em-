@@ -8,25 +8,6 @@ from login_controller import *
 from database import *
 PORT = 8888
 
-def init_database():
-	db_connection	= DatabaseConnection()
-	db_connection.init("sqlite:///:memory:")
-	db_connection.connect()
-	db_connection.start_session()
-	room		= Room(exchange="dealer_exchange_1")
-	ting		= User(username="ting", password="123", stake = 100)
-	mile		= User(username="mile", password="123", stake = 100)
-	mamingcao	= User(username="mamingcao", password="123", stake = 100)
-	huaqin		= User(username="huaqin", password="123", stake = 100)
-	db_connection.addItem(ting)
-	db_connection.addItem(mile)
-	db_connection.addItem(huaqin)
-	db_connection.addItem(mamingcao)
-	db_connection.addItem(room)
-	ting.friends = [mile, mamingcao]
-	mile.friends = [ting]
-	db_connection.commit_session()
-
 class IndexHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	def get(self):

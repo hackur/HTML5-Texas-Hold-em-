@@ -112,3 +112,22 @@ class DatabaseConnection(object):
 	def merge(self, object):
 		self.session.merge(object)
 
+def init_database():
+	db_connection  = DatabaseConnection()
+	db_connection.init("sqlite:///:memory:")
+	db_connection.connect()
+	db_connection.start_session()
+	room        = Room(exchange="dealer_exchange_1")
+	ting        = User(username="ting", password="123", stake = 100)
+	mile        = User(username="mile", password="123", stake = 500)
+	mamingcao   = User(username="mamingcao", password="123", stake = 200)
+	huaqin      = User(username="huaqin", password="123", stake = 500)
+	db_connection.addItem(ting)
+	db_connection.addItem(mile)
+	db_connection.addItem(huaqin)
+	db_connection.addItem(mamingcao)
+	db_connection.addItem(room)
+	# ting.friends = [mile, mamingcao]
+	# mile.friends = [ting]
+	db_connection.commit_session()
+

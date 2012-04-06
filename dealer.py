@@ -7,7 +7,9 @@ import random
 import poker_controller
 from game_room import GameRoom
 from sqlalchemy.orm import sessionmaker,relationship, backref
-from database import DatabaseConnection,User,Room,MessageQueue
+
+import database
+from database import DatabaseConnection,User,Room
 import tornado.ioloop
 from pika.adapters.tornado_connection import TornadoConnection
 try:
@@ -15,25 +17,6 @@ try:
 except:
 	import pickle
 
-
-import signal
-
-
-class Cards(object):
-	def __init__(self):
-		self._cards = []
-		self._cardCount = 52
-		for i in xrange(4):
-			self._cards.append(range(1,14))
-
-	def next(self):
-		ram = random.randint(0,self._cardCount)
-		for i in xrange(4):
-			if ram >= len(self._cards[i]):
-				ram -= len(self._cards[i])
-			else:
-				self._cardCount -= 1
-				return self._cards[i][ram]
 
 class Dealer(object):
 	#   users = []
@@ -51,57 +34,9 @@ class Dealer(object):
 		self.room_list  = {}
 		self.users      = []
 
-#		try:
-#			signal.signal(signal.CTRL_C_EVENT,self.keyboardInterrupt)
-#		except:
-#			pass
-#
-#		try:
-#			signal.signal(signal.SIGINT,self.keyboardInterrupt)
-#		except:
-#			pass
-#
-
-	def keyboardInterrupt(self,x,y):
-		for room in self.room_list.keys():
-			self.room_list[room].stop()
-		exit(0)
-
 
 	def init_database(self):
-		self.db_connection  = DatabaseConnection()
-		self.db_connection.init("sqlite:///:memory:")
-		self.db_connection.connect()
-		self.db_connection.start_session()
-		room        = Room(exchange="dealer_exchange_1")
-		queue1      = MessageQueue(queue_name="queue_1",room = room)
-		queue2      = MessageQueue(queue_name="queue_2",room = room)
-		queue3      = MessageQueue(queue_name="queue_3",room = room)
-		queue4      = MessageQueue(queue_name="queue_4",room = room)
-		queue5      = MessageQueue(queue_name="queue_5",room = room)
-		queue6      = MessageQueue(queue_name="queue_6",room = room)
-		queue7      = MessageQueue(queue_name="queue_7",room = room)
-		queue8      = MessageQueue(queue_name="queue_8",room = room)
-		queue9      = MessageQueue(queue_name="queue_9",room = room)
-		ting        = User(username="ting", password="123", stake = 100)
-		mile        = User(username="mile", password="123", stake = 500)
-		mamingcao   = User(username="mamingcao", password="123", stake = 200)
-		huaqin      = User(username="huaqin", password="123", stake = 500)
-		self.db_connection.addItem(ting)
-		self.db_connection.addItem(mile)
-		self.db_connection.addItem(huaqin)
-		self.db_connection.addItem(mamingcao)
-		self.db_connection.addItem(room)
-		self.db_connection.addItem(queue1)
-		self.db_connection.addItem(queue2)
-		self.db_connection.addItem(queue3)
-		self.db_connection.addItem(queue4)
-		self.db_connection.addItem(queue5)
-		self.db_connection.addItem(queue6)
-		self.db_connection.addItem(queue7)
-		# ting.friends = [mile, mamingcao]
-		# mile.friends = [ting]
-		self.db_connection.commit_session()
+		database.init_database()
 
 	def on_queue_bound(self, frame):
 		self.channel.basic_consume(consumer_callback=self.on_message, queue=self.queue, no_ack=True)
@@ -124,7 +59,6 @@ class Dealer(object):
 
 	def on_channel_open(self,channel):
 		self.channel    = channel
-
 		self.channel.exchange_declare(exchange = self.exchange,
 				type        = 'topic',
 				auto_delete = True,
@@ -187,7 +121,7 @@ class Dealer(object):
 				routing_key = routing_key,
 				body        = pickle.dumps(msg))
 
-	def cmd_init(self,args):
+	def cmd_enter(self,args):
 		if args['room_id'] not in self.room_list:
 			self.cmd_create_room(args)
 		print "Room created"
