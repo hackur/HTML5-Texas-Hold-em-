@@ -2,15 +2,9 @@
 <html>
 	<head>
 		<title></title>
-	<link rel="stylesheet" type="text/css" href="./css/game.css"/>
+	<link rel="stylesheet" type="text/css" href="css/game.css"/>
 	<script src="./js/jquery.min.js"></script>
-	<script src="./js/poker_lib.js"></script>
-	<script src="./js/index.js"> </script>
 	<script src="http://ricostacruz.com/jquery.transit/jquery.transit.js"></script>
-	<script src="http://ricostacruz.com/jquery.transit/jquery.transit.min.js"></script>
-	<script>
-		$(table_init);
-	</script>
 	</head>
 	<body>
 		<div id="container">
@@ -20,18 +14,7 @@
 					<div class="avatar">img here</div>
 					<div class="money">1000</div>
 					<div class="tablemoney">567</div>
-						<div class="hover panel">
-							<div class="front">
-							<image src="img/pokers/back.png" />
-						</div>
-						<div class="back">
-							<image src="img/pokers/heart/3.png" />
-						</div>
-					</div>
 					<div class="chipcontainer">
-						<img class="original" src="img/chip4small.png"/>
-						<img class="original" src="img/chip2small.png"/>
-						<img class="original" src="img/chip3small.png"/>
 					</div>
 				</div>
 				<div class="sits player2 5players">
@@ -72,16 +55,6 @@
 						<div>35K</div>
 					</div>
 					<div class="poker">
-						<!-- <img class="hiddenpoker hiddenpoker0" src="/img/pokers/spade/A.png"/>
-						<img class="hiddenpoker hiddenpoker1" src="/img/pokers/spade/K.png"/>
-						<img class="hiddenpoker hiddenpoker2" src="/img/pokers/spade/J.png"/>
-						<img class="hiddenpoker hiddenpoker3" src="/img/pokers/heart/2.png"/>
-						<img class="hiddenpoker hiddenpoker4" src="/img/pokers/heart/5.png"/> -->
-						<img id="card0" class="hiddenpoker hiddenpoker0" src=""/>
-						<img id="card1" class="hiddenpoker hiddenpoker1" src=""/>
-						<img id="card2" class="hiddenpoker hiddenpoker2" src=""/>
-						<img id="card3" class="hiddenpoker hiddenpoker3" src=""/>
-						<img id="card4" class="hiddenpoker hiddenpoker4" src=""/>
 					</div>
 					<div class="message">Message here</div>
 				</div>
@@ -95,13 +68,33 @@
 				</div>
 			</div>
 		</div>
-		<script type="text/javascript">
-			$("#image").mouseover(function (argument) {
-				$('#image').transition({
-    				perspective: '100px',
-    				rotateY: '180deg'
+		<script>
+			
+			
+
+				sitdown(3);
+
+				function sitdown(sit) {
+					var all_class = ['.sits.user.5players', '.sits.player8', '.sits.player2.5players', '.sits.player1.5players', '.sits.player6', '.sits.player5', '.sits.player4.5players', '.sits.player3.5players', '.sits.player7'];
+					var transit_id = sit, transit_temp = -1;
+					for (var i = transit_id; i < all_class.length; i++) {
+						transit(all_class[++transit_temp], all_class[i]);
+					}
+					for (var i = 0; i < transit_id; i++) {
+						transit(all_class[++transit_temp], all_class[i]);
+					}
+				};
+
+				function transit(transit_to, transit_from) {
+				$(transit_from).transition({
+					x: $(transit_to).position().left - $(transit_from).position().left,
+					y: $(transit_to).position().top - $(transit_from).position().top,
+					duration: 10000,
+					rotate: 0,
+					easing: 'snap'
 				});
-			});
+			};
+			
 		</script>
 	</body>
 </html>
