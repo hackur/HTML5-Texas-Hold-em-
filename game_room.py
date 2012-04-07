@@ -168,7 +168,7 @@ class GameRoom(object):
 
 		self.user_seat[player.id] = seat_no
 		self.seats[seat_no].sit(player, private_key)
-		self.seats[seat_no].player_stake = stake   # read user's money
+		self.seats[seat_no].player_stake = int(stake)
 		self.occupied_seat += 1
 		message = {'status':'success', 'seat_no': seat_no, "username": self.seats[seat_no].get_user().username}
 		self.broadcast(message)

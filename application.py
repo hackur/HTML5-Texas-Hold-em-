@@ -31,6 +31,7 @@ if __name__ == '__main__':
 		"debug": True,
 		'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
 		"static_path": os.path.join(os.path.dirname(__file__), "static"),
+		"PokerUITest": os.path.join(os.path.dirname(__file__), "PokerUITest"),
 		'session_storage':"dir"
 		#"session_storage":"mongodb:///db"
 	}
@@ -53,6 +54,7 @@ if __name__ == '__main__':
 		(r"/login", LoginHandler),
 		(r"/(.*.html)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
+		(r"/PokerUITest/(.*)", tornado.web.StaticFileHandler, dict(path=settings['PokerUITest'])),
 		], **settings)
 	http_server = tornado.httpserver.HTTPServer(application)
 	http_server.bind(PORT)
