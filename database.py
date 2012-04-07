@@ -7,23 +7,13 @@ class Room(Base):
 	__tablename__	= "room"
 	id		= Column(Integer,primary_key=True, autoincrement=True)
 	exchange	= Column(String(255))
-	def __init__(self, exchange):
+	blind		= Column(Integer)
+	player		= Column(Integer)
+	max_player	= Column(Integer)
+	def __init__(self, exchange, blind=10,player=0,max_player=9):
 		self.exchange	= exchange
 	def __repr__(self):
 		return "<Room('%s','%s','%s','%s')>" % (self.id, self.exchange, self.queues,self.owner)
-
-class MessageQueue(Base):
-	__tablename__	= "message_queue"
-	id		= Column(Integer, primary_key=True, autoincrement=True)
-	room_id		= Column(Integer, ForeignKey('room.id'))
-	queue_name	= Column(String(255))
-	room 		= relationship("Room", backref=backref('queues', order_by=id))
-	def __init__(self, queue_name, room_id = -1, room = None):
-		self.queue_name	= queue_name
-		self.room_id	= room_id
-		self.room	= room
-	def __repr__(self):
-		return "<Queue('%s','%s', '%s')>" % (self.id, self.room_id, self.queue_name)
 
 #imtermediate table
 friendShip=Table("friendShip",Base.metadata,
@@ -36,11 +26,9 @@ class User(Base):
 	id		= Column(Integer, primary_key=True, autoincrement=True)
 	username	= Column(String(255))
 	password	= Column(String(255))
-	queue_id	= Column(Integer, ForeignKey(MessageQueue.id))
-	queue		= relationship(MessageQueue, uselist=False,backref=backref('user', uselist = False))
 	room_id		= Column(Integer, ForeignKey("room.id"))
 	room		= relationship("Room", backref=backref('users'))
-	family_id  	= Column(Integer,ForeignKey('family.id'))
+	family_id   = Column(Integer,ForeignKey('family.id'))
 	family		= relationship("Family",backref=backref('members',order_by=id))
 	email		= Column(String(100))
 	level		= Column(Integer)
@@ -117,7 +105,7 @@ def init_database():
 	db_connection.init("sqlite:///:memory:")
 	db_connection.connect()
 	db_connection.start_session()
-	room        = Room(exchange="dealer_exchange_1")
+	room        = Room(exchange="dealer_exchange_1",blind=10,max_player=9,player=0)
 	ting        = User(username="ting", password="123", stake = 200)
 	mile        = User(username="mile", password="123", stake = 100)
 	mamingcao   = User(username="mamingcao", password="123", stake = 200)

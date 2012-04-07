@@ -15,9 +15,8 @@ import tornado.web
 
 from sqlalchemy.orm import sessionmaker,relationship, backref
 import database
-from database import DatabaseConnection,User,Room,MessageQueue
+from database import DatabaseConnection,User,Room
 from authenticate import *
-from pika.adapters.tornado_connection import TornadoConnection
 from pika_channel import Channel
 try:
     import cpickle as pickle
@@ -45,7 +44,10 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		db_connection.addItem(user)
 		db_connection.commit_session()
 		queue				= str(user.username) + '_init'
-		exchange			= str(user.room.exchange)
+		exchange			= str(room.exchange)
+
+		self.session['exchange'] = exchange
+
 		routing_key			= exchange + '_' + queue
 
 		broadcast_queue		= str(user.username) + '_broadcast'
@@ -76,6 +78,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		self.session['private_key']	= private_key
 		self.session['user']		= user
 		self.session['messages']	= list()
+		print "ENTER!"
 
 	def get(self):
 		self.render("room-test-ajax.html")
@@ -113,9 +116,6 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 		seat		= self.get_argument('seat')
 		stake		= self.get_argument('stake')
 
-		#DEBUG
-		#if False and 'is_sit_down' in self.session and
-		print "SIT DOWN","x" * 20
 		if'is_sit_down' in self.session and \
 			self.session['is_sit_down'] == True and \
 			self.session['seat'] == seat:
@@ -123,11 +123,9 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			self.finish()
 		else:
 			queue_name		= str(user.username) + '_sit'
-			exchange_name	= str(user.room.exchange)
+			exchange_name   = self.session['exchange']
+			#exchange_name	= str(user.room.exchange)
 			source_key		= "%s_%s" % (exchange_name, queue_name)
-			print '=============================keys==================================='
-			print self.session['private_key']
-			print self.session['public_key']
 
 			message			= {'method':'sit', 'user_id':user.id,'seat':seat,
 							'source':source_key, 'room_id':user.room.id,
@@ -143,12 +141,10 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			self.channel.close()
 			return
 
-		print "SIT CALL BACK!!!"
 		self.channel.add_message_action(self.message_call_back, None)
 		self.channel.publish_message(argument['routing_key'], argument['message'])
 
 	def message_call_back(self, argument):
-		print "message_call_back!!!!"
 		messages= self.channel.get_messages()[0]
 		if self.request.connection.stream.closed():
 			self.channel.close()
@@ -182,6 +178,7 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 		self.finish("{\'status\':\'success\'}");
 
 
+###BoardListenMessageHandler shouldn't touch database at all. Even in authenticate
 class BoardListenMessageHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
@@ -189,7 +186,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		user		= self.session['user']
 		timestamp	= int(self.get_argument('timestamp'))
 		queue		= str(user.username)
-		exchange	= str(user.room.exchange)
+		exchange	= self.session['exchange']
 		self.clean_matured_message(timestamp)
 
 		if len(self.session['messages']) > 0:

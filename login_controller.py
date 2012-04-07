@@ -3,7 +3,7 @@ import json
 import tornado.ioloop
 import tornado.httpserver
 import tornado.web
-from database import DatabaseConnection,User,Room,MessageQueue
+from database import DatabaseConnection,User,Room
 
 class LoginHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
@@ -17,7 +17,7 @@ class LoginHandler(tornado.web.RequestHandler):
 		else:
 			message		= {'status':'success'}
 			self.session['user'] = user
-		
+
 		self.set_header('Access-Control-Allow-Origin', '*')
 		self.write(json.dumps(message))
 		self.finish()
@@ -37,7 +37,7 @@ class GuestLoginHandler(tornado.web.RequestHandler):
 			username		= self.get_argument('username')
 			password		= self.get_argument('password')
 			user			= db_connection.query(User).filter_by(username = username).filter_by(password = password).one()
-		
+
 		if user is None:
 			message		= {'status':'failed', 'content':'invalid username or password'}
 		else:

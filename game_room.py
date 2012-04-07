@@ -77,7 +77,7 @@ class Seat(object):
 class GameRoom(object):
 	(GAME_WAIT,GAME_PLAY) = (0,1)
 	(A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME) = (1,2,3,4,5)
-	def __init__(self, room_id, owner, dealer, num_of_seats = 9, blind = 10):
+	def __init__(self, room_id, owner, dealer, num_of_seats = 9, blind = 10,min_stake=100,max_stake=2000):
 		self.room_id        = room_id
 		self.owner      = owner
 		self.status     = GameRoom.GAME_WAIT
@@ -105,6 +105,8 @@ class GameRoom(object):
 		self.t = None
 		self.ioloop = ioloop.IOLoop.instance()
 		self.user_seat = {}
+		self.min_stake = min_stake
+		self.max_stake = max_stake
 
 		for x in xrange(num_of_seats):
 			self.seats.append(Seat(x))
@@ -124,6 +126,9 @@ class GameRoom(object):
 			result['publicCard'] = self.poker_controller.publicCard
 			result['current_seat'] = self.current_seat
 		result['seats'] = [ seat.to_listener() for seat in self.seats ]
+		result['min_stake'] = self.min_stake
+		result['max_stake'] = self.max_stake
+		result['blind']     = self.blind
 		result['timestamp'] = self.msg_count
 		return result
 
@@ -583,7 +588,6 @@ class GameRoom(object):
 		if GameRoom.A_RAISESTAKE in self.seats[seat_no].rights:
 			if self.seats[seat_no].player_stake < min_amount:
 				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
-				print "REMOVE----" , 'x' * 100
 			else:
 				self.amount_limits[GameRoom.A_RAISESTAKE] = (min_amount, max_amount)
 

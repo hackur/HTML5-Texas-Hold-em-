@@ -5,7 +5,9 @@ import tornado.web
 import tornado.process
 from room_controller import *
 from login_controller import *
+from user_controller import *
 from database import *
+from pika.adapters.tornado_connection import TornadoConnection
 PORT = 8888
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -50,6 +52,7 @@ if __name__ == '__main__':
 		(r"/listen-board-message", BoardListenMessageHandler),
 		(r"/post-board-message", BoardActionMessageHandler),
 		(r"/enter", EnterRoomHandler),
+		(r"/userinfo", UserInfoHandler),
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),
 		(r"/(.*.html)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
