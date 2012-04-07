@@ -15,9 +15,20 @@ class IndexHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.render("test.html")
 
+class UIIndexHandler(tornado.web.RequestHandler):
+	@tornado.web.asynchronous
+	def get(self):
+		self.render("uitest.html")
+
+class UIIndexTestHandler(tornado.web.RequestHandler):
+	@tornado.web.asynchronous
+	def get(self):
+		self.render("static/game/game.html",username=self.get_argument('username'),password="123")
+
 class IndexTestHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.render("room-test-ajax.html",username=self.get_argument('username'),sitno=self.get_argument('sitno'))
+
 
 application = None
 def on_channel_open(channel):
@@ -32,7 +43,7 @@ if __name__ == '__main__':
 	settings = {
 		"debug": True,
 		'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
-		"static_path": os.path.join(os.path.dirname(__file__), "static"),
+		"static_path2": os.path.join(os.path.dirname(__file__), "static"),
 		"PokerUITest": os.path.join(os.path.dirname(__file__), "PokerUITest"),
 		'session_storage':"dir"
 		#"session_storage":"mongodb:///db"
@@ -47,6 +58,9 @@ if __name__ == '__main__':
 	application = tornado.web.Application([
 		(r"/$", IndexHandler),
 		(r"/test", IndexTestHandler),
+		(r"/static/game/game.html", UIIndexTestHandler),
+
+		(r"/uitest.html", UIIndexHandler),
 		(r"/test.html", IndexHandler),
 		(r"/sit-down", SitDownBoardHandler),
 		(r"/listen-board-message", BoardListenMessageHandler),
@@ -55,8 +69,8 @@ if __name__ == '__main__':
 		(r"/userinfo", UserInfoHandler),
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),
-		(r"/(.*.html)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
-		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
+		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path2'])),
+	#	(r"/(.*.html)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
 		(r"/PokerUITest/(.*)", tornado.web.StaticFileHandler, dict(path=settings['PokerUITest'])),
 		], **settings)
 	http_server = tornado.httpserver.HTTPServer(application)
