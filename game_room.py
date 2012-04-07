@@ -24,9 +24,9 @@ class Seat(object):
 		self.player_stake = 0
 
 	def __str__(self):
-		return "seat[%d], user[%d]" % (self._seat_id, self._user.id)
+		return "seat[%d], user[%d]" % (self.seat_id, self._user.id)
 	def __repr__(self):
-		return "seat[%d], user[%d]" % (self._seat_id, self._user.id)
+		return "seat[%d], user[%d]" % (self.seat_id, self._user.id)
 
 	def is_empty(self):
 		return self.status == Seat.SEAT_EMPTY
@@ -261,11 +261,7 @@ class GameRoom(object):
 
 		seat_no = self.current_seat
 		if not inComplete_all_in_flag:
-			amount = self.min_amount - self.seats[seat_no].table_amount
-
-		if not self.is_proper_amount(amount, command):
-			print "NOOOOOOO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-			return
+			amount = self.amount_limits[GameRoom.A_CALLSTAKE]
 
 		print "call amount: :", amount
 		self.seats[seat_no].bet(amount)
@@ -394,7 +390,7 @@ class GameRoom(object):
 		print "num_of_checks: ", self.num_of_checks
 		command  = 1
 		seat_no  = self.current_seat
-		amount  = min(self.seats[seat_no].player_stake, self.amount_limits[GameRoom.A_ALLIN][1])
+		amount   = self.amount_limits[GameRoom.A_ALLIN]
 		print "self.min_amount before all in: ", self.min_amount
 		print "----------------",self.min_amount == amount + self.seats[seat_no].table_amount
 
@@ -588,16 +584,16 @@ class GameRoom(object):
 		else:
 			max_amount = min(self.seats[seat_no].player_stake, total_amount_list[0] - self.seats[seat_no].table_amount)
 
-		min_amount = max(self.min_amount - self.seats[seat_no].table_amount, self.big_blind)
+		min_amount = self.min_amount - self.seats[seat_no].table_amount
 		if GameRoom.A_CALLSTAKE in self.seats[seat_no].rights:
 			if self.seats[seat_no].player_stake < min_amount:
 				self.seats[seat_no].rights.remove(GameRoom.A_CALLSTAKE)
 			else:
-				self.amount_limits[GameRoom.A_CALLSTAKE] = (min_amount, max_amount)
+				self.amount_limits[GameRoom.A_CALLSTAKE] = min_amount
 
 		min_amount = 2 * (self.min_amount - self.seats[seat_no].table_amount)
 		if GameRoom.A_RAISESTAKE in self.seats[seat_no].rights:
-			if num_of_stake == 4:
+			if self.num_of_raise == 4:
 				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
 			if self.seats[seat_no].player_stake < min_amount:
 				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
@@ -605,8 +601,7 @@ class GameRoom(object):
 				self.amount_limits[GameRoom.A_RAISESTAKE] = (min_amount, max_amount)
 
 		if GameRoom.A_ALLIN in self.seats[seat_no].rights:
-			self.amount_limits[GameRoom.A_ALLIN] = (min(self.seats[seat_no].player_stake - self.seats[seat_no].table_amount, self.min_amount-self.seats[seat_no].table_amount), \
-					min(self.seats[seat_no].player_stake, max_amount))
+			self.amount_limits[GameRoom.A_ALLIN] = min(self.seats[seat_no].player_stake, max_amount)
 
 		print self.amount_limits
 		return self.amount_limits
