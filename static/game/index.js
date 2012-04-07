@@ -322,14 +322,11 @@ var send_back_card = function(left_cor, top_cor, degree, id, callback) {
 				}
 
 				function transit(transit_to, transit_from) {
-				$(transit_from).transition({
-					x: $(transit_to).position().left - $(transit_from).position().left,
-					y: $(transit_to).position().top - $(transit_from).position().top,
-					duration: 10000,
-					rotate: 0,
-					easing: 'snap'
-				});
-			}
+
+				  	$(transit_from).css('left',$(transit_to).css('left'));
+				  	$(transit_from).css('top',$(transit_to).css('top'));
+
+				}
 
 
 			
