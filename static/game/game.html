@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Game</title>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<script src="jquery.min.js"></script>
+		<script src="poker_lib.js"></script>
+		<script>
+			window.username = "{{ username }}";
+			window.password = "{{ password }}";
+			var login = function(){
+					$.post(
+						"/login",
+						{username:username, password:password},
+						function(data){
+							console.log("Login success");
+							 enter(); 
+						},
+						'json'
+					);
+			}
+			$(login);
+		</script>
+		<script src="index.js"></script>
+		<!-- <script src="animation.js"></script> -->
+		<script src="game_control.js"></script>
+		<!-- The plugin works on Safari, Chrome, Webkit, Firefox 3.5+, IE9+, and Opera 11+. -->
+		<script src="rotate3Di/jquery-css-transform/jquery-css-transform.js"></script>
+		<script src="rotate3Di/rotate3Di.js"></script>
+
+		<script src="./jqueryUI/jquery-ui-1.8.18.custom.min.js"></script>
+		<script src="./jqueryUI/jquery.ui.slider.js"></script>
+		<script src="./jqueryUI/jquery.ui.touch-punch.min.js"></script>
+		<!-- <script src="jquery.transit.js"> </script> -->
+		<script src="http://ricostacruz.com/jquery.transit/jquery.transit.js"></script>
+		<link rel="stylesheet" type="text/css" href="jquery.ui.slider.css">
+		<script>
+			$(table_init);
+		</script>
+	</head>
+	<body>
+		<div id="container" class="view">
+			<div id="gbg" class="background"></div>
+			<div id="gametable">
+
+				<div id="chip0" class="chip"></div>
+				<div id="seat0" class="seat">
+					<div id="name0" class="name">name</div>
+					<div id="money0" class="money">money</div>
+				</div>
+				
+				<div id="chip1" class="chip"></div>
+				<div id="seat1" class="seat">
+					<div id="name1" class="name">name</div>
+					<div id="money1" class="money">money</div>
+				</div>
+
+				<div id="chip2" class="chip"></div>
+				<div id="seat2" class="seat">
+					<div id="name2" class="name">name</div>
+					<div id="money2" class="money">money</div>				
+				</div>
+
+				<div id="chip3" class="chip"></div>
+				<div id="seat3" class="seat">
+					<div id="name3" class="name">name</div>
+					<div id="money3" class="money">money</div>
+				</div>
+
+				<div id="chip4" class="chip"></div>
+				<div id="seat4" class="seat">
+					<div id="name4" class="name">name</div>
+					<div id="money4" class="money">money</div>				
+				</div>
+
+				<div id="send_cards">
+					<img id="backpng1" src="./pokers/back.png" />
+					<img id="cards_in_hand1" src="./pokers/club/2.png" />
+					<img id="back" src="./pokers/back.png" />
+					<img id="backshadow1" class="backcard" src="./pokers/back.png" />
+					<img id="backshadow2" class="backcard" src="./pokers/back.png" />
+					<img id="backshadow3" class="backcard" src="./pokers/back.png" />
+					<img id="backshadow4" class="backcard" src="./pokers/back.png" />
+					<img id="backshadow1_1" class="backcard" src="./pokers/back.png" />
+					<img id="backshadow2_1" class="backcard" src="./pokers/back.png" />
+					<img id="backshadow3_1" class="backcard" src="./pokers/back.png" />
+					<img id="backshadow4_1" class="backcard" src="./pokers/back.png" />
+					<!-- <img id="backshadow5" class="backcard" src="back.png" />
+					<img id="backshadow6" class="backcard" src="back.png" />
+					<img id="backshadow7" class="backcard" src="back.png" /> -->
+
+					<img id="backpng2" src="./pokers/back.png" />
+					<img id="cards_in_hand2" src="./pokers/heart/K.png" />
+				</div>
+				
+				<div id="board_cards" class="">
+					<img id="card0" class="round" />
+					<img id="card1" class="round" />
+					<img id="card2" class="round" />
+					<img id="card3" class="round" />
+					<img id="card4" class="round" />
+				</div>
+
+			</div>
+			<div id="carry_chips_view">
+				<div class="testdiv">
+					<p>
+						<label for="amount">Amount:</label>
+						<input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold" />
+					</p>
+					<div id="slider" class="ui-slider ui-slider-horizontal ui-widget-content ui-corner-all"></div>
+					<div id="submitButton"></div>
+				</div>
+			</div>
+
+			<div id="buttonWraper">
+				<div id="button1" class="button">Fold</div>
+				<div id="button2" class="button">Call</div>
+				<div id="button3" class="button">Raise</div>
+			</div>
+		</div>
+	</body>
+</html>

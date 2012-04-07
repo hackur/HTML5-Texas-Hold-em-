@@ -1,0 +1,278 @@
+
+body {
+	
+}
+
+.view {
+	height: 640px;
+	width: 960px;
+	position: absolute;
+	left: 50px;
+}
+
+.background {
+	height: 640px;
+	width: 960px;
+	position: absolute;
+	background-image: url(./image/bj.png);
+
+}
+
+#gametable {
+	height: 445px;
+	width: 939px;
+	position: absolute;
+	background-image: url(./image/leathertable.png);
+	top: 70px;
+	left: 10px;
+}
+
+/* seat */
+.seat {
+	height: 149px;
+	width: 135px;
+	position: absolute;
+	background-image: url(./image/seat.png);
+}
+#seat4 {
+	top: -45px;
+	left: 195px;
+}
+#seat3 {
+	top: -45px;
+	left: 400px;
+}
+#seat2 {
+	top: -45px;
+	left: 605px;
+}
+#seat0 {
+	top: 325px;
+	left: 255px;
+}
+#seat1 {
+	top: 325px;
+	left: 555px;
+}/* end */
+
+/* player name */
+.name {
+	font-size: 20px;
+	color: white;
+	position: absolute;
+}
+#name4 {
+	top: 70px;
+	left: 50px;
+}
+#name3 {
+	top: 70px;
+	left: 50px;
+}
+#name2 {
+	top: 70px;
+	left: 50px;
+}
+#name0 {
+	top: 70px;
+	left: 50px;
+}
+#name1 {
+	top: 70px;
+	left: 50px;
+}/* end */
+
+/* money for players */
+.money {
+	font-size: 20px;
+	color: white;
+	position: absolute;
+}
+#money4 {
+	top: 100px;
+	left: 43px;
+}
+#money3 {
+	top: 100px;
+	left: 43px;
+}
+#money2 {
+	top: 100px;
+	left:43px;
+}
+#money0 {
+	top: 100px;
+	left: 43px;
+}
+#money1 {
+	top: 100px;
+	left: 43px;
+}/* end */
+
+/*  chips */
+.chip {
+	position: absolute;
+	height: 49px;
+	width: 49px;
+}
+#chip4 {
+	top: 25px;
+	left: 235px;
+	background-image: url(./image/l1.png);
+}
+#chip3 {
+	top: 30px;
+	left: 440px;
+	background-image: url(./image/l2.png);
+}
+#chip2 {
+	top: 30px;
+	left: 640px;
+	background-image: url(./image/l4.png);
+}
+#chip0 {
+	top: 360px;
+	left: 300px;
+	background-image: url(./image/l3.png);
+}
+#chip1 {
+	top: 380px;
+	left: 590px;
+	background-image: url(./image/l1.png);
+}
+
+/* three button at right-bottom */
+.button {
+	background-image: url(./image/button.png);
+	font-size: 25px;
+	color: white;
+	text-align:center;
+	font-weight:bold;
+	line-height:62px;
+	height: 67px;
+	width: 185px;
+	position: absolute;
+	cursor:pointer;
+}
+/* check browser support */
+.button:hover {
+	-moz-transform: scale(1.05);
+ 	-webkit-transform: scale(1.05);
+    -o-transform: scale(1.05);
+    -ms-transform: scale(1.05);
+    transform: scale(1.05);
+}
+#button1 {
+	top:560px;
+	left:350px;
+}
+#button2 {
+	top:560px;
+	left:550px;
+}
+#button3 {
+	top:560px;
+	left:750px;
+}/*end*/
+
+/* two cards in hand for 'me' */
+#backpng1 {
+	/*background-image: url(./pokers/back.png);*/
+	width: 0px;
+	height: 0px;
+	top: 120px;
+	left: 450px;
+	position: absolute;
+}
+#backpng2 {
+	/*background-image: url(./pokers/back.png);*/
+	width: 0px;
+	height: 0px;
+	top: 120px;
+	left: 450px;
+	position: absolute;
+}
+#cards_in_hand1 {
+	top: 360px;
+	left: 390px;
+	position: absolute;
+	display: none;
+}
+#cards_in_hand2 {
+	top: 360px;
+	left: 420px;
+	position: absolute;
+	display: none;
+}/*end*/
+
+/* shadow cards for other players */
+#back {
+	width: 0px;
+	height: 0px;
+	top: 120px;
+	left: 450px;
+	position: absolute;
+}
+.backcard {
+	position: absolute;
+	width: 0px;
+	height: 0px;
+}/* end */
+
+
+/*  five cards for table*/
+.round {
+	top: 160px;
+	position: absolute;
+	display: none;
+}
+#card0 {
+
+	left: 260px;
+}
+#card1 {
+
+	left: 340px;
+}
+#card2 {
+
+	left: 420px;
+}
+#card3 {
+
+	left: 500px;
+}
+#card4 {
+
+	left: 580px;
+}/*end*/
+
+
+#carry_chips_view
+{
+	background-color: #6495ed;
+	background: -moz-linear-gradient(top, #6495ed, #3112a3);
+	background: -webkit-gradient(linear, left top, left bottom, from(#6495ed), to(#3112a3));
+	-ms-filter: progid:DXImageTransform.Microsoft.gradient(
+	                startColorstr=#6495ed, endColorstr=#3112a3, GradientType=1);
+	filter: progid:DXImageTransform.Microsoft.Gradient(
+					StartColorStr="#6495ed", EndColorStr="#3112a3", GradientType=1);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#6495ed', endColorstr='#3112a3');
+		
+	color: #000000;
+	padding: 15px;
+	min-height: 250px;
+	width: 400px;
+
+	position: absolute;
+	top: 100px;
+	left: 250px;
+	display: none;
+
+	filter: alpha(opacity=80);
+	-moz-opacity:0.8;
+	opacity: 0.8;
+}
+.testdiv { width: 360px; height: 130px; top: 100px; left: 30px; position: absolute;}
+#submitButton { background-image: url(./image/sure.png); position: absolute; width: 79px; height:41px; top: 90px; left: 285px;}
+#submitButton:hover { background-image: url(./image/sure-hover.png);}
