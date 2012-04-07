@@ -97,7 +97,6 @@ class GameRoom(object):
 		self.current_seat = None
 		self.flop_flag = False
 		self.all_in_flag = False
-		self.prize_pool = 0
 		self.pot = {}
 		self.num_of_checks = 0
 		self.action_counter = 0
@@ -105,6 +104,7 @@ class GameRoom(object):
 		self.t = None
 		self.ioloop = ioloop.IOLoop.instance()
 		self.user_seat = {}
+		self.num_of_raise = 0
 		self.min_stake = min_stake
 		self.max_stake = max_stake
 
@@ -308,6 +308,7 @@ class GameRoom(object):
 		print "RAISE!"
 		if self.num_of_checks != 0:
 			self.num_of_checks = 0
+		self.num_of_raise += 1
 		print "num_of_checks: ", self.num_of_checks
 		amount          = int(amount)
 		command         = 3
@@ -318,7 +319,10 @@ class GameRoom(object):
 			self.seats[seat_no].table_amount += amount
 			print "table amount for seat "+ str(seat_no) + ": " + str(self.seats[seat_no].table_amount)
 			self.min_amount     = self.seats[seat_no].table_amount
-			self.current_seat   = self.info_next(seat_no, [1, 2, 3, 5])
+			if self.num_of_raise == 4:
+				self.current_seat = self.info_next(seat_no, [1, 2, 5])
+			else:
+				self.current_seat   = self.info_next(seat_no, [1, 2, 3, 5])
 
 			broadcast_message   = {'status':'success', 'username': self.seats[seat_no].get_user().username, 'stake':self.seats[seat_no].player_stake}
 			next_player_message = {'status':'active', 'username': self.seats[self.current_seat].get_user().username, 'rights':[1, 2, 3, 5]}
@@ -367,11 +371,12 @@ class GameRoom(object):
 														# remove the player from player list
 		user = self.seats[seat_no].get_user()           # get user info from database
 		user.stake = self.seats[seat_no].player_stake         # update user's stake
-		self.add_audit(self.seats[seat_no].get_user())  # add the user to audit list
 
 		if self.same_amount_on_table():
+			print "finishing this round after folding!!"
 			self.round_finish()
 		else:
+			print "I'm here!!!!!"
 			self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
 
 		broadcast_message = {"status": "success", "username": self.seats[seat_no].get_user().username, "stake": self.seats[seat_no].player_stake}
@@ -439,10 +444,11 @@ class GameRoom(object):
 	def same_amount_on_table(self, smaller_than_min_amount=False):
 		i = 0
 		player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)
+		print player_list
 
 		for seat in player_list:
 			print "player names: =============:", seat.get_user().username
-			if seat.table_amount == self.min_amount:
+			if seat.table_amount == player_list[0].table_amount:
 				if seat.player_stake == 0:
 					seat.status = Seat.SEAT_ALL_IN
 				i += 1
@@ -466,7 +472,7 @@ class GameRoom(object):
 	def round_finish(self):
 		print "ROUND FINISHED!!!!"
 		self.clearCountDown();
-		player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING or seat.status == Seat.SEAT_ALL_IN, self.seats)
+		player_list = filter(lambda seat: seat.table_amount > 0, self.seats)
 		playing_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)
 		print "-----------no more stake------------"
 		print self.no_more_stake()
@@ -503,11 +509,13 @@ class GameRoom(object):
 					print card_list
 					broadcast_msg = {"winner": seat.get_user().username, "handcards": card_list}
 					self.broadcast(broadcast_msg)
-
+	#		self.status = GameRoom.GAME_WAIT
+	#		self.dispose_and_restart()
 			sys.exit()
 		else:
 			self.create_pot(player_list)
 			self.min_amount = self.blind/2
+			self.num_of_raise = 0
 			if self.flop_flag == False:
 				self.poker_controller.getFlop()
 				self.flop_flag = True
@@ -554,10 +562,12 @@ class GameRoom(object):
 		player_list = sorted(player_list, key = attrgetter("table_amount"))
 		min_bet = player_list[0].table_amount
 		for x in xrange(len(player_list)):
-			pot_owner.append(player_list[x].get_user().id)
-			print ":::::::::::::::::: ", player_list[x].get_user().id
 			player_list[x].table_amount -= min_bet
 			print ":::::::::::::::::: ", player_list[x].table_amount
+			if player_list[x].status == Seat.SEAT_PLAYING or player_list[x].status == Seat.SEAT_ALL_IN:
+				pot_owner.append(player_list[x].get_user().id)
+				print ":::::::::::::::::: ", player_list[x].get_user().id
+
 		pot_owner = tuple(pot_owner)
 		if pot_owner not in self.pot:
 			self.pot[pot_owner] = 0
@@ -585,8 +595,10 @@ class GameRoom(object):
 			else:
 				self.amount_limits[GameRoom.A_CALLSTAKE] = (min_amount, max_amount)
 
-		min_amount = 2 * self.min_amount - self.seats[seat_no].table_amount
+		min_amount = 2 * (self.min_amount - self.seats[seat_no].table_amount)
 		if GameRoom.A_RAISESTAKE in self.seats[seat_no].rights:
+			if num_of_stake == 4:
+				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
 			if self.seats[seat_no].player_stake < min_amount:
 				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
 			else:
@@ -594,7 +606,7 @@ class GameRoom(object):
 
 		if GameRoom.A_ALLIN in self.seats[seat_no].rights:
 			self.amount_limits[GameRoom.A_ALLIN] = (min(self.seats[seat_no].player_stake - self.seats[seat_no].table_amount, self.min_amount-self.seats[seat_no].table_amount), \
-					min(self.seats[seat_no].player_stake, total_amount_list[1] - self.seats[seat_no].table_amount))
+					min(self.seats[seat_no].player_stake, max_amount))
 
 		print self.amount_limits
 		return self.amount_limits
@@ -657,7 +669,23 @@ class GameRoom(object):
 		print "small_blind: ",      small_blind
 		print "big_blind: ",        big_blind
 
-#class Pot(object):
-#    def __init__(owner_list, amount):
-#        self.owner_list = owner_list
-#        self.amount = amount
+	def dispose_and_restart(self,blind = 10):
+		self.msg_count= 0
+		self.blind = blind
+		self.min_amount = 0
+		self.current_dealer = 0
+		self.small_blind = 0
+		self.big_blind = 0
+		self.current_seat = None
+		self.flop_flag = False
+		self.all_in_flag = False
+		self.pot = {}
+		self.num_of_checks = 0
+		self.action_counter = 0
+		self.amount_limits = {}
+		self.t = None
+		self.ioloop = ioloop.IOLoop.instance()
+		self.user_seat = {}
+		self.current_seat = 0
+
+		self.t = self.ioloop.add_timeout(time.time() + 5, self.start_game)
