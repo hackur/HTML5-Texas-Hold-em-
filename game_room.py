@@ -77,14 +77,16 @@ class Seat(object):
 class GameRoom(object):
 	(GAME_WAIT,GAME_PLAY) = (0,1)
 	(A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME) = (1,2,3,4,5)
+
+	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD) \
+				= ('sit','bhc','phc','winner','next','action','public')
 	def __init__(self, room_id, owner, dealer, num_of_seats = 9, blind = 10,min_stake=100,max_stake=2000):
 		self.room_id        = room_id
 		self.owner      = owner
 		self.status     = GameRoom.GAME_WAIT
 		self.dealer     = dealer
-		self.broadcast_key  = "broadcast_%s_%d.testing" %(self.dealer.exchange, self.room_id)
+		self.broadcast_key  = "broadcast_%s_%d.testing" % (self.dealer.exchange, self.room_id)
 		self.audit_list     = []
-		self.seats          = []
 		self.occupied_seat  = 0
 		self.suit = ["DIAMOND", "HEART", "SPADE", "CLUB"]
 		self.face = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
@@ -108,8 +110,7 @@ class GameRoom(object):
 		self.min_stake = min_stake
 		self.max_stake = max_stake
 
-		for x in xrange(num_of_seats):
-			self.seats.append(Seat(x))
+		self.seats = [ Seat(x) for x in xrange(num_of_seats) ]
 
 		self.current_seat = None
 
@@ -119,12 +120,14 @@ class GameRoom(object):
 						GameRoom.A_RAISESTAKE	:self.raise_stake,
 						GameRoom.A_CHECK		:self.check,
 						GameRoom.A_DISCARDGAME	:self.discard_game}
+
 	def to_listener(self):
 		result = {}
 		result['status'] = self.status
 		if self.status == GameRoom.GAME_PLAY:
 			result['publicCard'] = self.poker_controller.publicCard
 			result['current_seat'] = self.current_seat
+
 		result['seats'] = [ seat.to_listener() for seat in self.seats ]
 		result['min_stake'] = self.min_stake
 		result['max_stake'] = self.max_stake
@@ -133,14 +136,16 @@ class GameRoom(object):
 		return result
 
 
-	def broadcast(self,msg):
+	def broadcast(self,msg,msgType):
 		self.msg_count += 1
 		msg['timestamp'] = self.msg_count
+		msg['msgType'] = msgType
 		self.dealer.broadcast(self.broadcast_key, msg)
 
-	def direct_message(self, msg, destination):
+	def direct_message(self, msg, destination,msgType):
 		self.msg_count += 1
 		msg['timestamp'] = self.msg_count
+		msg['msgType'] = msgType
 		self.dealer.broadcast(destination, msg)
 
 	def user_action(self,args):
@@ -148,8 +153,6 @@ class GameRoom(object):
 		private_key     = args["private_key"]
 		user_id         = args["user_id"]
 		seat_no  = self.current_seat
-	#	print "SEAT NO.......................",seat_no
-	#	print "USER ID.......................", user_id
 		if self.is_valid_seat(user_id, seat_no) and self.is_valid_rights(action, seat_no):
 			self.clearCountDown()
 			if action != GameRoom.A_RAISESTAKE:
@@ -157,6 +160,13 @@ class GameRoom(object):
 			else:
 				amount = args['amount']
 				self.actions[action](user_id,amount)
+
+			seat = self.seats[seat_no]
+			broadcast_msg = {'action':action, 'seat_no':seat_no,'stake':seat.player_stake,'table':seat.table_amount}
+			self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
+
+			next_seat = self.seats[self.current_seat]
+			self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
 
 	def clearCountDown(self):
 		if self.countdown:
@@ -176,8 +186,8 @@ class GameRoom(object):
 		self.seats[seat_no].sit(player, private_key)
 		self.seats[seat_no].player_stake = int(stake)
 		self.occupied_seat += 1
-		message = {'msgType':'sit', 'seat_no': seat_no, "info": self.seats[seat_no].to_listener()}
-		self.broadcast(message)
+		message = {'seat_no': seat_no, "info": self.seats[seat_no].to_listener()}
+		self.broadcast(message,GameRoom.MSG_SIT)
 
 		if self.occupied_seat == 3 and not self.t:
 			self.t = self.ioloop.add_timeout(time.time() + 5, self.start_game)
@@ -196,12 +206,11 @@ class GameRoom(object):
 		for seat in self.seats:
 			if seat.status != Seat.SEAT_EMPTY:
 				seat.status = Seat.SEAT_PLAYING
-				card_list   = []
-				for card in seat.handcards:
-					card_list.append(str(card))
-				msg_sent = {"Cards in hand": card_list}
-				self.direct_message(msg_sent,seat.get_private_key())
-				self.broadcast({"HC":seat.seat_id}) # HC for Have Card
+				card_list   = [ str(card) for card in seat.handcards ]
+
+				msg_sent = {"cards": card_list,"Cards in hand": card_list}
+				self.direct_message(msg_sent,seat.get_private_key(),GameRoom.MSG_PHC)
+				self.broadcast({"HC":seat.seat_id},GameRoom.MSG_BHC) # HC for Have Card
 				#self.direct_message(msg_sent,seat.get_private_key())
 
 		# bet in big blind and small blind by default
@@ -286,19 +295,8 @@ class GameRoom(object):
 				else:
 					print "-----------sb before you has called all in---------------"
 					self.current_seat = self.info_next(seat_no, [2,5])      # cannot re-raise after sb's all-in
+
 		print "--------------------self.min_amount in call_stake: ", self.min_amount
-
-
-		card_list = []
-		for card in self.poker_controller.publicCard:
-			card_list.append(str(card))
-			print str(card)
-
-		broadcast_message = {"status": "success", "public cards": card_list, "username": self.seats[seat_no].get_user().username, "stake": self.seats[seat_no].player_stake}
-		next_player_message = {"status":"active", "username": self.seats[self.current_seat].get_user().username, "rights":self.seats[self.current_seat].rights}
-
-		self.broadcast(broadcast_message)
-		self.direct_message(next_player_message, self.seats[self.current_seat].get_private_key())
 
 	def raise_stake(self, user_id,  amount):
 		print "RAISE!"
@@ -311,8 +309,7 @@ class GameRoom(object):
 		seat_no         = self.current_seat
 		if self.is_proper_amount(amount, command):
 			print "This is a proper amount"
-			self.seats[seat_no].player_stake -= amount
-			self.seats[seat_no].table_amount += amount
+			self.seats[seat_no].bet(amount)
 			print "table amount for seat "+ str(seat_no) + ": " + str(self.seats[seat_no].table_amount)
 			self.min_amount     = self.seats[seat_no].table_amount
 			if self.num_of_raise == 4:
@@ -320,11 +317,6 @@ class GameRoom(object):
 			else:
 				self.current_seat   = self.info_next(seat_no, [1, 2, 3, 5])
 
-			broadcast_message   = {'status':'success', 'username': self.seats[seat_no].get_user().username, 'stake':self.seats[seat_no].player_stake}
-			next_player_message = {'status':'active', 'username': self.seats[self.current_seat].get_user().username, 'rights':[1, 2, 3, 5]}
-
-			self.broadcast(broadcast_message)
-			self.direct_message(next_player_message, self.seats[self.current_seat].get_private_key())
 		else:
 			print "RAISE INVALID AMOUNT OF MONEY!"
 			sys.exit()
@@ -348,16 +340,6 @@ class GameRoom(object):
 				self.num_of_checks = 0
 				self.round_finish()
 
-		card_list = []
-		for card in self.poker_controller.publicCard:
-			card_list.append(str(card))
-			print str(card)
-
-		broadcast_message = {"status": "success", "public cards": card_list, "username": self.seats[seat_no].get_user().username, "stake": self.seats[seat_no].player_stake}
-		next_player_message = {"status":"active", "username": self.seats[self.current_seat].get_user().username, "rights":self.seats[self.current_seat].rights}
-
-		self.broadcast(broadcast_message)
-		self.direct_message(next_player_message, self.seats[self.current_seat].get_private_key())
 
 	def discard_game(self, user_id):
 		print "FOLD!!"
@@ -374,13 +356,6 @@ class GameRoom(object):
 		else:
 			print "I'm here!!!!!"
 			self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
-
-		broadcast_message = {"status": "success", "username": self.seats[seat_no].get_user().username, "stake": self.seats[seat_no].player_stake}
-		next_player_message = {"status": "active", "username": self.seats[self.current_seat].get_user().username, "rights": self.seats[self.current_seat].rights}
-
-		self.broadcast(broadcast_message)
-		#self.direct_message(next_player_message, self.seats[self.current_seat].get_private_key())
-		self.broadcast(next_player_message)
 
 
 	def all_in(self, user_id):
@@ -403,12 +378,6 @@ class GameRoom(object):
 				self.round_finish()
 			else:
 				self.current_seat = self.info_next(seat_no, [1,2,3,5])
-
-			broadcast_message   = {'status':'success', 'username': self.seats[seat_no].get_user().username, 'stake':self.seats[seat_no].player_stake}
-			next_player_message = {'status':'active', 'username': self.seats[self.current_seat].get_user().username, 'rights':self.seats[seat_no].rights}
-
-			self.broadcast(broadcast_message)
-			self.direct_message(next_player_message, self.seats[self.current_seat].get_private_key())
 
 		elif self.min_amount == amount + self.seats[seat_no].table_amount:
 			print "going to call stake"
@@ -482,6 +451,12 @@ class GameRoom(object):
 				self.poker_controller.getFlop()
 				self.poker_controller.getOne()
 				self.poker_controller.getOne()
+				card_list = []
+				for card in self.poker_controller.publicCard:
+					card_list.append(str(card))
+
+				broadcast_msg = {'cards':card_list}
+				self.broadcast(broadcast_msg,GameRoom.MSG_PUBLIC_CARD)
 			elif len(self.poker_controller.publicCard) < 5:
 				for x in xrange(5 - len(self.poker_controller.publicCard)):
 					self.poker_controller.getOne()
@@ -504,10 +479,10 @@ class GameRoom(object):
 						card_list.append(str(card))
 					print card_list
 					broadcast_msg = {"winner": seat.get_user().username, "handcards": card_list}
-					self.broadcast(broadcast_msg)
+					self.broadcast(broadcast_msg,GameRoom.MSG_WINNER)
 	#		self.status = GameRoom.GAME_WAIT
 	#		self.dispose_and_restart()
-			sys.exit()
+	#		sys.exit()
 		else:
 			self.create_pot(player_list)
 			self.min_amount = self.blind/2
@@ -517,6 +492,13 @@ class GameRoom(object):
 				self.flop_flag = True
 			else:
 				self.poker_controller.getOne()
+
+			card_list = []
+			for card in self.poker_controller.publicCard:
+				card_list.append(str(card))
+
+			broadcast_msg = {'cards':card_list}
+			self.broadcast(broadcast_msg,GameRoom.MSG_PUBLIC_CARD)
 			self.current_seat = self.info_next(self.current_dealer, [1,3,4,5])
 			return
 
