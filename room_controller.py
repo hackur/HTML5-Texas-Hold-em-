@@ -58,7 +58,6 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 								'private_key'	: private_key}
 
 		arguments			= {'routing_key': 'dealer', 'message': pickle.dumps(message)}
-		print broadcast_queue
 		broadcast_channel	= Channel(	self.application.channel,
 										broadcast_queue,
 										exchange,
@@ -66,6 +65,8 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 										durable_queue = True,
 										declare_queue_only=True)
 
+		self.callBackCount = 0
+		broadcast_channel.add_ready_action(self.initial_call_back, arguments)
 		broadcast_channel.connect()
 
 		self.channel		= Channel(self.application.channel,queue, exchange, [routing_key])
@@ -80,19 +81,19 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		self.render("room-test-ajax.html")
 
 	def initial_call_back(self, argument):
-		print "init call back"
-		print argument['routing_key']
-		print argument['message']
+		if self.callBackCount < 2:
+			#We have to wait broadcast_channel created
+			self.callBackCount += 1
+			return
+
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
-		self.channel.publish_message(argument['routing_key'], argument['message'])
 		self.channel.add_message_action(self.message_call_back, None)
+		self.channel.publish_message(argument['routing_key'], argument['message'])
 
 	def message_call_back(self, argument):
 		messages= self.channel.get_messages()[0]
-		print "=====message====="
-		print messages
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
@@ -110,9 +111,11 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 	def post(self):
 		user		= self.session['user']
 		seat		= self.get_argument('seat')
+		stake		= self.get_argument('stake')
 
 		#DEBUG
 		#if False and 'is_sit_down' in self.session and
+		print "SIT DOWN","x" * 20
 		if'is_sit_down' in self.session and \
 			self.session['is_sit_down'] == True and \
 			self.session['seat'] == seat:
@@ -125,9 +128,13 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			print '=============================keys==================================='
 			print self.session['private_key']
 			print self.session['public_key']
-			message			= {'method':'sit', 'user_id':user.id,'seat':seat, 'source':source_key, 'room_id':user.room.id, 'private_key':self.session['private_key']}
+
+			message			= {'method':'sit', 'user_id':user.id,'seat':seat,
+							'source':source_key, 'room_id':user.room.id,
+							'private_key':self.session['private_key'] ,'stake':stake}
+
 			arguments		= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
-			self.channel	= Channel(self.application.channel,queue_name, exchange_name, [source_key])
+			self.channel	= Channel(self.application.channel,queue_name, exchange_name, (source_key,))
 			self.channel.add_ready_action(self.sit_call_back, arguments)
 			self.channel.connect()
 
@@ -135,11 +142,13 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 		if self.request.connection.stream.closed():
 			self.channel.close()
 			return
-		self.channel.publish_message(argument['routing_key'], argument['message'])
+
+		print "SIT CALL BACK!!!"
 		self.channel.add_message_action(self.message_call_back, None)
+		self.channel.publish_message(argument['routing_key'], argument['message'])
 
 	def message_call_back(self, argument):
-		user	= self.session['user']
+		print "message_call_back!!!!"
 		messages= self.channel.get_messages()[0]
 		if self.request.connection.stream.closed():
 			self.channel.close()

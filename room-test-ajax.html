@@ -106,7 +106,7 @@ $(function(){
 		$.ajax({
 			type:'post',
 			url:"./sit-down",
-			data:{seat:seat, offset:1,username:username, timestamp:1},
+			data:{seat:seat,stake:100},
 			success:function(data){
 				console.log(data);
 				$("#msg").append(JSON.stringify(data) + "<br>");
@@ -115,6 +115,7 @@ $(function(){
 		});
 	});
 });
+var index =1;
 function listenBoardMessage(timestamp){
 	if(!timestamp) timestamp = -1;
 
@@ -146,7 +147,6 @@ function listenBoardMessage(timestamp){
 	});
 }
 
-var index =1;
 function postBoardMessage(message){
 }
 </script>

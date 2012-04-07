@@ -1,3 +1,9 @@
+import json
+try:
+    import cpickle as pickle
+except:
+    import pickle
+import pika
 class Channel(object):
 	tag = 0
 	def __init__(self, channel, queue_name, exchange, binding_keys,
@@ -17,7 +23,6 @@ class Channel(object):
 		self.closing		= False
 		self.declare_queue_only = declare_queue_only
 		self.consumer_tag   = None
-		print "exchange [%s] queue [%s]" %( self.exchange, queue_name)
 
 	def connect(self):
 		pika.log.info('Declaring Queue')
@@ -42,30 +47,30 @@ class Channel(object):
 		#if not self.queue_name:
 		self.queue_name = frame.method.queue
 
+		print self.binding_keys
 		if len(self.binding_keys) > 0:
 			for key in self.binding_keys:
+				print key
 				self.channel.queue_bind(exchange	= self.exchange,
-										queue		= self.queue_name,
+						queue		= self.queue_name,
 										routing_key	= key,
 										callback	= self.on_queue_bound)
-
 		else:
 			for element in self.ready_actions:
 				element['functor'](element['argument'])
 
 	def on_queue_bound(self, frame):
-		if self.declare_queue_only:
-			return
+		if not self.declare_queue_only:
+			pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
+			print frame
 
-		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
+			self.consumer_tag	= "mtag%i" % Channel.tag ## Seems pika's tag name is not that reliable
+			Channel.tag += 1
 
-		self.consumer_tag	= "mtag%i" % Channel.tag ## Seems pika's tag name is not that reliable
-		Channel.tag += 1
-
-		self.consumer_tag = self.channel.basic_consume(consumer_callback=self.on_room_message,
-						queue=self.queue_name,
-						no_ack=True,consumer_tag=self.consumer_tag)
-		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume Finish')
+			self.consumer_tag = self.channel.basic_consume(consumer_callback=self.on_room_message,
+							queue=self.queue_name,
+							no_ack=True,consumer_tag=self.consumer_tag)
+			pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume Finish')
 
 		for element in self.ready_actions:
 			element['functor'](element['argument'])
@@ -74,6 +79,7 @@ class Channel(object):
 	def on_room_message(self, channel, method, header, body):
 		pika.log.info('PikaCient: Message receive, delivery tag #%i' % method.delivery_tag)
 		self.messages.append(pickle.loads(body))
+		print self.message_actions
 		for element in self.message_actions:
 			element['functor'](element['argument'])
 

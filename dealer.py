@@ -82,23 +82,8 @@ class Dealer(object):
 
 	def cmd_action(self, args):
 		#print "-------user trying to bet"
-		#self.db_connection.start_session()
-		#action          = args["action"]
-		#private_key     = args["private_key"]
-		#user_id         = args["user_id"]
 		current_room    = self.room_list[args["room_id"]]
 		current_room.user_action(args)
-		#if action == 1:
-		#	current_room.all_in(user_id, private_key)
-		#elif action == 2:
-		#	current_room.call_stake(user_id, private_key)
-		#elif action == 3:
-		#	amount = args['amount']
-		#	current_room.raise_stake(user_id, private_key, amount)
-		#elif action == 4:
-		#	current_room.check(user_id, private_key)
-		#elif action == 5:
-		#	current_room.discard_game(private_key)
 
 
 	def cmd_sit(self, args):
@@ -106,9 +91,10 @@ class Dealer(object):
 		self.db_connection.start_session()
 		source          = args['source']
 		private_key     = args['private_key']
+		stake			= args['stake']
 		user            = self.db_connection.query(User).filter_by(id=args['user_id']).first()
 		current_room    = self.room_list[args["room_id"]]
-		(status, msg)   = current_room.sit(user, int(args["seat"]), source, private_key)
+		(status, msg)   = current_room.sit(user, int(args["seat"]), source, private_key,stake)
 
 		if status:
 			message = {"status": "success" }
@@ -126,13 +112,13 @@ class Dealer(object):
 	def cmd_enter(self,args):
 		if args['room_id'] not in self.room_list:
 			self.cmd_create_room(args)
-		print "Room created"
+		print "Entered Room"
 
 		current_room = self.room_list[args["room_id"]]
 		current_room.add_audit({'user':args["user_id"]})
 
 		routing_key = args['source']
-		message     = {'status':'success', 'content':'nothing', 'timestamp':time.time()}
+		message     = {'status':'success', "room":current_room.to_listener()}
 		self.channel.basic_publish( exchange    = self.exchange,
 				routing_key = routing_key,
 				body        = pickle.dumps(message))

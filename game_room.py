@@ -11,72 +11,37 @@ class Seat(object):
 	(SEAT_EMPTY,SEAT_WAITING,SEAT_PLAYING,SEAT_ALL_IN) = (0,1,2,3)
 
 	def __init__(self, seat_id = -1):
-		self._seat_id= seat_id
+		self._seat_id = seat_id
 		self._user	= None
 		self._cards	= None
 		self._inAmount = 0
-		self._status = Seat.SEAT_EMPTY
+		self.status = Seat.SEAT_EMPTY
 		self._rights = []
-		self._direct_key = None
 		self._role = None
 		self.combination = []
 		self.handcards = []
 		self.table_amount = 0
 		self.player_stake = 0
-		pass
+
 	def __str__(self):
-		return "seat[%d], user[%d]"%(self._seat_id, self._user.id)
+		return "seat[%d], user[%d]" % (self._seat_id, self._user.id)
 	def __repr__(self):
-		return "seat[%d], user[%d]"%(self._seat_id, self._user.id)
+		return "seat[%d], user[%d]" % (self._seat_id, self._user.id)
 
 	def is_empty(self):
-		return self._status == Seat.SEAT_EMPTY
+		return self.status == Seat.SEAT_EMPTY
 
-	def sit(self, user, direct_key, private_key):
+	def sit(self, user, private_key):
 		self._user = user
-		self._status = Seat.SEAT_WAITING
-		self._direct_key = direct_key
+		self.status = Seat.SEAT_WAITING
 		self._private_key= private_key
+		self.rights = None
 
 	def get_user(self):
 		return self._user
 
-	def get_direct_key(self):
-		return self._direct_key
-
 	def get_private_key(self):
 		return self._private_key
-
-	@property
-	def seat_id(self):
-		return self._seat_id
-	@seat_id.setter
-	def seat_id(self, seatId):
-		self._seat_id = seatId
-
-	@property
-	def status(self):
-		return self._status
-
-	@status.setter
-	def status(self, status):
-		self._status = status
-
-	@property
-	def rights(self):
-		return self._rights
-
-	@rights.setter
-	def rights(self, rights):
-		self._rights = rights
-
-	@property
-	def inAmount(self):
-		return self._inAmount
-
-	@inAmount.setter
-	def inAmount(self, inAmount):
-		self._inAmount = inAmount
 
 	def get_role(self):
 		return self._role
@@ -94,6 +59,20 @@ class Seat(object):
 		self.player_stake -= result
 		self.table_amount += result
 		return result
+	def to_listener(self):
+		result = {}
+		if not self._user:
+			result['user'] = None
+			return
+
+		result['user'] = self._user.username
+		result['status'] = self.status
+		result['table_amount']  = self.table_amount
+		result['player_stake']  = self.player_stake
+		return result
+
+
+
 
 class GameRoom(object):
 	(GAME_WAIT,GAME_PLAY) = (0,1)
@@ -137,6 +116,16 @@ class GameRoom(object):
 						GameRoom.A_RAISESTAKE	:self.raise_stake,
 						GameRoom.A_CHECK		:self.check,
 						GameRoom.A_DISCARDGAME	:self.discard_game}
+	def to_listener(self):
+		result = {}
+		result['status'] = self.status
+		if self.status == GameRoom.GAME_PLAY:
+			result['publicCard'] = self.poker_controller.publicCard
+			result['current_seat'] = self.current_seat
+		result['seats'] = [ seat.to_listener() for seat in self.seats ]
+		result['timestamp'] = self.msg_count
+		return result
+
 
 	def broadcast(self,msg):
 		self.msg_count += 1
@@ -168,7 +157,7 @@ class GameRoom(object):
 			self.ioloop.remove_timeout(self.countdown)
 			self.countdown = None
 
-	def sit(self, player, seat_no, direct_key, private_key):
+	def sit(self, player, seat_no, direct_key, private_key,stake):
 		print "direct_key.........................................", direct_key
 		print "seat request =>%d\n" % (seat_no)
 		if seat_no > len(self.seats):
@@ -178,8 +167,8 @@ class GameRoom(object):
 
 
 		self.user_seat[player.id] = seat_no
-		self.seats[seat_no].sit(player, direct_key, private_key)
-		self.seats[seat_no].player_stake = player.stake   # read user's money
+		self.seats[seat_no].sit(player, private_key)
+		self.seats[seat_no].player_stake = stake   # read user's money
 		self.occupied_seat += 1
 		message = {'status':'success', 'seat_no': seat_no, "username": self.seats[seat_no].get_user().username}
 		self.broadcast(message)
