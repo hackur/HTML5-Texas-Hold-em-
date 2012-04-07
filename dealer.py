@@ -81,7 +81,7 @@ class Dealer(object):
 		self.connection.set_backpressure_multiplier(100000)
 
 	def cmd_action(self, args):
-		print "-------user trying to bet"
+		#print "-------user trying to bet"
 		#self.db_connection.start_session()
 		#action          = args["action"]
 		#private_key     = args["private_key"]
@@ -119,7 +119,6 @@ class Dealer(object):
 				body        = pickle.dumps(message))
 
 	def broadcast(self, routing_key, msg):
-		print "++++++++broadcasting in dealer++++++++++++++++++++"
 		self.channel.basic_publish(exchange     = self.exchange,
 				routing_key = routing_key,
 				body        = pickle.dumps(msg))
@@ -148,7 +147,6 @@ class Dealer(object):
 	def on_message(self, channel, method, header, body):
 		message = "message received, thanks!"
 		obj = pickle.loads(body)
-		print obj['method']
 		method = getattr(self,"cmd_" + obj['method'])
 		method(obj)
 

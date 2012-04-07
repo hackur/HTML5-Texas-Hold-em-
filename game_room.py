@@ -141,7 +141,6 @@ class GameRoom(object):
 	def broadcast(self,msg):
 		self.msg_count += 1
 		msg['timestamp'] = self.msg_count
-		print "```````````````````````broadcasting`````````````````````"
 		self.dealer.broadcast(self.broadcast_key, msg)
 
 	def direct_message(self, msg, destination):
@@ -154,6 +153,8 @@ class GameRoom(object):
 		private_key     = args["private_key"]
 		user_id         = args["user_id"]
 		seat_no  = self.current_seat
+	#	print "SEAT NO.......................",seat_no
+	#	print "USER ID.......................", user_id
 		if self.is_valid_seat(user_id, seat_no) and self.is_valid_rights(action, seat_no):
 			self.clearCountDown()
 			if action != GameRoom.A_RAISESTAKE:
@@ -227,8 +228,10 @@ class GameRoom(object):
 		request_seat = self.get_seat(user_id)
 		valid_seat = self.seats[current_seat]
 		if valid_seat == request_seat:
+			print "VALID SEAT"
 			return True
 		else:
+			print "INVALID SEAT"
 			return False
 
 	def is_valid_rights(self, command, seat_no):
@@ -272,9 +275,7 @@ class GameRoom(object):
 		print "table amount for seat "+ str(seat_no) + ": " + str(self.seats[seat_no].table_amount)
 		self.min_amount = self.seats[seat_no].table_amount
 		if self.flop_flag == False:
-			if self.no_more_stake():
-				self.round_finish()
-			elif self.same_amount_on_table():
+			if self.same_amount_on_table():
 				# At end of first round, small_blind and dealer are out of money
 				if len(filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)) < 2:
 					self.round_finish()
@@ -326,6 +327,9 @@ class GameRoom(object):
 
 			self.broadcast(broadcast_message)
 			self.direct_message(next_player_message, self.seats[self.current_seat].get_private_key())
+		else:
+			print "RAISE INVALID AMOUNT OF MONEY!"
+			sys.exit()
 
 	def check(self, user_id):
 		print "CHECK!"
@@ -335,8 +339,6 @@ class GameRoom(object):
 		player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)
 		self.min_amount = 0         # may cause bugs`
 		if self.flop_flag == False:         #Before flop, sb. called check
-			self.poker_controller.getFlop()
-			self.flop_flag = True
 			print "------------------------------", self.flop_flag
 			self.round_finish()
 		else:
@@ -389,7 +391,7 @@ class GameRoom(object):
 		print "num_of_checks: ", self.num_of_checks
 		command  = 1
 		seat_no  = self.current_seat
-		amount  = min(self.seats[seat_no].player_stake, max((x.player_stake for x in self.seats)))
+		amount  = min(self.seats[seat_no].player_stake, self.amount_limits[GameRoom.A_ALLIN][1])
 		print "self.min_amount before all in: ", self.min_amount
 		print "----------------",self.min_amount == amount + self.seats[seat_no].table_amount
 
@@ -401,7 +403,7 @@ class GameRoom(object):
 			if self.same_amount_on_table(True):
 				self.round_finish()
 			else:
-				self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
+				self.current_seat = self.info_next(seat_no, [1,2,3,5])
 
 			broadcast_message   = {'status':'success', 'username': self.seats[seat_no].get_user().username, 'stake':self.seats[seat_no].player_stake}
 			next_player_message = {'status':'active', 'username': self.seats[self.current_seat].get_user().username, 'rights':self.seats[seat_no].rights}
@@ -414,7 +416,7 @@ class GameRoom(object):
 			self.call_stake(user_id)
 		elif self.min_amount < amount + self.seats[seat_no].table_amount <= 2 * self.min_amount - self.seats[seat_no].table_amount:
 			#self.seats[seat_no].status = Seat.SEAT_ALL_IN
-			self.call_stake(user_id,  amount, all_in_flag = True)
+			self.call_stake(user_id,  amount, inComplete_all_in_flag = True)
 		else:
 			#self.seats[seat_no].status = Seat.SEAT_ALL_IN
 			self.raise_stake(user_id, amount)
@@ -492,10 +494,9 @@ class GameRoom(object):
 #			self.poker_controller.get_winner()
 			winner_dict = {}
 			ante_dict = self.distribute_ante()
-			winner_dict = {k:v for k, v in ante_dict.items() if v >0 } #filter(lambda seat: winner_dict[seat] != 0, ante_dict)
+			winner_dict = {k:v for k, v in ante_dict.items() if v > 0} #filter(lambda seat: winner_dict[seat] != 0, ante_dict)
 			print winner_dict
-			if True or len(winner_dict) > 1:
-				print "============================="
+			if len(winner_dict) > 1:
 				for seat in winner_dict.keys():
 					print "seat: ", seat.get_user().username
 					card_list = []
@@ -504,13 +505,16 @@ class GameRoom(object):
 					print card_list
 					broadcast_msg = {"winner": seat.get_user().username, "handcards": card_list}
 					self.broadcast(broadcast_msg)
-					print "=================msg broadcasted============="
 
 			sys.exit()
 		else:
 			self.create_pot(player_list)
 			self.min_amount = self.blind/2
-			self.poker_controller.getOne()
+			if self.flop_flag == False:
+				self.poker_controller.getFlop()
+				self.flop_flag = True
+			else:
+				self.poker_controller.getOne()
 			self.current_seat = self.info_next(self.current_dealer, [1,3,4,5])
 			return
 
@@ -570,7 +574,12 @@ class GameRoom(object):
 				total_amount_list.append(seat.player_stake + seat.table_amount)
 
 		total_amount_list.sort(reverse = True)
-		max_amount = min(self.seats[seat_no].player_stake, total_amount_list[1] - self.seats[seat_no].table_amount)
+		print "length of total amount list: ", len(total_amount_list)
+		if len(total_amount_list) > 1:
+			max_amount = min(self.seats[seat_no].player_stake, total_amount_list[1] - self.seats[seat_no].table_amount)
+		else:
+			max_amount = min(self.seats[seat_no].player_stake, total_amount_list[0] - self.seats[seat_no].table_amount)
+
 		min_amount = max(self.min_amount - self.seats[seat_no].table_amount, self.big_blind)
 		if GameRoom.A_CALLSTAKE in self.seats[seat_no].rights:
 			if self.seats[seat_no].player_stake < min_amount:
@@ -586,6 +595,10 @@ class GameRoom(object):
 			else:
 				self.amount_limits[GameRoom.A_RAISESTAKE] = (min_amount, max_amount)
 
+		if GameRoom.A_ALLIN in self.seats[seat_no].rights:
+			self.amount_limits[GameRoom.A_ALLIN] = (min(self.seats[seat_no].player_stake - self.seats[seat_no].table_amount, self.min_amount-self.seats[seat_no].table_amount), \
+					min(self.seats[seat_no].player_stake, total_amount_list[1] - self.seats[seat_no].table_amount))
+
 		print self.amount_limits
 		return self.amount_limits
 
@@ -594,9 +607,6 @@ class GameRoom(object):
 		print amount
 		print self.amount_limits[command][1]
 		print self.amount_limits[command][0]
-		print type(amount)
-		print type(self.amount_limits[command][1])
-		print type(self.amount_limits[command][0])
 		if amount > self.amount_limits[command][1]:
 			self.amount_limits.clear()
 			return False
