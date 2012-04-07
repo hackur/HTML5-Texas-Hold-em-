@@ -10,7 +10,7 @@ import functools
 class Seat(object):
 	(SEAT_EMPTY,SEAT_WAITING,SEAT_PLAYING,SEAT_ALL_IN) = (0,1,2,3)
 
-	def __init__(self, seat_id = -1):
+	def __init__(self, seat_id):
 		self._seat_id = seat_id
 		self._user	= None
 		self._cards	= None
@@ -108,6 +108,7 @@ class GameRoom(object):
 
 		for x in xrange(num_of_seats):
 			self.seats.append(Seat(x))
+
 		self.current_seat = None
 
 		self.poker_controller = PokerController(self.seats)
@@ -170,7 +171,7 @@ class GameRoom(object):
 		self.seats[seat_no].sit(player, private_key)
 		self.seats[seat_no].player_stake = int(stake)
 		self.occupied_seat += 1
-		message = {'status':'success', 'seat_no': seat_no, "username": self.seats[seat_no].get_user().username}
+		message = {'msgType':'sit', 'seat_no': seat_no, "info": self.seats[seat_no].to_listener()}
 		self.broadcast(message)
 
 		if self.occupied_seat == 3:
@@ -194,6 +195,8 @@ class GameRoom(object):
 					card_list.append(str(card))
 				msg_sent = {"Cards in hand": card_list}
 				self.direct_message(msg_sent,seat.get_private_key())
+				self.broadcast({"HC":seat.seat_no}) # HC for Have Card
+				#self.direct_message(msg_sent,seat.get_private_key())
 
 		# bet in big blind and small blind by default
 		print self.seats[self.small_blind].player_stake
