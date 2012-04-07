@@ -11,7 +11,7 @@ class Seat(object):
 	(SEAT_EMPTY,SEAT_WAITING,SEAT_PLAYING,SEAT_ALL_IN) = (0,1,2,3)
 
 	def __init__(self, seat_id):
-		self._seat_id = seat_id
+		self.seat_id = seat_id
 		self._user	= None
 		self._cards	= None
 		self._inAmount = 0
@@ -179,7 +179,7 @@ class GameRoom(object):
 		message = {'msgType':'sit', 'seat_no': seat_no, "info": self.seats[seat_no].to_listener()}
 		self.broadcast(message)
 
-		if self.occupied_seat == 3:
+		if self.occupied_seat == 3 and not self.t:
 			self.t = self.ioloop.add_timeout(time.time() + 5, self.start_game)
 		#	self.t = Timer(5, self.start_game)
 		#	self.t.start()
@@ -190,6 +190,7 @@ class GameRoom(object):
 		self.status = GameRoom.GAME_PLAY
 		self.poker_controller.start()
 		self.assign_role()
+		self.t = None
 
 		#Distribute cards to each player
 		for seat in self.seats:
@@ -200,7 +201,7 @@ class GameRoom(object):
 					card_list.append(str(card))
 				msg_sent = {"Cards in hand": card_list}
 				self.direct_message(msg_sent,seat.get_private_key())
-				self.broadcast({"HC":seat.seat_no}) # HC for Have Card
+				self.broadcast({"HC":seat.seat_id}) # HC for Have Card
 				#self.direct_message(msg_sent,seat.get_private_key())
 
 		# bet in big blind and small blind by default
