@@ -116,7 +116,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 		seat		= self.get_argument('seat')
 		stake		= self.get_argument('stake')
 
-		if'is_sit_down' in self.session and \
+		if 'is_sit_down' in self.session and \
 			self.session['is_sit_down'] == True and \
 			self.session['seat'] == seat:
 			self.write(json.dumps({'status':'success'}))

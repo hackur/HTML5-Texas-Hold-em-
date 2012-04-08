@@ -290,8 +290,8 @@ class Poker:
 		high = 0
 		straight = False
 
-        		#Checks to see if the hand contains an ace, and if so starts checking for the straight
-        		#using an ace low
+#Checks to see if the hand contains an ace, and if so starts checking for the straight
+#using an ace low
 		if (hand[6].value == 14):
 			prev = 1
 		else:
@@ -502,6 +502,7 @@ class PokerController(object):
 	def start(self):
 		self.users			= filter(lambda seat: seat.is_waiting(), self.seats)
 		number_of_players	= len(self.users)
+		print "length of users in poker controller %d" % number_of_players
 		self.publicCard		= []
 		self.poker			= Poker(number_of_players, self.debug)
 		self.poker.shuffle()

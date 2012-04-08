@@ -45,8 +45,8 @@ if __name__ == '__main__':
 		'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
 		"static_path2": os.path.join(os.path.dirname(__file__), "static"),
 		"PokerUITest": os.path.join(os.path.dirname(__file__), "PokerUITest"),
-		'session_storage':"dir"
-		#"session_storage":"mongodb:///db"
+		#'session_storage':"dir"
+		"session_storage":"mongodb:///db"
 	}
 
 

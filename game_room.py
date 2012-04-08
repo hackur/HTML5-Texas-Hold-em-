@@ -59,6 +59,7 @@ class Seat(object):
 		self.player_stake -= result
 		self.table_amount += result
 		return result
+
 	def to_listener(self):
 		result = {}
 		if not self._user:
@@ -98,10 +99,8 @@ class GameRoom(object):
 		self.big_blind = 0
 		self.current_seat = None
 		self.flop_flag = False
-		self.all_in_flag = False
 		self.pot = {}
 		self.num_of_checks = 0
-		self.action_counter = 0
 		self.amount_limits = {}
 		self.t = None
 		self.ioloop = ioloop.IOLoop.instance()
@@ -111,8 +110,6 @@ class GameRoom(object):
 		self.max_stake = max_stake
 
 		self.seats = [ Seat(x) for x in xrange(num_of_seats) ]
-
-		self.current_seat = None
 
 		self.poker_controller = PokerController(self.seats)
 		self.actions = {GameRoom.A_ALLIN		:self.all_in,
@@ -186,11 +183,12 @@ class GameRoom(object):
 		self.user_seat[player.id] = seat_no
 		self.seats[seat_no].sit(player, private_key)
 		self.seats[seat_no].player_stake = int(stake)
+		self.seats[seat_no].status = Seat.SEAT_WAITING
 		self.occupied_seat += 1
 		message = {'seat_no': seat_no, "info": self.seats[seat_no].to_listener()}
 		self.broadcast(message,GameRoom.MSG_SIT)
-
-		if self.occupied_seat == 3 and not self.t:
+		print len(filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats))
+		if len(filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)) == 2 and not self.t:
 			self.t = self.ioloop.add_timeout(time.time() + 5, self.start_game)
 		#	self.t = Timer(5, self.start_game)
 		#	self.t.start()
@@ -246,7 +244,7 @@ class GameRoom(object):
 		print command
 		print self.seats[seat_no]
 		if command not in self.seats[seat_no].rights:
-			print "INVALID ACTION!"
+			print "INVALID ACTION!", command
 			self.discard_game(seat_no)
 			return False
 		else:
@@ -264,8 +262,6 @@ class GameRoom(object):
 
 	def call_stake(self, user_id, amount = 0, inComplete_all_in_flag = False):
 		print "CALL!"
-		if self.num_of_checks != 0:
-			self.num_of_checks = 0
 		print "num_of_checks: ", self.num_of_checks
 		command = GameRoom.A_CALLSTAKE
 
@@ -297,12 +293,9 @@ class GameRoom(object):
 					print "-----------sb before you has called all in---------------"
 					self.current_seat = self.info_next(seat_no, [2,5])      # cannot re-raise after sb's all-in
 
-		print "--------------------self.min_amount in call_stake: ", self.min_amount
 
 	def raise_stake(self, user_id,  amount):
 		print "RAISE!"
-		if self.num_of_checks != 0:
-			self.num_of_checks = 0
 		self.num_of_raise += 1
 		print "num_of_checks: ", self.num_of_checks
 		amount          = int(amount)
@@ -330,7 +323,6 @@ class GameRoom(object):
 		player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)
 		self.min_amount = 0         # may cause bugs`
 		if self.flop_flag == False:         #Before flop, sb. called check
-			print "------------------------------", self.flop_flag
 			self.round_finish()
 		else:
 			self.num_of_checks += 1
@@ -338,7 +330,6 @@ class GameRoom(object):
 			if self.num_of_checks < len(player_list):
 				self.current_seat = self.info_next(seat_no, [1,3,4,5])
 			else:
-				self.num_of_checks = 0
 				self.round_finish()
 
 
@@ -361,8 +352,6 @@ class GameRoom(object):
 
 	def all_in(self, user_id):
 		print "FULL POWER! ALL INNNNNNNNN!!!!!!!!"
-		if self.num_of_checks != 0:
-			self.num_of_checks = 0
 		print "num_of_checks: ", self.num_of_checks
 		command  = 1
 		seat_no  = self.current_seat
@@ -395,14 +384,13 @@ class GameRoom(object):
 	def info_next(self, current_position, rights):
 		next_seat = self.check_next(current_position)
 		self.seats[next_seat].rights = rights
-		callback = functools.partial(self.discard_game,self.seats[next_seat].get_private_key())
+		callback = functools.partial(self.discard_game,self.seats[next_seat].get_user().id)
 		#self.countdown = Timer(20, self.discard_game, args=[self.seats[next_seat].get_private_key()])
 		self.countdown = self.ioloop.add_timeout(time.time() + 10, callback)
 
 		print "seat no. for next player: ", self.seats[next_seat].get_user().username
 		self.calculate_proper_amount(next_seat, rights)
 		return next_seat
-
 
 	def add_audit(self, player):
 		self.audit_list.append(player)
@@ -414,7 +402,7 @@ class GameRoom(object):
 
 		for seat in player_list:
 			print "player names: =============:", seat.get_user().username
-			if seat.table_amount == player_list[0].table_amount:
+			if seat.table_amount == player_list[0].table_amount and self.num_of_checks == 0:
 				if seat.player_stake == 0:
 					seat.status = Seat.SEAT_ALL_IN
 				i += 1
@@ -447,18 +435,23 @@ class GameRoom(object):
 		print "_____len(public card)---------------"
 		print len(self.poker_controller.publicCard)
 
+		if self.flop_flag == False:
+			self.poker_controller.getFlop()
+			self.flop_flag = True
+		else:
+			self.poker_controller.getOne()
+
 		if self.no_more_stake() or len(playing_list) < 2 or len(self.poker_controller.publicCard) == 5:
-			if len(self.poker_controller.publicCard) < 3:
-				self.poker_controller.getFlop()
+			print "GAME FINISHED!!!"
+			if len(self.poker_controller.publicCard) == 3:
 				self.poker_controller.getOne()
 				self.poker_controller.getOne()
 				card_list = [ str(card) for card in self.poker_controller.publicCard ]
 
 				broadcast_msg = {'cards':card_list}
 				self.broadcast(broadcast_msg,GameRoom.MSG_PUBLIC_CARD)
-			elif len(self.poker_controller.publicCard) < 5:
-				for x in xrange(5 - len(self.poker_controller.publicCard)):
-					self.poker_controller.getOne()
+			elif len(self.poker_controller.publicCard) == 4:
+				self.poker_controller.getOne()
 
 			print "We have a winner!"
 	#		print self.poker_controller.publicCard
@@ -479,23 +472,22 @@ class GameRoom(object):
 					print card_list
 					broadcast_msg = {"winner": seat.get_user().username, "handcards": card_list}
 					self.broadcast(broadcast_msg,GameRoom.MSG_WINNER)
-	#		self.status = GameRoom.GAME_WAIT
-	#		self.dispose_and_restart()
-	#		sys.exit()
+			else:
+				broadcast_msg = {"winner": winner_dict.keys()[0].get_user().username}
+				self.broadcast(broadcast_msg, GameRoom.MSG_WINNER)
+			self.status = GameRoom.GAME_WAIT
+			self.dispose_and_restart()
+#			sys.exit()
 		else:
 			self.create_pot(player_list)
 			self.min_amount = self.blind/2
 			self.num_of_raise = 0
-			if self.flop_flag == False:
-				self.poker_controller.getFlop()
-				self.flop_flag = True
-			else:
-				self.poker_controller.getOne()
+			self.num_of_checks = 0
 
 			card_list = [ str(card) for card in self.poker_controller.publicCard ]
 
 			broadcast_msg = {'cards':card_list}
-			self.broadcast(broadcast_msg,GameRoom.MSG_PUBLIC_CARD)
+			self.broadcast(broadcast_msg, GameRoom.MSG_PUBLIC_CARD)
 			self.current_seat = self.info_next(self.current_dealer, [1,3,4,5])
 			return
 
@@ -569,15 +561,19 @@ class GameRoom(object):
 				self.seats[seat_no].rights.remove(GameRoom.A_CALLSTAKE)
 			else:
 				self.amount_limits[GameRoom.A_CALLSTAKE] = min_amount
+		elif GameRoom.A_CALLSTAKE in self.amount_limits:
+			del self.amount_limits[GameRoom.A_CALLSTAKE]
 
 		min_amount = 2 * (self.min_amount - self.seats[seat_no].table_amount)
 		if GameRoom.A_RAISESTAKE in self.seats[seat_no].rights:
 			if self.num_of_raise == 4:
 				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
-			if self.seats[seat_no].player_stake < min_amount:
+			elif self.seats[seat_no].player_stake < min_amount:
 				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
 			else:
 				self.amount_limits[GameRoom.A_RAISESTAKE] = (min_amount, max_amount)
+		elif GameRoom.A_RAISESTAKE in self.amount_limits:
+			del self.amount_limits[GameRoom.A_RAISESTAKE]
 
 		if GameRoom.A_ALLIN in self.seats[seat_no].rights:
 			self.amount_limits[GameRoom.A_ALLIN] = min(self.seats[seat_no].player_stake, max_amount)
@@ -643,23 +639,20 @@ class GameRoom(object):
 		print "small_blind: ",      small_blind
 		print "big_blind: ",        big_blind
 
-	def dispose_and_restart(self,blind = 10):
+	def dispose_and_restart(self, blind = 10, min_stake=100, max_stake=2000):
 		self.msg_count= 0
 		self.blind = blind
 		self.min_amount = 0
-		self.current_dealer = 0
-		self.small_blind = 0
-		self.big_blind = 0
-		self.current_seat = None
 		self.flop_flag = False
-		self.all_in_flag = False
 		self.pot = {}
 		self.num_of_checks = 0
-		self.action_counter = 0
 		self.amount_limits = {}
 		self.t = None
-		self.ioloop = ioloop.IOLoop.instance()
-		self.user_seat = {}
-		self.current_seat = 0
-
-		self.t = self.ioloop.add_timeout(time.time() + 5, self.start_game)
+		self.num_of_raise = 0
+		self.min_stake = min_stake
+		self.max_stake = max_stake
+		player_list = filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)
+		for seat in player_list:
+			seat.status = Seat.SEAT_WAITING
+		if len(player_list) >= 2 and not self.t:
+			self.t = self.ioloop.add_timeout(time.time() + 5, self.start_game)
