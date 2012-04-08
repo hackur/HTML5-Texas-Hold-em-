@@ -87,7 +87,7 @@ var listenBoardMessage = function(timestamp) {
 var display_name_and_stake = function(seatID, username, stake) {
 	document.getElementById("name" + seatID).innerHTML = username
 	document.getElementById("money" + seatID).innerHTML = stake;
-	sit_transit(seatID);
+	sit_transit.transit(seatID);
 }
 
 var carry_chips = function() {
@@ -307,26 +307,7 @@ var send_back_card = function(left_cor, top_cor, degree, id, callback) {
 
 
 
-			function sit_transit(sit) {
-					//alert("sit");
-					console.log(sit + "   +++++=");
-					var all_class = ["#seat0","#seat1","#seat2","#seat3",
-						"#seat4"];
-					var transit_id = sit, transit_temp = -1;
-					for (var i = transit_id; i < all_class.length; i++) {
-						transit(all_class[++transit_temp], all_class[i]);
-					}
-					for (var i = 0; i < transit_id; i++) {
-						transit(all_class[++transit_temp], all_class[i]);
-					}
-				}
-
-				function transit(transit_to, transit_from) {
-
-				  	$(transit_from).css('left',$(transit_to).css('left'));
-				  	$(transit_from).css('top',$(transit_to).css('top'));
-
-				}
+			
 
 
 			

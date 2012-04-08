@@ -8,16 +8,18 @@
 		<link rel="stylesheet" type="text/css" href="button.css" />
 		<script src="jquery.min.js"></script>
 		<script src="poker_lib.js"></script>
+		<script src="sit_transit.js"> </script>
 		<script>
 			window.username = "{{ username }}";
 			window.password = "{{ password }}";
+
 			var login = function(){
 					$.post(
 						"/login",
 						{username:username, password:password},
 						function(data){
 							console.log("Login success");
-							 enter(); 
+							 enter();
 						},
 						'json'
 					);
