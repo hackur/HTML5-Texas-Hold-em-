@@ -343,6 +343,16 @@ class GameRoom(object):
 			else:
 				self.round_finish()
 
+	def discard_game_timeout(self,user_id):
+		seat_no = self.current_seat
+		self.discard_game(user_id)
+
+		seat = self.seats[seat_no]
+		broadcast_msg = {'action':GameRoom.A_DISCARDGAME, 'seat_no':seat_no,'stake':seat.player_stake,'table':seat.table_amount}
+		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
+
+		next_seat = self.seats[self.current_seat]
+		self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
 
 	def discard_game(self, user_id):
 		print "FOLD!!"
@@ -351,7 +361,9 @@ class GameRoom(object):
 		self.seats[seat_no].status = Seat.SEAT_WAITING  # set the status of this seat to empty
 														# remove the player from player list
 		user = self.seats[seat_no].get_user()           # get user info from database
-		user.stake = self.seats[seat_no].player_stake         # update user's stake
+
+		#TODO Database update
+		user.stake += self.seats[seat_no].player_stake  # update user's stake
 
 		if self.same_amount_on_table():
 			print "finishing this round after folding!!"
@@ -395,7 +407,7 @@ class GameRoom(object):
 	def info_next(self, current_position, rights):
 		next_seat = self.check_next(current_position)
 		self.seats[next_seat].rights = rights
-		callback = functools.partial(self.discard_game,self.seats[next_seat].get_user().id)
+		callback = functools.partial(self.discard_game_timeout,self.seats[next_seat].get_user().id)
 		#self.countdown = Timer(20, self.discard_game, args=[self.seats[next_seat].get_private_key()])
 		self.countdown = self.ioloop.add_timeout(time.time() + 10, callback)
 
