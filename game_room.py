@@ -77,10 +77,10 @@ class Seat(object):
 
 class GameRoom(object):
 	(GAME_WAIT,GAME_PLAY) = (0,1)
-	(A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME) = (1,2,3,4,5)
+	(A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND) = (1,2,3,4,5,6,7)
 
-	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD) \
-				= ('sit','bhc','phc','winner','next','action','public')
+	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START) \
+				= ('sit','bhc','phc','winner','next','action','public','start')
 	def __init__(self, room_id, owner, dealer, num_of_seats = 9, blind = 10,min_stake=100,max_stake=2000):
 		self.room_id        = room_id
 		self.owner      = owner
@@ -189,7 +189,10 @@ class GameRoom(object):
 		self.broadcast(message,GameRoom.MSG_SIT)
 		print len(filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats))
 		if len(filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)) == 2 and not self.t:
-			self.t = self.ioloop.add_timeout(time.time() + 5, self.start_game)
+			timeout = 5
+			self.t = self.ioloop.add_timeout(time.time() + timeout, self.start_game)
+			msg = {'to':timeout }
+			self.broadcast(msg,GameRoom.MSG_START)
 		#	self.t = Timer(5, self.start_game)
 		#	self.t.start()
 		return ( True, "" )
@@ -209,7 +212,7 @@ class GameRoom(object):
 
 				msg_sent = {"cards": card_list,"Cards in hand": card_list}
 				self.direct_message(msg_sent,seat.get_private_key(),GameRoom.MSG_PHC)
-				self.broadcast({"HC":seat.seat_id},GameRoom.MSG_BHC) # HC for Have Card
+				self.broadcast({"seat_no":seat.seat_id},GameRoom.MSG_BHC) # HC for Have Card
 				#self.direct_message(msg_sent,seat.get_private_key())
 
 		# bet in big blind and small blind by default
@@ -225,6 +228,14 @@ class GameRoom(object):
 		self.min_amount = self.blind
 		self.current_seat = self.info_next(self.big_blind, [1,2,3,5])
 		print "next seat in action =>", self.current_seat
+
+		seat = self.seats[self.small_blind]
+		broadcast_msg = {'action':GameRoom.A_SMALLBLIND, 'seat_no':seat.seat_id,'stake':seat.player_stake,'table':seat.table_amount}
+		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
+
+		seat = self.seats[self.big_blind]
+		broadcast_msg = {'action':GameRoom.A_BIGBLIND, 'seat_no':seat.seat_no,'stake':seat.player_stake,'table':seat.table_amount}
+		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
 
 	def get_seat(self, user_id):
 		return self.seats[self.user_seat[user_id]]
@@ -640,7 +651,6 @@ class GameRoom(object):
 		print "big_blind: ",        big_blind
 
 	def dispose_and_restart(self, blind = 10, min_stake=100, max_stake=2000):
-		self.msg_count= 0
 		self.blind = blind
 		self.min_amount = 0
 		self.flop_flag = False
@@ -655,4 +665,8 @@ class GameRoom(object):
 		for seat in player_list:
 			seat.status = Seat.SEAT_WAITING
 		if len(player_list) >= 2 and not self.t:
-			self.t = self.ioloop.add_timeout(time.time() + 5, self.start_game)
+			timeout = 5
+			self.t = self.ioloop.add_timeout(time.time() + timeout, self.start_game)
+			msg = {'to':timeout }
+			self.broadcast(msg,GameRoom.MSG_START)
+
