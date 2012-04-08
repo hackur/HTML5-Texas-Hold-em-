@@ -237,6 +237,9 @@ class GameRoom(object):
 		broadcast_msg = {'action':GameRoom.A_BIGBLIND, 'seat_no':seat.seat_id,'stake':seat.player_stake,'table':seat.table_amount}
 		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
 
+		next_seat = self.seats[self.current_seat]
+		self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
+
 	def get_seat(self, user_id):
 		return self.seats[self.user_seat[user_id]]
 		#return filter(lambda seat: seat.get_user() != None and seat.get_user().id == user_id, self.seats)[0]
