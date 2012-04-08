@@ -6,9 +6,11 @@
 
 		<link rel="stylesheet" type="text/css" href="style.css" />
 		<link rel="stylesheet" type="text/css" href="button.css" />
+		<link rel="stylesheet" type="text/css" href="sit_down_dialog.css" />
 		<script src="jquery.min.js"></script>
 		<script src="poker_lib.js"></script>
 		<script src="sit_transit.js"> </script>
+		<script src="sit_down_dialog.js"> </script>
 		<script>
 			window.username = "{{ username }}";
 			window.password = "{{ password }}";
@@ -20,6 +22,7 @@
 						function(data){
 							console.log("Login success");
 							 enter();
+							 fetch_user_info();
 						},
 						'json'
 					);
@@ -39,8 +42,6 @@
 		<script src="./jqueryUI/jquery.ui.slider.js"></script>
 		<script src="./jqueryUI/jquery.ui.touch-punch.min.js"></script>
 		<!-- <script src="jquery.transit.js"> </script> -->
-		<script src="http://ricostacruz.com/jquery.transit/jquery.transit.js"></script>
-		<link rel="stylesheet" type="text/css" href="jquery.ui.slider.css">
 		<script>
 			$(table_init);
 		</script>
@@ -109,13 +110,15 @@
 				</div>
 
 			</div>
-			<div id="carry_chips_view">
-				<div class="testdiv">
+			<div id="sit_down_dialog">
+				<div id="testdiv">
 					<p>
 						<label for="amount">Amount:</label>
-						<input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold" />
+						<label id="sit_dialog_amount" />
 					</p>
-					<div id="slider" class="ui-slider ui-slider-horizontal ui-widget-content ui-corner-all"></div>
+					<div id="sit_slider_bar" class="ui-slider ui-slider-horizontal ui-widget-content ui-corner-all">
+						<div id="sit_slider_button" class="ui-slider-handle"></div>
+					</div>
 					<div id="submitButton"></div>
 				</div>
 			</div>

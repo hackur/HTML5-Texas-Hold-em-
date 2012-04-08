@@ -1,7 +1,46 @@
 
 
 
+window.get_event_position = function(e){
+	if(window.touch_enable && e.touches){
+		if(e.touches[0]){
+			e.clientX =  e.touches[0].pageX;
+			e.clientY =  e.touches[0].pageY;
+		}
+		else{
+			e.clientX =  e.changedTouches[0].pageX;
+			e.clientY =  e.changedTouches[0].pageY;
+		}
+	}
+	return [e.clientX,e.clientY]
+}
+function decide_event(){
+	window.event_up = "touchend";
+	window.event_down = "touchstart"; 
+	window.event_move = "touchmove";
+	if(navigator.userAgent.match(/iPhone/i) ||
+	 		navigator.userAgent.match(/Android/i) ||
+			navigator.userAgent.match(/iPad/i) ||
+			navigator.userAgent.match(/iPod/i) ||
+			navigator.userAgent.match(/webOS/i) ||
+			navigator.userAgent.match(/BlackBerry/)
+	){
+		event_up = "touchend";
+		event_down = "touchstart"; 
+		event_move = "touchmove";
+		window.touch_enable = true;
+	}
+	else{
+		event_up = "mouseup"; 
+		event_down = "mousedown"; 
+		event_move = "mousemove";
+		window.touch_enable = false;
+	}
+
+}
 var table_init = function() {
+	decide_event();
+
 	document.ontouchmove = function(e) {
 		e.preventDefault();
 	};
@@ -14,7 +53,7 @@ var table_init = function() {
 		seat4: SeatObj(0)
 	};
 
-	carry_chips();
+	//carry_chips();
 
 	console.log(username);
 
@@ -28,6 +67,22 @@ var table_init = function() {
 	game_control.deal();
 };
 
+var fetch_user_info = function(){
+	$.get(
+		"/userinfo",
+		{},
+		function(data){
+			console.log("Below is user data:");
+			console.log(data);
+			window.user_info = {};
+			user_info.username = data.n;
+			user_info.asset = data.s;
+			user_info.level = data.l;
+			console.log(window.user_info);
+		},
+		'json'
+	);
+};
 var enter = function(){
 	var room = 1;
 	$.post(
@@ -38,6 +93,14 @@ var enter = function(){
 			console.log(data);
 			if( data.status == "success" ) {
 				listenBoardMessage();
+
+
+				window.room_info = {};
+				window.room_info.max_stake = data.room.max_stake;
+				window.room_info.min_stake = data.room.min_stake;
+				window.room_info.blind 	   = data.room.blind;
+				window.room_info.timestamp = data.room.timestamp;
+
 			}
 						
 		},
@@ -90,31 +153,13 @@ var display_name_and_stake = function(seatID, username, stake) {
 	sit_transit.transit(seatID);
 }
 
-var carry_chips = function() {
-	document.getElementById("carry_chips_view").style.display = "block";
-	$(function() {
-		$("#slider").slider({
-			value: 200,
-			min: 0,
-			max: 500,
-			step: 50,
-			slide: function(event, ui) {
-				$("#amount").val("$" + ui.value);
-			}
-		});
-		$("#amount").val("$" + $("#slider").slider("value"));
-	});
-	$("#submitButton").click(function() {
-		//console.log($("#amount")[0].value);
-		window.carry_stake = $("#amount")[0].value;
-		document.getElementById("carry_chips_view").style.display = "none";
-	});
-};
 
 var take_place = function(seatID, seatObj) {
 	$(seatID).click(function() {
 		if(seatObj.getIsSat() == 0)
 		{
+			sit_dialog.show(seatID);
+			/*
 			//console.log(seatID.slice(-1));
 			var id = seatID.slice(-1);
 			var stake = carry_stake.substring(1, carry_stake.length);
@@ -135,6 +180,7 @@ var take_place = function(seatID, seatObj) {
 			seatObj.setIsSat(1);
 			send_first_card();
 			//sit_transit(id);
+			*/
 		}
 		else {
 			console.log(seatObj.getIsSat());

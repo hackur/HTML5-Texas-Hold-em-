@@ -1,0 +1,51 @@
+
+#sit_down_dialog{
+	background-color: #6495ed;
+	background: -moz-linear-gradient(top, #6495ed, #3112a3);
+	background: -webkit-gradient(linear, left top, left bottom, from(#6495ed), to(#3112a3));
+	-ms-filter: progid:DXImageTransform.Microsoft.gradient(
+	                startColorstr=#6495ed, endColorstr=#3112a3, GradientType=1);
+	filter: progid:DXImageTransform.Microsoft.Gradient(
+					StartColorStr="#6495ed", EndColorStr="#3112a3", GradientType=1);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#6495ed', endColorstr='#3112a3');
+		
+	color: #000000;
+	padding: 15px;
+	min-height: 250px;
+	width: 400px;
+
+	position: absolute;
+	top: 100px;
+	left: 250px;
+	display: none;
+
+	filter: alpha(opacity=100);
+	-moz-opacity:1.0;
+	opacity: 1.0;
+}
+
+#testdiv { 
+	width: 360px;
+	height: 130px;
+	top: 100px;
+	left: 30px;
+	position: absolute;
+}
+#submitButton { 
+	background-image: url(./image/sure.png); 
+	position: absolute; 
+	width: 79px; height:41px; 
+	top: 90px; left: 285px;
+}
+#submitButton:hover { background-image: url(./image/sure-hover.png);}
+
+.ui-slider { position: relative; text-align: left; }
+.ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 1.2em; height: 1.2em; cursor: default; background-image: url(./image/runner.png);}
+
+.ui-slider-horizontal { height: .8em; }
+.ui-slider-horizontal .ui-slider-handle { top: -.3em; margin-left: -.6em; }
+
+.ui-corner-all { -moz-border-radius: 4px; -webkit-border-radius: 4px; }
+
+.ui-widget-content { border: 1px solid #ffffff; background: #330066 50% 50% }
+
