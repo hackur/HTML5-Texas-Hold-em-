@@ -125,7 +125,8 @@ class GameRoom(object):
 		result = {}
 		result['status'] = self.status
 		if self.status == GameRoom.GAME_PLAY:
-			result['publicCard'] = self.poker_controller.publicCard
+			card_list = [ str(card) for card in self.poker_controller.publicCard ]
+			result['publicCard'] = card_list
 			result['current_seat'] = self.current_seat
 
 		result['seats'] = [ seat.to_listener() for seat in self.seats ]
@@ -451,9 +452,7 @@ class GameRoom(object):
 				self.poker_controller.getFlop()
 				self.poker_controller.getOne()
 				self.poker_controller.getOne()
-				card_list = []
-				for card in self.poker_controller.publicCard:
-					card_list.append(str(card))
+				card_list = [ str(card) for card in self.poker_controller.publicCard ]
 
 				broadcast_msg = {'cards':card_list}
 				self.broadcast(broadcast_msg,GameRoom.MSG_PUBLIC_CARD)
@@ -493,9 +492,7 @@ class GameRoom(object):
 			else:
 				self.poker_controller.getOne()
 
-			card_list = []
-			for card in self.poker_controller.publicCard:
-				card_list.append(str(card))
+			card_list = [ str(card) for card in self.poker_controller.publicCard ]
 
 			broadcast_msg = {'cards':card_list}
 			self.broadcast(broadcast_msg,GameRoom.MSG_PUBLIC_CARD)
