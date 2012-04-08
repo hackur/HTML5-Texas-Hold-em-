@@ -6,7 +6,12 @@
 	var deal = function() {
 		/* draw roundRec time bar here*/
 
-		
+
+
+		for(var i = 0; i < 5; i++) { 
+			$("#chip" + i).hide();
+		}//hide the chip first
+
 		$('#button2').click(function() {			
 			if($("#card0")[0].src == "" || $("#card1")[0].src == "" || $("#card2")[0].src == "")
 			{
@@ -58,6 +63,7 @@
 	};
 
 	var ante_chips = function(chipId, ileft, itop, callback) {
+		$(chipId).show();
 		$(chipId).animate(
 			{
 				left: ileft,

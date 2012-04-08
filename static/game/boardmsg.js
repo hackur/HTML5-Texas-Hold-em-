@@ -11,6 +11,14 @@ function msg_sit(data){
 	/** Someone sat down
 	 *
 	 **/
+	var seatID = data.seat_no;
+	var username = data.info.user;
+	var stake = data.info.player_stake;
+	
+	document.getElementById("name" + seatID).innerHTML = username
+	document.getElementById("money" + seatID).innerHTML = stake;
+	SeatList[seatID].setIsSat(1);
+	
 }
 function msg_bhc(data){ 
 	/*
