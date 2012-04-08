@@ -40,11 +40,13 @@
 	actionButton.enable_buttons = enable_buttons;
 	actionButton.disable_all = disable_all;
 
+/*
 	function unit_test(){
 		//enable_buttons([2,3,4]);
 		disable_all();
 	}
 	$(unit_test);
+	*/
 
 }(window.actionButton = window.actionButton || {} ,jQuery));
 
