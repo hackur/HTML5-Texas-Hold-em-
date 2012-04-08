@@ -1,0 +1,78 @@
+.button {
+/*	background-image: url(./image/button.png);  */
+	font-size: 25px;
+	color: white;
+	text-align:center;
+	font-weight:bold;
+	line-height:62px;
+	height: 67px;
+	width: 125px;
+	position: relative;
+	cursor:pointer;
+	-moz-box-shadow:    10px 5px 6px #000;
+	-webkit-box-shadow: 10px 5px 6px #000;
+	box-shadow:        10px 5px 6px #000;
+	background-image: linear-gradient(right bottom, rgb(33,30,179) 42%, rgb(23,33,230) 71%);
+	background-image: -o-linear-gradient(right bottom, rgb(33,30,179) 42%, rgb(23,33,230) 71%);
+	background-image: -moz-linear-gradient(right bottom, rgb(33,30,179) 42%, rgb(23,33,230) 71%);
+	background-image: -webkit-linear-gradient(right bottom, rgb(33,30,179) 42%, rgb(23,33,230) 71%);
+	background-image: -ms-linear-gradient(right bottom, rgb(33,30,179) 42%, rgb(23,33,230) 71%);
+	-moz-transition: all 0.5s; 
+	-webkit-transition: all 0.5s;  
+	-ms-transition: all 0.5s;  
+	-o-transition: all 0.5s;  
+	transition-timing-function: ease-out;
+	transition: all 0.5s;  
+	float:right;
+	margin:10px;
+
+}
+/* check browser support */
+.buttonEnable.button:hover {
+	-moz-transform: scale(1.05);
+ 	-webkit-transform: scale(1.05);
+    -o-transform: scale(1.05);
+    -ms-transform: scale(1.05);
+    transform: scale(1.05);
+}
+.buttonHide{
+	display:none;
+}
+
+.buttonDisable{
+	background-image: linear-gradient(right bottom, rgb(168,168,168) 42%, rgb(235,235,235) 71%);
+	background-image: -o-linear-gradient(right bottom, rgb(168,168,168) 42%, rgb(235,235,235) 71%);
+	background-image: -moz-linear-gradient(right bottom, rgb(168,168,168) 42%, rgb(235,235,235) 71%);
+	background-image: -webkit-linear-gradient(right bottom, rgb(168,168,168) 42%, rgb(235,235,235) 71%);
+	background-image: -ms-linear-gradient(right bottom, rgb(168,168,168) 42%, rgb(235,235,235) 71%);
+}
+#buttonWraper{
+	width:600px;
+	height:150px;
+	position:absolute;
+	top:550px;
+	left:350px;
+}
+/*
+#btFold {
+	top:560px;
+	left:350px;
+}
+#btCall {
+	top:560px;
+	left:500px;
+}
+#btRaise {
+	top:560px;
+	left:650px;
+}
+#btAllin {
+	top:560px;
+	left:800px;
+}
+
+#btCheck {
+	top:560px;
+	left:950px;
+}
+*/

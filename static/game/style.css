@@ -147,39 +147,8 @@ body {
 	background-image: url(./image/l1.png);
 }
 
-/* three button at right-bottom */
-.button {
-	background-image: url(./image/button.png);
-	font-size: 25px;
-	color: white;
-	text-align:center;
-	font-weight:bold;
-	line-height:62px;
-	height: 67px;
-	width: 185px;
-	position: absolute;
-	cursor:pointer;
-}
-/* check browser support */
-.button:hover {
-	-moz-transform: scale(1.05);
- 	-webkit-transform: scale(1.05);
-    -o-transform: scale(1.05);
-    -ms-transform: scale(1.05);
-    transform: scale(1.05);
-}
-#button1 {
-	top:560px;
-	left:350px;
-}
-#button2 {
-	top:560px;
-	left:550px;
-}
-#button3 {
-	top:560px;
-	left:750px;
-}/*end*/
+
+/*end*/
 
 /* two cards in hand for 'me' */
 #backpng1 {

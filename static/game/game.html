@@ -2,7 +2,10 @@
 <html>
 	<head>
 		<title>Game</title>
+		<meta charset="UTF-8">
+
 		<link rel="stylesheet" type="text/css" href="style.css" />
+		<link rel="stylesheet" type="text/css" href="button.css" />
 		<script src="jquery.min.js"></script>
 		<script src="poker_lib.js"></script>
 		<script>
@@ -22,6 +25,7 @@
 			$(login);
 		</script>
 		<script src="index.js"></script>
+		<script src="action_button.js"></script>
 		<!-- <script src="animation.js"></script> -->
 		<script src="game_control.js"></script>
 		<!-- The plugin works on Safari, Chrome, Webkit, Firefox 3.5+, IE9+, and Opera 11+. -->
@@ -114,9 +118,11 @@
 			</div>
 
 			<div id="buttonWraper">
-				<div id="button1" class="button">Fold</div>
-				<div id="button2" class="button">Call</div>
-				<div id="button3" class="button">Raise</div>
+				<div id="btFold" class="button">Fold</div>
+				<div id="btCall" class="button">Call</div>
+				<div id="btRaise" class="button">Raise</div>
+				<div id="btAllin" class="button">All-IN</div>
+				<div id="btCheck" class="button buttonHide">Check</div>
 			</div>
 		</div>
 	</body>
