@@ -139,61 +139,61 @@ class Tester(object):
 			#	print "all in!!!!!!!!!!!!!!!!!!!"
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':2,'user_id':1,
-							"room_id":1, "private_key":self.users[0].private_key, "amount":10}))
+						body=pickle.dumps({'method':'action','action':3,'user_id':1,
+							"room_id":1, "private_key":self.users[0].private_key, "amount":20}))
+
+			self.channel.basic_publish(exchange='dealer_exchange_1',
+						routing_key="dealer",
+						body=pickle.dumps({'method':'action','action':3,'user_id':2,
+							"room_id":1, "private_key":self.users[1].private_key, "amount":40}))
+
+			self.channel.basic_publish(exchange='dealer_exchange_1',
+						routing_key="dealer",
+						body=pickle.dumps({'method':'action','action':3,'user_id':3,
+							"room_id":1, "private_key":self.users[2].private_key, "amount":80}))
+
+			self.channel.basic_publish(exchange='dealer_exchange_1',
+						routing_key="dealer",
+						body=pickle.dumps({'method':'action','action':3,'user_id':1,
+							"room_id":1, "private_key":self.users[0].private_key, "amount":160}))
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
 						body=pickle.dumps({'method':'action','action':5,'user_id':2,
 						"room_id":1, "private_key":self.users[1].private_key}))
 
-			self.channel.basic_publish(exchange='dealer_exchange_1',
-						routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':3,'user_id':3,
-							"room_id":1, "private_key":self.users[2].private_key, "amount":40}))
-
-			self.channel.basic_publish(exchange='dealer_exchange_1',
-						routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':3,'user_id':1,
-							"room_id":1, "private_key":self.users[0].private_key, "amount":80}))
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
 						body=pickle.dumps({'method':'action','action':2,'user_id':3,
-						"room_id":1, "private_key":self.users[1].private_key}))
-
-
-			self.channel.basic_publish(exchange='dealer_exchange_1',
-						routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':3,'user_id':3,
 							"room_id":1, "private_key":self.users[2].private_key, "amount":10}))
 
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':2,'user_id':1,
-							"room_id":1, "private_key":self.users[1].private_key}))
+						body=pickle.dumps({'method':'action','action':4,'user_id':1,
+							"room_id":1, "private_key":self.users[0].private_key}))
 
-#			self.channel.basic_publish(exchange='dealer_exchange_1',
-#					routing_key="dealer",
-#					body=pickle.dumps({'method':'action','action':4,'user_id':3,
-#						"room_id":1, "private_key":self.users[0].private_key}))
-#
-#
-#			self.channel.basic_publish(exchange='dealer_exchange_1',
-#					routing_key="dealer",
-#					body=pickle.dumps({'method':'action','action':4,'user_id':1,
-#					"room_id":1, "private_key":self.users[0].private_key}))
+			self.channel.basic_publish(exchange='dealer_exchange_1',
+							routing_key="dealer",
+							body=pickle.dumps({'method':'action','action':4,'user_id':3,
+							"room_id":1, "private_key":self.users[2].private_key}))
 
-	#		self.channel.basic_publish(exchange='dealer_exchange_1',
-	#					routing_key="dealer",
-	#					body=pickle.dumps({'method':'action','action':1,'user_id':2,
-	#						"room_id":1, "private_key":self.users[1].private_key}))
 
-	#		self.channel.basic_publish(exchange='dealer_exchange_1',
-	#					routing_key="dealer",
-	#					body=pickle.dumps({'method':'action','action':1,'user_id':3,
-	#					"room_id":1, "private_key":self.users[2].private_key}))
+			self.channel.basic_publish(exchange='dealer_exchange_1',
+							routing_key="dealer",
+						body=pickle.dumps({'method':'action','action':4,'user_id':1,
+						"room_id":1, "private_key":self.users[0].private_key}))
+
+			self.channel.basic_publish(exchange='dealer_exchange_1',
+						routing_key="dealer",
+						body=pickle.dumps({'method':'action','action':1,'user_id':3,
+							"room_id":1, "private_key":self.users[2].private_key}))
+
+			self.channel.basic_publish(exchange='dealer_exchange_1',
+						routing_key="dealer",
+						body=pickle.dumps({'method':'action','action':1,'user_id':1,
+						"room_id":1, "private_key":self.users[0].private_key}))
 
 
 	#		self.channel.basic_publish(exchange='dealer_exchange_1',

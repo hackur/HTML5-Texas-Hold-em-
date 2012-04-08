@@ -105,9 +105,9 @@ class GameRoom(object):
 		self.t = None
 		self.ioloop = ioloop.IOLoop.instance()
 		self.user_seat = {}
-		self.num_of_raise = 0
 		self.min_stake = min_stake
 		self.max_stake = max_stake
+		self.raise_amount = blind
 
 		self.seats = [ Seat(x) for x in xrange(num_of_seats) ]
 
@@ -234,7 +234,7 @@ class GameRoom(object):
 		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
 
 		seat = self.seats[self.big_blind]
-		broadcast_msg = {'action':GameRoom.A_BIGBLIND, 'seat_no':seat.seat_no,'stake':seat.player_stake,'table':seat.table_amount}
+		broadcast_msg = {'action':GameRoom.A_BIGBLIND, 'seat_no':seat.seat_id,'stake':seat.player_stake,'table':seat.table_amount}
 		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
 
 	def get_seat(self, user_id):
@@ -307,20 +307,17 @@ class GameRoom(object):
 
 	def raise_stake(self, user_id,  amount):
 		print "RAISE!"
-		self.num_of_raise += 1
 		print "num_of_checks: ", self.num_of_checks
-		amount          = int(amount)
-		command         = 3
-		seat_no         = self.current_seat
+		amount          	= int(amount)
+		self.raise_amount 	= amount
+		command         	= 3
+		seat_no         	= self.current_seat
 		if self.is_proper_amount(amount, command):
 			print "This is a proper amount"
 			self.seats[seat_no].bet(amount)
 			print "table amount for seat "+ str(seat_no) + ": " + str(self.seats[seat_no].table_amount)
 			self.min_amount     = self.seats[seat_no].table_amount
-			if self.num_of_raise == 4:
-				self.current_seat = self.info_next(seat_no, [1, 2, 5])
-			else:
-				self.current_seat   = self.info_next(seat_no, [1, 2, 3, 5])
+			self.current_seat   = self.info_next(seat_no, [1, 2, 3, 5])
 
 		else:
 			print "RAISE INVALID AMOUNT OF MONEY!"
@@ -490,12 +487,12 @@ class GameRoom(object):
 				broadcast_msg = {"winner": winner_dict.keys()[0].get_user().username}
 				self.broadcast(broadcast_msg, GameRoom.MSG_WINNER)
 			self.status = GameRoom.GAME_WAIT
-			self.dispose_and_restart()
-#			sys.exit()
+		#	self.dispose_and_restart()
+			sys.exit()
 		else:
 			self.create_pot(player_list)
-			self.min_amount = self.blind/2
-			self.num_of_raise = 0
+			self.min_amount = 0
+			self.raise_amount = self.blind
 			self.num_of_checks = 0
 
 
@@ -575,11 +572,9 @@ class GameRoom(object):
 		elif GameRoom.A_CALLSTAKE in self.amount_limits:
 			del self.amount_limits[GameRoom.A_CALLSTAKE]
 
-		min_amount = 2 * (self.min_amount - self.seats[seat_no].table_amount)
+		min_amount = 2 * self.raise_amount
 		if GameRoom.A_RAISESTAKE in self.seats[seat_no].rights:
-			if self.num_of_raise == 4:
-				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
-			elif self.seats[seat_no].player_stake < min_amount:
+			if self.seats[seat_no].player_stake < min_amount:
 				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
 			else:
 				self.amount_limits[GameRoom.A_RAISESTAKE] = (min_amount, max_amount)
@@ -658,9 +653,9 @@ class GameRoom(object):
 		self.num_of_checks = 0
 		self.amount_limits = {}
 		self.t = None
-		self.num_of_raise = 0
 		self.min_stake = min_stake
 		self.max_stake = max_stake
+		self.raise_amount = blind
 		player_list = filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)
 		for seat in player_list:
 			seat.status = Seat.SEAT_WAITING
