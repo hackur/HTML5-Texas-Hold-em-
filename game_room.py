@@ -451,6 +451,9 @@ class GameRoom(object):
 			self.flop_flag = True
 		else:
 			self.poker_controller.getOne()
+		card_list = [ str(card) for card in self.poker_controller.publicCard ]
+		broadcast_msg = {'cards':card_list}
+		self.broadcast(broadcast_msg, GameRoom.MSG_PUBLIC_CARD)
 
 		if self.no_more_stake() or len(playing_list) < 2 or len(self.poker_controller.publicCard) == 5:
 			print "GAME FINISHED!!!"
@@ -495,10 +498,7 @@ class GameRoom(object):
 			self.num_of_raise = 0
 			self.num_of_checks = 0
 
-			card_list = [ str(card) for card in self.poker_controller.publicCard ]
 
-			broadcast_msg = {'cards':card_list}
-			self.broadcast(broadcast_msg, GameRoom.MSG_PUBLIC_CARD)
 			self.current_seat = self.info_next(self.current_dealer, [1,3,4,5])
 			return
 
