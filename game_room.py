@@ -309,13 +309,13 @@ class GameRoom(object):
 		print "RAISE!"
 		print "num_of_checks: ", self.num_of_checks
 		amount          	= int(amount)
-		self.raise_amount 	= amount
 		command         	= 3
 		seat_no         	= self.current_seat
 		if self.is_proper_amount(amount, command):
 			print "This is a proper amount"
 			self.seats[seat_no].bet(amount)
 			print "table amount for seat "+ str(seat_no) + ": " + str(self.seats[seat_no].table_amount)
+			self.raise_amount 	= amount
 			self.min_amount     = self.seats[seat_no].table_amount
 			self.current_seat   = self.info_next(seat_no, [1, 2, 3, 5])
 
@@ -355,7 +355,7 @@ class GameRoom(object):
 			self.round_finish()
 		else:
 			print "I'm here!!!!!"
-			self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
+			self.current_seat = self.info_next(seat_no, [1,2,3,5])
 
 
 	def all_in(self, user_id):
