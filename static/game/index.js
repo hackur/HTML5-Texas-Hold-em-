@@ -277,38 +277,3 @@ var send_back_card = function(left_cor, top_cor, degree, id, callback) {
 	);
 };
 
-
-
-
-
-
-/*var sit_transit = function(sit) {
-					var _seatID = ["#seat0","#seat1","#seat2","#seat3",
-						"#seat4"];
-
-					var transit_id = sit , transit_temp = -1;
-					for (var i = transit_id; i < _seatID.length; i++) {
-						transit(_seatID[++transit_temp], _seatID[i]);
-					}
-					for (var i = 0; i < transit_id; i++) {
-						transit(_seatID[++transit_temp], _seatID[i]);
-					}
-			};
-
-			var transit = function(transit_to, transit_from) {
-				$(transit_from).transition({
-					x: $(transit_to).position().left - $(transit_from).position().left,
-					y: $(transit_to).position().top - $(transit_from).position().top,
-					duration: 10000,
-					rotate: 0,
-					easing: 'snap'
-				});
-			};*/
-
-
-
-			
-
-
-			
-			

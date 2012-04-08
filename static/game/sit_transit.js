@@ -1,6 +1,5 @@
 (function(sit_transit,$,undefined){
-	var all_class = ["#seat0","#seat1","#seat2","#seat3",
-			"#seat4"];
+	var all_class = ["#seat0","#seat1","#seat2","#seat3","#seat4"];
 	var all_position = [];
 	function init(){
 		$.each(all_class,function(id,value){
