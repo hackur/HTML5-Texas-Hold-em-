@@ -253,28 +253,6 @@ var send_first_card = function(first_seat_no) {
 									send_back_card(cur_cardpos[0], cur_cardpos[1], "10", "#backshadow" + j+ "_1", undefined);
 									j++;
 								}
-						
-								/*
-								if(SeatList[4].getIsSat() == 1 ) {
-									
-								}
-								if(SeatList[3].getIsSat() == 1 ) {
-									send_back_card("505px", "70px", "10", "#backshadow2_1", undefined);
-								}
-								if(SeatList[2].getIsSat() == 1 ) {
-									send_back_card("710px", "70px", "10", "#backshadow3_1", undefined);
-								}								
-								if(SeatList[1].getIsSat() == 1) {
-									send_back_card("665px", "335px", "10", "#backshadow4_1", undefined);
-								}
-								send_second_card();
-								*/
-								/*send_back_card("300px", "70px", "10", "#backshadow1", undefined);
-								send_back_card("505px", "70px", "10", "#backshadow2", undefined);
-								send_back_card("710px", "70px", "10", "#backshadow3", undefined);
-								send_back_card("665px", "335px", "10", "#backshadow4", function() {
-									send_second_card();
-								});*/
 							});						
 						}
 					}
@@ -402,7 +380,7 @@ var set_hand_cards = function(card0, card1) {
 	$('#cards_in_hand2')[0].src = poker_lib.getCard(_suit2, _rank2);	
 };
 
-var send_chips = function(chipId) {
+var send_chips = function(chipId, callback) {
 	var _id = chipId;
 	
 
@@ -410,12 +388,36 @@ var send_chips = function(chipId) {
 	/*console.log($("#seat" + _id).css("left"));
 	console.log($("#seat" + _id).css("top"));*/
 	console.log(chipCoor[SeatList[_id].pos]);
+	console.log($("#seat" + _id).css("width"));
+	console.log($("#seat" + _id).css("left"));
+	console.log($("#seat" + _id).css("top"));
+	console.log( ($("#seat" + _id).css("left").substring(0, $("#seat" + _id).css("left").length - 2 )/1 
+					+ $("#seat" + _id).css("width").substring(0, $("#seat" + _id).css("width").length - 2 )/2) + "px");
+	console.log( $("#seat" + _id).css("width").substring(0, $("#seat" + _id).css("width").length - 2 )/1 );
+	console.log($("#seat" + _id).css("top") + $("#seat" + _id).css("height")/2 );
+
+
 
 	$("#chip" + _id).css({
-		left: chipCoor[SeatList[_id].pos][0],
-		top: chipCoor[SeatList[_id].pos][1]
+		left: ($("#seat" + _id).css("left").substring(0, $("#seat" + _id).css("left").length - 2 )/1 
+					+ $("#seat" + _id).css("width").substring(0, $("#seat" + _id).css("width").length - 2 )/2) + "px",
+		top: ($("#seat" + _id).css("top").substring(0, $("#seat" + _id).css("top").length - 2 )/1 
+					+ $("#seat" + _id).css("height").substring(0, $("#seat" + _id).css("height").length - 2 )/2) + "px"
 	});
 	$("#chip" + _id).show();
+	$("#chip" + _id).animate( 
+		{
+			left: chipCoor[SeatList[_id].pos][0],
+			top: chipCoor[SeatList[_id].pos][1]
+		},
+		{
+			duration: 'slow',
+			complete: function() {
+				if(callback) { callback(); }
+			}
+		}
+	);
+	
 };
 
 
