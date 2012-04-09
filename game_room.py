@@ -502,8 +502,8 @@ class GameRoom(object):
 				broadcast_msg = {"winner": winner_dict.keys()[0].get_user().username}
 				self.broadcast(broadcast_msg, GameRoom.MSG_WINNER)
 			self.status = GameRoom.GAME_WAIT
-		#	self.dispose_and_restart()
-			sys.exit()
+			self.dispose_and_restart()
+			#sys.exit()
 		else:
 			self.create_pot(player_list)
 			self.min_amount = 0
