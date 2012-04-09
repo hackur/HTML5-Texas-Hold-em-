@@ -15,6 +15,9 @@ function msg_sit(data){
 	var username = data.info.user;
 	var stake = data.info.player_stake;
 	SeatList[seatID].sit(username,stake);
+	if(username == window.user_info.username){
+		window.user_info.sit_no = seatID;
+	}
 	
 }
 function msg_bhc(data){ 
@@ -23,6 +26,7 @@ function msg_bhc(data){
 	 * The "some one" may be you. Message should
 	 * be ignored in that case
 	 * */
+	dealCard.deal(data.seat_list);
 }
 function msg_phc(data){ 
 	//Private message: you got hand card
@@ -38,15 +42,16 @@ function msg_phc(data){
 		_suit1 = data.cards[0].charAt(1);
 		_rank1 = data.cards[0].charAt(0);
 	}
-	if(data.cards[0].length == 3){
+	else if(data.cards[0].length == 3){
 		_suit1 = data.cards[0].charAt(2);
 		_rank1 = "10";
 	}
+	
 	if(data.cards[1].length == 2) {
 		_suit2 = data.cards[1].charAt(1);
 		_rank2 = data.cards[1].charAt(0);
 	}
-	if(data.cards[1].length == 3) {
+	else if(data.cards[1].length == 3) {
 		_suit2 = data.cards[1].charAt(2);
 		_rank2 = "10";
 	}
@@ -55,7 +60,12 @@ function msg_phc(data){
 	console.log(_suit2 + " " + _rank2);
 	$('#cards_in_hand1')[0].src = poker_lib.getCard(_suit1, _rank1);
 	$('#cards_in_hand2')[0].src = poker_lib.getCard(_suit2, _rank2);
-	send_first_card(data.small_blind);
+	dealCard.set_hc(['#cards_in_hand1','#cards_in_hand2']);
+
+/*
+	dealCard.deal(window.user_info.sit_no,
+				["#cards_in_hand1","#cards_in_hand2"]);
+	*/
 	//actionButton.enable_buttons();
 }
 function msg_winner(data){

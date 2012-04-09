@@ -11,38 +11,37 @@
 		<script src="poker_lib.js"></script>
 		<script src="sit_transit.js"> </script>
 		<script src="sit_down_dialog.js"> </script>
+		<script src="index.js"></script>
 		<script>
-			window.username = "{{ username }}";
-			window.password = "{{ password }}";
 
 			var login = function(){
+					var username = "{{ username }}";
+					var password = "{{ password }}";
 					$.post(
 						"/login",
 						{username:username, password:password},
 						function(data){
 							console.log("Login success");
-							 enter();
+					//		 enter();
 							 fetch_user_info();
 						},
 						'json'
 					);
+			};
+			function init(){
+				table_init();
+				login();
 			}
-			$(login);
+			$(init);
 		</script>
-		<script src="index.js"></script>
 		<script src="action_button.js"></script>
 		<script src="boardmsg.js"></script>
 		<!-- <script src="animation.js"></script> -->
 		<script src="game_control.js"></script>
+		<script src="send_card.js"></script>
 		<!-- The plugin works on Safari, Chrome, Webkit, Firefox 3.5+, IE9+, and Opera 11+. -->
 		<script src="rotate3Di/jquery-css-transform/jquery-css-transform.js"></script>
 		<script src="rotate3Di/rotate3Di.js"></script>
-
-		<!--	<script src="./jqueryUI/jquery-ui-1.8.18.custom.min.js"></script> -->
-		<!-- <script src="jquery.transit.js"> </script> -->
-		<script>
-			$(table_init);
-		</script>
 	</head>
 	<body>
 		<div id="container" class="view">
@@ -81,7 +80,8 @@
 
 				<div id="send_cards">
 					<img id="backpng1" src="./pokers/back.png" />
-					<img id="cards_in_hand1" src="" />
+					<img id="cards_in_hand1" src="./pokers/club/A.png" />
+					<img id="cards_in_hand2" src="./pokers/heart/A.png" />
 					<img id="back" src="./pokers/back.png" />
 					<img id="backshadow1" class="backcard" src="./pokers/back.png" />
 					<img id="backshadow2" class="backcard" src="./pokers/back.png" />
@@ -96,7 +96,6 @@
 					<img id="backshadow7" class="backcard" src="back.png" /> -->
 
 					<img id="backpng2" src="./pokers/back.png" />
-					<img id="cards_in_hand2" src="" />
 				</div>
 				
 				<div id="board_cards" class="">

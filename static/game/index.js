@@ -46,7 +46,9 @@ var table_init = function() {
 	};
 
 	//window.cardpos = [["300px", "70px"],["505px", "70px"],["710px", "70px"],["665px","335px"]];	//clockwise #seat4,#seat3,#seat2,#seat1
-	window.cardpos = [undefined,["665px","335px"],["710px", "70px"],["505px", "70px"],["300px", "70px"]];
+	
+	//TODO GET cardpos from css. not hard code here
+	window.cardpos = [["390px","360px"],["665px","335px"],["710px", "70px"],["505px", "70px"],["300px", "70px"]];
 
 	window.SeatList = [
 	//carry_chips();
@@ -65,35 +67,12 @@ var table_init = function() {
 
 	actionButton.disable_all();
 
-	console.log(username);
 
 	$.each(SeatList,function(index,seat){
 		take_place(seat.id, seat);
 	});
 	
 	//game_control.deal();
-};
-
-
-var carry_stakes = function() {
-	document.getElementById("carry_stakes_view").style.display = "block";
-	$(function() {
-		$("#slider").slider({
-			value: 200,
-			min: 0,
-			max: 500,
-			step: 50,
-			slide: function(event, ui) {
-				$("#amount").val("$" + ui.value);
-			}
-		});
-		$("#amount").val("$" + $("#slider").slider("value"));
-	});
-	$("#submitButton").click(function() {
-		//console.log($("#amount")[0].value);
-		window.carry_stake = $("#amount")[0].value;
-		document.getElementById("carry_stakes_view").style.display = "none";
-	});
 };
 
 var fetch_user_info = function(){
@@ -108,12 +87,12 @@ var fetch_user_info = function(){
 			user_info.asset = data.s;
 			user_info.level = data.l;
 			console.log(window.user_info);
+			enter();
 		},
 		'json'
 	);
 };
 var enter = function(){
-	console.log("enter success!");
 	var room = 1;
 	$.post(
 		"/enter",
@@ -122,6 +101,7 @@ var enter = function(){
 			console.log("Below is enter data:");
 			console.log(data);
 			if( data.status == "success" ) {
+				console.log("enter success!");
 				listenBoardMessage();
 				console.log(data.room.seats);
 				for(var i = 0; i < data.room.seats.length; i++ ) {
@@ -143,6 +123,7 @@ var enter = function(){
 				window.room_info.min_stake = data.room.min_stake;
 				window.room_info.blind 	   = data.room.blind;
 				window.room_info.timestamp = data.room.timestamp;
+
 
 			}
 						
@@ -192,28 +173,6 @@ var take_place = function(seatID, seatObj) {
 		if(seatObj.getIsSat() == 0)
 		{
 			sit_dialog.show(seatID);
-			/*
-			//console.log(seatID.slice(-1));
-			var id = seatID.slice(-1);
-			var stake = carry_stake.substring(1, carry_stake.length);
-			//console.log(stake);
-			$.ajax({
-				type: "post",
-				url: "/sit-down",
-				data: {seat: id, stake: stake},
-				success: function(data) {
-					console.log("Below is sit-down data:");
-					console.log(data);
-					if(data.status != "success"){
-
-					}
-				},
-				dataType: "json"
-			});
-			seatObj.setIsSat(1);
-			send_first_card();
-			//sit_transit(id);
-			*/
 		}
 		else {
 			console.log(seatObj.getIsSat());
@@ -276,12 +235,12 @@ var send_first_card = function(first_seat_no) {
 								var j = 1;
 								for(i = first_seat_no ,count = 0; count < SeatList.length ; count++, i = i +1 % SeatList.length){
 									var seat = SeatList[i];
-									if(seat.username == window.username || seat.getIsSat() == 0){
+									if(seat.username == window.user_info.username || seat.getIsSat() == 0){
 										return;
 									}
 									console.log(seat);
 									console.log(seat.username);
-									console.log(window.username);
+									console.log(window.user_info.username);
 									console.log(cardpos);
 									console.log(seat.pos);
 									var cur_cardpos = cardpos[seat.pos];
