@@ -15,11 +15,13 @@
 		var transit_id = sit, transit_temp = -1;
 		for (var i = transit_id; i < all_class.length; i++) {
 			++transit_temp;
+			SeatList[i].pos = transit_temp;
 			transit(all_position[transit_temp][0], all_position[transit_temp][1], all_class[i]);
 		}
 
 		for (var i = 0; i < transit_id; i++) {
 			++transit_temp;
+			SeatList[i].pos = transit_temp;
 			transit(all_position[transit_temp][0], all_position[transit_temp][1], all_class[i]);
 		}
 	}

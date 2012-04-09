@@ -79,8 +79,12 @@
 			success: function(data) {
 				console.log("Below is sit-down data:");
 				console.log(data);
-				if(data.status != "success"){
-					alert(data);
+				if(data.status == "success"){
+					sit_transit.transit(id);
+					window.userIsSat = true;
+				}
+				else{
+
 				}
 			},
 			dataType: "json"

@@ -210,9 +210,9 @@ class GameRoom(object):
 				seat.status = Seat.SEAT_PLAYING
 				card_list   = [ str(card) for card in seat.handcards ]
 
-				msg_sent = {"cards": card_list,"Cards in hand": card_list}
+				msg_sent = { "dealer":self.current_dealer, "small_blind":self.small_blind , "big_blind": self.big_blind, "cards": card_list,"Cards in hand": card_list}
 				self.direct_message(msg_sent,seat.get_private_key(),GameRoom.MSG_PHC)
-				self.broadcast({"seat_no":seat.seat_id},GameRoom.MSG_BHC) # HC for Have Card
+				#self.broadcast({"seat_no":seat.seat_id},GameRoom.MSG_BHC) # HC for Have Card
 				#self.direct_message(msg_sent,seat.get_private_key())
 
 		# bet in big blind and small blind by default

@@ -14,10 +14,7 @@ function msg_sit(data){
 	var seatID = data.seat_no;
 	var username = data.info.user;
 	var stake = data.info.player_stake;
-	
-	document.getElementById("name" + seatID).innerHTML = username
-	document.getElementById("money" + seatID).innerHTML = stake;
-	SeatList[seatID].setIsSat(1);
+	SeatList[seatID].sit(username,stake);
 	
 }
 function msg_bhc(data){ 
@@ -29,6 +26,37 @@ function msg_bhc(data){
 }
 function msg_phc(data){ 
 	//Private message: you got hand card
+	console.log("msg_phc is ----------------------------------------------:");
+	console.log(data);
+	console.log(data.cards[0] + "  " + data.cards[1]);
+	var _suit1;
+	var _rank1;
+	var _suit2;
+	var _rank2;
+	
+	if(data.cards[0].length == 2) {
+		_suit1 = data.cards[0].charAt(1);
+		_rank1 = data.cards[0].charAt(0);
+	}
+	if(data.cards[0].length == 3){
+		_suit1 = data.cards[0].charAt(2);
+		_rank1 = "10";
+	}
+	if(data.cards[1].length == 2) {
+		_suit2 = data.cards[1].charAt(1);
+		_rank2 = data.cards[1].charAt(0);
+	}
+	if(data.cards[1].length == 3) {
+		_suit2 = data.cards[1].charAt(2);
+		_rank2 = "10";
+	}
+
+	console.log(_suit1 + " " + _rank1);
+	console.log(_suit2 + " " + _rank2);
+	$('#cards_in_hand1')[0].src = poker_lib.getCard(_suit1, _rank1);
+	$('#cards_in_hand2')[0].src = poker_lib.getCard(_suit2, _rank2);
+	send_first_card(data.small_blind);
+	//actionButton.enable_buttons();
 }
 function msg_winner(data){
 	//We have a winner in this game
@@ -39,6 +67,9 @@ function msg_next(data){
 	 * Rights ( whether user can  call, check,...) will included
 	 * Also amount limits is included ( How much user can put in action)
 	 * */
+	 console.log("msg_next=========================================");
+	console.log(data);
+	actionButton.enable_buttons(data.rights);
 }
 function msg_action(data){
 	/***
@@ -51,6 +82,9 @@ function msg_public_card(data){
 	 * Public cards is updated
 	 * */
 }
+function msg_start_game(data){
+	
+}
 var funs = {
 	'sit':		msg_sit,
 	'bhc':		msg_bhc,
@@ -58,7 +92,9 @@ var funs = {
 	'winner':	msg_winner,
 	'next':		msg_next,
 	'action':	msg_action,
-	'public':	msg_public_card};
+	'public':	msg_public_card,
+	'start':    msg_start_game
+};
 
 function _board_msg_handler(data){
 	
