@@ -32,41 +32,17 @@ function msg_phc(data){
 	//Private message: you got hand card
 	console.log("msg_phc is ----------------------------------------------:");
 	console.log(data);
-	console.log(data.cards[0] + "  " + data.cards[1]);
-	var _suit1;
-	var _rank1;
-	var _suit2;
-	var _rank2;
-	
-	if(data.cards[0].length == 2) {
-		_suit1 = data.cards[0].charAt(1);
-		_rank1 = data.cards[0].charAt(0);
-	}
-	else if(data.cards[0].length == 3){
-		_suit1 = data.cards[0].charAt(2);
-		_rank1 = "10";
-	}
-	
-	if(data.cards[1].length == 2) {
-		_suit2 = data.cards[1].charAt(1);
-		_rank2 = data.cards[1].charAt(0);
-	}
-	else if(data.cards[1].length == 3) {
-		_suit2 = data.cards[1].charAt(2);
-		_rank2 = "10";
-	}
 
-	console.log(_suit1 + " " + _rank1);
-	console.log(_suit2 + " " + _rank2);
-	$('#cards_in_hand1')[0].src = poker_lib.getCard(_suit1, _rank1);
-	$('#cards_in_hand2')[0].src = poker_lib.getCard(_suit2, _rank2);
+	set_hand_cards(data.cards[0], data.cards[1]);
+
+	set_blind(data.small_blind, data.big_blind);
+
 	dealCard.set_hc(['#cards_in_hand1','#cards_in_hand2']);
 
 /*
 	dealCard.deal(window.user_info.sit_no,
 				["#cards_in_hand1","#cards_in_hand2"]);
 	*/
-	//actionButton.enable_buttons();
 }
 function msg_winner(data){
 	//We have a winner in this game

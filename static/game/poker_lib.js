@@ -19,11 +19,8 @@
 				console.log("No such a poker.");
 				break;
 		}
-		//because charAt()
-		if(rank == "T")
-			_rank = "10";
-		else
-			_rank = rank;
+		
+		_rank = rank;
 
 		return "./pokers/" + _suit + "/" + _rank + ".png";
 	};

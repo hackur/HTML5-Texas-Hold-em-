@@ -229,7 +229,7 @@ var send_first_card = function(first_seat_no) {
 				$("#backpng1").rotate3Di(90, "fast", 
 					{
 						complete: function() {
-							console.log("PPPPPPPPPPPPPPPPPPPPPPPPP");
+							console.log("Below is SeatList: ");
 							console.log(SeatList);
 							$('#cards_in_hand1').fadeIn("fast", function() {
 								var j = 1;
@@ -365,6 +365,56 @@ var send_back_card = function(left_cor, top_cor, degree, id, callback) {
 			}
 		}
 	);
+};
+
+var set_hand_cards = function(card0, card1) {
+	var _suit1;
+	var _rank1;
+	var _suit2;
+	var _rank2;
+	
+	if(card0.length == 2) {
+		_suit1 = card0.charAt(1);
+		_rank1 = card0.charAt(0);
+	}
+	if(card0.length == 3){
+		_suit1 = card0.charAt(2);
+		_rank1 = "10";
+	}
+	if(card1.length == 2) {
+		_suit2 = card1.charAt(1);
+		_rank2 = card1.charAt(0);
+	}
+	if(card1.length == 3) {
+		_suit2 = card1.charAt(2);
+		_rank2 = "10";
+	}
+
+	console.log(_suit1 + " " + _rank1);
+	console.log(_suit2 + " " + _rank2);
+	$('#cards_in_hand1')[0].src = poker_lib.getCard(_suit1, _rank1);
+	$('#cards_in_hand2')[0].src = poker_lib.getCard(_suit2, _rank2);	
+};
+
+var set_blind = function(small_blind, big_blind) {
+	var _sb = small_blind;
+	var _bb = big_blind;
+
+	console.log("*************************");
+	console.log($("#seat" + _sb).css("left"));
+	console.log($("#seat" + _sb).css("top"));
+
+	$("#chip" + _sb).css({ 
+		left: $("#seat" + _sb).css("left"),
+		top: $("#seat" + _sb).css("top")
+	}) ;
+	$("#chip" + _sb).show();
+
+	$("#chip" + _bb).css({ 
+		left: $("#seat" + _bb).css("left"),
+		top: $("#seat" + _bb).css("top")
+	}) ;
+	$("#chip" + _bb).show();	
 };
 
 
