@@ -35,8 +35,6 @@ function msg_phc(data){
 
 	set_hand_cards(data.cards[0], data.cards[1]);
 
-	set_blind(data.small_blind, data.big_blind);
-
 	dealCard.set_hc(['#cards_in_hand1','#cards_in_hand2']);
 
 /*
@@ -53,7 +51,7 @@ function msg_next(data){
 	 * Rights ( whether user can  call, check,...) will included
 	 * Also amount limits is included ( How much user can put in action)
 	 * */
-	 console.log("msg_next=========================================");
+	console.log("msg_next=========================================");
 	console.log(data);
 	actionButton.enable_buttons(data.rights);
 }
@@ -62,6 +60,22 @@ function msg_action(data){
 	 * Some one did an action,
 	 * Also, this one can be current user
 	 * */
+	console.log("msg_action=====================================");
+	console.log(data);
+	var _s_b;
+	var _b_b;
+	if(data.action == 7) {
+		_s_b = data.seat_no;
+		document.getElementById("money" + _s_b).innerHTML = data.stake;
+		send_chips(_s_b);
+		console.log("_s_b is : " + _s_b);
+	}
+	if(data.action == 6) {
+		_b_b = data.seat_no;
+		document.getElementById("money" + _b_b).innerHTML = data.stake;
+		send_chips(_b_b);
+		console.log("_b_b is : " + _b_b);
+	}
 }
 function msg_public_card(data){
 	/***

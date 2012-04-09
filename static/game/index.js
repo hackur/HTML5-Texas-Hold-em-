@@ -49,7 +49,13 @@ var table_init = function() {
 	
 	//TODO GET cardpos from css. not hard code here
 	window.cardpos = [["390px","360px"],["665px","335px"],["710px", "70px"],["505px", "70px"],["300px", "70px"]];
-
+	window.chipCoor = 
+		[	["215px","320px"],
+			["515px","320px"],
+			["580px","80px"],
+			["390px","80px"],
+			["150px","80px"]
+		];
 	window.SeatList = [
 	//carry_chips();
 		SeatObj(0,"#seat0",0),
@@ -396,25 +402,20 @@ var set_hand_cards = function(card0, card1) {
 	$('#cards_in_hand2')[0].src = poker_lib.getCard(_suit2, _rank2);	
 };
 
-var set_blind = function(small_blind, big_blind) {
-	var _sb = small_blind;
-	var _bb = big_blind;
+var send_chips = function(chipId) {
+	var _id = chipId;
+	
 
 	console.log("*************************");
-	console.log($("#seat" + _sb).css("left"));
-	console.log($("#seat" + _sb).css("top"));
+	/*console.log($("#seat" + _id).css("left"));
+	console.log($("#seat" + _id).css("top"));*/
+	console.log(chipCoor[SeatList[_id].pos]);
 
-	$("#chip" + _sb).css({ 
-		left: $("#seat" + _sb).css("left"),
-		top: $("#seat" + _sb).css("top")
-	}) ;
-	$("#chip" + _sb).show();
-
-	$("#chip" + _bb).css({ 
-		left: $("#seat" + _bb).css("left"),
-		top: $("#seat" + _bb).css("top")
-	}) ;
-	$("#chip" + _bb).show();	
+	$("#chip" + _id).css({
+		left: chipCoor[SeatList[_id].pos][0],
+		top: chipCoor[SeatList[_id].pos][1]
+	});
+	$("#chip" + _id).show();
 };
 
 
