@@ -82,7 +82,7 @@ class GameRoom(object):
 	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START) \
 				= ('sit','bhc','phc','winner','next','action','public','start')
 	def __init__(self, room_id, owner, dealer, num_of_seats = 9, blind = 10,min_stake=100,max_stake=2000):
-		self.room_id        = room_id
+		self.room_id    = room_id
 		self.owner      = owner
 		self.status     = GameRoom.GAME_WAIT
 		self.dealer     = dealer
@@ -458,14 +458,6 @@ class GameRoom(object):
 		print "_____len(public card)---------------"
 		print len(self.poker_controller.publicCard)
 
-		if self.flop_flag == False:
-			self.poker_controller.getFlop()
-			self.flop_flag = True
-		else:
-			self.poker_controller.getOne()
-		card_list = [ str(card) for card in self.poker_controller.publicCard ]
-		broadcast_msg = {'cards':card_list}
-		self.broadcast(broadcast_msg, GameRoom.MSG_PUBLIC_CARD)
 
 		if self.no_more_stake() or len(playing_list) < 2 or len(self.poker_controller.publicCard) == 5:
 			print "GAME FINISHED!!!"
@@ -509,6 +501,15 @@ class GameRoom(object):
 			self.min_amount = 0
 			self.raise_amount = self.blind
 			self.num_of_checks = 0
+
+			if self.flop_flag == False:
+				self.poker_controller.getFlop()
+				self.flop_flag = True
+			else:
+				self.poker_controller.getOne()
+			card_list = [ str(card) for card in self.poker_controller.publicCard ]
+			broadcast_msg = {'cards':card_list}
+			self.broadcast(broadcast_msg, GameRoom.MSG_PUBLIC_CARD)
 
 
 			self.current_seat = self.info_next(self.current_dealer, [1,3,4,5])
@@ -680,3 +681,8 @@ class GameRoom(object):
 			msg = {'to':timeout }
 			self.broadcast(msg,GameRoom.MSG_START)
 
+	def stand_up(self, user_id):
+		for seat in self.seats:
+			if user_id == seat.user_id:
+				seat.status = Seat.SEAT_EMPTY
+		self.audit_list.append({"user": user_id})
