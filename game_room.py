@@ -461,8 +461,15 @@ class GameRoom(object):
 		print len(self.poker_controller.publicCard)
 
 
-		if self.no_more_stake() or len(self.poker_controller.publicCard) == 5:
+		if self.no_more_stake() or len(playing_list) < 2 or len(self.poker_controller.publicCard) == 5:
 			print "GAME FINISHED!!!"
+			if len(self.poker_controller.publicCard) <= 3:
+				self.poker_controller.getFlop()
+				self.poker_controller.getOne()
+				self.poker_controller.getOne()
+				card_list = [str(card) for card in self.poker_controller.publicCard]
+				broadcast_msg = {"cards": card_list}
+				self.broadcast(broadcast_msg, GameRoom.MSG_PUBLIC_CARD)
 			if len(self.poker_controller.publicCard) == 3:
 				self.poker_controller.getOne()
 				self.poker_controller.getOne()
@@ -498,15 +505,6 @@ class GameRoom(object):
 			self.status = GameRoom.GAME_WAIT
 			self.dispose_and_restart()
 			#sys.exit()
-		elif len(playing_list) < 2:
-			print "We have a winner"
-			print playing_list[0].get_user().username
-			self.create_pot(player_list)
-			for users in self.pot.keys():
-				if playing_list[0].get_user().id in users:
-					playing_list[0].player_stake += self.pot[users]
-			print playing_list[0].player_stake
-
 		else:
 			self.create_pot(player_list)
 			self.min_amount = 0
