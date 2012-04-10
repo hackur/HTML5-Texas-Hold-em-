@@ -132,10 +132,9 @@ class Tester(object):
 		if 'Cards in hand' in msg:
 			self.pKeys[method.routing_key] = 1
 
-		print self.users[0].private_key
-
 		if len(self.pKeys) == 3:
 			self.pKeys = {}
+			return
 			#	print "all in!!!!!!!!!!!!!!!!!!!"
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",

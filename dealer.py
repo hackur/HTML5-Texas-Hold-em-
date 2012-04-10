@@ -123,19 +123,22 @@ class Dealer(object):
 				routing_key = routing_key,
 				body        = pickle.dumps(message))
 
-
 	def cmd_create_room(self, args):
 		print "creating room"
 		self.room_list[args['room_id']] = GameRoom(args["room_id"], args["user_id"], self)
 
-
+#	def cmd_exit(self, args):
+#		print "exiting room"
+#		current_room = self.room_list[args["room_id"]]
+#		current_room.user_action[]
+#		self.room_list[args["room_id"]].exit_room(args["user_id"])
+#		print room.status for room in room_list
 
 	def on_message(self, channel, method, header, body):
 		message = "message received, thanks!"
 		obj = pickle.loads(body)
 		method = getattr(self,"cmd_" + obj['method'])
 		method(obj)
-
 
 	def close(self):
 		self.connection.close()
