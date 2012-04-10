@@ -48,14 +48,14 @@ var table_init = function() {
 	//window.cardpos = [["300px", "70px"],["505px", "70px"],["710px", "70px"],["665px","335px"]];	//clockwise #seat4,#seat3,#seat2,#seat1
 	
 	//TODO GET cardpos from css. not hard code here
-	window.cardpos = [["390px","360px"],["665px","335px"],["710px", "70px"],["505px", "70px"],["300px", "70px"]];
+	window.cardpos = [["390px","360px"],["665px","360px"],["710px", "70px"],["505px", "70px"],["300px", "70px"]];
 	window.chipCoor = 
-		[	["215px","320px"],
-			["515px","320px"],
-			["580px","80px"],
-			["390px","80px"],
-			["150px","80px"]
-		];
+		[	[$("#chip0").css("left"),$("#chip0").css("top")],
+			[$("#chip1").css("left"),$("#chip1").css("top")],
+			[$("#chip2").css("left"),$("#chip2").css("top")],
+			[$("#chip3").css("left"),$("#chip3").css("top")],
+			[$("#chip4").css("left"),$("#chip4").css("top")]
+		];//left,top
 	window.SeatList = [
 	//carry_chips();
 		SeatObj(0,"#seat0",0),
@@ -65,9 +65,9 @@ var table_init = function() {
 		SeatObj(0,"#seat4",4)
 	];
 
-	for(var i = 0; i < 5; i++) { 
+	/*for(var i = 0; i < 5; i++) { 
 			$("#chip" + i).hide();
-	}//hide the chip first
+	}//hide the chip first*/
 
 	//carry_stakes();
 
@@ -205,6 +205,9 @@ var SeatObj = function(IsSat,id,pos) {
 		document.getElementById("money" + id.slice(-1)).innerHTML = _stake;
 		seatObj.setIsSat(1);
 	};
+	seatObj.setStake = function(seat_no, newstake) {
+		document.getElementById("money" + seat_no).innerHTML = newstake;
+	}
 
 	seatObj.id = id;
 	seatObj.pos = pos;
@@ -397,13 +400,15 @@ var send_chips = function(chipId, callback) {
 	console.log($("#seat" + _id).css("top") + $("#seat" + _id).css("height")/2 );
 
 
-
+	//set the chips original top and left 
 	$("#chip" + _id).css({
 		left: ($("#seat" + _id).css("left").substring(0, $("#seat" + _id).css("left").length - 2 )/1 
 					+ $("#seat" + _id).css("width").substring(0, $("#seat" + _id).css("width").length - 2 )/2) + "px",
 		top: ($("#seat" + _id).css("top").substring(0, $("#seat" + _id).css("top").length - 2 )/1 
 					+ $("#seat" + _id).css("height").substring(0, $("#seat" + _id).css("height").length - 2 )/2) + "px"
 	});
+
+	//show it and animate
 	$("#chip" + _id).show();
 	$("#chip" + _id).animate( 
 		{
