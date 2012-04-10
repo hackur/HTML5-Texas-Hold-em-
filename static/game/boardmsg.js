@@ -53,6 +53,9 @@ function msg_next(data){
 	 * */
 	console.log("msg_next=========================================");
 	console.log(data);
+
+	//should be called after dealed card
+	time_bar(data.seat_no);
 	actionButton.enable_buttons(data.rights);
 }
 function msg_action(data){

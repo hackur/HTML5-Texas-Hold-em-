@@ -153,7 +153,6 @@ var listenBoardMessage = function(timestamp) {
 
 			for(var i = 0; i < data.length; i++) {
 				timestamp =data[i].timestamp;
-				console.log("data[i] ++++++++++");
 				console.log(data[i]);
 				board_msg_handler.process(data[i]);
 			}
@@ -390,7 +389,7 @@ var send_chips = function(chipId, callback) {
 	console.log("*************************");
 	/*console.log($("#seat" + _id).css("left"));
 	console.log($("#seat" + _id).css("top"));*/
-	console.log(chipCoor[SeatList[_id].pos]);
+	/*console.log(chipCoor[SeatList[_id].pos]);
 	console.log($("#seat" + _id).css("width"));
 	console.log($("#seat" + _id).css("left"));
 	console.log($("#seat" + _id).css("top"));
@@ -398,7 +397,7 @@ var send_chips = function(chipId, callback) {
 					+ $("#seat" + _id).css("width").substring(0, $("#seat" + _id).css("width").length - 2 )/2) + "px");
 	console.log( $("#seat" + _id).css("width").substring(0, $("#seat" + _id).css("width").length - 2 )/1 );
 	console.log($("#seat" + _id).css("top") + $("#seat" + _id).css("height")/2 );
-
+*/
 
 	//set the chips original top and left 
 	$("#chip" + _id).css({
@@ -423,6 +422,16 @@ var send_chips = function(chipId, callback) {
 		}
 	);
 	
+};
+
+/*  countdownID is number */
+var time_bar = function(countdownID) {
+	$("#countdown" + countdownID).addClass("countdown");
+	$("#countdown" + countdownID).animate({	width: 0}, 20000, function() {
+				$("#countdown" + countdownID).removeClass("countdown");
+				$("#countdown" + countdownID).removeAttr("style");
+			}
+	);
 };
 
 
