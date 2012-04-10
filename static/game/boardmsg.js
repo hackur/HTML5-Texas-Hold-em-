@@ -62,20 +62,11 @@ function msg_action(data){
 	 * */
 	console.log("msg_action=====================================");
 	console.log(data);
-	var _s_b;
-	var _b_b;
-	if(data.action == 7) {
-		_s_b = data.seat_no;
-		document.getElementById("money" + _s_b).innerHTML = data.stake;
-		send_chips(_s_b);
-		console.log("_s_b is : " + _s_b);
-	}
-	if(data.action == 6) {
-		_b_b = data.seat_no;
-		document.getElementById("money" + _b_b).innerHTML = data.stake;
-		send_chips(_b_b);
-		console.log("_b_b is : " + _b_b);
-	}
+	//*document.getElementById("money" + data.seat_no).innerHTML = data.stake;*/
+	SeatList[data.seat_no].setStake(data.seat_no, data.stake);
+	send_chips(data.seat_no);
+	
+
 }
 function msg_public_card(data){
 	/***
