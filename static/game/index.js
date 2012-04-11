@@ -382,7 +382,7 @@ var set_hand_cards = function(card0, card1) {
 	$('#cards_in_hand2')[0].src = poker_lib.getCard(_suit2, _rank2);	
 };
 
-var send_chips = function(chipId, callback) {
+var send_chips = function(chipId, tstake, callback) {
 	var _id = chipId;
 	
 
@@ -421,6 +421,7 @@ var send_chips = function(chipId, callback) {
 			}
 		}
 	);
+	$("#tstake" + chipId).html(tstake);
 	
 };
 
@@ -432,6 +433,11 @@ var time_bar = function(countdownID) {
 				$("#countdown" + countdownID).removeAttr("style");
 			}
 	);
+};
+
+//boardmsg.js--->>>msg_next()   //send call chips, change tstake collect chips and deal 3 PC
+var roundone = function() {
+	
 };
 
 

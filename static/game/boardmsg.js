@@ -66,7 +66,8 @@ function msg_next(data){
 	{ 
 		actionButton.enable_buttons(data.rights);
 		console.log("yes, match!");
-	}	
+		//game_control.deal();
+	}
 }
 function msg_action(data){
 	/***
@@ -77,7 +78,7 @@ function msg_action(data){
 	console.log(data);
 	//*document.getElementById("money" + data.seat_no).innerHTML = data.stake;*/
 	SeatList[data.seat_no].setStake(data.seat_no, data.stake);
-	send_chips(data.seat_no);
+	send_chips(data.seat_no, data.table);
 	
 
 }
