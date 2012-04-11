@@ -26,6 +26,8 @@ function msg_bhc(data){
 	 * The "some one" may be you. Message should
 	 * be ignored in that case
 	 * */
+	console.log("msg_bhc =================================");
+	console.log(data);
 	dealCard.deal(data.seat_list);
 }
 function msg_phc(data){ 
@@ -56,7 +58,14 @@ function msg_next(data){
 
 	//should be called after dealed card
 	time_bar(data.seat_no);
-	actionButton.enable_buttons(data.rights);
+	//if($("#name" + data.seat_no).html())
+	console.log($("#name" + data.seat_no).html());
+	console.log(window.user_info.username);
+	if( $("#name" + data.seat_no).html() == window.user_info.username )
+	{ 
+		actionButton.enable_buttons(data.rights);
+		console.log("yes, match!");
+	}	
 }
 function msg_action(data){
 	/***
