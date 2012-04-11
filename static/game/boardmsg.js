@@ -59,9 +59,10 @@ function msg_next(data){
 	//should be called after dealed card
 	time_bar(data.seat_no);
 	//if($("#name" + data.seat_no).html())
-	console.log($("#name" + data.seat_no).html());
+	//console.log($("#name" + data.seat_no).html());
 	console.log(window.user_info.username);
-	if( $("#name" + data.seat_no).html() == window.user_info.username )
+	console.log(SeatList[data.seat_no].username);
+	if( SeatList[data.seat_no].username == window.user_info.username )
 	{ 
 		actionButton.enable_buttons(data.rights);
 		console.log("yes, match!");

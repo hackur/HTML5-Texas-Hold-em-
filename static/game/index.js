@@ -427,7 +427,7 @@ var send_chips = function(chipId, callback) {
 /*  countdownID is number */
 var time_bar = function(countdownID) {
 	$("#countdown" + countdownID).addClass("countdown");
-	$("#countdown" + countdownID).animate({	width: 0}, 20000, function() {
+	$("#countdown" + countdownID).animate({	width: 0}, 30000, function() {
 				$("#countdown" + countdownID).removeClass("countdown");
 				$("#countdown" + countdownID).removeAttr("style");
 			}
