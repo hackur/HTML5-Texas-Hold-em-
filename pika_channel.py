@@ -52,7 +52,7 @@ class Channel(object):
 			for key in self.binding_keys:
 				print key
 				self.channel.queue_bind(exchange	= self.exchange,
-						queue		= self.queue_name,
+										queue		= self.queue_name,
 										routing_key	= key,
 										callback	= self.on_queue_bound)
 		else:

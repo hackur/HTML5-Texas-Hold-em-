@@ -346,14 +346,15 @@ class GameRoom(object):
 				self.round_finish()
 
 	def discard_game_timeout(self,user_id):
-		seat_no = self.current_seat
+		seat = self.seats[self.current_seat]
+		broadcast_msg = {'action':GameRoom.A_DISCARDGAME, 'seat_no':self.current_seat,'stake':seat.player_stake,'table':seat.table_amount}
+		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
+		# seat_no = self.current_seat
+		print "current seat no.................................................", self.current_seat
 		self.discard_game(user_id)
 
-		seat = self.seats[seat_no]
-		broadcast_msg = {'action':GameRoom.A_DISCARDGAME, 'seat_no':seat_no,'stake':seat.player_stake,'table':seat.table_amount}
-		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
-
 		next_seat = self.seats[self.current_seat]
+		print "next seat no....................................................", next_seat.seat_id
 		self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
 
 	def discard_game(self, user_id):
@@ -517,11 +518,9 @@ class GameRoom(object):
 			else:
 				self.poker_controller.getOne()
 			card_list = [ str(card) for card in self.poker_controller.publicCard ]
+			self.current_seat = self.info_next(self.current_dealer, [1,3,4,5])
 			broadcast_msg = {'cards':card_list}
 			self.broadcast(broadcast_msg, GameRoom.MSG_PUBLIC_CARD)
-
-
-			self.current_seat = self.info_next(self.current_dealer, [1,3,4,5])
 			return
 
 	def distribute_ante(self):
