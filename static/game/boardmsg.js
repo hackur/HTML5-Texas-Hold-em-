@@ -67,6 +67,10 @@ function msg_next(data){
 		actionButton.enable_buttons(data.rights);
 		console.log("yes, match!");
 		//game_control.deal();
+		$("#btCall").click(function() {
+			//console.log(data.amount_limits[2]);
+			roundone(data.seat_no, data.amount_limits[2]);
+		});		
 	}
 }
 function msg_action(data){

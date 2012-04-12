@@ -436,8 +436,10 @@ var time_bar = function(countdownID) {
 };
 
 //boardmsg.js--->>>msg_next()   //send call chips, change tstake collect chips and deal 3 PC
-var roundone = function() {
-	
+var roundone = function(seatNum, callStake) {
+	//console.log(parseInt($("#tstake" + seatNum).html()) + parseInt(callStake));
+	$("#money" + seatNum).html(parseInt($("#money" + seatNum).html()) - parseInt(callStake));
+	$("#tstake" + seatNum).html(parseInt($("#tstake" + seatNum).html()) + parseInt(callStake));
 };
 
 
