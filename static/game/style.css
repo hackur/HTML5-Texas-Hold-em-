@@ -22,8 +22,8 @@ body {
 	width: 939px;
 	position: absolute;
 	background-image: url(./image/leathertable.png);
-	top: 70px;
-	left: 10px;
+	top: 82px;
+	left: 26px;
 }
 
 /* seat */
@@ -39,26 +39,44 @@ body {
 	transition: all 1s;  
 	background-image: url(./image/seat.png);
 }
-#seat4 {
-	top: -45px;
-	left: 195px;
+.seatPos0 {
+	top: 388px;
+	left: 417px;
 }
-#seat3 {
-	top: -45px;
-	left: 400px;
+.seatPos1 {
+	top: 388px;
+	left: 222px;
 }
-#seat2 {
-	top: -45px;
-	left: 605px;
+.seatPos2 {
+	top: 310px;
+	left: 22px;
 }
-#seat0 {
-	top: 325px;
-	left: 255px;
+.seatPos3 {
+	top: 96px;
+	left: 22px;
 }
-#seat1 {
-	top: 325px;
-	left: 555px;
+.seatPos4 {
+	top: 30px;
+	left: 222px;
+}
+.seatPos5 {
+	top: 30px;
+	left: 622px;
+}
+.seatPos6 {
+	top: 96px;
+	left: 810px;
+}
+.seatPos7 {
+	top: 311px;
+	left: 810px;
+}
+.seatPos8 {
+	top: 388px;
+	left: 622px;
 }/* end */
+
+
 
 /* player name */
 .name {
@@ -93,39 +111,79 @@ body {
 	position: absolute;
 	height: 49px;
 	width: 49px;
-	display: none;
+	-moz-transition: all 1s; 
+	-webkit-transition: all 1s;  
+	-ms-transition: all 1s;  
+	-o-transition: all 1s;  
+	transition-timing-function: ease-out;
+	transition: all 1s;  
 }
-#chip0 {
-	top: 320px;
-	left: 215px;
-	background-image: url(./image/l3.png);
-}
-#chip4 {
-	top: 80px;
-	left: 170px;
+.chip5 {
 	background-image: url(./image/l1.png);
 }
-#chip3 {
-	top: 80px;
-	left: 380px;
+.chip10 {
 	background-image: url(./image/l2.png);
 }
-#chip2 {
-	top: 80px;
-	left: 580px;
+.chip100 {
+	background-image: url(./image/l3.png);
+}
+.chip500 {
 	background-image: url(./image/l4.png);
 }
-#chip1 {
-	top: 320px;
-	left: 515px;
+
+.seatPos0 .chip{
+	top: -43px;
+	left: 76px;
+	background-image: url(./image/l4.png);
+}
+.seatPos8 .chip{
+	top: -43px;
+	left: 76px;
+	background-image: url(./image/l2.png);
+}
+.seatPos7 .chip{
+	top: -2px;
+	left: 28px;
+	background-image: url(./image/l3.png);
+}
+.seatPos6 .chip{
+	top: -104px;
+	left: 28px;
 	background-image: url(./image/l1.png);
-}/*end*/
+}
+.seatPos5 .chip{
+	top: -130px;
+	left: -76px;
+	background-image: url(./image/l1.png);
+}
+.seatPos4 .chip{
+	top: -130px;
+	left: -76px;
+	background-image: url(./image/l1.png);
+}
+.seatPos3 .chip{
+	top: -157px;
+	left: -104px;
+	background-image: url(./image/l1.png);
+}
+.seatPos2 .chip{
+	top: -157px;
+	left: 1px;
+	background-image: url(./image/l1.png);
+}
+.seatPos1 .chip{
+	top: 44px;
+	left: -76px;
+	background-image: url(./image/l1.png);
+}
+
 .tstake {
 	font-size: 20px;
 	color: white;
 	position: absolute;
-	top: 40px;
-	left: 12px;
+	top: 0px;
+	left: -50px;
+	/*display: none;*/
 }
 
 /* two cards in hand for 'me' */
