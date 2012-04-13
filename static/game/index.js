@@ -78,6 +78,7 @@ var table_init = function() {
 		take_place(seat.id, seat);
 	});
 	
+	
 	//game_control.deal();
 };
 
@@ -440,6 +441,48 @@ var roundone = function(seatNum, callStake) {
 	//console.log(parseInt($("#tstake" + seatNum).html()) + parseInt(callStake));
 	$("#money" + seatNum).html(parseInt($("#money" + seatNum).html()) - parseInt(callStake));
 	$("#tstake" + seatNum).html(parseInt($("#tstake" + seatNum).html()) + parseInt(callStake));
+};
+
+var collect_chips = function() {
+	for(var i = 0; i <= 4; i++) {
+		if($("#tstake" + i).html() != "0") {
+			$("#chip" + i ).animate(
+				{
+					left: "750px",
+					top: "180px"
+				},
+				{
+					duration: "5000"
+				}
+			);
+		}
+	}
+};
+
+var testFun = function() {
+	$("#btCall").click(function() {
+			//console.log(data.amount_limits[2]);
+			//roundone(data.seat_no, data.amount_limits[2]);
+			var message = { action: 2 };
+			var msg = JSON.stringify(message);
+			console.log(msg);
+			$.ajax({
+				type:'post',
+				url:"/post-board-message",
+				data:{message:msg},
+				success:function(data){
+					console.log("######################");
+					console.log(data);
+					//collect_chips();
+					//roundone(data.seat_no, data.amount_limits[2]);
+					window.flag = 1;
+				},
+				dataType:'json'
+				}
+			);
+			//if(callback) { callback(); }
+	});
+	
 };
 
 

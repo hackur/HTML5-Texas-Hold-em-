@@ -56,6 +56,7 @@ function msg_next(data){
 	console.log("msg_next=========================================");
 	console.log(data);
 
+	window.flag = 0;
 	//should be called after dealed card
 	time_bar(data.seat_no);
 	//if($("#name" + data.seat_no).html())
@@ -65,13 +66,11 @@ function msg_next(data){
 	if( SeatList[data.seat_no].username == window.user_info.username )
 	{ 
 		actionButton.enable_buttons(data.rights);
-		console.log("yes, match!");
+		//console.log("yes, match!");
 		//game_control.deal();
-		$("#btCall").click(function() {
-			//console.log(data.amount_limits[2]);
-			roundone(data.seat_no, data.amount_limits[2]);
-		});		
+		testFun();
 	}
+	//collect_chips();
 }
 function msg_action(data){
 	/***
@@ -83,8 +82,7 @@ function msg_action(data){
 	//*document.getElementById("money" + data.seat_no).innerHTML = data.stake;*/
 	SeatList[data.seat_no].setStake(data.seat_no, data.stake);
 	send_chips(data.seat_no, data.table);
-	
-
+		
 }
 function msg_public_card(data){
 	/***
