@@ -177,10 +177,10 @@ var listenBoardMessage = function(timestamp) {
 
 
 var take_place = function(seatID, seatObj) {
-	$(seatID).click(function() {
+	seatObj.getSeatDIV().click(function() {
 		if(seatObj.getIsSat() == 0)
 		{
-			sit_dialog.show(seatID);
+			sit_dialog.show(seatObj);
 		}
 		else {
 			console.log(seatObj.getIsSat());

@@ -84,6 +84,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		self.render("room-test-ajax.html")
 
 	def initial_call_back(self, argument):
+		print "ENTER CALL BACK",argument
 		if self.callBackCount < 2:
 			#We have to wait broadcast_channel created
 			self.callBackCount += 1

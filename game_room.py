@@ -243,11 +243,17 @@ class GameRoom(object):
 		self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
 
 	def get_seat(self, user_id):
-		return self.seats[self.user_seat[user_id]]
+		if user_id in self.user_seat:
+			return self.seats[self.user_seat[user_id]]
+		else:
+			return None
 		#return filter(lambda seat: seat.get_user() != None and seat.get_user().id == user_id, self.seats)[0]
 
 	def is_valid_seat(self, user_id, current_seat):
 		request_seat = self.get_seat(user_id)
+		if not request_seat:
+			return False
+
 		valid_seat = self.seats[current_seat]
 		if valid_seat == request_seat:
 			print "VALID SEAT"

@@ -79,6 +79,9 @@ function Seat(id,pos){
 				}
 		);
 	};
+	seatObj.getSeatDIV = function(){
+		return divSeat;
+	}
 
 	seatObj.setPos = function(newpos) {
 		divSeat.removeClass(cur_pos);

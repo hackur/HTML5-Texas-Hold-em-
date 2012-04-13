@@ -65,10 +65,10 @@ function msg_next(data){
 	console.log(SeatList[data.seat_no].username);
 	if( SeatList[data.seat_no].username == window.user_info.username )
 	{ 
-		actionButton.enable_buttons(data.rights);
+		actionButton.enable_buttons(data.rights,data.amount_limits);
 		//console.log("yes, match!");
 		//game_control.deal();
-		btCallFun();
+		//btCallFun();
 	}
 	
 	//collect_chips();
@@ -84,6 +84,7 @@ function msg_action(data){
 	SeatList[data.seat_no].setStake(data.stake,data.table);
 	//send_chips(data.seat_no, data.table);
 
+/*
 	$('#btCheck').click(function(){
 		var message = { action: 4 };
 			var msg = JSON.stringify(message);
@@ -103,6 +104,7 @@ function msg_action(data){
 				}
 			);
 	});	
+	*/
 }
 function msg_public_card(data){
 	/***

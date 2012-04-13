@@ -16,7 +16,7 @@
 		var seat = SeatList[seat_no];
 		var backCard = $('<img class="backcard" src="./pokers/back.png" />').appendTo($("#send_cards"));
 
-		var cur_cardpos = window.cardpos[seat.pos];
+		//var cur_cardpos = window.cardpos[seat.pos];
 
 		var nextcard = function(){
 			if(seat.username == user_info.username){
@@ -48,7 +48,8 @@
 			*/
 		};
 
-		send_back_card(cur_cardpos[0], cur_cardpos[1], degree,backCard, nextcard);
+		//send_back_card(cur_cardpos[0], cur_cardpos[1], degree,backCard, nextcard);
+		nextcard();
 		back_cards.push(backCard);
 
 	};

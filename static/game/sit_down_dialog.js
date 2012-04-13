@@ -6,7 +6,7 @@
 	var startY = 0;
 	var barLeft = 0;
 	var barRight = 0;
-	var seat_no;
+	var seatObj;
 	var cur_stake;
 
 	function sit_silder_down(e){
@@ -71,7 +71,7 @@
 	}
 
 	function submitSit(){
-		var id = seat_no.slice(-1);
+		var id = seatObj.id;
 		$.ajax({
 			type: "post",
 			url: "/sit-down",
@@ -91,7 +91,7 @@
 		hide();
 	};
 
-	function show(sit_no){
+	function show(_seatObj){
 		document.getElementById("sit_down_dialog").style.display = "block";
 		$("#submitButton").click(submitSit);
 
@@ -105,7 +105,7 @@
 		cur_stake = window.room_info.min_stake;
 
 		slider_button = document.getElementById("sit_slider_button");
-		seat_no = sit_no;
+		seatObj = _seatObj;
 	};
 	function hide(){
 		window.removeEventListener(event_down, sit_silder_down);
