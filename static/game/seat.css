@@ -1,0 +1,171 @@
+/* seat */
+.seat {
+	height: 149px;
+	width: 135px;
+	position: absolute;
+	-moz-transition: all 1s; 
+	-webkit-transition: all 1s;  
+	-ms-transition: all 1s;  
+	-o-transition: all 1s;  
+	transition-timing-function: ease-out;
+	transition: all 1s;  
+}
+.seatbg{
+	background-image: url(./image/seat.png);
+
+	height: 149px;
+	width: 135px;
+}
+.seatPos0 {
+	top: 388px;
+	left: 417px;
+}
+.seatPos1 {
+	top: 388px;
+	left: 222px;
+}
+.seatPos2 {
+	top: 310px;
+	left: 22px;
+}
+.seatPos3 {
+	top: 96px;
+	left: 22px;
+}
+.seatPos4 {
+	top: 30px;
+	left: 222px;
+}
+.seatPos5 {
+	top: 30px;
+	left: 622px;
+}
+.seatPos6 {
+	top: 96px;
+	left: 810px;
+}
+.seatPos7 {
+	top: 311px;
+	left: 810px;
+}
+.seatPos8 {
+	top: 388px;
+	left: 622px;
+}/* end */
+
+
+
+/* player name */
+.name {
+	font-size: 20px;
+	color: white;
+	position: absolute;
+	top: 70px;
+	left: 50px;
+}/* end */
+
+/* money for players */
+.money {
+	font-size: 20px;
+	color: yellow;
+	position: absolute;
+	top: 100px;
+	left: 43px;
+	font-weight: 900;
+}/* end */
+
+/*  countdown */
+.countdown {
+	height: 84px;
+	width: 68px;
+	position: absolute;
+	top: 8px;
+	left: 33px;
+	background-image: url(./image/timebar.png);
+	display: none;
+}/* end countdown */
+
+/* Top and left are the finally position, original position are reseted in index.js function send_chips() */
+.chip {
+	position: absolute;
+	height: 49px;
+	width: 49px;
+	
+}
+
+.chipStart {
+	top: 30px;
+	left: 50px;
+
+	-moz-transition: all 0.3s; 
+	-webkit-transition: all 0.3s;  
+	-ms-transition: all 0.3s;  
+	-o-transition: all 0.3s;  
+	transition-timing-function: ease-out;
+	transition: all 0.3s;
+	height: 49px;
+	width: 49px;
+	
+	position: absolute;
+}
+.chip5 {
+	background-image: url(./image/l1.png);
+}
+.chip10 {
+	background-image: url(./image/l2.png);
+}
+.chip100 {
+	background-image: url(./image/l3.png);
+}
+.chip500 {
+	background-image: url(./image/l4.png);
+}
+
+.seatPos0 .chip{
+	top: -43px;
+	left: 76px;
+
+}
+.seatPos8 .chip{
+	top: -43px;
+	left: 76px;
+}
+.seatPos7 .chip{
+	top: -2px;
+	left: -28px;
+}
+.seatPos6 .chip{
+	top: 104px;
+	left: -28px;
+}
+.seatPos5 .chip{
+	top: 130px;
+	left: 76px;
+}
+.seatPos4 .chip{
+	top: 130px;
+	left: 76px;
+}
+.seatPos3 .chip{
+	top: 104px;
+	left: 157px;
+}
+.seatPos2 .chip{
+	top: -1px;
+	left: 157px;
+}
+.seatPos1 .chip{
+	top: -43px;
+	left: 76px;
+}
+
+.tstake {
+	font-size: 20px;
+	font-weight: 900;
+	color: yellow;
+	position: absolute;
+	top: 0px;
+	left: -50px;
+	display: none;
+	
+}
