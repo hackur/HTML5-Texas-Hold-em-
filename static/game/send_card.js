@@ -62,6 +62,10 @@
 	}
 	function send_back_card(left_cor, top_cor, degree, card, callback) {
 		var i = 0;
+		if(callback){
+			callback();
+				  }
+				  return;
 		card.animate({
 			left: left_cor,
 			top:  top_cor,

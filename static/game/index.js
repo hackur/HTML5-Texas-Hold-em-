@@ -49,21 +49,23 @@ var table_init = function() {
 	
 	//TODO GET cardpos from css. not hard code here
 	window.cardpos = [["390px","360px"],["665px","360px"],["710px", "70px"],["505px", "70px"],["300px", "70px"]];
-	window.chipCoor = 
+	/*window.chipCoor = 
 		[	[$("#chip0").css("left"),$("#chip0").css("top")],
 			[$("#chip1").css("left"),$("#chip1").css("top")],
 			[$("#chip2").css("left"),$("#chip2").css("top")],
 			[$("#chip3").css("left"),$("#chip3").css("top")],
 			[$("#chip4").css("left"),$("#chip4").css("top")]
 		];//left,top
-	window.SeatList = [
+	*/
+	/*window.SeatList = [
 	//carry_chips();
 		SeatObj(0,"#seat0",0),
 		SeatObj(0,"#seat1",1),
 		SeatObj(0,"#seat2",2),
 		SeatObj(0,"#seat3",3),
 		SeatObj(0,"#seat4",4)
-	];
+	];*/
+	seatInit();
 
 	/*for(var i = 0; i < 5; i++) { 
 			$("#chip" + i).hide();
@@ -188,171 +190,9 @@ var take_place = function(seatID, seatObj) {
 	});
 };
 
-var SeatObj = function(IsSat,id,pos) {
-	var seatObj = {};
-	seatObj.IsSat = IsSat;
 
-	seatObj.getIsSat = function() {
-		return seatObj.IsSat;
-	};
-	seatObj.setIsSat = function(newIsSat) {
-		seatObj.IsSat = newIsSat;
-	};
-	seatObj.sit = function(_username,_stake) {	
-		seatObj.username 	= _username;
-		seatObj.stake 		= _stake;
-		document.getElementById("name" + id.slice(-1)).innerHTML = _username
-		document.getElementById("money" + id.slice(-1)).innerHTML = _stake;
-		seatObj.setIsSat(1);
-	};
-	seatObj.setStake = function(seat_no, newstake) {
-		document.getElementById("money" + seat_no).innerHTML = newstake;
-	}
 
-	seatObj.id = id;
-	seatObj.pos = pos;
 
-	return seatObj;
-};
-
-var send_first_card = function(first_seat_no) {
-		var i = 0;
-		$('#backpng1').animate(
-		{
-			"left": "-=60px", 
-			"top": "+=240px",
-			 width: "84px",
-			 height: "116px"
-		}, 
-		{
-			duration: "fast", 
-			step: function() {
-				i++;
-				$("#backpng1").css("transform", "rotate(" + i + "deg)");
-	            $("#backpng1").css("-moz-transform", "rotate(" + i + "deg)");
-	            $("#backpng1").css("-webkit-transform", "rotate(" + i + "deg)");
-	            $("#backpng1").css("-ms-transform", "rotate(" + i + "deg)");
-	            $("#backpng1").css("-o-transform", "rotate(" + i + "deg)");
-			},
-			complete: function() {
-				$("#backpng1").rotate3Di(90, "fast", 
-					{
-						complete: function() {
-							console.log("Below is SeatList: ");
-							console.log(SeatList);
-							$('#cards_in_hand1').fadeIn("fast", function() {
-								var j = 1;
-								for(i = first_seat_no ,count = 0; count < SeatList.length ; count++, i = i +1 % SeatList.length){
-									var seat = SeatList[i];
-									if(seat.username == window.user_info.username || seat.getIsSat() == 0){
-										return;
-									}
-									console.log(seat);
-									console.log(seat.username);
-									console.log(window.user_info.username);
-									console.log(cardpos);
-									console.log(seat.pos);
-									var cur_cardpos = cardpos[seat.pos];
-									send_back_card(cur_cardpos[0], cur_cardpos[1], "10", "#backshadow" + j+ "_1", undefined);
-									j++;
-								}
-							});						
-						}
-					}
-				);				
-			}
-		});
-};
-
-var send_second_card = function() {
-		// send two cards to everyone  
-		var i = 0;
-		$('#backpng2').animate(
-		{
-			"left": "-=30px", 
-			"top": "+=240px",
-			width: "84px",
-			height: "116px"
-		}, 
-		{
-			duration: "fast", 
-			step: function() {
-				i++;
-				$("#backpng2").css("-moz-transform", "rotate(" + i + "deg)" );
-				$("#backpng2").css("-webkit-transform", "rotate(" + i + "deg)" );
-				$("#backpng2").css("-ms-transform", "rotate(" + i + "deg)" );
-				$("#backpng2").css("-o-transform", "rotate(" + i + "deg)" );
-				$("#backpng2").css("transform", "rotate(" + i + "deg)" );
-			},
-			complete: function() {
-				$("#backpng2").rotate3Di(90, "fast", 
-					{
-						complete: function() {
-							$('#cards_in_hand2').fadeIn("fast", function() {
-								/*send_back_card("300px", "70px", "-10", "#backshadow1", undefined);
-								send_back_card("505px", "70px", "-10", "#backshadow2", undefined);
-								send_back_card("710px", "70px", "-10", "#backshadow3", undefined);
-								send_back_card("665px", "335px", "-10", "#backshadow4", undefined);*/
-								if(SeatList[4].getIsSat() == 1 ) {
-									send_back_card("300px", "70px", "-10", "#backshadow1", undefined);
-								}
-								if(SeatList[3].getIsSat() == 1 ) {
-									send_back_card("505px", "70px", "-10", "#backshadow2", undefined);
-								}
-								if(SeatList[2].getIsSat() == 1 ) {
-									send_back_card("710px", "70px", "-10", "#backshadow3", undefined);
-								}								
-								if(SeatList[1].getIsSat() == 1) {
-									send_back_card("665px", "335px", "-10", "#backshadow4", undefined);
-								}
-							});
-						}
-					}
-				);
-			}
-		});
-};
-
-var send_back_card = function(left_cor, top_cor, degree, id, callback) {
-	var i = 0;
-	$("#back").animate(
-		{
-			left: left_cor,
-			top:  top_cor,
-			width: "30px",
-			height: "41px"
-		}, 
-		{
-			duration: "normal",
-			step: function() {
-				i++;
-				$("#back").css("-moz-transform", "rotate(" + i + "deg)" );
-				$("#back").css("-webkit-transform", "rotate(" + i + "deg)" );
-				$("#back").css("-ms-transform", "rotate(" + i + "deg)" );
-				$("#back").css("-o-transform", "rotate(" + i + "deg)" );
-				$("#back").css("transform", "rotate(" + i + "deg)" );
-			},
-			complete: function() {
-				//set '#backshadow' the same with '#back' and display it...   width and height depand on ratio
-				$(id).css({'top': top_cor,'left': left_cor,'width': '30px','height': '41px'});
-
-				$(id).css("-moz-transform", "rotate(" + degree + "deg)" );
-				$(id).css("-webkit-transform", "rotate(" + degree + "deg)" );
-				$(id).css("-ms-transform", "rotate(" + degree + "deg)" );
-				$(id).css("-o-transform", "rotate(" + degree + "deg)" );
-				$(id).css("transform", "rotate(" + degree + "deg)" );
-				//reset '#back'
-				$("#back").css({'top': '120px', 'left': '450px', 'width': '0px', 'height': '0px'});
-
-				if(callback)
-				{
-					callback();
-				}
-
-			}
-		}
-	);
-};
 
 var set_hand_cards = function(card0, card1) {
 	var _suit1;
@@ -388,27 +228,20 @@ var send_chips = function(chipId, tstake, callback) {
 	
 
 	console.log("*************************");
-	/*console.log($("#seat" + _id).css("left"));
-	console.log($("#seat" + _id).css("top"));*/
-	/*console.log(chipCoor[SeatList[_id].pos]);
-	console.log($("#seat" + _id).css("width"));
-	console.log($("#seat" + _id).css("left"));
-	console.log($("#seat" + _id).css("top"));
-	console.log( ($("#seat" + _id).css("left").substring(0, $("#seat" + _id).css("left").length - 2 )/1 
-					+ $("#seat" + _id).css("width").substring(0, $("#seat" + _id).css("width").length - 2 )/2) + "px");
-	console.log( $("#seat" + _id).css("width").substring(0, $("#seat" + _id).css("width").length - 2 )/1 );
-	console.log($("#seat" + _id).css("top") + $("#seat" + _id).css("height")/2 );
-*/
-
+	var seatid = "#seat" + _id;
+	var pos = SeatList[_id].pos;
+	var chipPos = windows.cardpos[SeatList[_id].pos];
 	//set the chips original top and left 
-	$("#chip" + _id).css({
-		left: ($("#seat" + _id).css("left").substring(0, $("#seat" + _id).css("left").length - 2 )/1 
-					+ $("#seat" + _id).css("width").substring(0, $("#seat" + _id).css("width").length - 2 )/2) + "px",
-		top: ($("#seat" + _id).css("top").substring(0, $("#seat" + _id).css("top").length - 2 )/1 
-					+ $("#seat" + _id).css("height").substring(0, $("#seat" + _id).css("height").length - 2 )/2) + "px"
-	});
-
+	
 	//show it and animate
+	var chip = $('<img class="chip5"/>');
+	chip.css("top",chipPos[1]);
+	chip.css("left",chipPos[0]);
+	var chipClass = "chip" + pos;
+	chip.appendTo("#gametable");
+	chip.addClass(chipClass + " chip" );
+	//.appendTo($("#send_cards"));
+	/*
 	$("#chip" + _id).show();
 	$("#chip" + _id).animate( 
 		{
@@ -422,18 +255,15 @@ var send_chips = function(chipId, tstake, callback) {
 			}
 		}
 	);
+	*/
 	$("#tstake" + chipId).html(tstake);
 	
 };
 
-/*  countdownID is number */
-var time_bar = function(countdownID) {
-	$("#countdown" + countdownID).addClass("countdown");
-	$("#countdown" + countdownID).animate({	width: 0}, 30000, function() {
-				$("#countdown" + countdownID).removeClass("countdown");
-				$("#countdown" + countdownID).removeAttr("style");
-			}
-	);
+/*  ctPos is number */
+var time_bar = function(ctPos) {
+	SeatList[ctPos].setCountdown(ctPos);
+	
 };
 
 //boardmsg.js--->>>msg_next()   //send call chips, change tstake collect chips and deal 3 PC
@@ -459,7 +289,7 @@ var collect_chips = function() {
 	}
 };
 
-var testFun = function() {
+var btCallFun = function() {
 	$("#btCall").click(function() {
 			//console.log(data.amount_limits[2]);
 			//roundone(data.seat_no, data.amount_limits[2]);
@@ -475,7 +305,7 @@ var testFun = function() {
 					console.log(data);
 					//collect_chips();
 					//roundone(data.seat_no, data.amount_limits[2]);
-					window.flag = 1;
+					//window.flag = 1;
 				},
 				dataType:'json'
 				}

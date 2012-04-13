@@ -56,7 +56,7 @@ function msg_next(data){
 	console.log("msg_next=========================================");
 	console.log(data);
 
-	window.flag = 0;
+	//window.flag = 0;
 	//should be called after dealed card
 	time_bar(data.seat_no);
 	//if($("#name" + data.seat_no).html())
@@ -68,8 +68,9 @@ function msg_next(data){
 		actionButton.enable_buttons(data.rights);
 		//console.log("yes, match!");
 		//game_control.deal();
-		testFun();
+		btCallFun();
 	}
+	
 	//collect_chips();
 }
 function msg_action(data){
@@ -80,17 +81,39 @@ function msg_action(data){
 	console.log("msg_action=====================================");
 	console.log(data);
 	//*document.getElementById("money" + data.seat_no).innerHTML = data.stake;*/
-	SeatList[data.seat_no].setStake(data.seat_no, data.stake);
-	send_chips(data.seat_no, data.table);
-		
+	SeatList[data.seat_no].setStake(data.stake,data.table);
+	//send_chips(data.seat_no, data.table);
+
+	$('#btCheck').click(function(){
+		var message = { action: 4 };
+			var msg = JSON.stringify(message);
+			console.log(msg);
+			$.ajax({
+				type:'post',
+				url:"/post-board-message",
+				data:{message:msg},
+				success:function(data){
+					console.log("######################");
+					console.log(data);
+					//collect_chips();
+					//roundone(data.seat_no, data.amount_limits[2]);
+					//window.flag = 1;
+				},
+				dataType:'json'
+				}
+			);
+	});	
 }
 function msg_public_card(data){
 	/***
 	 * Public cards is updated
 	 * */
+	 console.log("msg_public_card ==================================");
+	 console.log(data);
 }
 function msg_start_game(data){
-	
+	console.log("msg_start_game================================");
+	console.log(data);
 }
 var funs = {
 	'sit':		msg_sit,

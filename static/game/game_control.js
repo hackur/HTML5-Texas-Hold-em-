@@ -5,7 +5,7 @@
 
 	var deal = function() {
 		/* draw roundRec time bar here*/
-
+		//round_one();
 		$('#btCall').click(function() {			
 			if($("#card0")[0].src == "" || $("#card1")[0].src == "" || $("#card2")[0].src == "")
 			{
@@ -21,6 +21,7 @@
 						});
 					});
 				});
+				//round_one();
 
 			}
 			else 
