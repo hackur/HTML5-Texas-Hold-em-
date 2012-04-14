@@ -87,7 +87,19 @@ function msg_public_card(data){
 	 * */
 	 console.log("msg_public_card ==================================");
 	 console.log(data);
+	 
+	 var cards = ["#card0","#card1","#card2","#card3","#card4"];
 
+	 for(var i = 0; i < data.cards.length; i++){
+		if($(cards[i])[0].src == ""){
+			console.log("Card i = " + i);
+	 		poker_lib.setCard(data.cards[i], cards[i]);
+			$(cards[i]).fadeIn("fast");
+		}
+
+	 }
+
+/*
 	if($("#card0")[0].src == "" || $("#card1")[0].src == "" || $("#card2")[0].src == "")
 	 {
 	 	poker_lib.setCard(data.cards[0], '#card0');
@@ -112,6 +124,7 @@ function msg_public_card(data){
 			}
 	 	}
 	 }
+*/
 
 }
 function msg_start_game(data){
@@ -131,6 +144,10 @@ function msg_start_game(data){
 	countDown();
 	
 }
+function msg_pot(data){
+	console.log("POT!!!!!!!!!!!!!!!!!!!!!!!");
+	console.log(data);
+}
 var funs = {
 	'sit':		msg_sit,
 	'bhc':		msg_bhc,
@@ -139,7 +156,8 @@ var funs = {
 	'next':		msg_next,
 	'action':	msg_action,
 	'public':	msg_public_card,
-	'start':    msg_start_game
+	'start':    msg_start_game,
+	'pot':  	msg_pot
 };
 
 function _board_msg_handler(data){

@@ -163,8 +163,9 @@ class GameRoom(object):
 			broadcast_msg = {'action':action, 'seat_no':seat_no,'stake':seat.player_stake,'table':seat.table_amount}
 			self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
 
-			next_seat = self.seats[self.current_seat]
-			self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
+			if self.status != GameRoom.GAME_WAIT:
+				next_seat = self.seats[self.current_seat]
+				self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
 
 	def clearCountDown(self):
 		if self.countdown:
@@ -469,14 +470,14 @@ class GameRoom(object):
 
 		if self.no_more_stake() or len(playing_list) < 2 or len(self.poker_controller.publicCard) == 5:
 			print "GAME FINISHED!!!"
-			if len(self.poker_controller.publicCard) <= 3:
+			if len(self.poker_controller.publicCard) < 3:
 				self.poker_controller.getFlop()
 				self.poker_controller.getOne()
 				self.poker_controller.getOne()
 				card_list = [str(card) for card in self.poker_controller.publicCard]
 				broadcast_msg = {"cards": card_list}
 				self.broadcast(broadcast_msg, GameRoom.MSG_PUBLIC_CARD)
-			if len(self.poker_controller.publicCard) == 3:
+			elif len(self.poker_controller.publicCard) == 3:
 				self.poker_controller.getOne()
 				self.poker_controller.getOne()
 				card_list = [ str(card) for card in self.poker_controller.publicCard ]
@@ -491,9 +492,11 @@ class GameRoom(object):
 			for player in player_list:
 				print player.get_user().username
 			self.create_pot(player_list)
-			#TODO BUG
-			#pot_msg = {'pot': self.pot}
-			#self.broadcast(pot_msg, GameRoom.MSG_POT)
+
+			pot_info = [ (users,amount) for users,amount in self.pot.iteritems() ]
+			pot_msg = {'pot': pot_info}
+			self.broadcast(pot_msg, GameRoom.MSG_POT)
+
 #			self.poker_controller.get_winner()
 			winner_dict = {}
 			ante_dict = self.distribute_ante()
@@ -534,9 +537,10 @@ class GameRoom(object):
 			self.broadcast(broadcast_msg, GameRoom.MSG_PUBLIC_CARD)
 			if len(playing_list) != self.num_of_checks:
 				self.create_pot(player_list)
-				#TODO BUG
-				#pot_msg = {'pot': self.pot}
-				#self.broadcast(pot_msg, GameRoom.MSG_POT)
+				pot_info = [ (users,amount) for users,amount in self.pot.iteritems() ]
+				pot_msg = {'pot': pot_info}
+				self.broadcast(pot_msg, GameRoom.MSG_POT)
+
 			self.num_of_checks = 0
 			return
 
