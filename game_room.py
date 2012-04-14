@@ -286,6 +286,7 @@ class GameRoom(object):
 	def call_stake(self, user_id, amount = 0, inComplete_all_in_flag = False):
 		print "CALL!"
 		print "num_of_checks: ", self.num_of_checks
+		self.num_of_checks = 0
 		command = GameRoom.A_CALLSTAKE
 
 		seat_no = self.current_seat
@@ -320,6 +321,7 @@ class GameRoom(object):
 	def raise_stake(self, user_id,  amount):
 		print "RAISE!"
 		print "num_of_checks: ", self.num_of_checks
+		self.num_of_checks = 0
 		amount          	= int(amount)
 		command         	= 3
 		seat_no         	= self.current_seat
@@ -385,6 +387,7 @@ class GameRoom(object):
 	def all_in(self, user_id):
 		print "FULL POWER! ALL INNNNNNNNN!!!!!!!!"
 		print "num_of_checks: ", self.num_of_checks
+		self.num_of_checks = 0
 		command  = 1
 		seat_no  = self.current_seat
 		amount   = self.amount_limits[GameRoom.A_ALLIN]
@@ -709,6 +712,7 @@ class GameRoom(object):
 		for seat in player_list:
 			seat.status = Seat.SEAT_WAITING
 		for seat in go_away_list:
+			print seat.get_user().id
 			self.stand_up(seat.get_user().id)
 		if len(player_list) >= 2 and not self.t:
 			timeout = 5
@@ -720,6 +724,7 @@ class GameRoom(object):
 		for seat in self.seats:
 			if not seat.is_empty and user_id == seat.user_id:
 				seat.status = Seat.SEAT_EMPTY
+				print "broadcasting standup msg"
 				standup_msg = {"seat no": seat.seat_id, "user_id": user_id}
 				self.broadcast(standup_msg, GameRoom.MSG_STAND_UP)
 		self.audit_list.append({"user": user_id})
