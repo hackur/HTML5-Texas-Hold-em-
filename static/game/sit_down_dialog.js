@@ -33,6 +33,7 @@
 				hide();
 				return;
 			}
+			e.preventDefault();
 		}
 	
 	}
@@ -95,7 +96,6 @@
 		document.getElementById("sit_down_dialog").style.display = "block";
 		$("#submitButton").click(submitSit);
 
-		console.log(event_down);
 		window.addEventListener(event_down, sit_silder_down);
 		window.addEventListener(event_up, 	sit_silder_up);
 		barLeft = $("#sit_slider_bar").offset().left;

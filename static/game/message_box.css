@@ -1,0 +1,32 @@
+
+
+.message_box{
+	left:334px;
+	top:6px;	
+	width:291px;
+	height:100px; /*43px;*/
+	position:absolute;
+}
+.message_box_entry{
+	background-image: url(./image/message_box.png);  
+	width:291px;
+	height:43px;
+	-moz-transition: all 0.5s; 
+	-webkit-transition: all 0.5s;  
+	-ms-transition: all 0.5s;  
+	-o-transition: all 0.5s;  
+	transition-timing-function: ease-out;
+	transition: all 0.5s;  
+	position:absolute;
+	top:0px;
+}
+.message_box_content{
+	text-align:center;
+	vertical-align:middle;
+	font-weight:bold;
+	color: white;
+	font-size: 20px;
+	top:10px;
+	width:291px;
+	position:absolute;
+}
