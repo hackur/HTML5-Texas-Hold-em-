@@ -17,6 +17,7 @@ function Seat(id,pos){
 	var divName = $('<div class="name">name</div>');
 	var divMoney = $('<div class="money">money</div>');
 	var divCountdown = $('<div class="countdown"></div>');
+	var divCount = $('<div class="countdown down"></div>');
 	var divChip = $('<div class="chip"> </div>');
 	var divStake = $('<div class="tstake"></div>');
 	var cur_pos = "seatPos" + pos;
@@ -26,6 +27,7 @@ function Seat(id,pos){
 	divName.appendTo(divSeat);
 	divMoney.appendTo(divSeat);
 	divCountdown.appendTo(divSeat);
+	divCount.appendTo(divCountdown);
 	divSeat.addClass(cur_pos);
 	divSeat.appendTo($("#container"));
 	
@@ -73,23 +75,27 @@ function Seat(id,pos){
 	}
 
 	seatObj.setCountdown = function(position) {
-		divCountdown.removeClass("countdown");
-		divCountdown.addClass("countdown");
+		divCount.removeClass("countdown down");
+		divCount.addClass("countdown down");
 	//	var ct = ".countdown" + position;
 		//$(ct).css('height', );
-		divCountdown.show();
+		divCount.show();
 		//$("#countdown" + countdownID).addClass("countdown");
-		divCountdown.animate({ top: '92px', height: 0}, 10000, function() {
-					divCountdown.hide();
-					divCountdown.removeAttr("style");
+		divCount.animate({ top : 92 }, 10000, function() {
+					divCount.hide();
+					divCount.removeAttr("style");
 				}
 		);
+	/*	setTimeout(function(){
+			divCountdown.css("top", "92px");
+			divCountdown.css("height", "0px");
+		},1);*/
 	};
 
 	seatObj.removeCountdown = function(position) {
-		divCountdown.stop();
-		divCountdown.hide();
-		divCountdown.removeAttr("style");
+		divCount.stop();
+		divCount.hide();
+		divCount.removeAttr("style");
 	};
 
 	seatObj.getSeatDIV = function(){
