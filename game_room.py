@@ -491,8 +491,9 @@ class GameRoom(object):
 			for player in player_list:
 				print player.get_user().username
 			self.create_pot(player_list)
-			pot_msg = {'pot': self.pot}
-			self.broadcast(pot_msg, GameRoom.MSG_POT)
+			#TODO BUG
+			#pot_msg = {'pot': self.pot}
+			#self.broadcast(pot_msg, GameRoom.MSG_POT)
 #			self.poker_controller.get_winner()
 			winner_dict = {}
 			ante_dict = self.distribute_ante()

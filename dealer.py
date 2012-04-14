@@ -12,11 +12,8 @@ import database
 from database import DatabaseConnection,User,Room
 import tornado.ioloop
 from pika.adapters.tornado_connection import TornadoConnection
-try:
-	import cpickle as pickle
-except:
-	import pickle
 
+import json
 
 class Dealer(object):
 	#   users = []
@@ -102,12 +99,12 @@ class Dealer(object):
 			message = {"status": "failed", "msg": msg}
 		self.channel.basic_publish( exchange    = self.exchange,
 				routing_key = source,
-				body        = pickle.dumps(message))
+				body        = json.dumps(message))
 
 	def broadcast(self, routing_key, msg):
 		self.channel.basic_publish(exchange     = self.exchange,
 				routing_key = routing_key,
-				body        = pickle.dumps(msg))
+				body        = json.dumps(msg))
 
 	def cmd_enter(self,args):
 		if args['room_id'] not in self.room_list:
@@ -121,7 +118,7 @@ class Dealer(object):
 		message     = {'status':'success', "room":current_room.to_listener()}
 		self.channel.basic_publish( exchange    = self.exchange,
 				routing_key = routing_key,
-				body        = pickle.dumps(message))
+				body        = json.dumps(message))
 
 	def cmd_create_room(self, args):
 		print "creating room"
@@ -136,7 +133,7 @@ class Dealer(object):
 
 	def on_message(self, channel, method, header, body):
 		message = "message received, thanks!"
-		obj = pickle.loads(body)
+		obj = json.loads(body)
 		method = getattr(self,"cmd_" + obj['method'])
 		method(obj)
 

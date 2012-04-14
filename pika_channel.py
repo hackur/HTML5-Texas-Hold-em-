@@ -1,8 +1,4 @@
 import json
-try:
-    import cpickle as pickle
-except:
-    import pickle
 import pika
 class Channel(object):
 	tag = 0
@@ -78,7 +74,7 @@ class Channel(object):
 
 	def on_room_message(self, channel, method, header, body):
 		pika.log.info('PikaCient: Message receive, delivery tag #%i' % method.delivery_tag)
-		self.messages.append(pickle.loads(body))
+		self.messages.append(json.loads(body))
 		print self.message_actions
 		for element in self.message_actions:
 			element['functor'](element['argument'])
@@ -90,6 +86,7 @@ class Channel(object):
 		print "connection close---"
 		if self.request and not self.request.request.connection.stream.closed():
 			if len(self.request.session['messages']) > 0:
+				print self.request.session['messages']
 				self.request.write(json.dumps(self.request.session['messages']));
 			try:
 				self.request.finish()

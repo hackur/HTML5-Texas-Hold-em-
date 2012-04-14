@@ -4,9 +4,9 @@ import sys
 import time
 
 try:
-    import cpickle as pickle
+    import cjson as json
 except:
-    import pickle
+    import json
 
 exchange	= 'dealer_exchange_1'
 room_id		= 1
@@ -24,10 +24,6 @@ import database
 from database import DatabaseConnection,User,Room
 import tornado.ioloop
 from pika.adapters.tornado_connection import TornadoConnection
-try:
-	import cpickle as pickle
-except:
-	import pickle
 
 class User(object):
 	def __init__(self,user_id,seat):
@@ -59,19 +55,19 @@ class Tester(object):
 		for user in self.users:
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 								routing_key="dealer",
-								body=pickle.dumps({'method':'enter','source':'IAMGOD', "room_id":1, "user_id":user.user_id}))
+								body=json.dumps({'method':'enter','source':'IAMGOD', "room_id":1, "user_id":user.user_id}))
 
 		self.channel.basic_publish(exchange='dealer_exchange_1',
 								routing_key="dealer",
-								body=pickle.dumps({'method':'sit','source':'IAMGOD','user_id':1, "room_id":1, "seat":1,"private_key":self.users[0].private_key, "stake":200}))
+								body=json.dumps({'method':'sit','source':'IAMGOD','user_id':1, "room_id":1, "seat":1,"private_key":self.users[0].private_key, "stake":200}))
 
 		self.channel.basic_publish(exchange='dealer_exchange_1',
 								routing_key="dealer",
-								body=pickle.dumps({'method':'sit','source':'IAMGOD','user_id':2, "room_id":1, "seat":2,"private_key":self.users[1].private_key, "stake":100}))
+								body=json.dumps({'method':'sit','source':'IAMGOD','user_id':2, "room_id":1, "seat":2,"private_key":self.users[1].private_key, "stake":100}))
 
 #		self.channel.basic_publish(exchange='dealer_exchange_1',
 #								routing_key="dealer",
-#								body=pickle.dumps({'method':'sit','source':'IAMGOD','user_id':3, "room_id":1, "seat":3,"private_key":self.users[2].private_key, "stake":500}))
+#								body=json.dumps({'method':'sit','source':'IAMGOD','user_id':3, "room_id":1, "seat":3,"private_key":self.users[2].private_key, "stake":500}))
 
 	def on_queue_declared(self, frame):
 		for user in self.users:
@@ -127,8 +123,8 @@ class Tester(object):
 		self.connection = TornadoConnection(param, on_open_callback=self.on_connected)
 		self.connection.set_backpressure_multiplier(100000)
 	def on_message(self,ch, method, properties, body):
-		print " [x] %r:%r" % (method.routing_key, pickle.loads(body),)
-		msg = pickle.loads(body)
+		print " [x] %r:%r" % (method.routing_key, json.loads(body),)
+		msg = json.loads(body)
 		if 'Cards in hand' in msg:
 			self.pKeys[method.routing_key] = 1
 
@@ -137,71 +133,71 @@ class Tester(object):
 			#	print "all in!!!!!!!!!!!!!!!!!!!"
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':3,'user_id':1,
+						body=json.dumps({'method':'action','action':3,'user_id':1,
 							"room_id":1, "private_key":self.users[0].private_key, "amount":20}))
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':3,'user_id':2,
+						body=json.dumps({'method':'action','action':3,'user_id':2,
 							"room_id":1, "private_key":self.users[1].private_key, "amount":40}))
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':2,'user_id':1,
+						body=json.dumps({'method':'action','action':2,'user_id':1,
 							"room_id":1, "private_key":self.users[0].private_key, "amount":80}))
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':4,'user_id':2,
+						body=json.dumps({'method':'action','action':4,'user_id':2,
 							"room_id":1, "private_key":self.users[1].private_key, "amount":160}))
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':4,'user_id':2,
+						body=json.dumps({'method':'action','action':4,'user_id':2,
 						"room_id":1, "private_key":self.users[1].private_key}))
 
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':4,'user_id':1,
+						body=json.dumps({'method':'action','action':4,'user_id':1,
 							"room_id":1, "private_key":self.users[0].private_key, "amount":10}))
 
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':4,'user_id':2,
+						body=json.dumps({'method':'action','action':4,'user_id':2,
 							"room_id":1, "private_key":self.users[1].private_key}))
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 							routing_key="dealer",
-							body=pickle.dumps({'method':'action','action':4,'user_id':1,
+							body=json.dumps({'method':'action','action':4,'user_id':1,
 							"room_id":1, "private_key":self.users[0].private_key}))
 
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 							routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':1,'user_id':2,
+						body=json.dumps({'method':'action','action':1,'user_id':2,
 						"room_id":1, "private_key":self.users[1].private_key}))
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
-						body=pickle.dumps({'method':'action','action':2,'user_id':1,
+						body=json.dumps({'method':'action','action':2,'user_id':1,
 							"room_id":1, "private_key":self.users[0].private_key}))
 #
 #			self.channel.basic_publish(exchange='dealer_exchange_1',
 #						routing_key="dealer",
-#						body=pickle.dumps({'method':'action','action':1,'user_id':1,
+#						body=json.dumps({'method':'action','action':1,'user_id':1,
 #						"room_id":1, "private_key":self.users[0].private_key}))
 
 
 	#		self.channel.basic_publish(exchange='dealer_exchange_1',
 	#					routing_key="dealer",
-	#					body=pickle.dumps({'method':'action','action':1,'user_id':1,
+	#					body=json.dumps({'method':'action','action':1,'user_id':1,
 	#						"room_id":1, "private_key":self.users[0].private_key}))
 
 			#self.channel.basic_publish(exchange='dealer_exchange_1',
 			#			routing_key="dealer",
-			#			body=pickle.dumps({'method':'action','action':2,'user_id':1,
+			#			body=json.dumps({'method':'action','action':2,'user_id':1,
 			#			"room_id":1, "private_key":1}))
 
 if __name__ == "__main__":
@@ -263,12 +259,12 @@ if __name__ == "__main__":
 #	for user in users:
 #		channel.basic_publish(exchange='dealer_exchange_1',
 #							routing_key="dealer",
-#							body=pickle.dumps({'method':'enter','source':'IAMGOD', "room_id":1, "user_id":user.user_id}))
+#							body=json.dumps({'method':'enter','source':'IAMGOD', "room_id":1, "user_id":user.user_id}))
 #
 #	for user in users:
 #		channel.basic_publish(exchange='dealer_exchange_1',
 #							routing_key="dealer",
-#							body=pickle.dumps({'method':'sit','source':'IAMGOD','user_id':user.user_id, "room_id":1, "seat":user.seat,"private_key":user.private_key}))
+#							body=json.dumps({'method':'sit','source':'IAMGOD','user_id':user.user_id, "room_id":1, "seat":user.seat,"private_key":user.private_key}))
 #
 #
 #	channel.start_consuming()

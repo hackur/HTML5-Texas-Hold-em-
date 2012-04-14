@@ -18,10 +18,6 @@ import database
 from database import DatabaseConnection,User,Room
 from authenticate import *
 from pika_channel import Channel
-try:
-    import cpickle as pickle
-except:
-    import pickle
 
 
 
@@ -59,7 +55,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 								'room_id'		: user.room.id,
 								'private_key'	: private_key}
 
-		arguments			= {'routing_key': 'dealer', 'message': pickle.dumps(message)}
+		arguments			= {'routing_key': 'dealer', 'message': json.dumps(message)}
 		broadcast_channel	= Channel(	self.application.channel,
 										broadcast_queue,
 										exchange,
@@ -132,7 +128,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 							'source':source_key, 'room_id':user.room.id,
 							'private_key':self.session['private_key'] ,'stake':stake}
 
-			arguments		= {'routing_key': 'dealer', 'message':pickle.dumps(message)}
+			arguments		= {'routing_key': 'dealer', 'message':json.dumps(message)}
 			self.channel	= Channel(self.application.channel,queue_name, exchange_name, (source_key,))
 			self.channel.add_ready_action(self.sit_call_back, arguments)
 			self.channel.connect()
@@ -173,9 +169,9 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 		message['method']		= 'action'
 		message['private_key']	= self.session['private_key']
 		message['room_id']		= user.room.id
-		arguments				= {'routing_key':'dealer', 'message':pickle.dumps(message)}
+		arguments				= {'routing_key':'dealer', 'message':json.dumps(message)}
 		self.channel			= Channel(self.application.channel,queue, exchange, [])
-		self.channel.publish_message("dealer", pickle.dumps(message));
+		self.channel.publish_message("dealer", json.dumps(message));
 		self.finish("{\'status\':\'success\'}");
 
 

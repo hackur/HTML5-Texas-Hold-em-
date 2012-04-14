@@ -19,10 +19,6 @@ import database
 from database import DatabaseConnection,User,Room
 from authenticate import *
 from pika_channel import Channel
-try:
-    import cpickle as pickle
-except:
-    import pickle
 
 class UserInfoHandler(tornado.web.RequestHandler):
 	@authenticate
