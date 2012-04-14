@@ -27,6 +27,7 @@
 				message_boxes.splice(message_boxes.indexOf(msg),1);
 			});
 		},expire * 1000);
+		return contentbox;
 	}
 	message_box.showMessage = showMessage;
 

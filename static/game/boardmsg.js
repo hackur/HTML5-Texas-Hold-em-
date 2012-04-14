@@ -117,6 +117,19 @@ function msg_public_card(data){
 function msg_start_game(data){
 	console.log("msg_start_game================================");
 	console.log(data);
+	var seconds = parseInt(data.to);
+	var contentDIV = window.message_box.showMessage("XXXYYY",seconds);
+
+	var countDown = function(){
+		contentDIV.html(
+				"Game start in " +  seconds + " seconds");
+		if(seconds > 0){
+			setTimeout(countDown,1000);
+		}
+		seconds--;
+	}
+	countDown();
+	
 }
 var funs = {
 	'sit':		msg_sit,
