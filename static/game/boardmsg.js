@@ -86,27 +86,6 @@ function msg_action(data){
 	SeatList[data.seat_no].setStake(data.stake,data.table);
 	//send_chips(data.seat_no, data.table);
 
-/*
-	$('#btCheck').click(function(){
-		var message = { action: 4 };
-			var msg = JSON.stringify(message);
-			console.log(msg);
-			$.ajax({
-				type:'post',
-				url:"/post-board-message",
-				data:{message:msg},
-				success:function(data){
-					console.log("######################");
-					console.log(data);
-					//collect_chips();
-					//roundone(data.seat_no, data.amount_limits[2]);
-					//window.flag = 1;
-				},
-				dataType:'json'
-				}
-			);
-	});	
-	*/
 }
 function msg_public_card(data){
 	/***
@@ -114,11 +93,32 @@ function msg_public_card(data){
 	 * */
 	 console.log("msg_public_card ==================================");
 	 console.log(data);
-	 poker_lib.setCard(data.cards[0], '#card0');
-	 poker_lib.setCard(data.cards[1], '#card1');
-	 poker_lib.setCard(data.cards[2], '#card2');
-	 poker_lib.setCard(data.cards[3], '#card3');
-	 poker_lib.setCard(data.cards[4], '#card4');
+
+	if($("#card0")[0].src == "" || $("#card1")[0].src == "" || $("#card2")[0].src == "")
+	 {
+	 	poker_lib.setCard(data.cards[0], '#card0');
+		poker_lib.setCard(data.cards[1], '#card1');
+		poker_lib.setCard(data.cards[2], '#card2');
+	 	roundOne();
+	 	console.log("roundOne............");
+	 }
+	 else {
+	 	if($("#card3")[0].src == "")
+	 	{
+	 		poker_lib.setCard(data.cards[3], '#card3');
+	 		roundTwo();
+	 		console.log("roundTwo......");
+	 	}	
+	 	else {
+	 		if($("#card4")[0].src == "")
+			{
+				poker_lib.setCard(data.cards[4], '#card4');
+				roundThree();
+				console.log("roundThree......");
+			}
+	 	}
+	 }
+
 }
 function msg_start_game(data){
 	console.log("msg_start_game================================");
