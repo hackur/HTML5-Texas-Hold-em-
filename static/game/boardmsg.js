@@ -118,7 +118,7 @@ function msg_start_game(data){
 	console.log("msg_start_game================================");
 	console.log(data);
 	var seconds = parseInt(data.to);
-	var contentDIV = window.message_box.showMessage("XXXYYY",seconds);
+	var contentDIV = window.message_box.showMessage("",seconds);
 
 	var countDown = function(){
 		contentDIV.html(
