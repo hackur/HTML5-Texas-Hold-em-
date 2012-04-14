@@ -79,8 +79,8 @@ class GameRoom(object):
 	(GAME_WAIT,GAME_PLAY) = (0,1)
 	(A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND) = (1,2,3,4,5,6,7)
 
-	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START,MSG_POT) \
-				= ('sit','bhc','phc','winner','next','action','public','start','pot')
+	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START,MSG_POT,MSG_STAND_UP) \
+				= ('sit','bhc','phc','winner','next','action','public','start','pot','standup')
 	def __init__(self, room_id, owner, dealer, num_of_seats = 9, blind = 10,min_stake=100,max_stake=2000):
 		self.room_id    = room_id
 		self.owner      = owner
@@ -699,8 +699,11 @@ class GameRoom(object):
 		self.max_stake = max_stake
 		self.raise_amount = blind
 		player_list = filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)
+		go_away_list = filter(lambda seat: not seat.is_empty() and seat.player_stake == 0, self.seats)
 		for seat in player_list:
 			seat.status = Seat.SEAT_WAITING
+		for seat in go_away_list:
+			self.stand_up(seat.get_user().id)
 		if len(player_list) >= 2 and not self.t:
 			timeout = 5
 			self.t = self.ioloop.add_timeout(time.time() + timeout, self.start_game)
@@ -709,6 +712,8 @@ class GameRoom(object):
 
 	def stand_up(self, user_id):
 		for seat in self.seats:
-			if user_id == seat.user_id:
+			if not seat.is_empty and user_id == seat.user_id:
 				seat.status = Seat.SEAT_EMPTY
+				standup_msg = {"seat no": seat.seat_id, "user_id": user_id}
+				self.broadcast(standup_msg, GameRoom.MSG_STAND_UP)
 		self.audit_list.append({"user": user_id})
