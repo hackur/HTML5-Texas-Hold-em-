@@ -35,7 +35,9 @@ function msg_phc(data){
 	console.log("msg_phc is ----------------------------------------------:");
 	console.log(data);
 
-	set_hand_cards(data.cards[0], data.cards[1]);
+	//set_hand_cards(data.cards[0], data.cards[1]);
+	poker_lib.setCard(data.cards[0], '#cards_in_hand1');
+	poker_lib.setCard(data.cards[1], '#cards_in_hand2');
 
 	dealCard.set_hc(['#cards_in_hand1','#cards_in_hand2']);
 
@@ -112,6 +114,11 @@ function msg_public_card(data){
 	 * */
 	 console.log("msg_public_card ==================================");
 	 console.log(data);
+	 poker_lib.setCard(data.cards[0], '#card0');
+	 poker_lib.setCard(data.cards[1], '#card1');
+	 poker_lib.setCard(data.cards[2], '#card2');
+	 poker_lib.setCard(data.cards[3], '#card3');
+	 poker_lib.setCard(data.cards[4], '#card4');
 }
 function msg_start_game(data){
 	console.log("msg_start_game================================");

@@ -156,7 +156,7 @@ var listenBoardMessage = function(timestamp) {
 
 			for(var i = 0; i < data.length; i++) {
 				timestamp =data[i].timestamp;
-				console.log(data[i]);
+				//console.log(data[i]);
 				board_msg_handler.process(data[i]);
 			}
 
@@ -191,37 +191,26 @@ var take_place = function(seatID, seatObj) {
 };
 
 
+/*var set_card = function(card, cardDivId) {
+	var _suit;
+	var _rank;
 
-
-
-var set_hand_cards = function(card0, card1) {
-	var _suit1;
-	var _rank1;
-	var _suit2;
-	var _rank2;
-	
-	if(card0.length == 2) {
-		_suit1 = card0.charAt(1);
-		_rank1 = card0.charAt(0);
+	console.log(card);
+	if (card.length == 2) {
+		_suit = card.charAt(1);
+		_rank = card.charAt(0);
 	}
-	if(card0.length == 3){
-		_suit1 = card0.charAt(2);
-		_rank1 = "10";
+	if (card.length == 3) {
+		_suit = card.charAt(2);
+		_rank = "10";
 	}
-	if(card1.length == 2) {
-		_suit2 = card1.charAt(1);
-		_rank2 = card1.charAt(0);
+	if (card.length != 2 && card.length != 3) {
+		console.log("ERROR!!!");
+		return;
 	}
-	if(card1.length == 3) {
-		_suit2 = card1.charAt(2);
-		_rank2 = "10";
-	}
-
-	console.log(_suit1 + " " + _rank1);
-	console.log(_suit2 + " " + _rank2);
-	$('#cards_in_hand1')[0].src = poker_lib.getCard(_suit1, _rank1);
-	$('#cards_in_hand2')[0].src = poker_lib.getCard(_suit2, _rank2);	
-};
+	console.log(_suit + " " + _rank);
+	$(cardDivId)[0].src = poker_lib.getCard(_suit, _rank);
+};*/
 
 var send_chips = function(chipId, tstake, callback) {
 	var _id = chipId;
@@ -267,11 +256,11 @@ var time_bar = function(ctPos) {
 };
 
 //boardmsg.js--->>>msg_next()   //send call chips, change tstake collect chips and deal 3 PC
-var roundone = function(seatNum, callStake) {
+/*var roundone = function(seatNum, callStake) {
 	//console.log(parseInt($("#tstake" + seatNum).html()) + parseInt(callStake));
 	$("#money" + seatNum).html(parseInt($("#money" + seatNum).html()) - parseInt(callStake));
 	$("#tstake" + seatNum).html(parseInt($("#tstake" + seatNum).html()) + parseInt(callStake));
-};
+};*/
 
 var collect_chips = function() {
 	for(var i = 0; i <= 4; i++) {
@@ -287,6 +276,21 @@ var collect_chips = function() {
 			);
 		}
 	}
+};
+
+var roundOne = function() {
+	$("#card0").fadeIn("fast", function() {
+		$("#card1").fadeIn("fast", function() {
+			$("#card2").fadeIn("fast");
+		});
+	});
+};
+var roundTwo = function() {
+	$("#card3").fadeIn("fast");	
+};
+
+var roundThree = function() {
+	$("#card4").fadeIn("fast");
 };
 
 var btCallFun = function() {

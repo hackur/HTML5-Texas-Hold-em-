@@ -25,7 +25,29 @@
 		return "./pokers/" + _suit + "/" + _rank + ".png";
 	};
 
-	poker_lib.getCard = getCard;
+	var setCard = function(card, cardDivId) {
+		var _suit;
+		var _rank;
+
+		console.log(card);
+		if (card.length == 2) {
+			_suit = card.charAt(1);
+			_rank = card.charAt(0);
+		}
+		if (card.length == 3) {
+			_suit = card.charAt(2);
+			_rank = "10";
+		}
+		if (card.length != 2 && card.length != 3) {
+			console.log("ERROR!!!");
+			return;
+		}
+		console.log(_suit + " " + _rank);
+		$(cardDivId)[0].src = getCard(_suit, _rank);
+	};
+
+	poker_lib.setCard = setCard;
+	//poker_lib.getCard = getCard;
 
 }(window.poker_lib = window.poker_lib || {}, jQuery));
 
