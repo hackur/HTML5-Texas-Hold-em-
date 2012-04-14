@@ -5,7 +5,8 @@ class Channel(object):
 	def __init__(self, channel, queue_name, exchange, binding_keys,
 					request=None,
 					durable_queue = False,
-					declare_queue_only = False):
+					declare_queue_only = False,
+					arguments = {}):
 		# Construct a queue name we'll use for this instance only
 		self.channel		= channel
 		self.exchange		= exchange
@@ -19,6 +20,7 @@ class Channel(object):
 		self.closing		= False
 		self.declare_queue_only = declare_queue_only
 		self.consumer_tag   = None
+		self.arguments 		= arguments
 
 	def connect(self):
 		pika.log.info('Declaring Queue')
@@ -28,7 +30,8 @@ class Channel(object):
 								auto_delete	= not self.durable_queue,
 								durable		= self.durable_queue,
 								exclusive	= not self.durable_queue, # durable_queue may be shared
-								callback	= self.on_queue_declared)
+								callback	= self.on_queue_declared,
+								arguments 	= self.arguments)
 		else:
 			self.channel.queue_declare(
 								auto_delete	= not self.durable_queue,

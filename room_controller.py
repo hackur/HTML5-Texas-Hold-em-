@@ -61,7 +61,8 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 										exchange,
 										(private_key, public_key),
 										durable_queue = True,
-										declare_queue_only=True)
+										declare_queue_only=True,
+										arguments = {"x-expires":int(15000)})
 
 		self.callBackCount = 0
 		broadcast_channel.add_ready_action(self.initial_call_back, arguments)

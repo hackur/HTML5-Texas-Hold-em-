@@ -96,9 +96,10 @@ class Tester(object):
 	def on_exchange_declared(self,frame):
 		self.channel.queue_declare(queue    = self.queue,
 				auto_delete = True,
-				durable     = False,
+				durable     = True,
 				exclusive   = False,
-				callback=self.on_queue_declared)
+				callback=self.on_queue_declared,
+				arguments = {"x-expires":15000})
 
 
 	def on_channel_open(self,channel):
@@ -167,18 +168,18 @@ class Tester(object):
 						routing_key="dealer",
 						body=json.dumps({'method':'action','action':2,'user_id':2,
 							"room_id":1, "private_key":self.users[1].private_key}))
-#
-#			self.channel.basic_publish(exchange='dealer_exchange_1',
-#							routing_key="dealer",
-#							body=json.dumps({'method':'action','action':4,'user_id':1,
-#							"room_id":1, "private_key":self.users[0].private_key}))
-#
-#
-#			self.channel.basic_publish(exchange='dealer_exchange_1',
-#							routing_key="dealer",
-#						body=json.dumps({'method':'action','action':1,'user_id':2,
-#						"room_id":1, "private_key":self.users[1].private_key}))
-#
+
+			self.channel.basic_publish(exchange='dealer_exchange_1',
+							routing_key="dealer",
+							body=json.dumps({'method':'action','action':1,'user_id':2,
+							"room_id":1, "private_key":self.users[0].private_key}))
+
+
+			self.channel.basic_publish(exchange='dealer_exchange_1',
+							routing_key="dealer",
+						body=json.dumps({'method':'action','action':2,'user_id':1,
+						"room_id":1, "private_key":self.users[1].private_key}))
+
 #			self.channel.basic_publish(exchange='dealer_exchange_1',
 #						routing_key="dealer",
 #						body=json.dumps({'method':'action','action':2,'user_id':1,

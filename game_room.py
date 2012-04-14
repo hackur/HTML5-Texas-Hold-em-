@@ -66,6 +66,7 @@ class Seat(object):
 			result['user'] = None
 			return
 
+		result['uid'] = self._user.id
 		result['user'] = self._user.username
 		result['status'] = self.status
 		result['table_amount']  = self.table_amount
@@ -153,15 +154,21 @@ class GameRoom(object):
 		seat_no  = self.current_seat
 		if self.is_valid_seat(user_id, seat_no) and self.is_valid_rights(action, seat_no):
 			self.clearCountDown()
+			seat = self.seats[seat_no]
 			if action != GameRoom.A_RAISESTAKE:
+				if action in self.amount_limits:
+					broadcast_msg = {'action':action, 'seat_no':seat_no,'stake':seat.player_stake-self.amount_limits[action],\
+							'table':seat.table_amount+self.amount_limits[action]}
+				else:
+					broadcast_msg = {'action':action, 'seat_no':seat_no,'stake':seat.player_stake,'table':seat.table_amount}
+				self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
 				self.actions[action](user_id)
 			else:
-				amount = args['amount']
+				amount = int(args['amount'])
+				broadcast_msg = {'action':action, 'seat_no':seat_no,'stake':seat.player_stake-amount,'table':seat.table_amount+amount}
+				self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
 				self.actions[action](user_id,amount)
 
-			seat = self.seats[seat_no]
-			broadcast_msg = {'action':action, 'seat_no':seat_no,'stake':seat.player_stake,'table':seat.table_amount}
-			self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
 
 			if self.status != GameRoom.GAME_WAIT:
 				next_seat = self.seats[self.current_seat]
@@ -332,10 +339,9 @@ class GameRoom(object):
 			self.raise_amount 	= amount
 			self.min_amount     = self.seats[seat_no].table_amount
 			self.current_seat   = self.info_next(seat_no, [1, 2, 3, 5])
-
 		else:
-			print "RAISE INVALID AMOUNT OF MONEY!"
-			sys.exit()
+			print "RAISE INVALID AMOUNT OF MONEY! GET OUT OF HERE!!!!"
+			self.discard_game(user_id)
 
 	def check(self, user_id):
 		print "CHECK!"
@@ -712,7 +718,6 @@ class GameRoom(object):
 		for seat in player_list:
 			seat.status = Seat.SEAT_WAITING
 		for seat in go_away_list:
-			print seat.get_user().id
 			self.stand_up(seat.get_user().id)
 		if len(player_list) >= 2 and not self.t:
 			timeout = 5
@@ -722,7 +727,7 @@ class GameRoom(object):
 
 	def stand_up(self, user_id):
 		for seat in self.seats:
-			if not seat.is_empty and user_id == seat.user_id:
+			if not seat.is_empty() and user_id == seat.get_user().id:
 				seat.status = Seat.SEAT_EMPTY
 				print "broadcasting standup msg"
 				standup_msg = {"seat no": seat.seat_id, "user_id": user_id}
