@@ -533,8 +533,9 @@ class GameRoom(object):
 			self.broadcast(broadcast_msg, GameRoom.MSG_PUBLIC_CARD)
 			if len(playing_list) != self.num_of_checks:
 				self.create_pot(player_list)
-				pot_msg = {'pot': self.pot}
-				self.broadcast(pot_msg, GameRoom.MSG_POT)
+				#TODO BUG
+				#pot_msg = {'pot': self.pot}
+				#self.broadcast(pot_msg, GameRoom.MSG_POT)
 			self.num_of_checks = 0
 			return
 
