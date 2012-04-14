@@ -69,20 +69,23 @@ function Seat(id,pos){
 	};
 
 	seatObj.setCountdown = function(position) {
-		divCountdown.addClass("countdown" + position);
-		var ct = ".countdown" + position;
-		$(ct).show();
+		divCountdown.removeClass("countdown");
+		divCountdown.addClass("countdown");
+	//	var ct = ".countdown" + position;
+		//$(ct).css('height', );
+		divCountdown.show();
 		//$("#countdown" + countdownID).addClass("countdown");
-		$(ct).animate({ top: '92px', height: 0}, 30000, function() {
-					$(".countdown").removeClass("countdown" + position);
-					$(".countdown").removeAttr("style");
+		divCountdown.animate({ top: '92px', height: 0}, 10000, function() {
+					divCountdown.hide();
+					divCountdown.removeAttr("style");
 				}
 		);
 	};
 
 	seatObj.removeCountdown = function(position) {
-		$(".countdown").removeClass("countdown" + position);
-		$(".countdown").removeAttr("style");
+		divCountdown.stop();
+		divCountdown.hide();
+		divCountdown.removeAttr("style");
 	};
 
 	seatObj.getSeatDIV = function(){
