@@ -48,6 +48,7 @@ function msg_phc(data){
 }
 function msg_winner(data){
 	//We have a winner in this game
+	message_box.showMessage("WINNER!!! ",5)
 }
 function msg_next(data){
 	/**
@@ -92,7 +93,6 @@ function msg_public_card(data){
 
 	 for(var i = 0; i < data.cards.length; i++){
 		if($(cards[i])[0].src == ""){
-			console.log("Card i = " + i);
 	 		poker_lib.setCard(data.cards[i], cards[i]);
 			$(cards[i]).fadeIn("fast");
 		}

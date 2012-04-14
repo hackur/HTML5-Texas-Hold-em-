@@ -1,19 +1,16 @@
 
 function Seat(id,pos){
 	var seatObj = {};
-
-
-				/*
-				<div id="seat0" class="seat seatPos0">
-					<div class="chip">
-						<div id="tstake0" class="tstake">0</div>
-					</div>
-					<div id="name0" class="name">name</div>
-					<div id="money0" class="money">money</div>
-					<div id="countdown0"></div>
-					
-				</div>
-				*/
+		/*
+		<div id="seat0" class="seat seatPos0">
+			<div class="chip">
+				<div id="tstake0" class="tstake">0</div>
+			</div>
+			<div id="name0" class="name">name</div>
+			<div id="money0" class="money">money</div>
+			<div id="countdown0"></div>
+		</div>
+		*/
 	var divSeat = $('<div class="seat"></div>');
 	var divSeatbg = $('<div class="seatbg"></div>');
 

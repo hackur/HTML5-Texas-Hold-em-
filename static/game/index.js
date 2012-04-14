@@ -106,11 +106,11 @@ var enter = function(){
 				console.log(SeatList);
 
 
-				window.room_info = {};
-				window.room_info.max_stake = data.room.max_stake;
-				window.room_info.min_stake = data.room.min_stake;
-				window.room_info.blind 	   = data.room.blind;
-				window.room_info.timestamp = data.room.timestamp;
+				window.room_info = data.room;
+				//max_stake;
+				//min_stake;
+				//blind;
+				//timestamp;
 
 
 			}
@@ -213,18 +213,3 @@ var collect_chips = function() {
 	}
 };
 
-var roundOne = function() {
-	$("#card0").fadeIn("fast", function() {
-		$("#card1").fadeIn("fast", function() {
-			$("#card2").fadeIn("fast");
-		});
-	});
-};
-var roundTwo = function() {
-	$("#card3").fadeIn("fast");	
-};
-
-var roundThree = function() {
-	$("#card4").fadeIn("fast");
-};
-		

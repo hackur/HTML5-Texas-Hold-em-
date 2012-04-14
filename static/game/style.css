@@ -75,9 +75,10 @@ body {
 
 /*  five cards for table*/
 .round {
-	top: 140px;
+	top: 170px;
 	position: absolute;
 	display: none;
+	width:65px;
 }
 #card0 {
 
