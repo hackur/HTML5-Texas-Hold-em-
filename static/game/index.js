@@ -37,6 +37,13 @@ function decide_event(){
 		window.touch_enable = false;
 	}
 
+	if( $.browser.webkit ) {
+			eventTransitionEnd = "webkitTransitionEnd";
+	} else if( $.browser.mozilla ) {
+			eventTransitionEnd = "transitionend";
+	} else if ($.browser.opera) {
+			eventTransitionEnd = "oTransitionEnd";
+	}
 }
 var table_init = function() {
 	decide_event();

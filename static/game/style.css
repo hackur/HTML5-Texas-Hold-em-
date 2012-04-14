@@ -100,5 +100,20 @@ body {
 
 	left: 580px;
 }/*end*/
+.potWrapper{
+	height: 70px;
+	width: 450px;
+	position: absolute;
+	top: 170px;
+	left:265px;
+}
+.potSpan{
+	height:49px;
+	width:49px;
+}
+.potChip{
+	height:49px;
+	width:49px;
+}
 
 

@@ -39,9 +39,11 @@ function Seat(id,pos){
 			IsSat = newIsSat;
 	};
 
-	seatObj.sit = function(_username,_stake) {	
+	seatObj.sit = function(_username,_stake,_user_id) {	
 				seatObj.username 	= _username;
 				seatObj.stake 		= _stake;
+				seatObj.userid		= _user_id;
+
 				divName.html(_username);
 				divMoney.html(_stake);
 				//document.getElementById("money" + id.slice(-1)).innerHTML = _stake;
@@ -62,8 +64,13 @@ function Seat(id,pos){
 				},1);
 				divStake.html(newtable);
 				divStake.show();
+				chips.push(newChip);
 			}
 	};
+	seatObj.clearStake = function(){
+		table = 0;
+		divStake.hide();
+	}
 
 	seatObj.setCountdown = function(position) {
 		divCountdown.removeClass("countdown");
@@ -87,13 +94,20 @@ function Seat(id,pos){
 
 	seatObj.getSeatDIV = function(){
 		return divSeat;
-	}
+	};
+
+	seatObj.getChipDIV = function(){
+		return divChip;
+	};
 
 	seatObj.setPos = function(newpos) {
 		divSeat.removeClass(cur_pos);
 		cur_pos = "seatPos" + newpos;
 		divSeat.addClass(cur_pos);
 	};
+	seatObj.getChips = function(){
+		return chips;
+	}
 	//seatObj.sendChip = function(chip)
 
 	seatObj.id = id;

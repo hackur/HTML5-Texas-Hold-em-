@@ -14,7 +14,8 @@ function msg_sit(data){
 	var seatID = data.seat_no;
 	var username = data.info.user;
 	var stake = data.info.player_stake;
-	SeatList[seatID].sit(username,stake);
+	var userid = data.info.uid;
+	SeatList[seatID].sit(username,stake,userid);
 	if(username == window.user_info.username){
 		window.user_info.sit_no = seatID;
 	}
@@ -145,7 +146,10 @@ function msg_start_game(data){
 	
 }
 function msg_pot(data){
-	console.log("POT!!!!!!!!!!!!!!!!!!!!!!!");
+	pot_manager.update(data.pot);
+}
+function msg_standup(data){
+	console.log("Stand up");
 	console.log(data);
 }
 var funs = {
@@ -157,7 +161,8 @@ var funs = {
 	'action':	msg_action,
 	'public':	msg_public_card,
 	'start':    msg_start_game,
-	'pot':  	msg_pot
+	'pot':  	msg_pot,
+	'standup':	msg_standup
 };
 
 function _board_msg_handler(data){
