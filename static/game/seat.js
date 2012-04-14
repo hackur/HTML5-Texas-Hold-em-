@@ -79,6 +79,12 @@ function Seat(id,pos){
 				}
 		);
 	};
+
+	seatObj.removeCountdown = function(position) {
+		$(".countdown").removeClass("countdown" + position);
+		$(".countdown").removeAttr("style");
+	};
+
 	seatObj.getSeatDIV = function(){
 		return divSeat;
 	}
