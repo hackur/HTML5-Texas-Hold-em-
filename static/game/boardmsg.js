@@ -90,15 +90,8 @@ function msg_public_card(data){
 	 console.log("msg_public_card ==================================");
 	 console.log(data);
 	 
-	 var cards = ["#card0","#card1","#card2","#card3","#card4"];
-
-	 for(var i = 0; i < data.cards.length; i++){
-		if($(cards[i])[0].src == ""){
-	 		poker_lib.setCard(data.cards[i], cards[i]);
-			$(cards[i]).fadeIn("fast");
-		}
-
-	 }
+	 
+	 dealCard.send_public_card(data.cards);
 
 /*
 	if($("#card0")[0].src == "" || $("#card1")[0].src == "" || $("#card2")[0].src == "")
@@ -141,7 +134,7 @@ function msg_start_game(data){
 			setTimeout(countDown,1000);
 		}
 		seconds--;
-	}
+	};
 	countDown();
 	
 }

@@ -98,7 +98,7 @@ var enter = function(){
 			if( data.status == "success" ) {
 				console.log("enter success!");
 				listenBoardMessage();
-				console.log(data.room.seats);
+				//console.log(data.room.seats);
 				for(var i = 0; i < data.room.seats.length; i++ ) {
 					if(i < SeatList.length){
 						if(data.room.seats[i] == null ) {							
@@ -107,10 +107,16 @@ var enter = function(){
 						else {
 							SeatList[i].sit(data.room.seats[i].user,
 									data.room.seats[i].player_stake);
+							
+							if( SeatList[i].username == window.user_info.username ) {
+								sit_transit.transit(i);
+								console.log("-----------------------" + i);
+								dealCard.send_public_card(data.room.publicCard);
+							}
 						}
 					}
 				}
-				console.log(SeatList);
+				//console.log(SeatList);
 
 
 				window.room_info = data.room;

@@ -1,6 +1,6 @@
 
 body {
-	
+	text-align: center;
 }
 
 .view {
@@ -116,4 +116,13 @@ body {
 	width:49px;
 }
 
+
+/* left1: 342px left2:px*/
+#stakeholder {
+	height: 70px;
+	width: 450px;
+	position: absolute;
+	top: 170px;
+	left:265px;
+}
 

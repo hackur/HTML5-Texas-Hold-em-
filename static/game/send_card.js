@@ -108,8 +108,20 @@
 			card.remove();
 		});
 	};
+	function send_public_card(cards) {
+		 var _cards = ["#card0","#card1","#card2","#card3","#card4"];
+
+		 for(var i = 0; i < cards.length; i++){
+			if($(_cards[i])[0].src == ""){
+		 		poker_lib.setCard(cards[i], _cards[i]);
+				$(_cards[i]).fadeIn("fast");
+			}
+
+		 }
+	};
 	dealCard.deal = deal;
 	dealCard.clear = clear;
 	dealCard.set_hc = set_hc;
+	dealCard.send_public_card = send_public_card;
 
 }(window.dealCard = window.dealCard || {} ,jQuery));
