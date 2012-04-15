@@ -80,8 +80,8 @@ class GameRoom(object):
 	(GAME_WAIT,GAME_PLAY) = (0,1)
 	(A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND) = (1,2,3,4,5,6,7)
 
-	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START,MSG_POT,MSG_STAND_UP) \
-				= ('sit','bhc','phc','winner','next','action','public','start','pot','standup')
+	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START,MSG_POT,MSG_STAND_UP,MSG_SHOWDOWN) \
+				= ('sit','bhc','phc','winner','next','action','public','start','pot','standup','showdown')
 	def __init__(self, room_id, owner, dealer, num_of_seats = 9, blind = 10,min_stake=100,max_stake=2000):
 		self.room_id    = room_id
 		self.owner      = owner
@@ -508,19 +508,21 @@ class GameRoom(object):
 
 #			self.poker_controller.get_winner()
 			winner_dict = {}
+			msg_dict 	= {}
 			ante_dict = self.distribute_ante()
-			winner_dict = {k:v for k, v in ante_dict.items() if v > 0} #filter(lambda seat: winner_dict[seat] != 0, ante_dict)
+			winner_dict = {k:v for k, v in ante_dict.iteritems() if v > 0} #filter(lambda seat: winner_dict[seat] != 0, ante_dict)
 			print "winner_dict: ", winner_dict
-			if len(winner_dict) > 1:
-				for seat in winner_dict.keys():
-					card_list = []
-					for card in seat.handcards:
-						card_list.append(str(card))
-					print card_list
-					seat.player_stake += winner_dict[seat]
-					print "%s's stake: %d" %(seat.get_user().username, seat.player_stake)
-					broadcast_msg = {"winner": seat.get_user().username, "handcards": card_list}
-					self.broadcast(broadcast_msg,GameRoom.MSG_WINNER)
+			if len(player_list) > 1:
+				for seat in player_list:
+					card_list = [str(card) for card in seat.handcards]
+					if seat in winner_dict.keys():
+						seat.player_stake += winner_dict[seat]
+						pot = [amount["pid"] for users, amount in self.pot.iteritems() if seat._user.id in users]
+						msg_dict.update({seat._user.id:{"isWin":True,"earned":winner_dict[seat],"pot": pot, "stake": seat.player_stake, "handcards": card_list}})
+					else:
+						msg_dict.update({seat._user.id:{"isWin":False, "stake":seat.player_stake, "handcards": card_list}})
+				self.broadcast(msg_dict ,GameRoom.MSG_WINNER)
+				print msg_dict
 			else:
 				winner_dict.keys()[0].player_stake += winner_dict.values()[0]
 				print "%s's stake: %d" %(winner_dict.keys()[0].get_user().username,winner_dict.keys()[0].player_stake)
@@ -562,6 +564,7 @@ class GameRoom(object):
 				print item.get_user().id;
 
 			for owner, ante in self.pot.iteritems():
+				ante = ante["amount"]
 				share_list = filter(lambda seat: seat.get_user().id in owner and seat.status != Seat.SEAT_WAITING, rank_list[i])
 				for user in share_list:
 					if user in ante_dict:
@@ -569,7 +572,7 @@ class GameRoom(object):
 					else:
 						ante_dict[user] = math.floor(ante/len(share_list))
 				if len(share_list) > 0 :
-					self.pot[owner] = 0
+					self.pot[owner]["amount"] = 0
 
 		print ante_dict
 		return ante_dict
@@ -599,8 +602,8 @@ class GameRoom(object):
 
 		pot_owner = tuple(pot_owner)
 		if pot_owner not in self.pot:
-			self.pot[pot_owner] = 0
-		self.pot[pot_owner] += min_bet * len(player_list)
+			self.pot[pot_owner] = {"amount":0, "pid":len(self.pot)}
+		self.pot[pot_owner]["amount"] += min_bet * len(player_list)
 		print self.pot
 		self.create_pot(player_list)
 
