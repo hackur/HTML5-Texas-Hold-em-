@@ -9,7 +9,6 @@
 	-o-transition: all 1s;  
 	transition-timing-function: ease-out;
 	transition: all 1s;  
-	overflow:hidden;
 }
 .seatbg{
 	background-image: url(./image/seat.png);
