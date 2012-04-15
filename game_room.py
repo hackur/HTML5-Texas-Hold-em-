@@ -498,9 +498,8 @@ class GameRoom(object):
 
 			print "We have a winner!"
 	#		print self.poker_controller.publicCard
-			for player in player_list:
-				print player.get_user().username
 			self.create_pot(player_list)
+			player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING or seat.status == Seat.SEAT_ALL_IN, self.seats)
 
 			pot_info = [ (users,amount) for users,amount in self.pot.iteritems() ]
 			pot_msg = {'pot': pot_info}
@@ -522,9 +521,9 @@ class GameRoom(object):
 					else:
 						msg_dict[seat._user.id] = {"isWin":False, "stake":seat.player_stake, "handcards": card_list}
 			else:
-				card_list = [str(card) for card in playing_list[0].handcards]
-				pot = [amount["pid"] for users, amount in self.pot.iteritems() if playing_list[0]._user.id in users]
-				msg_dict[playing_list[0]._user.id] = {"isWin":True,"earned":winner_dict[playing_list[0]],"pot": pot, "stake": playing_list[0].player_stake, "handcards": card_list}
+				card_list = [str(card) for card in winner_dict.keys()[0].handcards]
+				pot = [amount["pid"] for users, amount in self.pot.iteritems() if winner_dict.keys()[0]._user.id in users]
+				msg_dict[playing_list[0]._user.id] = {"isWin":True,"earned":winner_dict[winner_dict.keys()[0]],"pot": pot, "stake": winner_dict.keys()[0].player_stake, "handcards": card_list}
 			self.broadcast(msg_dict ,GameRoom.MSG_WINNER)
 			print msg_dict
 			self.status = GameRoom.GAME_WAIT
