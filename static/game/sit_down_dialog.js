@@ -82,6 +82,7 @@
 				console.log(data);
 				if(data.status == "success"){
 					sit_transit.transit(id);
+					window.user_info.userIsSat = true;
 				}
 				else{
 
