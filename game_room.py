@@ -443,7 +443,7 @@ class GameRoom(object):
 
 		for seat in player_list:
 			print "player names: =============:", seat.get_user().username
-			if seat.table_amount == player_list[0].table_amount and self.num_of_checks == 0:
+			if seat.table_amount == self.min_amount and self.num_of_checks == 0:
 				if seat.player_stake == 0:
 					seat.status = Seat.SEAT_ALL_IN
 				i += 1
@@ -518,16 +518,15 @@ class GameRoom(object):
 					if seat in winner_dict.keys():
 						seat.player_stake += winner_dict[seat]
 						pot = [amount["pid"] for users, amount in self.pot.iteritems() if seat._user.id in users]
-						msg_dict.update({seat._user.id:{"isWin":True,"earned":winner_dict[seat],"pot": pot, "stake": seat.player_stake, "handcards": card_list}})
+						msg_dict[seat._user.id] = {"isWin":True,"earned":winner_dict[seat],"pot": pot, "stake": seat.player_stake, "handcards": card_list}
 					else:
-						msg_dict.update({seat._user.id:{"isWin":False, "stake":seat.player_stake, "handcards": card_list}})
-				self.broadcast(msg_dict ,GameRoom.MSG_WINNER)
-				print msg_dict
+						msg_dict[seat._user.id] = {"isWin":False, "stake":seat.player_stake, "handcards": card_list}
 			else:
-				winner_dict.keys()[0].player_stake += winner_dict.values()[0]
-				print "%s's stake: %d" %(winner_dict.keys()[0].get_user().username,winner_dict.keys()[0].player_stake)
-				broadcast_msg = {"winner": winner_dict.keys()[0].get_user().username}
-				self.broadcast(broadcast_msg, GameRoom.MSG_WINNER)
+				card_list = [str(card) for card in playing_list[0].handcards]
+				pot = [amount["pid"] for users, amount in self.pot.iteritems() if playing_list[0]._user.id in users]
+				msg_dict[playing_list[0]._user.id] = {"isWin":True,"earned":winner_dict[playing_list[0]],"pot": pot, "stake": playing_list[0].player_stake, "handcards": card_list}
+			self.broadcast(msg_dict ,GameRoom.MSG_WINNER)
+			print msg_dict
 			self.status = GameRoom.GAME_WAIT
 			self.dispose_and_restart()
 			#sys.exit()
@@ -551,7 +550,6 @@ class GameRoom(object):
 				pot_info = [ (users,amount) for users,amount in self.pot.iteritems() ]
 				pot_msg = {'pot': pot_info}
 				self.broadcast(pot_msg, GameRoom.MSG_POT)
-
 			self.num_of_checks = 0
 			return
 
