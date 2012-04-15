@@ -81,7 +81,7 @@ function Seat(id,pos){
 		//$(ct).css('height', );
 		divCount.show();
 		//$("#countdown" + countdownID).addClass("countdown");
-		divCount.animate({ top : 92 }, 10000, function() {
+		divCount.animate({ top : divCount.height() }, 10000, function() {
 					divCount.hide();
 					divCount.removeAttr("style");
 				}
