@@ -115,6 +115,11 @@
 			collect_coin(pots[pid],pot[0]);
 		});
 		$.each(SeatList,function(index,seat){
+			$.each(seat.getChips(),function(index,chip){
+				console.log("removing");
+				console.log(chip);
+				chip.remove();
+			});
 			seat.cleanChips();
 		});
 	}

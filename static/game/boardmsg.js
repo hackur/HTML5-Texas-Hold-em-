@@ -49,26 +49,38 @@ function msg_phc(data){
 function msg_winner(data){
 	//We have a winner in this game
 	message_box.showMessage("We have a winner! ",5)
+	console.log("WINNER!");
+	console.log(data);
 	$.each(data,function(userid,info){
 		console.log(info);
 		if(info.isWin == undefined){
 			return;
 		}
 		var seat = getSeatById(userid);
+		seat.setStake(info.stake,0);
 		if(info.isWin){
-			seat.setStake(info.stake,0);
 			$.each(info.pot,function(index,pid){
 				pot_manager.distribute(userid,pid);
 			});
 		}
-		else{
-			seat.setStake(info.stake,0);
-			$.each(seat.getChips(),function(index,chip){
-				chip.remove();
-			});
-			seat.cleanChips();
-		}
+		$.each(seat.getChips(),function(index,chip){
+			console.log("removing");
+			console.log(chip);
+			chip.remove();
+		});
+		seat.cleanChips();
 	});
+
+	$.each(SeatList,function(index,seat){
+		$.each(seat.getChips(),function(index,chip){
+			console.log("removing");
+			console.log(chip);
+			chip.remove();
+		});
+		seat.cleanChips();
+		seat.clearStake();
+	});
+
 	setTimeout(function(){
 		pot_manager.reset();
 	 	var cards = ["#card0","#card1","#card2","#card3","#card4"];

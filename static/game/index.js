@@ -102,7 +102,7 @@ var enter = function(){
 				for(var i = 0; i < data.room.seats.length; i++ ) {
 					if(i < SeatList.length){
 						if(data.room.seats[i] == null ) {							
-							SeatList[i].setIsSat(0);							
+							SeatList[i].setIsSat(false);							
 						}
 						else {
 							SeatList[i].sit(data.room.seats[i].user,
