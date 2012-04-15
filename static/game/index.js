@@ -170,11 +170,12 @@ var listenBoardMessage = function(timestamp) {
 
 var take_place = function(seatID, seatObj) {
 	seatObj.getSeatDIV().click(function() {
-		if(seatObj.getIsSat() == 0)
+		if(!window.user_info.userIsSat)
 		{
 			sit_dialog.show(seatObj);
+			seatObj.setIsSat(true);
 		}
-		else {
+		else if(seatObj.getIsSat()) {
 			console.log(seatObj.getIsSat());
 			//customer information
 			alert("[IsSat == 1] Customer Information!");
