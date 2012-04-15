@@ -24,6 +24,7 @@ class Channel(object):
 
 	def connect(self):
 		pika.log.info('Declaring Queue')
+		pika.log.info(self.queue_name)
 		if self.durable_queue:
 			self.channel.queue_declare(
 								queue		= self.queue_name,
@@ -50,6 +51,8 @@ class Channel(object):
 		if len(self.binding_keys) > 0:
 			for key in self.binding_keys:
 				print key
+				#TODO May be we shouldn't bind queue everytime
+				#for durable queue
 				self.channel.queue_bind(exchange	= self.exchange,
 										queue		= self.queue_name,
 										routing_key	= key,

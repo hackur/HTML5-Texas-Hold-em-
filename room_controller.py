@@ -77,9 +77,6 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		self.session['messages']	= list()
 		print "ENTER!"
 
-	def get(self):
-		self.render("room-test-ajax.html")
-
 	def initial_call_back(self, argument):
 		print "ENTER CALL BACK",argument
 		if self.callBackCount < 2:

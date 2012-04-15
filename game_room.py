@@ -501,9 +501,7 @@ class GameRoom(object):
 			self.create_pot(player_list)
 			player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING or seat.status == Seat.SEAT_ALL_IN, self.seats)
 
-			pot_info = [ (users,amount) for users,amount in self.pot.iteritems() ]
-			pot_msg = {'pot': pot_info}
-			self.broadcast(pot_msg, GameRoom.MSG_POT)
+			self.broadcast_pot()
 
 #			self.poker_controller.get_winner()
 			winner_dict = {}
@@ -546,11 +544,14 @@ class GameRoom(object):
 			self.broadcast(broadcast_msg, GameRoom.MSG_PUBLIC_CARD)
 			if len(playing_list) != self.num_of_checks:
 				self.create_pot(player_list)
-				pot_info = [ (users,amount) for users,amount in self.pot.iteritems() ]
-				pot_msg = {'pot': pot_info}
-				self.broadcast(pot_msg, GameRoom.MSG_POT)
+				self.broadcast_pot()
 			self.num_of_checks = 0
 			return
+
+	def broadcast_pot(self):
+		pot_info = [ (users,info) for users,info in self.pot.iteritems() ]
+		pot_msg = {'pot': pot_info}
+		self.broadcast(pot_msg, GameRoom.MSG_POT)
 
 	def distribute_ante(self):
 		ante_dict = {}
@@ -568,8 +569,13 @@ class GameRoom(object):
 						ante_dict[user] += math.floor(ante/len(share_list))
 					else:
 						ante_dict[user] = math.floor(ante/len(share_list))
+
 				if len(share_list) > 0 :
+					pass
 					self.pot[owner]["amount"] = 0
+				else:
+					pass
+					#raise Exception("!!!");
 
 		print ante_dict
 		return ante_dict
@@ -588,6 +594,7 @@ class GameRoom(object):
 		if len(player_list) == 0:
 			return
 
+
 		player_list = sorted(player_list, key = attrgetter("table_amount"))
 		min_bet = player_list[0].table_amount
 		for x in xrange(len(player_list)):
@@ -599,8 +606,10 @@ class GameRoom(object):
 
 		pot_owner = tuple(pot_owner)
 		if pot_owner not in self.pot:
-			self.pot[pot_owner] = {"amount":0, "pid":len(self.pot)}
+			self.pot[pot_owner] = {"amount":0,"pid":len(self.pot)}
+
 		self.pot[pot_owner]["amount"] += min_bet * len(player_list)
+
 		print self.pot
 		self.create_pot(player_list)
 

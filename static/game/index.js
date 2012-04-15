@@ -106,15 +106,20 @@ var enter = function(){
 						}
 						else {
 							SeatList[i].sit(data.room.seats[i].user,
-									data.room.seats[i].player_stake);
+									data.room.seats[i].player_stake,
+									data.room.seats[i].uid
+							);
 							
 							if( SeatList[i].username == window.user_info.username ) {
 								sit_transit.transit(i);
 								console.log("-----------------------" + i);
-								dealCard.send_public_card(data.room.publicCard);
+								window.user_info.userIsSat = true;
 							}
 						}
 					}
+				}
+				if(data.room.publicCard){
+					dealCard.send_public_card(data.room.publicCard);
 				}
 				//console.log(SeatList);
 
@@ -211,19 +216,11 @@ var time_bar = function(ctPos) {
 };
 
 
-var collect_chips = function() {
-	for(var i = 0; i <= 4; i++) {
-		if($("#tstake" + i).html() != "0") {
-			$("#chip" + i ).animate(
-				{
-					left: "750px",
-					top: "180px"
-				},
-				{
-					duration: "5000"
-				}
-			);
+function getSeatById(userid){
+	for(var i = 0; i < SeatList.length; i++){
+		var seat = SeatList[i];
+		if(seat.getIsSat() && seat.userid == userid){
+			return seat;
 		}
 	}
-};
-
+}

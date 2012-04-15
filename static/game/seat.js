@@ -77,19 +77,12 @@ function Seat(id,pos){
 	seatObj.setCountdown = function(position) {
 		divCount.removeClass("countdown down");
 		divCount.addClass("countdown down");
-	//	var ct = ".countdown" + position;
-		//$(ct).css('height', );
 		divCount.show();
-		//$("#countdown" + countdownID).addClass("countdown");
 		divCount.animate({ top : divCount.height() }, 10000, function() {
 					divCount.hide();
 					divCount.removeAttr("style");
 				}
 		);
-	/*	setTimeout(function(){
-			divCountdown.css("top", "92px");
-			divCountdown.css("height", "0px");
-		},1);*/
 	};
 
 	seatObj.removeCountdown = function(position) {
@@ -113,6 +106,9 @@ function Seat(id,pos){
 	};
 	seatObj.getChips = function(){
 		return chips;
+	}
+	seatObj.cleanChips = function(){
+		chips = [];
 	}
 	//seatObj.sendChip = function(chip)
 

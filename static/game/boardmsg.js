@@ -19,7 +19,6 @@ function msg_sit(data){
 	if(username == window.user_info.username){
 		window.user_info.sit_no = seatID;
 	}
-	
 }
 function msg_bhc(data){ 
 	/*
@@ -49,7 +48,36 @@ function msg_phc(data){
 }
 function msg_winner(data){
 	//We have a winner in this game
-	message_box.showMessage("WINNER!!! ",5)
+	message_box.showMessage("We have a winner! ",5)
+	$.each(data,function(userid,info){
+		console.log(info);
+		if(info.isWin == undefined){
+			return;
+		}
+		var seat = getSeatById(userid);
+		if(info.isWin){
+			seat.setStake(info.stake,0);
+			$.each(info.pot,function(index,pid){
+				pot_manager.distribute(userid,pid);
+			});
+		}
+		else{
+			seat.setStake(info.stake,0);
+			$.each(seat.getChips(),function(index,chip){
+				chip.remove();
+			});
+			seat.cleanChips();
+		}
+	});
+	setTimeout(function(){
+		pot_manager.reset();
+	 	var cards = ["#card0","#card1","#card2","#card3","#card4"];
+		 for(var i = 0; i < cards.length; i++){
+			$(cards[i]).fadeOut("fast");
+		 }
+		$("#cards_in_hand1").fadeOut("fast");
+		$("#cards_in_hand2").fadeOut("fast");
+	},2500);
 }
 function msg_next(data){
 	/**
@@ -92,33 +120,6 @@ function msg_public_card(data){
 	 
 	 
 	 dealCard.send_public_card(data.cards);
-
-/*
-	if($("#card0")[0].src == "" || $("#card1")[0].src == "" || $("#card2")[0].src == "")
-	 {
-	 	poker_lib.setCard(data.cards[0], '#card0');
-		poker_lib.setCard(data.cards[1], '#card1');
-		poker_lib.setCard(data.cards[2], '#card2');
-	 	roundOne();
-	 	console.log("roundOne............");
-	 }
-	 else {
-	 	if($("#card3")[0].src == "")
-	 	{
-	 		poker_lib.setCard(data.cards[3], '#card3');
-	 		roundTwo();
-	 		console.log("roundTwo......");
-	 	}	
-	 	else {
-	 		if($("#card4")[0].src == "")
-			{
-				poker_lib.setCard(data.cards[4], '#card4');
-				roundThree();
-				console.log("roundThree......");
-			}
-	 	}
-	 }
-*/
 
 }
 function msg_start_game(data){

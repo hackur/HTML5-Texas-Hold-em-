@@ -112,11 +112,10 @@
 		 var _cards = ["#card0","#card1","#card2","#card3","#card4"];
 
 		 for(var i = 0; i < cards.length; i++){
-			if($(_cards[i])[0].src == ""){
+			if($(_cards[i]).is(":visible") == false){
 		 		poker_lib.setCard(cards[i], _cards[i]);
 				$(_cards[i]).fadeIn("fast");
 			}
-
 		 }
 	};
 	dealCard.deal = deal;
