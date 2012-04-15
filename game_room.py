@@ -333,6 +333,7 @@ class GameRoom(object):
 		print "RAISE!"
 		print "num_of_checks: ", self.num_of_checks
 		self.num_of_checks = 0
+		self.big_blind_move= True
 		amount          	= int(amount)
 		command         	= 3
 		seat_no         	= self.current_seat
