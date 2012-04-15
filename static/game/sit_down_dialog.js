@@ -83,6 +83,7 @@
 				if(data.status == "success"){
 					sit_transit.transit(id);
 					window.user_info.userIsSat = true;
+					seatObj.setIsSat(true);
 				}
 				else{
 
