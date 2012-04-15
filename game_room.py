@@ -410,6 +410,7 @@ class GameRoom(object):
 			self.seats[seat_no].player_stake = 0
 			self.seats[seat_no].table_amount += amount
 			# self.seats[seat_no].status = Seat.SEAT_ALL_IN
+	#		if flop_flag == False:
 			if self.same_amount_on_table(True):
 				self.round_finish()
 			else:
@@ -526,6 +527,7 @@ class GameRoom(object):
 			else:
 				card_list = [str(card) for card in winner_dict.keys()[0].handcards]
 				pot = [amount["pid"] for users, amount in self.pot.iteritems() if winner_dict.keys()[0]._user.id in users]
+				winner_dict.keys()[0].player_stake += winner_dict[winner_dict.keys()[0]]
 				msg_dict[playing_list[0]._user.id] = {"isWin":True,"earned":winner_dict[winner_dict.keys()[0]],"pot": pot, "stake": winner_dict.keys()[0].player_stake, "handcards": card_list}
 			self.broadcast(msg_dict ,GameRoom.MSG_WINNER)
 			print msg_dict
