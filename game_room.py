@@ -109,6 +109,7 @@ class GameRoom(object):
 		self.min_stake = min_stake
 		self.max_stake = max_stake
 		self.raise_amount = blind
+		self.big_blind_move = False
 
 		self.seats = [ Seat(x) for x in xrange(num_of_seats) ]
 
@@ -310,8 +311,11 @@ class GameRoom(object):
 				# At end of first round, small_blind and dealer are out of money
 				if len(filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)) < 2:
 					self.round_finish()
+				elif self.check_next(seat_no) == self.big_blind and self.big_blind_move == False:
+					self.current_seat = self.info_next(seat_no, [1,3,4,5])
+					self.big_blind_move = True
 				else:
-					self.current_seat = self.info_next(seat_no, [1,3,4,5])        # final choice goes to the person who gives the first raise
+					self.round_finish()
 			else:
 				self.current_seat = self.info_next(seat_no, [1,2,3,5])
 		else:
@@ -722,6 +726,7 @@ class GameRoom(object):
 		self.min_stake = min_stake
 		self.max_stake = max_stake
 		self.raise_amount = blind
+		self.big_blind = False
 		player_list = filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)
 		go_away_list = filter(lambda seat: not seat.is_empty() and seat.player_stake == 0, self.seats)
 		for seat in player_list:
