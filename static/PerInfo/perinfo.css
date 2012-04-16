@@ -1,0 +1,398 @@
+
+body {
+	text-align: center;
+}
+#background {
+	top: 10px;
+	left: 50px;
+	height: 640px;
+	width: 960px;
+	position: absolute;
+	background-image: url(./image/bg.png);
+}
+#btFrame {
+	top: 20px;
+	left: 18px;
+	width: 596px;
+	height: 61px;
+	position: absolute;
+	background-image: url(./image/btFrame.png);
+}
+#info {
+	top: 0px;
+	left: 0px;
+	width: 141px;
+	height: 48px;
+	position: absolute;
+	color: white;
+	padding-top: 20px;
+	font-weight: bolder;
+	cursor: pointer;
+}
+#info:hover {
+	background-image: url(./image/left.png);
+}
+#email {
+	top: 0px;
+	left: 131px;
+	width: 121px;
+	height: 48px;
+	position: absolute;
+	color: white;
+	padding-top: 20px;
+	font-weight: bolder;
+	cursor: pointer;
+}
+#email:hover {
+	background-image: url(./image/middle.png);
+}
+#market {
+	top: 0px;
+	left: 244px;
+	width: 121px;
+	height: 48px;
+	position: absolute;
+	color: white;
+	padding-top: 20px;
+	font-weight: bolder;
+	cursor: pointer;
+}
+#market:hover {
+	background-image: url(./image/middle.png);
+}
+#recharge {
+	top: 0px;
+	left: 357px;
+	width: 121px;
+	height: 48px;
+	position: absolute;
+	color: white;
+	padding-top: 20px;
+	cursor: pointer;
+}
+#recharge:hover {
+	background-image: url(./image/middle.png);	
+}
+#friend {
+	top: 0px;
+	left: 465px;
+	width: 129px;
+	height: 48px;
+	position: absolute;	
+	color: white;
+	padding-top: 20px;
+	font-weight: bolder;
+	cursor: pointer;
+}
+#friend:hover {
+	background-image: url(./image/right.png);
+}
+
+
+.bigFrame {
+	top: 82px;
+	left: 25px;
+	width: 586px;
+	height: 358px;
+	position: absolute;
+	color: white;
+	font-weight: bolder;
+}
+/* person info */
+#bigFrame1 {
+	display: none;
+}
+#portrait_box {
+	top: 5px;
+	left: 3px;
+	width: 119px;
+	height: 140px;
+	position: absolute;
+	cursor: pointer;
+	background-image: url(./image/portrait_box.png);
+}
+#ID {
+	top: 30px;
+	left: 150px;
+	position: absolute;
+}
+#family {
+	top: 70px;
+	left: 150px;
+	position: absolute;
+}
+#rank {
+	top: 70px;
+	left: 350px;
+	position: absolute;
+}
+#pos {
+	top: 110px;
+	left: 150px;
+	position: absolute;
+}
+#property {
+	top: 110px;
+	left: 350px;
+	position: absolute;
+}
+#winRate {
+	top: 150px;
+	left: 40px;
+	position: absolute;
+}
+#winBiggestStake {
+	top: 150px;
+	left: 290px;
+	position: absolute;
+}
+#totalInnings {
+	top: 200px;
+	left: 40px;
+	position: absolute;
+}
+#victoryInnings {
+	top: 200px;
+	left: 290px;
+	position: absolute;
+}
+#latestOnline {
+	top: 250px;
+	left: 40px;
+	position: absolute;
+}
+#idiograph {
+	top: 300px;
+	left: 40px;
+	position: absolute;
+}/* end person info*/
+
+/* email*/
+#bigFrame2 {
+	display: none;
+}
+#sender {
+	top: 30px;
+	left: 30px;
+	position: absolute;
+}
+#time {
+	top: 30px;
+	left: 300px;
+	position: absolute;
+}
+#inputFrame {
+	top: 60px;
+	left: 20px;
+	height: 244px;
+	width: 547px;
+	position: absolute;
+	background-image: url(./image/inputFrame.png);
+}
+#content {
+	top: 20px;
+	left: 30px;
+	position: absolute;
+}
+#reply {
+	top: 300px;
+	left: 20px;
+	height: 54px;
+	width: 124px;
+	position: absolute;
+	background-image: url(./image/btE.png);
+	line-height: 42px;
+}
+#delete {
+	top: 300px;
+	left: 450px;
+	height: 54px;
+	width: 124px;
+	position: absolute;
+	background-image: url(./image/btE.png);
+	line-height: 42px;
+}/*end email*/
+
+/*market*/
+#bigFrame3 {
+	display: block;
+}
+#member {
+	top: 30px;
+	left: 40px;
+	height: 67px;
+	width: 103px;
+	position: absolute;
+	background-image: url(./image/member.png);
+}
+#yellowDia {
+	top: 150px;
+	left: 40px;
+	height: 67px;
+	width: 103px;
+	position: absolute;
+	background-image: url(./image/yellowDia.png);
+}
+#redDia {
+	top: 260px;
+	left: 40px;
+	height: 67px;
+	width: 103px;
+	position: absolute;
+	background-image: url(./image/redDia.png);
+}
+.light {
+	height: 139px;
+	width: 178px;
+	position: absolute;
+	background-image: url(./image/light.png);
+}
+#light1 {
+	top: -5px;
+	left: 0px;	
+}
+#light2 {
+	top: 109px;
+	left: 0px;	
+}
+#light3 {
+	top: 222px;
+	left: 0px;	
+}
+.line {
+	height: 14px;
+	width: 590px;
+	position: absolute;
+	background-image: url(./image/line.png);
+}
+#line1 {
+	top: 115px;
+	left: 0px;	
+}
+#line2 {
+	top: 230px;
+	left: 0px;	
+}
+#content1 {
+	top: 30px;
+	left: 200px;
+	position: absolute;
+}
+#content2 {
+	top: 150px;
+	left: 200px;
+	position: absolute;
+}
+#content3 {
+	top: 260px;
+	left: 200px;
+	position: absolute;
+}
+.purchase {
+	height: 68px;
+	width: 101px;
+	position: absolute;
+	background-image: url(./image/purchase.png);
+	line-height: 60px;
+	cursor: pointer;
+}
+#purchase1 {
+	top: 30px;
+	left: 450px;
+}
+#purchase2 {
+	top: 150px;
+	left: 450px;
+}
+#purchase3 {
+	top: 260px;
+	left: 450px;
+}
+
+
+
+
+
+
+#smallFrame {
+	top: 484px;
+	left: 25px;
+	width: 586px;
+	height: 130px;
+	position: absolute;
+}
+
+
+
+
+#rightFrame {
+	top: 260px;
+	left: 666px;
+	width: 270px;
+	height: 360px;
+	position: absolute;
+}
+#span1 {
+	color: white;
+	font-weight: bolder;
+}
+#range {
+	top: 35px;
+	left: 0px;
+	width: 273px;
+	height: 83px;
+	position: absolute;
+	background-image: url(./image/yellowBT.png);
+	color: white;
+	font-weight: bolder;
+	line-height: 75px;
+	cursor: pointer;
+}
+#lobby {
+	top: 120px;
+	left: 0px;
+	width: 273px;
+	height: 83px;
+	position: absolute;
+	background-image: url(./image/yellowBT.png);
+	color: white;
+	font-weight: bolder;
+	line-height: 75px;
+	cursor: pointer;
+}
+#quick_acc {
+	top: 205px;
+	left: 0px;
+	width: 273px;
+	height: 83px;
+	position: absolute;
+	background-image: url(./image/blueBT.png);
+	color: white;
+	font-weight: bolder;
+	line-height: 75px;
+	cursor: pointer;
+}
+#help {
+	top: 300px;
+	left: 0px;
+	width: 133px;
+	height: 62px;
+	position: absolute;
+	background-image: url(./image/buttonTwo.png);
+	color: white;
+	font-weight: bolder;
+	line-height: 58px;
+	cursor: pointer;
+}
+#setting {
+	top: 300px;
+	left: 140px;
+	width: 133px;
+	height: 62px;
+	position: absolute;
+	background-image: url(./image/buttonTwo.png);
+	color: white;
+	font-weight: bolder;
+	line-height: 58px;
+	cursor: pointer;
+}
