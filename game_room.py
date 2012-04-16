@@ -589,6 +589,7 @@ class GameRoom(object):
 	def distribute_ante(self):
 		ante_dict = {}
 		rank_list = self.poker_controller.rank_users()
+		print rank_list
 		for i in xrange(len(rank_list)):
 			print "rank list"
 			for item in rank_list[i]:

@@ -500,7 +500,7 @@ class PokerController(object):
 		self.debug	= debug
 
 	def start(self):
-		self.users			= filter(lambda seat: seat.is_waiting(), self.seats)
+		self.users			= self.seats#filter(lambda seat: seat.is_waiting(), self.seats)
 		number_of_players	= len(self.users)
 		print "length of users in poker controller %d" % number_of_players
 		self.publicCard		= []
@@ -585,7 +585,7 @@ class User:
 
 
 users=[]
-for i in range(7):
+for i in range(2):
 	users.append(User())
 debug = False
 #generate 2 cards for each users
