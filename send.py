@@ -196,7 +196,7 @@ class Tester(object):
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
-						body=json.dumps({'method':'action','action':3,'user_id':2,
+						body=json.dumps({'method':'action','action':1,'user_id':2,
 							"room_id":1, "private_key":self.users[1].private_key, "amount":20}))
 
 			self.channel.basic_publish(exchange='dealer_exchange_1',

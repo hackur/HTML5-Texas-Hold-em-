@@ -431,6 +431,7 @@ class GameRoom(object):
 					self.round_finish()
 				else:
 					if self.inComplete_all_in_flag == False:
+						print "HERE HERE!"
 						self.current_seat = self.info_next(seat_no, [1,2,3,5])
 					else:
 						print "-----------sb before you has called all in---------------"
@@ -562,8 +563,8 @@ class GameRoom(object):
 		else:
 			print "length of playing list: ", len(playing_list)
 			print "number of checks: ", self.num_of_checks
-			self.min_amount = 0
-			self.raise_amount = self.blind
+			self.min_amount = self.blind/2
+			self.raise_amount = self.blind/2
 			self.inComplete_all_in_flag = False
 
 			if self.flop_flag == False:
