@@ -487,7 +487,7 @@ class GameRoom(object):
 	def round_finish(self):
 		print "ROUND FINISHED!!!!"
 		self.clearCountDown();
-		player_list = filter(lambda seat: seat.table_amount > 0, self.seats)
+		player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING or seat.table_amount > 0, self.seats)
 		playing_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)
 		print "-----------no more stake------------"
 		print self.no_more_stake()
@@ -542,7 +542,7 @@ class GameRoom(object):
 				card_list = [str(card) for card in winner_dict.keys()[0].handcards]
 				pot = [amount["pid"] for users, amount in self.pot.iteritems() if winner_dict.keys()[0]._user.id in users]
 				winner_dict.keys()[0].player_stake += winner_dict[winner_dict.keys()[0]]
-				msg_dict[playing_list[0]._user.id] = {"isWin":True,"earned":winner_dict[winner_dict.keys()[0]],"pot": pot, "stake": winner_dict.keys()[0].player_stake, "handcards": card_list}
+				msg_dict[winner_dict.keys()[0]._user.id] = {"isWin":True,"earned":winner_dict[winner_dict.keys()[0]],"pot": pot, "stake": winner_dict.keys()[0].player_stake, "handcards": card_list}
 			self.broadcast(msg_dict ,GameRoom.MSG_WINNER)
 			print msg_dict
 			self.status = GameRoom.GAME_WAIT
