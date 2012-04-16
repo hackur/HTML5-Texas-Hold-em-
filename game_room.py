@@ -659,9 +659,9 @@ class GameRoom(object):
 				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
 			elif max_amount < min_amount:
 				min_amount = max_amount
-				self.amount_limits[GameRoom.A_RAISESTAKE] = (min_amount, max_amount)
+				self.amount_limits[GameRoom.A_RAISESTAKE] = (min_amount, min(self.seats[seat_no].player_stake, max_amount))
 			else:
-				self.amount_limits[GameRoom.A_RAISESTAKE] = (min_amount, max_amount)
+				self.amount_limits[GameRoom.A_RAISESTAKE] = (min_amount, min(self.seats[seat_no].player_stake, max_amount))
 		elif GameRoom.A_RAISESTAKE in self.amount_limits:
 			del self.amount_limits[GameRoom.A_RAISESTAKE]
 
