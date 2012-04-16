@@ -1,0 +1,68 @@
+/* person info */
+#bigFrame1 {
+	display: none;
+}
+#portrait_box {
+	top: 5px;
+	left: 3px;
+	width: 119px;
+	height: 140px;
+	position: absolute;
+	cursor: pointer;
+	background-image: url(./image/portrait_box.png);
+}
+#ID {
+	top: 30px;
+	left: 150px;
+	position: absolute;
+}
+#family {
+	top: 70px;
+	left: 150px;
+	position: absolute;
+}
+#rank {
+	top: 70px;
+	left: 350px;
+	position: absolute;
+}
+#pos {
+	top: 110px;
+	left: 150px;
+	position: absolute;
+}
+#property {
+	top: 110px;
+	left: 350px;
+	position: absolute;
+}
+#winRate {
+	top: 150px;
+	left: 40px;
+	position: absolute;
+}
+#winBiggestStake {
+	top: 150px;
+	left: 290px;
+	position: absolute;
+}
+#totalInnings {
+	top: 200px;
+	left: 40px;
+	position: absolute;
+}
+#victoryInnings {
+	top: 200px;
+	left: 290px;
+	position: absolute;
+}
+#latestOnline {
+	top: 250px;
+	left: 40px;
+	position: absolute;
+}
+#idiograph {
+	top: 300px;
+	left: 40px;
+	position: absolute;
+}/* end person info*/
