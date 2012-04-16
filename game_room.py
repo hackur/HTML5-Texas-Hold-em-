@@ -552,6 +552,7 @@ class GameRoom(object):
 			print "number of checks: ", self.num_of_checks
 			self.min_amount = self.blind/2
 			self.raise_amount = self.blind/2
+			self.raise_person = None
 
 			if self.flop_flag == False:
 				self.poker_controller.getFlop()
@@ -636,6 +637,7 @@ class GameRoom(object):
 
 	def calculate_proper_amount(self, seat_no, rights):
 		total_amount_list = []
+		self.amount_limits = {}
 		for seat in self.seats:
 			if seat.status >= Seat.SEAT_PLAYING:
 				total_amount_list.append(seat.player_stake + seat.table_amount)
@@ -751,12 +753,17 @@ class GameRoom(object):
 		self.max_stake = max_stake
 		self.raise_amount = blind
 		self.big_blind = False
+		self.raise_person = None
 		player_list = filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)
 		go_away_list = filter(lambda seat: not seat.is_empty() and seat.player_stake == 0, self.seats)
 		for seat in player_list:
 			seat.status = Seat.SEAT_WAITING
+		msg = {}
 		for seat in go_away_list:
 			self.stand_up(seat.get_user().id)
+			msg[seat.get_user().id] = seat.seat_id
+		print "broadcasting standup msg"
+		self.broadcast(msg, GameRoom.MSG_STAND_UP)
 		if len(player_list) >= 2 and not self.t:
 			timeout = 5
 			self.t = self.ioloop.add_timeout(time.time() + timeout, self.start_game)
@@ -767,7 +774,4 @@ class GameRoom(object):
 		for seat in self.seats:
 			if not seat.is_empty() and user_id == seat.get_user().id:
 				seat.status = Seat.SEAT_EMPTY
-				print "broadcasting standup msg"
-				standup_msg = {"seat no": seat.seat_id, "user_id": user_id}
-				self.broadcast(standup_msg, GameRoom.MSG_STAND_UP)
 				self.audit_list.append({"user": user_id})
