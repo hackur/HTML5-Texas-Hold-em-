@@ -110,8 +110,7 @@ class GameRoom(object):
 		self.max_stake = max_stake
 		self.raise_amount = blind
 		self.big_blind_move = False
-		self.inComplete_all_in_flag = False
-
+		self.raise_person = None
 		self.seats = [ Seat(x) for x in xrange(num_of_seats) ]
 
 		self.poker_controller = PokerController(self.seats)
@@ -292,16 +291,13 @@ class GameRoom(object):
 					return False
 		return True
 
-	def call_stake(self, user_id, amount = None):
+	def call_stake(self, user_id):
 		print "CALL!"
 		print "num_of_checks: ", self.num_of_checks
 		self.num_of_checks = 0
 		command = GameRoom.A_CALLSTAKE
-
+		amount = self.amount_limits[GameRoom.A_CALLSTAKE]
 		seat_no = self.current_seat
-		if not self.inComplete_all_in_flag:
-			amount = self.amount_limits[GameRoom.A_CALLSTAKE]
-		print "incomplete all in: ", self.inComplete_all_in_flag
 		print "call amount: :", amount
 		self.seats[seat_no].bet(amount)
 		print "player stake: ", self.seats[seat_no].player_stake
@@ -323,14 +319,7 @@ class GameRoom(object):
 			if self.same_amount_on_table():                 # all players have put down equal amount of money, next round
 				self.round_finish()
 			else:
-				if self.inComplete_all_in_flag == False:
-					self.current_seat = self.info_next(seat_no, [1,2,3,5])
-				else:
-					print "-----------sb before you has called all in---------------"
-					if self.seats[self.check_next(seat_no)].player_stake >= self.min_amount:
-						self.current_seat = self.info_next(seat_no, [2,5])      # cannot re-raise after sb's all-in
-					else:
-						self.current_seat = self.info_next(seat_no, [1,5])
+				self.current_seat = self.info_next(seat_no, [1,2,3,5])
 
 
 	def raise_stake(self, user_id,  amount):
@@ -341,6 +330,7 @@ class GameRoom(object):
 		amount          	= int(amount)
 		command         	= 3
 		seat_no         	= self.current_seat
+		self.raise_stake	= seat_no
 		if self.is_proper_amount(amount, command):
 			print "This is a proper amount"
 			self.seats[seat_no].bet(amount)
@@ -433,16 +423,7 @@ class GameRoom(object):
 			if self.same_amount_on_table(True):                 # all players have put down equal amount of money, next round
 				self.round_finish()
 			else:
-				if self.inComplete_all_in_flag == False:
-					print "HERE HERE!"
-					self.current_seat = self.info_next(seat_no, [1,2,3,5])
-				else:
-					print "-----------sb before you has called all in---------------"
-					if self.seats[self.check_next(seat_no)].player_stake >= self.min_amount:
-						self.current_seat = self.info_next(seat_no, [2,5])      # cannot re-raise after sb's all-in
-					else:
-						self.current_seat = self.info_next(seat_no, [1,5])
-
+				self.current_seat = self.info_next(seat_no, [1,2,3,5])
 
 #		elif self.min_amount == amount + self.seats[seat_no].table_amount:
 #			print "going to call stake"
@@ -566,7 +547,6 @@ class GameRoom(object):
 			print "number of checks: ", self.num_of_checks
 			self.min_amount = self.blind/2
 			self.raise_amount = self.blind/2
-			self.inComplete_all_in_flag = False
 
 			if self.flop_flag == False:
 				self.poker_controller.getFlop()
@@ -675,6 +655,8 @@ class GameRoom(object):
 		if GameRoom.A_RAISESTAKE in self.seats[seat_no].rights:
 			if self.seats[seat_no].player_stake < min_amount:
 				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
+			elif self.current_seat == self.raise_person:
+				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
 			elif max_amount < min_amount:
 				min_amount = max_amount
 				self.amount_limits[GameRoom.A_RAISESTAKE] = (min_amount, max_amount)
@@ -683,8 +665,13 @@ class GameRoom(object):
 		elif GameRoom.A_RAISESTAKE in self.amount_limits:
 			del self.amount_limits[GameRoom.A_RAISESTAKE]
 
+		if GameRoom.A_RAISESTAKE in self.seats[seat_no].rights:
+			if GameRoom.A_ALLIN in self.seats[seat_no].rights:
+				self.seats[seat_no].rights.remove(GameRoom.A_ALLIN)
+
 		if GameRoom.A_ALLIN in self.seats[seat_no].rights:
 			self.amount_limits[GameRoom.A_ALLIN] = min(self.seats[seat_no].player_stake, max_amount)
+
 
 		print self.amount_limits
 		return self.amount_limits
