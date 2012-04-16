@@ -300,6 +300,8 @@ class GameRoom(object):
 		seat_no = self.current_seat
 		print "call amount: :", amount
 		self.seats[seat_no].bet(amount)
+		if self.seats[seat_no].player_stake == 0:
+			self.seats[seat_no].status = Seat.SEAT_ALL_IN
 		print "player stake: ", self.seats[seat_no].player_stake
 		print "table amount for seat "+ str(seat_no) + ": " + str(self.seats[seat_no].table_amount)
 		self.min_amount = self.seats[seat_no].table_amount
@@ -337,6 +339,9 @@ class GameRoom(object):
 			print "table amount for seat "+ str(seat_no) + ": " + str(self.seats[seat_no].table_amount)
 			self.raise_amount 	= amount
 			self.min_amount     = self.seats[seat_no].table_amount
+			if self.seats[seat_no].player_stake == 0:
+				self.seats[seat_no].status = Seat.SEAT_ALL_IN
+			print "player stake: %d" % self.seats[seat_no].player_stake
 			self.current_seat   = self.info_next(seat_no, [1, 2, 3, 5])
 		else:
 			print "RAISE INVALID AMOUNT OF MONEY! GET OUT OF HERE!!!!"
@@ -765,4 +770,4 @@ class GameRoom(object):
 				print "broadcasting standup msg"
 				standup_msg = {"seat no": seat.seat_id, "user_id": user_id}
 				self.broadcast(standup_msg, GameRoom.MSG_STAND_UP)
-		self.audit_list.append({"user": user_id})
+				self.audit_list.append({"user": user_id})
