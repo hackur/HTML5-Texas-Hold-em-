@@ -111,6 +111,7 @@ class GameRoom(object):
 		self.raise_amount = blind
 		self.big_blind_move = False
 		self.raise_person = None
+		self.non_fold_move = False
 		self.seats = [ Seat(x) for x in xrange(num_of_seats) ]
 
 		self.poker_controller = PokerController(self.seats)
@@ -296,6 +297,7 @@ class GameRoom(object):
 		print "CALL!"
 		print "num_of_checks: ", self.num_of_checks
 		self.num_of_checks = 0
+		self.non_fold_move = True
 		command = GameRoom.A_CALLSTAKE
 		amount = self.amount_limits[GameRoom.A_CALLSTAKE]
 		seat_no = self.current_seat
@@ -329,6 +331,7 @@ class GameRoom(object):
 		print "RAISE!"
 		print "num_of_checks: ", self.num_of_checks
 		self.num_of_checks = 0
+		self.non_fold_move = True
 		self.big_blind_move= True
 		amount          	= int(amount)
 		command         	= 3
@@ -351,6 +354,7 @@ class GameRoom(object):
 	def check(self, user_id):
 		print "CHECK!"
 		print "flop_flag: ", self.flop_flag
+		self.non_fold_move = True
 		command = 4
 		seat_no = self.current_seat
 		player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)
@@ -384,15 +388,18 @@ class GameRoom(object):
 														# remove the player from player list
 		user = self.seats[seat_no].get_user()           # get user info from database
 
+		player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING or seat.status == Seat.SEAT_ALL_IN, self.seats)
 		#TODO Database update
 		user.stake += self.seats[seat_no].player_stake  # update user's stake
 
-		if self.same_amount_on_table():
+		if len(player_list) == 1:
+			self.round_finish()
+		elif self.same_amount_on_table():
 			print "finishing this round after folding!!"
 			self.round_finish()
 		else:
 			print "I'm here!!!!!"
-			self.current_seat = self.info_next(seat_no, [1,2,3,5])
+			self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
 
 
 	def all_in(self, user_id):
@@ -467,7 +474,7 @@ class GameRoom(object):
 		for seat in player_list:
 			print "player names: =============:", seat.get_user().username
 			print "seat.table_amount = %d, self.min_amount = %d" %(seat.table_amount, self.min_amount)
-			if seat.table_amount == self.min_amount and self.num_of_checks == 0:
+			if seat.table_amount == self.min_amount and self.num_of_checks == 0 and self.non_fold_move == True:
 				i += 1
 				continue
 			else:
@@ -551,9 +558,10 @@ class GameRoom(object):
 		else:
 			print "length of playing list: ", len(playing_list)
 			print "number of checks: ", self.num_of_checks
-			self.min_amount = self.blind/2
+			self.min_amount = 0
 			self.raise_amount = self.blind/2
 			self.raise_person = None
+			self.non_fold_move = False
 
 			if self.flop_flag == False:
 				self.poker_controller.getFlop()
@@ -761,6 +769,8 @@ class GameRoom(object):
 		self.raise_amount = blind
 		self.big_blind = False
 		self.raise_person = None
+		self.non_fold_move = False
+
 		player_list = filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)
 		go_away_list = filter(lambda seat: not seat.is_empty() and seat.player_stake == 0, self.seats)
 		for seat in player_list:
