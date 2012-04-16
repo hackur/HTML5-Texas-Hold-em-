@@ -237,7 +237,8 @@ class GameRoom(object):
 		print self.seats[self.current_dealer].get_user().username
 
 		self.min_amount = self.blind
-		self.current_seat = self.info_next(self.big_blind, [1,2,3,5])
+		self.current_seat = self.big_blind
+		self.current_seat = self.info_next(self.current_seat, [1,2,3,5])
 		print "next seat in action =>", self.current_seat
 
 		seat = self.seats[self.small_blind]
@@ -658,11 +659,17 @@ class GameRoom(object):
 		elif GameRoom.A_CALLSTAKE in self.amount_limits:
 			del self.amount_limits[GameRoom.A_CALLSTAKE]
 
+		print "-------------player's rights: ", self.seats[seat_no].rights
 		min_amount = 2 * self.raise_amount
+		print "min amount for raise: %d" % min_amount
 		if GameRoom.A_RAISESTAKE in self.seats[seat_no].rights:
 			if self.seats[seat_no].player_stake < min_amount:
+				print "hooray!"
 				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
 			elif self.current_seat == self.raise_person:
+				print self.current_seat
+				print self.raise_person
+				print "you find me!"
 				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
 			elif max_amount < min_amount:
 				min_amount = max_amount
@@ -675,7 +682,7 @@ class GameRoom(object):
 		if GameRoom.A_RAISESTAKE in self.seats[seat_no].rights:
 			if GameRoom.A_ALLIN in self.seats[seat_no].rights:
 				self.seats[seat_no].rights.remove(GameRoom.A_ALLIN)
-
+		print "-------------player's rights: ", self.seats[seat_no].rights
 		if GameRoom.A_ALLIN in self.seats[seat_no].rights:
 			self.amount_limits[GameRoom.A_ALLIN] = min(self.seats[seat_no].player_stake, max_amount)
 

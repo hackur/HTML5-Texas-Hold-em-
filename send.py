@@ -132,6 +132,7 @@ class Tester(object):
 		if len(self.pKeys) == 2:
 			self.pKeys = {}
 			#	print "all in!!!!!!!!!!!!!!!!!!!"
+			return
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
 						body=json.dumps({'method':'action','action':2,'user_id':1,
