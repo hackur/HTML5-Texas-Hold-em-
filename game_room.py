@@ -292,7 +292,7 @@ class GameRoom(object):
 					return False
 		return True
 
-	def call_stake(self, user_id, amount = 0):
+	def call_stake(self, user_id, amount = None):
 		print "CALL!"
 		print "num_of_checks: ", self.num_of_checks
 		self.num_of_checks = 0
@@ -301,7 +301,7 @@ class GameRoom(object):
 		seat_no = self.current_seat
 		if not self.inComplete_all_in_flag:
 			amount = self.amount_limits[GameRoom.A_CALLSTAKE]
-
+		print "incomplete all in: ", self.inComplete_all_in_flag
 		print "call amount: :", amount
 		self.seats[seat_no].bet(amount)
 		print "player stake: ", self.seats[seat_no].player_stake
@@ -410,47 +410,50 @@ class GameRoom(object):
 		print "----------------",self.min_amount == amount + self.seats[seat_no].table_amount
 
 		print "amount to be on table: ", amount + self.seats[seat_no].table_amount
-		if 0 < amount + self.seats[seat_no].table_amount < self.min_amount:
-			self.seats[seat_no].player_stake = 0
-			self.seats[seat_no].table_amount += amount
-			# self.seats[seat_no].status = Seat.SEAT_ALL_I
-			if self.flop_flag == False:
-				if self.same_amount_on_table(True):
-					# At end of first round, small_blind and dealer are out of money
-					if len(filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)) < 2:
-						self.round_finish()
-					elif self.check_next(seat_no) == self.big_blind and self.big_blind_move == False:
-						self.current_seat = self.info_next(seat_no, [1,3,4,5])
-						self.big_blind_move = True
-					else:
-						self.round_finish()
-				else:
-					self.current_seat = self.info_next(seat_no, [1,2,3,5])
-			else:
-				if self.same_amount_on_table(True):                 # all players have put down equal amount of money, next round
+#		if 0 < amount + self.seats[seat_no].table_amount < self.min_amount:
+		if self.min_amount < amount:
+			self.min_amount = amount
+		self.seats[seat_no].player_stake = 0
+		self.seats[seat_no].table_amount += amount
+		# self.seats[seat_no].status = Seat.SEAT_ALL_I
+		if self.flop_flag == False:
+			if self.same_amount_on_table(True):
+				# At end of first round, small_blind and dealer are out of money
+				if len(filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)) < 2:
 					self.round_finish()
+				elif self.check_next(seat_no) == self.big_blind and self.big_blind_move == False:
+					self.current_seat = self.info_next(seat_no, [1,3,4,5])
+					self.big_blind_move = True
 				else:
-					if self.inComplete_all_in_flag == False:
-						print "HERE HERE!"
-						self.current_seat = self.info_next(seat_no, [1,2,3,5])
-					else:
-						print "-----------sb before you has called all in---------------"
-						if self.seats[self.check_next(seat_no)].player_stake >= self.min_amount:
-							self.current_seat = self.info_next(seat_no, [2,5])      # cannot re-raise after sb's all-in
-						else:
-							self.current_seat = self.info_next(seat_no, [1,5])
-
-
-		elif self.min_amount == amount + self.seats[seat_no].table_amount:
-			print "going to call stake"
-			self.call_stake(user_id)
-		elif self.min_amount < amount + self.seats[seat_no].table_amount <= 2 * self.min_amount - self.seats[seat_no].table_amount:
-			#self.seats[seat_no].status = Seat.SEAT_ALL_IN
-			self.call_stake(user_id,  amount)
-			self.inComplete_all_in_flag = True
+					self.round_finish()
+			else:
+				self.current_seat = self.info_next(seat_no, [1,2,3,5])
 		else:
-			#self.seats[seat_no].status = Seat.SEAT_ALL_IN
-			self.raise_stake(user_id, amount)
+			if self.same_amount_on_table(True):                 # all players have put down equal amount of money, next round
+				self.round_finish()
+			else:
+				if self.inComplete_all_in_flag == False:
+					print "HERE HERE!"
+					self.current_seat = self.info_next(seat_no, [1,2,3,5])
+				else:
+					print "-----------sb before you has called all in---------------"
+					if self.seats[self.check_next(seat_no)].player_stake >= self.min_amount:
+						self.current_seat = self.info_next(seat_no, [2,5])      # cannot re-raise after sb's all-in
+					else:
+						self.current_seat = self.info_next(seat_no, [1,5])
+
+
+#		elif self.min_amount == amount + self.seats[seat_no].table_amount:
+#			print "going to call stake"
+#			self.call_stake(user_id)
+#		elif self.min_amount < amount + self.seats[seat_no].table_amount <= 2 * self.min_amount - self.seats[seat_no].table_amount:
+#			#self.seats[seat_no].status = Seat.SEAT_ALL_IN
+#			self.inComplete_all_in_flag = True
+#			self.call_stake(user_id,  amount)
+#			self.inComplete_all_in_flag = False
+#		else:
+#			#self.seats[seat_no].status = Seat.SEAT_ALL_IN
+#			self.raise_stake(user_id, amount)
 
 
 
@@ -475,6 +478,7 @@ class GameRoom(object):
 
 		for seat in player_list:
 			print "player names: =============:", seat.get_user().username
+			print "seat.table_amount = %d, self.min_amount = %d" %(seat.table_amount, self.min_amount)
 			if seat.table_amount == self.min_amount and self.num_of_checks == 0:
 				if seat.player_stake == 0:
 					seat.status = Seat.SEAT_ALL_IN
@@ -482,14 +486,13 @@ class GameRoom(object):
 				continue
 			else:
 				if seat.player_stake == 0:
-					if smaller_than_min_amount == True:
-						i += 1
+					#if smaller_than_min_amount == True:
+					i += 1
 					seat.status = Seat.SEAT_ALL_IN
 					print "all in name: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", seat.get_user().username
 				else:
 					return False
-		print "length of player list in same_amount_on_table: ", len(player_list)
-		print "==============================================", i
+		print "i: %d, length of player list: %d" %(i, len(player_list))
 		if i == len(player_list):
 			return True
 		else:
@@ -638,7 +641,7 @@ class GameRoom(object):
 			if player_list[x].status == Seat.SEAT_PLAYING or player_list[x].status == Seat.SEAT_ALL_IN:
 				pot_owner.append(player_list[x].get_user().id)
 				print ":::::::::::::::::: ", player_list[x].get_user().id
-
+		pot_owner.sort()
 		pot_owner = tuple(pot_owner)
 		if pot_owner not in self.pot:
 			self.pot[pot_owner] = {"amount":0,"pid":len(self.pot)}
