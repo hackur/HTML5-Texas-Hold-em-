@@ -406,6 +406,7 @@ class GameRoom(object):
 		command  = 1
 		seat_no  = self.current_seat
 		amount   = self.amount_limits[GameRoom.A_ALLIN]
+		self.seats[seat_no].status  = Seat.SEAT_ALL_IN
 		print "self.min_amount before all in: ", self.min_amount
 		print "----------------",self.min_amount == amount + self.seats[seat_no].table_amount
 
@@ -473,22 +474,19 @@ class GameRoom(object):
 
 	def same_amount_on_table(self, smaller_than_min_amount=False):
 		i = 0
-		player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)
+		player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING or (seat.status == Seat.SEAT_ALL_IN and seat.table_amount > 0), self.seats)
 		print player_list
 
 		for seat in player_list:
 			print "player names: =============:", seat.get_user().username
 			print "seat.table_amount = %d, self.min_amount = %d" %(seat.table_amount, self.min_amount)
 			if seat.table_amount == self.min_amount and self.num_of_checks == 0:
-				if seat.player_stake == 0:
-					seat.status = Seat.SEAT_ALL_IN
 				i += 1
 				continue
 			else:
 				if seat.player_stake == 0:
 					#if smaller_than_min_amount == True:
 					i += 1
-					seat.status = Seat.SEAT_ALL_IN
 					print "all in name: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", seat.get_user().username
 				else:
 					return False
