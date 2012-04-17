@@ -11,6 +11,7 @@ function Seat(id,pos){
 			<div id="countdown0"></div>
 		</div>
 		*/
+		console.log([id,pos,"-------------------------!!!!!!!!!"]);
 	var divSeat = $('<div class="seat"></div>');
 	var divSeatbg = $('<div class="seatbg"></div>');
 
@@ -18,6 +19,9 @@ function Seat(id,pos){
 	var divMoney = $('<div class="money">money</div>');
 	var divCountdown = $('<div class="countdown"></div>');
 	var divCount = $('<div class="countdown down"></div>');
+	var divWin = $('<div class="countdown win"></div>');
+	var divWin_lasr_card01 = $('<img class="countdown win card01" src="./pokers/club/A.png">');
+	var divWin_lasr_card02 = $('<img class="countdown win card02" src="./pokers/club/A.png">');
 	var divChip = $('<div class="chip"> </div>');
 	var divStake = $('<div class="tstake"></div>');
 	var cur_pos = "seatPos" + pos;
@@ -28,6 +32,11 @@ function Seat(id,pos){
 	divMoney.appendTo(divSeat);
 	divCountdown.appendTo(divSeat);
 	divCount.appendTo(divCountdown);
+	divWin.appendTo(divCountdown);
+	divWin_lasr_card01.attr("id", "last_card" + id + "1");
+	divWin_lasr_card01.appendTo(divWin);
+	divWin_lasr_card02.attr("id", "last_card" + id + "2");
+	divWin_lasr_card02.appendTo(divWin);
 	divSeat.addClass(cur_pos);
 	divSeat.appendTo($("#container"));
 	

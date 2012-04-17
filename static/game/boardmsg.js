@@ -15,6 +15,9 @@ function msg_sit(data){
 	var username = data.info.user;
 	var stake = data.info.player_stake;
 	var userid = data.info.uid;
+	var public_card = [];
+	var div1;
+	var div2;
 	SeatList[seatID].sit(username,stake,userid);
 	if(username == window.user_info.username){
 		window.user_info.sit_no = seatID;
@@ -57,17 +60,42 @@ function msg_winner(data){
 			return;
 		}
 		var seat = getSeatById(userid);
+		console.log([userid, seat,info.seat_no,"+++++++++++++"]);
 		seat.setStake(info.stake,0);
 		if(info.isWin){
 			$.each(info.pot,function(index,pid){
 				pot_manager.distribute(userid,pid);
 			});
 		}
-		$.each(seat.getChips(),function(index,chip){
-			console.log("removing");
-			console.log(chip);
-			chip.remove();
-		});
+	console.log([public_card, info.handcards, "------------------------------"]);
+	for (var i = 0, k = 0;  i <= info.handcards.length - 1 && k <= 1; i++) {
+		for (var j = 0; j <= public_card.length - 1; j++) {
+			if (info.handcards[i] == public_card[j]) {
+				break;
+			} else if (j == public_card.length - 1) {
+				console.log([info.handcards[i], "++++++++++++++++++++++++"]);
+				div1 = "#last_card" + info.seat_no + "1";
+				div2 = "#last_card" + info.seat_no + "2";
+				if (k == 0) {
+					poker_lib.setCard(info.handcards[i], div1);
+					$(div1).css("display","block");
+					k++;
+				} else {
+					poker_lib.setCard(info.handcards[i], div2);
+					$(div2).css("display","block");
+					k++;
+				}
+			}
+		}
+	}
+
+	//console.log([public_card, info.handcards, "++++++++++++++++++++++++++++++++++++++++"]);
+
+	$.each(seat.getChips(),function(index,chip){
+		console.log("removing");
+		console.log(chip);
+		chip.remove();
+	});
 		seat.cleanChips();
 	});
 
@@ -82,6 +110,8 @@ function msg_winner(data){
 	});
 
 	setTimeout(function(){
+		$(div1).removeAttr("style");
+		$(div2).removeAttr("style");
 		pot_manager.reset();
 	 	var cards = ["#card0","#card1","#card2","#card3","#card4"];
 		 for(var i = 0; i < cards.length; i++){
@@ -129,8 +159,7 @@ function msg_public_card(data){
 	 * */
 	 console.log("msg_public_card ==================================");
 	 console.log(data);
-	 
-	 
+	 public_card = data.cards;
 	 dealCard.send_public_card(data.cards);
 
 }
@@ -139,7 +168,6 @@ function msg_start_game(data){
 	console.log(data);
 	var seconds = parseInt(data.to);
 	var contentDIV = window.message_box.showMessage("",seconds);
-
 	var countDown = function(){
 		contentDIV.html(
 				"Game start in " +  seconds + " seconds");
