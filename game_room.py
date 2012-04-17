@@ -556,12 +556,12 @@ class GameRoom(object):
 													"pot": pot,
 													"stake": seat.player_stake,
 													"handcards": card_list,
-													"seat no": seat.seat_id }
+													"seat_no": seat.seat_id }
 					else:
 						msg_dict[seat._user.id] = {	"isWin": False,
 													"stake": seat.player_stake,
 													"handcards": card_list,
-													"seat no": seat.seat_id}
+													"seat_no": seat.seat_id}
 			else:
 #				card_list = [str(card) for card in winner_dict.keys()[0].handcards]
 #				pot = [amount["pid"] for users, amount in self.pot.iteritems() if winner_dict.keys()[0]._user.id in users]
@@ -577,7 +577,7 @@ class GameRoom(object):
 												"pot": pot,
 												"stake": winner.player_stake, #winner_dict.keys()[0].player_stake,
 												"handcards": card_list,
-												"seat no": winner.seat_id
+												"seat_no": winner.seat_id
 											} #winner_dict.keys()[0].seat_id}
 
 			self.broadcast(msg_dict ,GameRoom.MSG_WINNER)
