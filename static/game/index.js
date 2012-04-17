@@ -177,6 +177,8 @@ var take_place = function(seatID, seatObj) {
 	seatObj.getSeatDIV().click(function() {
 		if(!seatObj.getIsSat() && !window.user_info.userIsSat)
 		{
+			console.log(seatObj);
+			console.log(this);
 			sit_dialog.show(seatObj);
 		}
 		else if(seatObj.getIsSat()) {
