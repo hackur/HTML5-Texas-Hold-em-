@@ -16,33 +16,45 @@
 }
 
 #convert1 {
-	top: 20px;
-	left: 85px;
+	top: 10px;
+	left: 13px;
 	position: absolute;
+	width: 350px;
+	height: 38px;
+	line-height: 33px;
 }
 #convert1:hover {
 	background-image: url(./image/pitch1.png);
 }
 #convert2 {
-	top: 72px;
-	left: 85px;
+	top: 63px;
+	left: 13px;
 	position: absolute;
+	width: 350px;
+	height: 38px;
+	line-height: 33px;
 }
 #convert2:hover {
 	background-image: url(./image/pitch1.png);
 }
 #convert3 {
-	top: 123px;
-	left: 85px;
+	top: 113px;
+	left: 13px;
 	position: absolute;
+	width: 350px;
+	height: 38px;
+	line-height: 33px;
 }
 #convert3:hover {
 	background-image: url(./image/pitch1.png);
 }
 #convert4 {
-	top: 174px;
-	left: 85px;
+	top: 161px;
+	left: 13px;
 	position: absolute;
+	width: 350px;
+	height: 38px;
+	line-height: 33px;
 }
 #convert4:hover {
 	background-image: url(./image/pitch1.png);
@@ -53,6 +65,7 @@
 	position: absolute;
 	background-image: url(./image/btE.png);
 	line-height: 45px;
+	cursor: pointer;
 }
 #rpurchase1 {
 	top: 5px;
@@ -86,6 +99,7 @@
 	line-height: 45px;
 	top: 222px;
 	left: 440px;
+	cursor: pointer;
 }
 #rrunner {
 	width: 78px;
@@ -94,6 +108,7 @@
 	background-image: url(./image/rrunner.png);
 	top: 255px;
 	left: 45px;
+	cursor: pointer;
 }
 #min {
 	top: 290px;

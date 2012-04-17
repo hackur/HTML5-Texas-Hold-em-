@@ -11,6 +11,38 @@
 		<link rel="stylesheet" type="text/css" href="bigFrame5.css">
 		<link rel="stylesheet" type="text/css" href="rightFrame.css">
 		<script src="jquery.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				window.bigframe = ["#info","#email","#market","#recharge","#friend"];
+
+				document.getElementById('bigFrame1').style.display = "block";
+				$("#info")[0].style.backgroundImage = "url(./image/left.png)";
+				for(var i = 0; i <= bigframe.length; i++) {
+					frameControl(bigframe[i], i);
+				}
+				
+			});
+			function frameControl(frame, i) {
+				$(frame).click(function() {	
+					document.getElementById('bigFrame' + (i+1)).style.display = "block";
+					if( i == 0) {
+						$(frame)[0].style.backgroundImage = "url(./image/left.png)";		
+					}
+					if( i == 4) {
+						$(frame)[0].style.backgroundImage = "url(./image/right.png)";	
+					}
+					if( i > 0 && i < 4) {
+						$(frame)[0].style.backgroundImage = "url(./image/middle.png)";	
+					}
+					for(var j = 0; j <= 4; j++) {
+						if( j != i) {
+							document.getElementById('bigFrame' + (j+1)).style.display = "none";
+							$(bigframe[j])[0].style.backgroundImage = "url()";
+						}
+					}
+				});			
+			}
+		</script>
 	</head>
 	<body>
 		<div id="background">
@@ -73,13 +105,13 @@
 			</div>
 
 			<div id="bigFrame4" class="bigFrame">
-				<span id="convert1">1RMB=1钻石</span>
+				<div id="convert1">1RMB=1钻石</div>
 				<div id="rpurchase1" class="rpurchase">购 买</div>
-				<span id="convert2">5RMB=5钻石</span>
+				<div id="convert2">5RMB=5钻石</div>
 				<div id="rpurchase2" class="rpurchase">购 买</div>
-				<span id="convert3">20RMB=20钻石</span>
+				<div id="convert3">20RMB=20钻石</div>
 				<div id="rpurchase3" class="rpurchase">购 买</div>
-				<span id="convert4">其他金额购买</span>
+				<div id="convert4">其他金额购买</div>
 				<div id="rpurchase4" class="rpurchase">购 买</div>
 
 				<div id="rrunway"></div>
@@ -96,7 +128,18 @@
 			</div>
 
 			<div id="bigFrame5" class="bigFrame">
-				<div id="rightInfo"></div>
+				<div id="rightInfo">
+					<div id="por_box"></div>
+					<div id="fspace">好友空间</div>
+					<div id="fsend">发送邮件</div>
+					<div id="fdelete">删除好友</div>
+					<span id="fID">ID名称：</span>
+					<span id="ffamily">家族：</span>
+					<span id="fpos">职位：</span>
+					<span id="frank">等级：</span>
+					<span id="fpro">资产：</span>
+				</div>
+				<div id="name1">少年</div>
 				<div id="line7" class="line"></div>
 				<div id="line8" class="line"></div>
 				<div id="line9" class="line"></div>
