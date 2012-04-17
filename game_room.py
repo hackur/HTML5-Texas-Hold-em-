@@ -542,14 +542,14 @@ class GameRoom(object):
 					if seat in winner_dict.keys():
 						seat.player_stake += winner_dict[seat]
 						pot = [amount["pid"] for users, amount in self.pot.iteritems() if seat._user.id in users]
-						msg_dict[seat._user.id] = {"isWin":True,"earned":winner_dict[seat],"pot": pot, "stake": seat.player_stake, "handcards": card_list}
+						msg_dict[seat._user.id] = {"isWin":True,"earned":winner_dict[seat],"pot": pot, "stake": seat.player_stake, "handcards": card_list, "seat no":seat.seat_id}
 					else:
-						msg_dict[seat._user.id] = {"isWin":False, "stake":seat.player_stake, "handcards": card_list}
+						msg_dict[seat._user.id] = {"isWin":False, "stake":seat.player_stake, "handcards": card_list, "seat no":seat.seat_id}
 			else:
 				card_list = [str(card) for card in winner_dict.keys()[0].handcards]
 				pot = [amount["pid"] for users, amount in self.pot.iteritems() if winner_dict.keys()[0]._user.id in users]
 				winner_dict.keys()[0].player_stake += winner_dict[winner_dict.keys()[0]]
-				msg_dict[winner_dict.keys()[0]._user.id] = {"isWin":True,"earned":winner_dict[winner_dict.keys()[0]],"pot": pot, "stake": winner_dict.keys()[0].player_stake, "handcards": card_list}
+				msg_dict[winner_dict.keys()[0]._user.id] = {"isWin":True,"earned":winner_dict[winner_dict.keys()[0]],"pot": pot, "stake": winner_dict.keys()[0].player_stake, "handcards": card_list, "seat no":winner_dict.keys()[0].seat_id}
 			self.broadcast(msg_dict ,GameRoom.MSG_WINNER)
 			print msg_dict
 			self.status = GameRoom.GAME_WAIT
