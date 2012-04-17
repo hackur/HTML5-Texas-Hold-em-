@@ -1,6 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey,Text,Table
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey,Text,Table,DateTime
 from sqlalchemy.orm import sessionmaker,relationship, backref
+from datetime import datetime
 from pprint import pprint
 Base	= declarative_base()
 class Room(Base):
@@ -14,13 +15,23 @@ class Room(Base):
 		self.exchange	= exchange
 	def __repr__(self):
 		return "<Room('%s','%s','%s','%s')>" % (self.id, self.exchange, self.queues,self.owner)
+class HeadPortrait(Base):
+	__tablename__	= "head_portrait"
+	id		= Column(Integer, primary_key = True, autoincrement = True)
+	path	= Column(String(255))
+	url		= Column(String(255))
+	def __init__(self, url, path):
+		self.path	= path
+		self.url	= url
+
+
+
 
 #imtermediate table
 friendShip=Table("friendShip",Base.metadata,
 	Column("leftFriendId",Integer,ForeignKey("user.id"),primary_key=True),
 	Column("rightFriendId",Integer,ForeignKey("user.id"),primary_key=True)
 )
-
 class User(Base):
 	__tablename__	= "user"
 	id		= Column(Integer, primary_key=True, autoincrement=True)
@@ -32,10 +43,17 @@ class User(Base):
 	family		= relationship("Family",backref=backref('members',order_by=id))
 	email		= Column(String(100))
 	level		= Column(Integer)
-	points		= Column(Integer) #need to be changed
+	total_games = Column(Integer)
+	won_games	= Column(Integer)
+	max_reward	= Column(Integer)
+	last_login	= Column(DateTime)
+	signature	= Column(String(255))
+	asset		= Column(Integer) #need to be changed
+	head_portrait_id	= Column(Integer, ForeignKey("head_portrait.id"))
+	head_portrait		= relationship("HeadPortrait", backref=backref('user'), uselist=False)
 	#type in family
-	ftype_id	= Column(Integer,ForeignKey('familyType.id'))
-	ftype		= relationship("FamilyType",backref=backref('members',order_by=id))
+	family_position_id	= Column(Integer,ForeignKey('familyPosition.id'))
+	family_position		= relationship("FamilyPosition", backref=backref('members',order_by=id))
 	friends		= relationship("User",
 					secondary=friendShip,
 					primaryjoin=id==friendShip.c.leftFriendId,
@@ -54,20 +72,29 @@ class User(Base):
 class Family(Base):
 	__tablename__="family"
 	id	= Column(Integer, primary_key=True, autoincrement=True)
-	name 	= Column(String(100))
+	name	= Column(String(100))
 	def __init__(self,name):
 		self.name=name
 
-
-class FamilyType(Base):
-	__tablename__="familyType"
-	id		= Column(Integer, primary_key=True, autoincrement=True)
+class FamilyPosition(Base):
+	__tablename__="familyPosition"
+	id			= Column(Integer, primary_key=True, autoincrement=True)
 	name		= Column(String(100))
 	description	= Column(Text)
 
 	def __init__(self,name):
 		self.name=name
 
+class Email(Base):
+	__tablename__	= "email"
+	id			= Column(Integer, primary_key=True, autoincrement=True)
+	from_user_id= Column(Integer, ForeignKey("user.id"))
+	from_user	= relationship("User", primaryjoin=(from_user_id==User.id), backref=backref('out_mails'))
+	to_user_id	= Column(Integer, ForeignKey("user.id"))
+	to_user		= relationship("User", primaryjoin=(to_user_id==User.id), backref=backref('in_mails'))
+	content		= Column(Text)
+	sent_date	= Column(DateTime)
+	status		= Column(Integer)
 
 class DatabaseConnection(object):
 	__single	= None
@@ -110,6 +137,13 @@ def init_database():
 	mile        = User(username="mile", password="123", stake = 100)
 	mamingcao   = User(username="mamingcao", password="123", stake = 200)
 	huaqin      = User(username="huaqin", password="123", stake = 500)
+	ting.level	= 12
+	ting.total_games= 100
+	ting.won_games	= 40
+	ting.max_reward	= 998
+	ting.last_login	= datetime.strptime("2012-04-13 12:02:20", "%Y-%m-%d %H:%M:%S")
+	ting.signature	= "software engineer"
+	ting.asset		= 12000
 	db_connection.addItem(ting)
 	db_connection.addItem(mile)
 	db_connection.addItem(huaqin)

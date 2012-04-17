@@ -6,6 +6,7 @@ import tornado.process
 from room_controller import *
 from login_controller import *
 from user_controller import *
+from archive_controller import *
 from database import *
 from pika.adapters.tornado_connection import TornadoConnection
 PORT = 8888
@@ -66,6 +67,8 @@ if __name__ == '__main__':
 		(r"/listen-board-message", BoardListenMessageHandler),
 		(r"/post-board-message", BoardActionMessageHandler),
 		(r"/enter", EnterRoomHandler),
+		(r"/personal-archive",PersonalArchiveHandler),
+		(r"/head-portrait-upload",HeadPortraitHandler),
 		(r"/userinfo", UserInfoHandler),
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),
