@@ -60,7 +60,7 @@ class EmailListHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
 		user	= self.session['user']
-		message = {"status":"success", emails:user.in_mails}
+		message = {"status":"success", "emails":user.in_mails}
 		self.finish(json.dumps(message))
 
 class EmailSendHandler(tornado.web.RequestHandler):

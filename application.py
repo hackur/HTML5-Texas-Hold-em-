@@ -69,6 +69,9 @@ if __name__ == '__main__':
 		(r"/enter", EnterRoomHandler),
 		(r"/personal-archive",PersonalArchiveHandler),
 		(r"/head-portrait-upload",HeadPortraitHandler),
+		(r"/list-email",EmailListHandler),
+		(r"/sent-email",EmailSendHandler),
+
 		(r"/userinfo", UserInfoHandler),
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),
