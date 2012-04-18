@@ -87,8 +87,15 @@ var uploadImage = function() {
 	var status = $('#status');
 	$('form').ajaxForm({
 		complete: function(xhr) {
-			console.log(xhr.responseText);
-			status.html(xhr.responseText);
+			var data = JSON.parse(xhr.responseText);
+			console.log(data);
+			if(data.status == "success") {
+				var url = "../." + data.url;
+				console.log(url);
+				status.html("upload success");
+				var image = $('<img id="image1" src=' + url + ' />').appendTo($("#portrait_box"));
+				$("#image1").css({'width': 102, 'height': 126, 'top': 6, 'left': 8, 'position': 'absolute'});
+			}
 		}
 	});
 };
