@@ -1,4 +1,5 @@
 import time
+import math
 import os
 import json
 import tornado.ioloop
@@ -62,11 +63,47 @@ class HeadPortraitHandler(tornado.web.RequestHandler):
 		self.finish(json.dumps(message))
 
 class EmailListHandler(tornado.web.RequestHandler):
+	(PAGE_SIZE,PAGE_OFFSET) = (20, 19)
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
+		db_connection  = DatabaseConnection()
+		page	= self.get_argument('page', 1)
+		start	= (page - 1) * self.PAGE_SIZE
+		end		= start + self.PAGE_OFFSET
 		user	= self.session['user']
-		message = {"status":"success", "emails":user.in_mails}
+
+		all_emails	= db_connection.query(Email).filter_by(to_user = user).order_by(Email.sent_date)
+
+		total_emails= all_emails.count()
+		pages		= math.ceil(email_amount / self.PAGE_SIZE)
+		emails		= all_emails.slice(start, end)
+		email_list	= list()
+		for email in emails:
+			email_list.push({
+								"id": email.id,
+								"title": email.title,
+								"date": email.sent_date,
+								"from": email.from_user.username
+							})
+
+		message =	{
+						"status": "success",
+						"total": total_emails,
+						"pages": pages,
+						"emails": email_list
+					}
+		self.finish(json.dumps(message))
+
+class EmailViewHandler(tornado.web.RequestHandler):
+	@tornado.web.asynchronous
+	@authenticate
+	def post(self):
+		db_connection  = DatabaseConnection()
+		email_id= self.get_argument('email')
+		user	= self.session['user']
+		email	= db_connection.query(Email).filter_by(to_user = user).filter_by(id = email_id).one()
+		message = {"status":"success", "email":email}
 		self.finish(json.dumps(message))
 
 class EmailSendHandler(tornado.web.RequestHandler):

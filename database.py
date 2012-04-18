@@ -85,6 +85,7 @@ class FamilyPosition(Base):
 class Email(Base):
 	__tablename__	= "email"
 	id			= Column(Integer, primary_key=True, autoincrement=True)
+	title		= Column(String(255))
 	from_user_id= Column(Integer, ForeignKey("user.id"))
 	from_user	= relationship("User", primaryjoin=(from_user_id==User.id), backref=backref('out_mails'))
 	to_user_id	= Column(Integer, ForeignKey("user.id"))
