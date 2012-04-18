@@ -827,8 +827,11 @@ class GameRoom(object):
 		msg = {}
 
 		for seat in go_away_list:
-			self.stand_up(seat.get_user().id)
+			#self.stand_up(seat.get_user().id)
 			msg[seat.get_user().id] = seat.seat_id
+			seat.status = Seat.SEAT_EMPTY
+			self.audit_list.append({"user": seat.get_user().id})
+			seat.set_user(None)
 
 		print "broadcasting standup msg"
 		self.broadcast(msg, GameRoom.MSG_STAND_UP)
@@ -838,9 +841,9 @@ class GameRoom(object):
 			msg = {'to':timeout }
 			self.broadcast(msg,GameRoom.MSG_START)
 
-	def stand_up(self, user_id):
-		for seat in self.seats:
-			if not seat.is_empty() and user_id == seat.get_user().id:
-				seat.set_user(None)
-				seat.status = Seat.SEAT_EMPTY
-				self.audit_list.append({"user": user_id})
+	#def stand_up(self, user_id):
+	#	for seat in self.seats:
+	#		if not seat.is_empty() and user_id == seat.get_user().id:
+	#			seat.set_user(None)
+	#			seat.status = Seat.SEAT_EMPTY
+	#			self.audit_list.append({"user": user_id})
