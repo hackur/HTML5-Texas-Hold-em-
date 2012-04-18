@@ -119,6 +119,8 @@ class DatabaseConnection(object):
 		return self.session.query(object)
 	def addItem(self, item):
 		self.session.add(item)
+	def delete(self, item):
+		self.session.delete(item)
 	def rollback(self):
 		self.session.rollback()
 	def merge(self, object):
