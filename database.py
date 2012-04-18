@@ -38,7 +38,7 @@ class User(Base):
 	room		= relationship("Room", backref=backref('users'))
 	family_id   = Column(Integer,ForeignKey('family.id'))
 	family		= relationship("Family",backref=backref('members',order_by=id))
-	email		= Column(String(100))
+	#email		= Column(String(100))
 	level		= Column(Integer)
 	total_games = Column(Integer)
 	won_games	= Column(Integer)
@@ -58,10 +58,15 @@ class User(Base):
 					)
 	stake		= Column(Integer)
 
-	def __init__(self, username, password, stake, **kwargs):
-		self.username = username
-		self.password = password
-		self.stake = stake
+	def __init__(self, username, password, stake, total_games=0, won_games = 0, level = 0, asset = 0, max_reward = 0, **kwargs):
+		self.username		= username
+		self.password		= password
+		self.stake			= stake
+		self.total_games	= total_games
+		self.won_games		= won_games
+		self.level			= level
+		self.asset			= asset
+		self.max_reward		= max_reward
 
 	def __repr__(self):
 		return "<User('%s','%s', '%s', '%s', '%s')>" % (self.id, self.username, self.password, self.queue, self.friends)
@@ -118,14 +123,22 @@ class DatabaseConnection(object):
 
 	def query(self, object):
 		return self.session.query(object)
+
 	def addItem(self, item):
 		self.session.add(item)
+
 	def delete(self, item):
 		self.session.delete(item)
+
 	def rollback(self):
 		self.session.rollback()
+
 	def merge(self, object):
 		self.session.merge(object)
+
+	def close(self):
+		self.session.expunge_all()
+		self.session.close()
 
 def init_database():
 	db_connection  = DatabaseConnection()

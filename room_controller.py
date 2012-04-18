@@ -25,7 +25,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		db_connection	= DatabaseConnection()
+#		db_connection	= DatabaseConnection()
 		message			= None
 
 		# Only for using  apache ab to test
@@ -33,12 +33,12 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 
 		user			= self.session['user']
 		room_id			= self.get_argument('room_id')
-		room			= db_connection.query(Room).filter_by(id = room_id).one()
+		room			= self.db_connection.query(Room).filter_by(id = room_id).one()
 
 		user.room	= room
 		user.room_id= room.id
-		db_connection.addItem(user)
-		db_connection.commit_session()
+		self.db_connection.addItem(user)
+		self.db_connection.commit_session()
 		queue				= str(user.username) + '_init'
 		exchange			= str(room.exchange)
 

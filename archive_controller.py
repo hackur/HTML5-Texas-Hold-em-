@@ -12,15 +12,18 @@ class PersonalArchiveHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		user	= self.session['user']
-		portrait= "#"
-		family	= "-1"
-		position= "-1"
+		user		= self.session['user']
+		portrait	= "#"
+		family		= "-1"
+		position	= "-1"
+		percentage	= 0
 		if user.head_portrait is not None:
 			portrait = user.head_portrait.url
 		if user.family is not None:
 			family	= user.family.name
 			position= user.family_position.name
+		if user.total_games > 0:
+			percentage = (user.won_games * 1.0) / user.total_games
 		message	= {
 					"status": "success",
 					"name": user.username,
@@ -29,11 +32,11 @@ class PersonalArchiveHandler(tornado.web.RequestHandler):
 					"position": position,
 					"level": user.level,
 					"asset": user.asset,
-					"percentage": (user.total_games * 1.0) / use.won_games,
+					"percentage": percentage,
 					"total_games": user.total_games,
 					"won_games": user.won_games,
 					"max_reward": user.max_reward,
-					"last_login": user.last_login,
+					"last_login": user.last_login.strftime("%Y-%m-%d %H:%M:%S"),
 					"signature": user.signature
 				}
 		self.write(json.dumps(message))
@@ -43,7 +46,7 @@ class HeadPortraitHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		db_connection  = DatabaseConnection()
+		#db_connection  = DatabaseConnection()
 
 		user			= self.session['user']
 		directory		= "uploads/" + user.username
@@ -66,9 +69,9 @@ class HeadPortraitHandler(tornado.web.RequestHandler):
 		portrait.url		= "./" + directory + '/' + head_portrait['filename']
 		portrait.path		= "./" + directory + '/' + head_portrait['filename']
 		user.head_portrait	= portrait
-		db_connection.addItem(portrait)
-		db_connection.addItem(user)
-		db_connection.commit_session()
+		self.db_connection.addItem(portrait)
+		self.db_connection.addItem(user)
+		self.db_connection.commit_session()
 		message = {"status":"success","url":user.head_portrait.url}
 		self.finish(json.dumps(message))
 
@@ -77,13 +80,13 @@ class EmailListHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		db_connection  = DatabaseConnection()
+		#db_connection  = DatabaseConnection()
 		page	= self.get_argument('page', 1)
 		start	= (page - 1) * self.PAGE_SIZE
 		end		= start + self.PAGE_OFFSET
 		user	= self.session['user']
 
-		all_emails	= db_connection.query(Email).filter_by(to_user = user).order_by(Email.sent_date)
+		all_emails	= self.db_connection.query(Email).filter_by(to_user = user).order_by(Email.sent_date)
 
 		total_emails= all_emails.count()
 		pages		= math.ceil(email_amount / self.PAGE_SIZE)
@@ -109,10 +112,10 @@ class EmailViewHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		db_connection  = DatabaseConnection()
+		#db_connection  = DatabaseConnection()
 		email_id= self.get_argument('email')
 		user	= self.session['user']
-		email	= db_connection.query(Email).filter_by(to_user = user).filter_by(id = email_id).one()
+		email	= self.db_connection.query(Email).filter_by(to_user = user).filter_by(id = email_id).one()
 		message = {"status":"success", "email":email}
 		self.finish(json.dumps(message))
 
@@ -130,10 +133,10 @@ class EmailSendHandler(tornado.web.RequestHandler):
 		email.content	= content
 		email.sent_date	= sent_date
 		email.satus		= 0
-		db_connection  = DatabaseConnection()
-		db_connection.start_session()
-		db_connection.addItem(email)
-		db_connection.commit_session()
+		#db_connection  = DatabaseConnection()
+		self.db_connection.start_session()
+		self.db_connection.addItem(email)
+		self.db_connection.commit_session()
 		message	= {"status":"success"}
 		self.finish(json.dumps(message))
 
