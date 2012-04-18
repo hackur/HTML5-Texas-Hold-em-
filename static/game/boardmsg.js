@@ -53,9 +53,40 @@ function msg_phc(data){
 }
 function msg_winner(data){
 	//We have a winner in this game
-	message_box.showMessage("We have a winner! ",5)
-	console.log("WINNER!");
+	message_box.showMessage("We have a winner! ",3)
 	console.log(data);
+
+    function distribute(){
+        /* We have to wait for while here 
+         * Because we may still collecting coins
+         * */
+        $.each(data,function(userid,info){
+            console.log(info);
+            if(info.isWin == undefined){
+                    return;
+            }
+            var seat = getSeatById(userid);
+            if(info.isWin){
+                $.each(info.pot,function(index,pid){
+                    pot_manager.distribute(userid,pid);
+                });
+                div_winbg = "#winbg" + info.seat_no;
+                $(div_winbg).css("display","block");
+            }
+        });
+        $.each(SeatList,function(index,seat){
+            $.each(seat.getChips(),function(index,chip){
+                console.log("removing");
+                console.log(chip);
+                chip.remove();
+            });
+            seat.cleanChips();
+            seat.clearStake();
+        });
+		pot_manager.reset();
+    }
+    setTimeout(distribute,1000);
+
 	$.each(data,function(userid,info){
 		console.log(info);
 		if(info.isWin == undefined){
@@ -66,49 +97,26 @@ function msg_winner(data){
 		div1.push("#last_card" + info.seat_no + "1");
 		div2.push("#last_card" + info.seat_no + "2");
 		seat.setStake(info.stake,0);
-		if(info.isWin){
-			$.each(info.pot,function(index,pid){
-				pot_manager.distribute(userid,pid);
-			});
-			div_winbg = "#winbg" + info.seat_no;
-			$(div_winbg).css("display","block");
-		}
-	console.log([public_card, info.handcards, "------------------------------"]);
-	for (var i = 0, k = 0;  i <= info.handcards.length - 1 && k <= 1; i++) {
-		for (var j = 0; j <= public_card.length - 1; j++) {
-			if (info.handcards[i] == public_card[j]) {
-				break;
-			} else if (j == public_card.length - 1) {
-				console.log([info.handcards[i], "++++++++++++++++++++++++"]);
-				if (k == 0) {
-					poker_lib.setCard(info.handcards[i], div1[div1.length - 1]);
-					$(div1[div1.length - 1]).css("display","block");
-					k++;
-				} else {
-					poker_lib.setCard(info.handcards[i], div2[div2.length - 1]);
-					$(div2[div2.length - 1]).css("display","block");
-					k++;
-				}
-			}
-		}
-	}
-	$.each(seat.getChips(),function(index,chip){
-		console.log("removing");
-		console.log(chip);
-		chip.remove();
-	});
-		seat.cleanChips();
+        for (var i = 0, k = 0;  i <= info.handcards.length - 1 && k <= 1; i++) {
+            for (var j = 0; j <= public_card.length - 1; j++) {
+                if (info.handcards[i] == public_card[j]) {
+                    break;
+                } else if (j == public_card.length - 1) {
+                    console.log([info.handcards[i], "++++++++++++++++++++++++"]);
+                    if (k == 0) {
+                        poker_lib.setCard(info.handcards[i], div1[div1.length - 1]);
+                        $(div1[div1.length - 1]).css("display","block");
+                        k++;
+                    } else {
+                        poker_lib.setCard(info.handcards[i], div2[div2.length - 1]);
+                        $(div2[div2.length - 1]).css("display","block");
+                        k++;
+                    }
+                }
+            }
+        }
 	});
 
-	$.each(SeatList,function(index,seat){
-		$.each(seat.getChips(),function(index,chip){
-			console.log("removing");
-			console.log(chip);
-			chip.remove();
-		});
-		seat.cleanChips();
-		seat.clearStake();
-	});
 
 	setTimeout(function(){
 		while(div1.length > 0) {
@@ -116,7 +124,7 @@ function msg_winner(data){
 			$(div2.pop()).removeAttr("style");
 		} 
 		$(div_winbg).removeAttr("style");
-		pot_manager.reset();
+		//pot_manager.reset();
 	 	var cards = ["#card0","#card1","#card2","#card3","#card4"];
 		 for(var i = 0; i < cards.length; i++){
 			$(cards[i]).fadeOut("fast");
