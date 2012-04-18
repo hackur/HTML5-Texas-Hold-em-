@@ -34,16 +34,19 @@ class HeadPortraitHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		directory		= "uploads/" + user.username
 		user			= self.session['user']
+		directory		= "uploads/" + user.username
 		head_portrait	= self.request.files['head_portrait'][0]
+		print head_portrait
 		if not os.path.exists(directory):
 			os.makedirs(directory)
-		output_file		= open(directory + "/" + head_portrait['filename'], 'w')
+		output_file		= open(directory + "/" + head_portrait['filename'], 'wb')
 		output_file.write(head_portrait['body'])
+		output_file.seek(0)
+		output_file.close()
 
 		db_connection  = DatabaseConnection()
-		db_connection.start_session()
+		#db_connection.start_session()
 		portrait			= HeadPortrait()
 		portrait.url		= "./" + directory +  head_portrait['filename']
 		portrait.path		= "./" + directory +  head_portrait['filename']
@@ -52,7 +55,7 @@ class HeadPortraitHandler(tornado.web.RequestHandler):
 		db_connection.addItem(user)
 		db_connection.commit_session()
 
-		message = {"status":"success"}
+		message = {"status":"success","url":user.head_portrait.url}
 		self.finish(json.dumps(message))
 
 class EmailListHandler(tornado.web.RequestHandler):
