@@ -180,7 +180,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 	def post(self):
 		user		= self.session['user']
 		timestamp	= int(self.get_argument('timestamp'))
-		queue		= str(user.username)
+		queue		= str(user.username)  + '_broadcast'
 		exchange	= self.session['exchange']
 		self.clean_matured_message(timestamp)
 
@@ -192,7 +192,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		binding_keys= (self.session['public_key'], self.session['private_key'])
 		self.channel= Channel(self.application.channel,queue, exchange, binding_keys, self)
 		self.channel.add_message_action(self.message_call_back, None)
-		self.channel.connect()
+		self.channel.consume()
 
 	def clean_matured_message(self, timestamp):
 		self.session['messages'] = filter(lambda x: int(x['timestamp']) > timestamp,self.session['messages'])

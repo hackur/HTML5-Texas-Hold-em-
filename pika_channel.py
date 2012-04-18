@@ -30,14 +30,15 @@ class Channel(object):
 								queue		= self.queue_name,
 								auto_delete	= not self.durable_queue,
 								durable		= self.durable_queue,
-								exclusive	= not self.durable_queue, # durable_queue may be shared
+								exclusive	= False, #not self.durable_queue, # durable_queue may be shared
 								callback	= self.on_queue_declared,
 								arguments 	= self.arguments)
 		else:
+			pika.log.info('Declaring anonymous Queue')
 			self.channel.queue_declare(
 								auto_delete	= not self.durable_queue,
 								durable		= self.durable_queue,
-								exclusive	= not self.durable_queue, # durable_queue may be shared
+								exclusive	= False,#not self.durable_queue, # durable_queue may be shared
 								callback	= self.on_queue_declared)
 
 		pika.log.info('PikaClient: Exchange Declared, Declaring Queue Finish')
@@ -64,18 +65,23 @@ class Channel(object):
 	def on_queue_bound(self, frame):
 		if not self.declare_queue_only:
 			pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
-			print frame
+			print self.queue_name
+			self.consume()
 
-			self.consumer_tag	= "mtag%i" % Channel.tag ## Seems pika's tag name is not that reliable
-			Channel.tag += 1
-
-			self.consumer_tag = self.channel.basic_consume(consumer_callback=self.on_room_message,
-							queue=self.queue_name,
-							no_ack=True,consumer_tag=self.consumer_tag)
 			pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume Finish')
 
 		for element in self.ready_actions:
 			element['functor'](element['argument'])
+
+	def consume(self):
+		print "CONSUME!!!!",self.queue_name
+		self.consumer_tag	= "mtag%i" % Channel.tag ## Seems pika's tag name is not that reliable
+		Channel.tag += 1
+
+		self.consumer_tag = self.channel.basic_consume(consumer_callback=self.on_room_message,
+						queue=self.queue_name,
+						no_ack=True,consumer_tag=self.consumer_tag)
+		print "END!!!!"
 
 
 	def on_room_message(self, channel, method, header, body):
