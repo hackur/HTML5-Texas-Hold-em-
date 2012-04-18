@@ -433,7 +433,7 @@ class GameRoom(object):
 
 #		if 0 < amount + self.seats[seat_no].table_amount < self.min_amount:
 		if self.min_amount < amount:
-			self.min_amount = amount
+			self.min_amount = self.seats[seat_no].table_amount + amount
 		self.seats[seat_no].player_stake -= amount
 		self.seats[seat_no].table_amount += amount
 		# self.seats[seat_no].status = Seat.SEAT_ALL_I
