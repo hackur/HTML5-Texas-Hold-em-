@@ -109,7 +109,7 @@ var enter = function(){
 									data.room.seats[i].player_stake,
 									data.room.seats[i].uid
 							);
-							$("#seatbg" + SeatList[i].id).css("display", "none");
+							
 							if( SeatList[i].username == window.user_info.username ) {
 								sit_transit.transit(i);
 								console.log("-----------------------" + i);
