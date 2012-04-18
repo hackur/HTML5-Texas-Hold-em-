@@ -13,12 +13,20 @@ class PersonalArchiveHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
 		user	= self.session['user']
+		portrait= "#"
+		family	= "-1"
+		position= "-1"
+		if user.head_portrait is not None:
+			portrait = user.head_portrait.url
+		if user.family is not None:
+			family	= user.family.name
+			position= user.family_position.name
 		message	= {
 					"status": "success",
 					"name": user.username,
-					"head_portrait": user.head_portrait.url,
-					"family": user.family.name,
-					"position": user.family_position.name,
+					"head_portrait": portrait,
+					"family": family,
+					"position": position,
 					"level": user.level,
 					"asset": user.asset,
 					"percentage": (user.total_games * 1.0) / use.won_games,
@@ -40,6 +48,8 @@ class HeadPortraitHandler(tornado.web.RequestHandler):
 		user			= self.session['user']
 		directory		= "uploads/" + user.username
 		head_portrait	= self.request.files['head_portrait'][0]
+		#print head_portrait
+
 		if not os.path.exists(directory):
 			os.makedirs(directory)
 		output_file		= open(directory + "/" + head_portrait['filename'], 'wb')
