@@ -23,6 +23,7 @@ function msg_sit(data){
 	if(username == window.user_info.username){
 		window.user_info.sit_no = seatID;
 	}
+	$("#seatbg" + seatID).css("display", "none");
 }
 function msg_bhc(data){ 
 	/*

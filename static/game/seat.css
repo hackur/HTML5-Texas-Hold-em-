@@ -10,9 +10,10 @@
 	transition-timing-function: ease-out;
 	transition: all 1s;  
 }
+
+
 .seatbg{
 	background-image: url(./image/seat.png);
-
 	height: 149px;
 	width: 135px;
 }
@@ -84,6 +85,19 @@
 	overflow : hidden;
 }/* end countdown */
 
+.countdown .seat_dowm_bg {
+	top:0px;
+	left:0px;
+	height:32px;
+	width:28px;
+	position: absolute;
+	background-image: url(./image/seat1.png);
+}
+
+.countdown .seat_dowm_bg:hover {
+	background-image: url(./image/seat2.png);
+}
+
 .countdown .down {
 	top:0px;
 	left:0px;
@@ -106,6 +120,19 @@
 	left:0px;
 	height:70px;
 	position: absolute;
+}
+
+.countdown .win .seat_dowm_bg {
+	top:25px;
+	left:20px;
+	height:32px;
+	width:28px;
+	position: absolute;
+	background-image: url(./image/seat1.png);
+}
+
+.countdown .win .seat_dowm_bg:hover {
+	background-image: url(./image/seat2.png);
 }
 
 .countdown .win .card01 {

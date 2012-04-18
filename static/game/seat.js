@@ -11,10 +11,10 @@ function Seat(id,pos){
 			<div id="countdown0"></div>
 		</div>
 		*/
-		console.log([id,pos,"-------------------------!!!!!!!!!"]);
+	console.log([id,pos,"-------------------------!!!!!!!!!"]);
 	var divSeat = $('<div class="seat"></div>');
 	var divSeatbg = $('<div class="seatbg"></div>');
-
+	var divSeatdownbg = $('<div class="countdown win seat_dowm_bg"></div>');
 	var divName = $('<div class="name">name</div>');
 	var divMoney = $('<div class="money">money</div>');
 	var divCountdown = $('<div class="countdown"></div>');
@@ -36,6 +36,8 @@ function Seat(id,pos){
 	divWinbg.appendTo(divSeat);
 	divWinbg.attr("id", "winbg" + id);
 	divWin.appendTo(divCountdown);
+	divSeatdownbg.appendTo(divWin);
+	divSeatdownbg.attr("id", "seatbg" + id);
 	divWin_lasr_card01.attr("id", "last_card" + id + "1");
 	divWin_lasr_card01.appendTo(divWin);
 	divWin_lasr_card02.attr("id", "last_card" + id + "2");
