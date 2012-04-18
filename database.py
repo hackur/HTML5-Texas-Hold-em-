@@ -20,9 +20,6 @@ class HeadPortrait(Base):
 	id		= Column(Integer, primary_key = True, autoincrement = True)
 	path	= Column(String(255))
 	url		= Column(String(255))
-	def __init__(self, url, path):
-		self.path	= path
-		self.url	= url
 
 
 
