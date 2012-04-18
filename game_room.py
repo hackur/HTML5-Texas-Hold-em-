@@ -40,6 +40,9 @@ class Seat(object):
 	def get_user(self):
 		return self._user
 
+	def set_user(self, user):
+		self._user = user
+
 	def get_private_key(self):
 		return self._private_key
 
@@ -382,7 +385,11 @@ class GameRoom(object):
 	def discard_game_timeout(self,user_id):
 		# put before discard in order to send fold msg before the potential round/game finish msg
 		seat = self.seats[self.current_seat]
-		broadcast_msg = {'action':GameRoom.A_DISCARDGAME, 'seat_no':self.current_seat,'stake':seat.player_stake,'table':seat.table_amount}
+		broadcast_msg = {	'action': GameRoom.A_DISCARDGAME,
+							'seat_no': self.current_seat,
+							'stake': seat.player_stake,
+							'table': seat.table_amount
+						}
 		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
 		self.discard_game(user_id)
 
@@ -504,8 +511,8 @@ class GameRoom(object):
 	def round_finish(self):
 		print "ROUND FINISHED!!!!"
 		self.clearCountDown();
-		player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING or seat.table_amount > 0, self.seats)
-		playing_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)
+		player_list	= filter(lambda seat: seat.status == Seat.SEAT_PLAYING or seat.table_amount > 0, self.seats)
+		playing_list= filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)
 		print "-----------no more stake------------"
 		print self.no_more_stake()
 		print "__________len(playing_list)_________"
@@ -834,5 +841,6 @@ class GameRoom(object):
 	def stand_up(self, user_id):
 		for seat in self.seats:
 			if not seat.is_empty() and user_id == seat.get_user().id:
+				seat.set_user(None)
 				seat.status = Seat.SEAT_EMPTY
 				self.audit_list.append({"user": user_id})
