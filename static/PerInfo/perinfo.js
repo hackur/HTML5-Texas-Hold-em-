@@ -55,6 +55,9 @@ var info_init = function() {
 	$("#portrait_box").click(function() {
 		$("#change_por")[0].style.display = "block";
 		uploadImage();
+		$("#icancel").click(function() {
+			$("#change_por")[0].style.display = "none";
+		});
 	});
 	for(var i = 0; i <= bigframe.length; i++) {
 		frameControl(bigframe[i], i);
@@ -97,5 +100,17 @@ var uploadImage = function() {
 				$("#image1").css({'width': 102, 'height': 126, 'top': 6, 'left': 8, 'position': 'absolute'});
 			}
 		}
+	});
+};
+
+var getuserImage = function() {
+	$.ajax({
+		type: "post",
+		url:  "/personal-archive",
+		data: {},
+		success: function(data) {
+			console.log(data);
+		},
+		dataType: "json"
 	});
 };
