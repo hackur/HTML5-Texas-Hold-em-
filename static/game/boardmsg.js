@@ -7,6 +7,8 @@
 				= ('sit','bhc','phc','winner','next','action','public')
  *
  */
+var div1 = [];
+var div2 = [];
 function msg_sit(data){
 	/** Someone sat down
 	 *
@@ -16,8 +18,7 @@ function msg_sit(data){
 	var stake = data.info.player_stake;
 	var userid = data.info.uid;
 	var public_card = [];
-	var div1;
-	var div2;
+	var div_winbg;
 	SeatList[seatID].sit(username,stake,userid);
 	if(username == window.user_info.username){
 		window.user_info.sit_no = seatID;
@@ -61,11 +62,15 @@ function msg_winner(data){
 		}
 		var seat = getSeatById(userid);
 		console.log([userid, seat,info.seat_no,"+++++++++++++"]);
+		div1.push("#last_card" + info.seat_no + "1");
+		div2.push("#last_card" + info.seat_no + "2");
 		seat.setStake(info.stake,0);
 		if(info.isWin){
 			$.each(info.pot,function(index,pid){
 				pot_manager.distribute(userid,pid);
 			});
+			div_winbg = "#winbg" + info.seat_no;
+			$(div_winbg).css("display","block");
 		}
 	console.log([public_card, info.handcards, "------------------------------"]);
 	for (var i = 0, k = 0;  i <= info.handcards.length - 1 && k <= 1; i++) {
@@ -74,23 +79,18 @@ function msg_winner(data){
 				break;
 			} else if (j == public_card.length - 1) {
 				console.log([info.handcards[i], "++++++++++++++++++++++++"]);
-				div1 = "#last_card" + info.seat_no + "1";
-				div2 = "#last_card" + info.seat_no + "2";
 				if (k == 0) {
-					poker_lib.setCard(info.handcards[i], div1);
-					$(div1).css("display","block");
+					poker_lib.setCard(info.handcards[i], div1[div1.length - 1]);
+					$(div1[div1.length - 1]).css("display","block");
 					k++;
 				} else {
-					poker_lib.setCard(info.handcards[i], div2);
-					$(div2).css("display","block");
+					poker_lib.setCard(info.handcards[i], div2[div2.length - 1]);
+					$(div2[div2.length - 1]).css("display","block");
 					k++;
 				}
 			}
 		}
 	}
-
-	//console.log([public_card, info.handcards, "++++++++++++++++++++++++++++++++++++++++"]);
-
 	$.each(seat.getChips(),function(index,chip){
 		console.log("removing");
 		console.log(chip);
@@ -110,8 +110,11 @@ function msg_winner(data){
 	});
 
 	setTimeout(function(){
-		$(div1).removeAttr("style");
-		$(div2).removeAttr("style");
+		while(div1.length > 0) {
+			$(div1.pop()).removeAttr("style");
+			$(div2.pop()).removeAttr("style");
+		} 
+		$(div_winbg).removeAttr("style");
 		pot_manager.reset();
 	 	var cards = ["#card0","#card1","#card2","#card3","#card4"];
 		 for(var i = 0; i < cards.length; i++){

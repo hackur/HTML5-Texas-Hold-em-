@@ -91,6 +91,16 @@
 	background-image: url(./image/timebar.png);
 }
 
+.winbg {
+	top:3px;
+	left:27px;
+	height:95px;
+	width:79px;
+	display: none;
+	position: absolute;
+	background-image: url(./image/winner.png);
+}
+
 .countdown .win {
 	top:0px;
 	left:0px;
@@ -107,6 +117,10 @@
 	display: none;
 	left:19px;
 	width:50px;
+}
+
+.countdown .win .background {
+	background-image: url(./image/winner.png);
 }
 
 /* Top and left are the finally position, original position are reseted in index.js function send_chips() */
