@@ -428,13 +428,13 @@ class GameRoom(object):
 		amount   = self.amount_limits[GameRoom.A_ALLIN]
 		self.seats[seat_no].status  = Seat.SEAT_ALL_IN
 		print "self.min_amount before all in: ", self.min_amount
-		print "----------------",self.min_amount == amount + self.seats[seat_no].table_amount
+		print "======amount limits======="
+		print self.amount_limits
 
-		print "amount to be on table: ", amount + self.seats[seat_no].table_amount
 #		if 0 < amount + self.seats[seat_no].table_amount < self.min_amount:
 		if self.min_amount < amount:
 			self.min_amount = amount
-		self.seats[seat_no].player_stake = 0
+		self.seats[seat_no].player_stake -= amount
 		self.seats[seat_no].table_amount += amount
 		# self.seats[seat_no].status = Seat.SEAT_ALL_I
 		if self.flop_flag == False:
