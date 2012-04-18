@@ -54,6 +54,7 @@ var info_init = function() {
 	$("#info")[0].style.backgroundImage = "url(./image/left.png)";
 	$("#portrait_box").click(function() {
 		$("#change_por")[0].style.display = "block";
+		uploadImage();
 	});
 	for(var i = 0; i <= bigframe.length; i++) {
 		frameControl(bigframe[i], i);
@@ -78,6 +79,16 @@ var frameControl = function(frame, i) {
 		}
 		if( i > 0 && i < 4) {
 			$(frame)[0].style.backgroundImage = "url(./image/middle.png)";	
+		}
+	});
+};
+
+var uploadImage = function() {
+	var status = $('#status');
+	$('form').ajaxForm({
+		complete: function(xhr) {
+			console.log(xhr.responseText);
+			status.html(xhr.responseText);
 		}
 	});
 };

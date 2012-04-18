@@ -21,15 +21,7 @@
 	background-image: url(./image/comFrame.png);
 	z-index: 10;
 }
-#row1 {
-	line-height: 144px;
-	font-weight: bolder;
-}
-#row2 {
-	top:120px;
-	left: 100px;
-	position: absolute;
-}
+
 #boxOption1 {
 	top: 115px;
 	left: 215px;
@@ -70,13 +62,22 @@
 	position: absolute;
 	background-image: url(./image/female.png);
 }
+#row1 {
+	line-height: 144px;
+	font-weight: bolder;
+}
+#row2 {
+	top:120px;
+	left: 100px;
+	position: absolute;
+}
 #row3 {
-	top:170px;
+	top:155px;
 	left: 100px;
 	position: absolute;
 }
 #row4 {
-	top:220px;
+	top:185px;
 	left: 100px;
 	position: absolute;
 }

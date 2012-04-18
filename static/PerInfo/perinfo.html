@@ -11,10 +11,28 @@
 		<link rel="stylesheet" type="text/css" href="bigFrame5.css">
 		<link rel="stylesheet" type="text/css" href="rightFrame.css">
 		<script src="jquery.min.js"></script>
+		<script src="jquery.form.js"></script>
 		<script src="perinfo.js"></script>
 		<script src="recharge.js"></script>
 		<script type="text/javascript">
-			$(info_init);
+		var login = function(){
+					var username = "mile";
+					var password = "123";
+					$.post(
+						"../../login",
+						{username:username, password:password},
+						function(data){
+							console.log("Login success");
+						},
+						'json'
+					);
+			};
+			function init(){
+				info_init();
+				login();
+			}
+			$(init);
+			//$(info_init);
 		</script>
 	</head>
 	<body>
@@ -40,9 +58,18 @@
 					<span id="row4">现居地：</span>
 					<div id="isetting">设 置</div>
 					<div id="icancel">取 消</div>
-					<!-- <form>
-					<input name="head-portrait" type="input"/>
-					</form> -->
+
+					<div id="divtest" style="top:215px;left:100px;position:absolute">
+						<form action="../../head-portrait-upload" method="post" enctype="multipart/form-data">
+						<label id="label1">头像：</label>
+						<!-- <input id="input1" name="head-portrait" type="input"/> -->
+						<input type="file" name="head_portrait">
+						</br>
+						<input type="submit" value="上传" >
+						</form>
+					</div>
+					<div id="status"></div>
+
 				</div>
 				<span id="ID">ID名称:</span>
 				<span id="family">家族:</span>
