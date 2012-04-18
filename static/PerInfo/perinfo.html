@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 	<head>
-		<title></title>
+		<title>person information</title>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		<link rel="stylesheet" type="text/css" href="perinfo.css">
 		<link rel="stylesheet" type="text/css" href="bigFrame1.css">
@@ -11,37 +11,10 @@
 		<link rel="stylesheet" type="text/css" href="bigFrame5.css">
 		<link rel="stylesheet" type="text/css" href="rightFrame.css">
 		<script src="jquery.min.js"></script>
+		<script src="perinfo.js"></script>
+		<script src="recharge.js"></script>
 		<script type="text/javascript">
-			$(document).ready(function() {
-				window.bigframe = ["#info","#email","#market","#recharge","#friend"];
-
-				document.getElementById('bigFrame1').style.display = "block";
-				$("#info")[0].style.backgroundImage = "url(./image/left.png)";
-				for(var i = 0; i <= bigframe.length; i++) {
-					frameControl(bigframe[i], i);
-				}
-				
-			});
-			function frameControl(frame, i) {
-				$(frame).click(function() {	
-					document.getElementById('bigFrame' + (i+1)).style.display = "block";
-					if( i == 0) {
-						$(frame)[0].style.backgroundImage = "url(./image/left.png)";		
-					}
-					if( i == 4) {
-						$(frame)[0].style.backgroundImage = "url(./image/right.png)";	
-					}
-					if( i > 0 && i < 4) {
-						$(frame)[0].style.backgroundImage = "url(./image/middle.png)";	
-					}
-					for(var j = 0; j <= 4; j++) {
-						if( j != i) {
-							document.getElementById('bigFrame' + (j+1)).style.display = "none";
-							$(bigframe[j])[0].style.backgroundImage = "url()";
-						}
-					}
-				});			
-			}
+			$(info_init);
 		</script>
 	</head>
 	<body>
@@ -56,6 +29,21 @@
 
 			<div id="bigFrame1" class="bigFrame">
 				<div id="portrait_box"></div>
+				<div id="change_por">
+					<span id="row1">更 改 头 像</span>
+					<span id="row2">性别：</span>
+					<div id="boxOption1"></div>
+					<div id="male"></div>
+					<div id="boxOption2"></div>
+					<div id="female"></div>
+					<span id="row3">年龄：</span>
+					<span id="row4">现居地：</span>
+					<div id="isetting">设 置</div>
+					<div id="icancel">取 消</div>
+					<!-- <form>
+					<input name="head-portrait" type="input"/>
+					</form> -->
+				</div>
 				<span id="ID">ID名称:</span>
 				<span id="family">家族:</span>
 				<span id="rank">等级:</span>
@@ -150,7 +138,6 @@
 
 			<div id="smallFrame">
 			</div>
-
 
 			<div id="rightFrame">
 				<span id="span1">当 前 在 玩 人 数 ：100,000</span>
