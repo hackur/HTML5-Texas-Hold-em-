@@ -1,13 +1,14 @@
 
 body {
 	
+	margin: 0px;
 }
 
 .view {
 	height: 640px;
 	width: 960px;
 	position: absolute;
-	left: 50px;
+/*	left: 50px; */
 }
 
 .background {
