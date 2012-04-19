@@ -432,10 +432,10 @@ class GameRoom(object):
 		print self.amount_limits
 
 #		if 0 < amount + self.seats[seat_no].table_amount < self.min_amount:
-		if self.min_amount < amount:
-			self.min_amount = self.seats[seat_no].table_amount + amount
-		self.seats[seat_no].player_stake -= amount
 		self.seats[seat_no].table_amount += amount
+		if self.min_amount < self.seats[seat_no].table_amount:
+			self.min_amount = self.seats[seat_no].table_amount
+		self.seats[seat_no].player_stake -= amount
 		# self.seats[seat_no].status = Seat.SEAT_ALL_I
 		if self.flop_flag == False:
 			if self.same_amount_on_table(True):
@@ -728,8 +728,7 @@ class GameRoom(object):
 				print "you find me!"
 				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
 			elif max_amount < min_amount:
-				min_amount = max_amount
-				self.amount_limits[GameRoom.A_RAISESTAKE] = (min_amount, min(self.seats[seat_no].player_stake, max_amount))
+				self.seats[seat_no].rights.remove(GameRoom.A_RAISESTAKE)
 			else:
 				self.amount_limits[GameRoom.A_RAISESTAKE] = (min_amount, min(self.seats[seat_no].player_stake, max_amount))
 		elif GameRoom.A_RAISESTAKE in self.amount_limits:

@@ -47,8 +47,8 @@ if __name__ == '__main__':
 		"static_path2": os.path.join(os.path.dirname(__file__), "static"),
 		"uploaded_image_path": os.path.join(os.path.dirname(__file__), "uploads"),
 		"PokerUITest": os.path.join(os.path.dirname(__file__), "PokerUITest"),
-		'session_storage':"dir"
-		#"session_storage":"mongodb:///db"
+		#'session_storage':"dir"
+		"session_storage":"mongodb:///db"
 	}
 
 
