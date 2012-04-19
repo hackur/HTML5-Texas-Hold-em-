@@ -818,6 +818,7 @@ class GameRoom(object):
 		self.big_blind		= False
 		self.raise_person	= None
 		self.non_fold_move	= False
+		self.big_blind_move = False
 
 		player_list		= filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)
 		go_away_list	= filter(lambda seat: not seat.is_empty() and seat.player_stake == 0, self.seats)
