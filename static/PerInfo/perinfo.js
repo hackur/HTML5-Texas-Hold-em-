@@ -103,13 +103,40 @@ var uploadImage = function() {
 	});
 };
 
-var getuserImage = function() {
+var getUserImage = function() {
 	$.ajax({
 		type: "post",
 		url:  "/personal-archive",
 		data: {},
 		success: function(data) {
 			console.log(data);
+			var url = "../." + data.head_portrait;
+			var image = $('<img id="image2" src=' + url + ' />').appendTo($("#portrait_box"));
+			$("#image2").css({'width': 102, 'height': 126, 'top': 6, 'left': 8, 'position': 'absolute'});
+			
+			$("#property").html($("#property").html() + data.asset);
+			$("#family").html($("#family").html() + data.family);
+			$("#rank").html($("#rank").html() + data.level);
+			$("#ID").html($("#ID").html() + data.name);
+			$("#winRate").html($("#winRate").html() + data.percentage);
+			$("#winBiggestStake").html($("#winBiggestStake").html() + data.max_reward);
+			$("#pos").html($("#pos").html() + data.position);
+			$("#idiograph").html($("#idiograph").html() + data.signature);
+			$("#totalInnings").html($("#totalInnings").html() + data.total_games);
+			$("#victoryInnings").html($("#victoryInnings").html() + data.won_games);
+			$("#latestOnline").html($("#latestOnline").html() + data.last_login);
+		},
+		dataType: "json"
+	});
+};
+
+var getEmailInfo = function() {
+	$.ajax({
+		type: "post",
+		url:  "/list-email",
+		data: {},
+		success: function(data) {
+			console.log(data);			
 		},
 		dataType: "json"
 	});

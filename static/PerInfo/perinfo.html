@@ -23,7 +23,8 @@
 						{username:username, password:password},
 						function(data){
 							console.log("Login success");
-							getuserImage();
+							getUserImage();
+							getEmailInfo();
 						},
 						'json'
 					);
@@ -70,19 +71,18 @@
 						</form>
 					</div>
 					<div id="status" style="top:215px;left:360px;position:absolute"></div>
-
 				</div>
-				<span id="ID">ID名称:</span>
-				<span id="family">家族:</span>
-				<span id="rank">等级:</span>
-				<span id="pos">职位:</span>
-				<span id="property">资产:</span>
-				<span id="winRate">胜率:</span>
-				<span id="winBiggestStake">赢得最大赌注:</span>
-				<span id="totalInnings">总局数:</span>
-				<span id="victoryInnings">胜利局数:</span>
-				<span id="latestOnline">最近上线时间:</span>
-				<span id="idiograph">个性签名:</span>
+				<span id="ID">ID名称：</span>
+				<span id="family">家族：</span>
+				<span id="rank">等级：</span>
+				<span id="pos">职位：</span>
+				<span id="property">资产：</span>
+				<span id="winRate">胜率：</span>
+				<span id="winBiggestStake">赢得最大赌注：</span>
+				<span id="totalInnings">总局数：</span>
+				<span id="victoryInnings">胜利局数：</span>
+				<span id="latestOnline">最近上线时间：</span>
+				<span id="idiograph">个性签名：</span>
 			</div>
 
 			<div id="bigFrame2" class="bigFrame">
