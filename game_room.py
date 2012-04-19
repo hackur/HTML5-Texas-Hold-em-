@@ -271,6 +271,8 @@ class GameRoom(object):
 				self.min_amount = self.seats[self.big_blind].table_amount
 				if self.same_amount_on_table():
 					self.round_finish()
+				elif self.check(self.current_seat) == self.small_blind:
+					self.current_seat	= self.info_next(self.current_seat, [1,2,3,5])
 				else:
 					self.min_amount = self.blind
 					self.current_seat	= self.info_next(self.current_seat, [1,2,3,5])
