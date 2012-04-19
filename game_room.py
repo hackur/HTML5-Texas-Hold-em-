@@ -423,6 +423,7 @@ class GameRoom(object):
 		print "FULL POWER! ALL INNNNNNNNN!!!!!!!!"
 		print "num_of_checks: ", self.num_of_checks
 		self.num_of_checks = 0
+		self.non_fold_move = True
 		command  = 1
 		seat_no  = self.current_seat
 		amount   = self.amount_limits[GameRoom.A_ALLIN]
