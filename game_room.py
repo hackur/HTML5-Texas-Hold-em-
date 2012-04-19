@@ -251,11 +251,6 @@ class GameRoom(object):
 		print self.seats[self.small_blind].get_user().username
 		print self.seats[self.current_dealer].get_user().username
 
-		self.min_amount		= self.blind
-		self.current_seat	= self.big_blind
-		self.current_seat	= self.info_next(self.current_seat, [1,2,3,5])
-		print "next seat in action =>", self.current_seat
-
 		seat = self.seats[self.small_blind]
 		broadcast_msg = {'action':GameRoom.A_SMALLBLIND, 'seat_no':seat.seat_id,'stake':seat.player_stake,'table':seat.table_amount}
 		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
@@ -264,8 +259,27 @@ class GameRoom(object):
 		broadcast_msg = {'action':GameRoom.A_BIGBLIND, 'seat_no':seat.seat_id,'stake':seat.player_stake,'table':seat.table_amount}
 		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
 
-		next_seat = self.seats[self.current_seat]
-		self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
+		self.min_amount		= self.blind
+		self.current_seat	= self.big_blind
+		if self.seats[self.small_blind].player_stake == 0:
+			self.seats[self.small_blind].status = Seat.SEAT_ALL_IN
+		if self.seats[self.big_blind].player_stake == 0:
+			self.seats[self.big_blind].status = Seat.SEAT_ALL_IN
+			if self.seats[self.big_blind].table_amount <= self.seats[self.small_blind].table_amount:
+				self.round_finish()
+			elif self.seats[self.big_blind].table_amount < self.blind:
+				self.min_amount = self.seats[self.big_blind].table_amount
+				if self.same_amount_on_table():
+					self.round_finish()
+				else:
+					self.min_amount = self.blind
+					self.current_seat	= self.info_next(self.current_seat, [1,2,3,5])
+		if self.status != GameRoom.GAME_WAIT:
+			self.current_seat	= self.info_next(self.current_seat, [1,2,3,5])
+			print "next seat in action =>", self.current_seat
+			next_seat = self.seats[self.current_seat]
+			self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
+
 
 	def get_seat(self, user_id):
 		if user_id in self.user_seat:
