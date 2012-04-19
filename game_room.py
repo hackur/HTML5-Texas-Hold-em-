@@ -18,7 +18,7 @@ class Seat(object):
 		self.status = Seat.SEAT_EMPTY
 		self._rights = []
 		self._role = None
-		self.combination = []
+	#	self.combination = []
 		self.handcards = []
 		self.table_amount = 0
 		self.player_stake = 0
@@ -555,6 +555,7 @@ class GameRoom(object):
 			msg_dict	= {}
 			ante_dict	= self.distribute_ante()
 			winner_dict = {k:v for k, v in ante_dict.iteritems() if v > 0} #filter(lambda seat: winner_dict[seat] != 0, ante_dict)
+			name_of_hand = self.poker_controller.poker.name_of_hand
 			print "winner_dict: ", winner_dict
 			if len(player_list) > 1:
 				for seat in player_list:
@@ -567,7 +568,9 @@ class GameRoom(object):
 													"pot": pot,
 													"stake": seat.player_stake,
 													"handcards": card_list,
-													"seat_no": seat.seat_id }
+													"seat_no": seat.seat_id,
+													"pattern": name_of_hand(seat.combination[0])
+													}
 					else:
 						msg_dict[seat._user.id] = {	"isWin": False,
 													"stake": seat.player_stake,
@@ -588,7 +591,8 @@ class GameRoom(object):
 												"pot": pot,
 												"stake": winner.player_stake, #winner_dict.keys()[0].player_stake,
 												"handcards": card_list,
-												"seat_no": winner.seat_id
+												"seat_no": winner.seat_id,
+												"pattern": name_of_hand(winner.combination[0])
 											} #winner_dict.keys()[0].seat_id}
 
 			self.broadcast(msg_dict ,GameRoom.MSG_WINNER)
@@ -831,8 +835,11 @@ class GameRoom(object):
 		msg = {}
 
 		for seat in go_away_list:
+			go_away_dict = {}
 			#self.stand_up(seat.get_user().id)
-			msg[seat.get_user().id] = seat.seat_id
+			go_away_dict["user_id"] = seat._user.id
+			go_away_dict["seat_no"] = seat.seat_id
+			msg[seat._user.id] = {"seat_no":seat.seat_id}
 			seat.status = Seat.SEAT_EMPTY
 			self.audit_list.append({"user": seat.get_user().id})
 			seat.set_user(None)
