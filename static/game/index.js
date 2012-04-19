@@ -98,19 +98,20 @@ var enter = function(){
 			if( data.status == "success" ) {
 				console.log("enter success!");
 				listenBoardMessage();
-				//console.log(data.room.seats);
+				console.log([data.room.seats, "++++++___________++++++++"]);
 				for(var i = 0; i < data.room.seats.length; i++ ) {
 					if(i < SeatList.length){
-						if(data.room.seats[i] == null ) {							
-							SeatList[i].setIsSat(false);							
+						if(data.room.seats[i] == null ) {						
+							SeatList[i].setIsSat(false);
 						}
 						else {
+
 							SeatList[i].sit(data.room.seats[i].user,
 									data.room.seats[i].player_stake,
 									data.room.seats[i].uid
 							);
 							
-							if( SeatList[i].username == window.user_info.username ) {
+							if( SeatList[i].username == window.user_info.username) {
 								sit_transit.transit(i);
 								console.log("-----------------------" + i);
 								window.user_info.userIsSat = true;
@@ -118,6 +119,16 @@ var enter = function(){
 						}
 					}
 				}
+
+				if (!window.user_info.userIsSat) {
+					for (var i = 0; i < SeatList.length; i++) {
+						if(data.room.seats[i] == null) {						
+							SeatList[i].showSeatdownbg();
+
+						}
+					}
+				}
+
 				if(data.room.publicCard){
 					dealCard.send_public_card(data.room.publicCard);
 				}
@@ -129,7 +140,6 @@ var enter = function(){
 				//min_stake;
 				//blind;
 				//timestamp;
-
 
 			}
 						

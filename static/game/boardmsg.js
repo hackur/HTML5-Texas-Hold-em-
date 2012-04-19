@@ -7,8 +7,6 @@
 				= ('sit','bhc','phc','winner','next','action','public')
  *
  */
-var div1 = [];
-var div2 = [];
 function msg_sit(data){
 	/** Someone sat down
 	 *
@@ -18,12 +16,13 @@ function msg_sit(data){
 	var stake = data.info.player_stake;
 	var userid = data.info.uid;
 	var public_card = [];
-	var div_winbg;
 	SeatList[seatID].sit(username,stake,userid);
 	if(username == window.user_info.username){
 		window.user_info.sit_no = seatID;
 	}
-	$("#seatbg" + seatID).css("display", "none");
+	for (var i = 0; i < SeatList.length; i++) {
+	SeatList[i].removeSeatdownbg();
+	}
 }
 function msg_bhc(data){ 
 	/*
@@ -70,8 +69,7 @@ function msg_winner(data){
                 $.each(info.pot,function(index,pid){
                     pot_manager.distribute(userid,pid);
                 });
-                div_winbg = "#winbg" + info.seat_no;
-                $(div_winbg).css("display","block");
+                SeatList[info.seat_no].showWinbg();
             }
         });
         $.each(SeatList,function(index,seat){
@@ -94,9 +92,8 @@ function msg_winner(data){
 		}
 		var seat = getSeatById(userid);
 		console.log([userid, seat,info.seat_no,"+++++++++++++"]);
-		div1.push("#last_card" + info.seat_no + "1");
-		div2.push("#last_card" + info.seat_no + "2");
 		seat.setStake(info.stake,0);
+		SeatList[info.seat_no].showWinCard();
         for (var i = 0, k = 0;  i <= info.handcards.length - 1 && k <= 1; i++) {
             for (var j = 0; j <= public_card.length - 1; j++) {
                 if (info.handcards[i] == public_card[j]) {
@@ -104,12 +101,10 @@ function msg_winner(data){
                 } else if (j == public_card.length - 1) {
                     console.log([info.handcards[i], "++++++++++++++++++++++++"]);
                     if (k == 0) {
-                        poker_lib.setCard(info.handcards[i], div1[div1.length - 1]);
-                        $(div1[div1.length - 1]).css("display","block");
+                        SeatList[info.seat_no].setWinCard(info.handcards[i], 1);
                         k++;
                     } else {
-                        poker_lib.setCard(info.handcards[i], div2[div2.length - 1]);
-                        $(div2[div2.length - 1]).css("display","block");
+                        SeatList[info.seat_no].setWinCard(info.handcards[i], 2);
                         k++;
                     }
                 }
@@ -119,11 +114,6 @@ function msg_winner(data){
 
 
 	setTimeout(function(){
-		while(div1.length > 0) {
-			$(div1.pop()).removeAttr("style");
-			$(div2.pop()).removeAttr("style");
-		} 
-		$(div_winbg).removeAttr("style");
 		//pot_manager.reset();
 	 	var cards = ["#card0","#card1","#card2","#card3","#card4"];
 		 for(var i = 0; i < cards.length; i++){
@@ -131,6 +121,14 @@ function msg_winner(data){
 		 }
 		$("#cards_in_hand1").fadeOut("fast");
 		$("#cards_in_hand2").fadeOut("fast");
+		$.each(data,function(userid,info){
+			if (info.seat_no != undefined) {
+				SeatList[info.seat_no].removeCard();
+			}
+			if (info.isWin) {
+				SeatList[info.seat_no].removeWinbg();
+			}
+		});
 	},2500);
 }
 function msg_next(data){

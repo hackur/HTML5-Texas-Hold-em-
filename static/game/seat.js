@@ -21,8 +21,8 @@ function Seat(id,pos){
 	var divCount = $('<div class="countdown down"></div>');
 	var divWinbg = $('<div class="winbg"></div>')
 	var divWin = $('<div class="countdown win"></div>');
-	var divWin_lasr_card01 = $('<img class="countdown win card01" src="./pokers/club/A.png">');
-	var divWin_lasr_card02 = $('<img class="countdown win card02" src="./pokers/club/A.png">');
+	var divWin_last_card01 = $('<img class="countdown win card01" src="./pokers/club/A.png">');
+	var divWin_last_card02 = $('<img class="countdown win card02" src="./pokers/club/A.png">');
 	var divChip = $('<div class="chip"> </div>');
 	var divStake = $('<div class="tstake"></div>');
 	var cur_pos = "seatPos" + pos;
@@ -34,14 +34,10 @@ function Seat(id,pos){
 	divCountdown.appendTo(divSeat);
 	divCount.appendTo(divCountdown);
 	divWinbg.appendTo(divSeat);
-	divWinbg.attr("id", "winbg" + id);
 	divWin.appendTo(divCountdown);
 	divSeatdownbg.appendTo(divWin);
-	divSeatdownbg.attr("id", "seatbg" + id);
-	divWin_lasr_card01.attr("id", "last_card" + id + "1");
-	divWin_lasr_card01.appendTo(divWin);
-	divWin_lasr_card02.attr("id", "last_card" + id + "2");
-	divWin_lasr_card02.appendTo(divWin);
+	divWin_last_card01.appendTo(divWin);
+	divWin_last_card02.appendTo(divWin);
 	divSeat.addClass(cur_pos);
 	divSeat.appendTo($("#container"));
 	
@@ -103,6 +99,57 @@ function Seat(id,pos){
 		divCount.stop();
 		divCount.hide();
 		divCount.removeAttr("style");
+	};
+
+	seatObj.showWinCard = function() {
+		divWin_last_card01.show();
+		divWin_last_card02.show();
+	};
+
+	seatObj.setWinCard = function(card, carDiv_no) {
+		var _suit;
+		var _rank;
+
+		console.log(card);
+		if (card.length == 2) {
+			_suit = card.charAt(1);
+			_rank = card.charAt(0);
+		}
+		if (card.length == 3) {
+			_suit = card.charAt(2);
+			_rank = "10";
+		}
+		if (card.length != 2 && card.length != 3) {
+			console.log("ERROR!!!");
+			return;
+		}
+		if(carDiv_no == 1) {
+			console.log([poker_lib.getCard(_suit, _rank),"+++++++++++++++++++++++++++++++>>>>>>"]);
+			divWin_last_card01.attr("src", poker_lib.getCard(_suit, _rank));
+		} else {
+			divWin_last_card02.attr("src", poker_lib.getCard(_suit, _rank));
+		}
+	};
+
+	seatObj.removeCard = function() {
+		divWin_last_card01.removeAttr("style");
+		divWin_last_card02.removeAttr("style");
+	};
+
+	seatObj.showSeatdownbg = function() {
+		divSeatdownbg.show();		
+	};
+
+	seatObj.removeSeatdownbg = function() {
+		divSeatdownbg.removeAttr("style");
+	};
+
+	seatObj.showWinbg = function() {
+		divWinbg.show();
+	};
+
+	seatObj.removeWinbg = function() {
+		divWinbg.removeAttr("style");
 	};
 
 	seatObj.getSeatDIV = function(){
