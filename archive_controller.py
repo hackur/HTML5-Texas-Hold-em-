@@ -89,7 +89,7 @@ class EmailListHandler(tornado.web.RequestHandler):
 		all_emails	= self.db_connection.query(Email).filter_by(to_user = user).order_by(Email.sent_date)
 
 		total_emails= all_emails.count()
-		pages		= math.ceil(email_amount / self.PAGE_SIZE)
+		pages		= math.ceil(total_emails / self.PAGE_SIZE)
 		emails		= all_emails.slice(start, end)
 		email_list	= list()
 		for email in emails:
