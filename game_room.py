@@ -22,6 +22,7 @@ class Seat(object):
 		self.handcards = []
 		self.table_amount = 0
 		self.player_stake = 0
+		self.time_out_flag = False
 
 	def __str__(self):
 		return "seat[%d], user[%d]" % (self.seat_id, self._user.id)
@@ -391,11 +392,13 @@ class GameRoom(object):
 							'table': seat.table_amount
 						}
 		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
+		seat.time_out_flag = True
 		self.discard_game(user_id)
 
-		next_seat = self.seats[self.current_seat]
-		print "next seat no....................................................", next_seat.seat_id
-		self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
+		if self.status != GameRoom.GAME_WAIT:
+			next_seat = self.seats[self.current_seat]
+			print "next seat no....................................................", next_seat.seat_id
+			self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
 
 	def discard_game(self, user_id):
 		print "FOLD!!"
@@ -820,8 +823,8 @@ class GameRoom(object):
 		self.non_fold_move	= False
 		self.big_blind_move = False
 
-		player_list		= filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)
-		go_away_list	= filter(lambda seat: not seat.is_empty() and seat.player_stake == 0, self.seats)
+		player_list		= filter(lambda seat: not seat.is_empty() and seat.player_stake != 0 and seat.time_out_flag == False, self.seats)
+		go_away_list	= filter(lambda seat: (not seat.is_empty() and seat.player_stake == 0) or seat.time_out_flag == True, self.seats)
 		for seat in player_list:
 			seat.status = Seat.SEAT_WAITING
 
@@ -833,6 +836,7 @@ class GameRoom(object):
 			seat.status = Seat.SEAT_EMPTY
 			self.audit_list.append({"user": seat.get_user().id})
 			seat.set_user(None)
+			seat.time_out_flag = False
 
 		print "broadcasting standup msg"
 		self.broadcast(msg, GameRoom.MSG_STAND_UP)
