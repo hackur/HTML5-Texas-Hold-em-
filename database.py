@@ -1,3 +1,4 @@
+import hashlib
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey,Text,Table,DateTime
 from sqlalchemy.orm import sessionmaker,relationship, backref
@@ -151,10 +152,10 @@ def init_database():
 	db_connection.connect()
 	db_connection.start_session()
 	room        = Room(exchange="dealer_exchange_1",blind=10,max_player=9,player=0)
-	ting        = User(username="ting", password="123", stake = 200)
-	mile        = User(username="mile", password="123", stake = 100)
-	mamingcao   = User(username="mamingcao", password="123", stake = 200)
-	huaqin      = User(username="huaqin", password="123", stake = 500)
+	ting        = User(username="ting", password=hashlib.md5("123").hexdigest(), stake = 200)
+	mile        = User(username="mile", password=hashlib.md5("123").hexdigest(), stake = 100)
+	mamingcao   = User(username="mamingcao", password=hashlib.md5("123").hexdigest(), stake = 200)
+	huaqin      = User(username="huaqin", password=hashlib.md5("123").hexdigest(), stake = 500)
 	ting.level	= 12
 	ting.total_games= 100
 	ting.won_games	= 40

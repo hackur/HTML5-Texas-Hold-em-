@@ -1,5 +1,6 @@
 import time
 import json
+import hashlib
 import tornado.ioloop
 import tornado.httpserver
 import tornado.web
@@ -12,7 +13,7 @@ class LoginHandler(tornado.web.RequestHandler):
 		db_connection	= DatabaseConnection()
 		db_connection.start_session()
 		username		= self.get_argument('username')
-		password		= self.get_argument('password')
+		password		= hashlib.md5(self.get_argument('password')).hexdigest()
 		user			= db_connection.query(User).filter_by(username = username).filter_by(password = password).one()
 		if user is None:
 			message		= {'status':'failed', 'content':'invalid username or password'}
@@ -34,13 +35,13 @@ class GuestLoginHandler(tornado.web.RequestHandler):
 		if self.get_argument('username', default=None) is None:
 			username		= str(time.time()) + '_username'
 			password		= str(time.time()) + '_password'
-			user			= User(username = username, password= password)
+			user			= User(username = username, password = hashlib.md5(password).hexdigest() )
 			db_connection.start_session()
 			db_connection.addItem(user)
 			db_connection.commit_session()
 		else:
 			username		= self.get_argument('username')
-			password		= self.get_argument('password')
+			password		= hashlib.md5(self.get_argument('password')).hexdigest()
 			user			= db_connection.query(User).filter_by(username = username).filter_by(password = password).one()
 
 		if user is None:
