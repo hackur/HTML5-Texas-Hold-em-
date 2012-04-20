@@ -6,6 +6,7 @@ import tornado.ioloop
 import tornado.httpserver
 import tornado.web
 from authenticate import *
+from datetime import datetime
 from database import DatabaseConnection,User,Family,FamilyPosition,Email,HeadPortrait
 
 class PersonalArchiveHandler(tornado.web.RequestHandler):
@@ -120,13 +121,12 @@ class EmailSendHandler(tornado.web.RequestHandler):
 		user				= self.session['user']
 		destination			= self.get_argument('destination')
 		content				= self.get_argument('conent')
-		sent_date			= self.get_argument('datetime')
-		reply_to			= self.get_argument('reply_to')
+		reply_to			= self.get_argument('reply_to', None)
 		email				= Email()
 		email.from_id		= user.id
 		email.to_id			= destination
 		email.content		= content
-		email.sent_date		= sent_date
+		email.sent_date		= datetime.now()
 		email.satus			= 0
 		email.reply_to_id	= reply_to
 		self.db_connection.start_session()
