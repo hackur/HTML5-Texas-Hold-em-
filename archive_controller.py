@@ -120,7 +120,7 @@ class EmailSendHandler(tornado.web.RequestHandler):
 	def post(self):
 		user				= self.session['user']
 		destination			= self.get_argument('destination')
-		content				= self.get_argument('conent')
+		content				= self.get_argument('content')
 		reply_to			= self.get_argument('reply_to', None)
 		email				= Email()
 		email.from_id		= user.id
