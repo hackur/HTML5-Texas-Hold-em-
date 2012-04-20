@@ -165,6 +165,7 @@ body{
     background:lightblue;
     height:255px;
     width:472px;
+    display: none;
 }
 #setting .barcontainer{
     clear:both;

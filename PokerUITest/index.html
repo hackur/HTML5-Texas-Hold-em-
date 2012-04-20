@@ -3,7 +3,7 @@
     <head>
         <title>Main Room</title>
         <link rel="stylesheet" type="text/css" href="css/room.css"/>
-	<link rel="stylesheet" type="text/css" href="css/lionbars.css"/>
+	    <link rel="stylesheet" type="text/css" href="css/lionbars.css"/>
         <script src="js/jquery.min.js"></script>
         <script src="js/jquery-ui-1.8.18.custom.min.js"></script>
 	<script src="js/jquery.lionbars.0.3.js"></script>
@@ -17,7 +17,7 @@
                     <div class="bar"></div>
                     <span class="button" id="bar1"></span>
                 </div>
-                <div class="bet1"><span>20</span><span>/</span><span>10</span></div>
+                <div id="b1" class="bet1"><span>20</span><span>/</span><span>10</span></div>
                 <div class="bet2"><span>2</span><span>/</span><span>1</span></div>
             </div>
             <div class="barcontainer">
@@ -26,7 +26,7 @@
                     <div class="bar"></div>
                     <span class="button" id="bar2"></span>
                 </div>
-                <div class="bet1"><span>20</span><span>/</span><span>10</span></div>
+                <div id="b2" class="bet1"><span>20</span><span>/</span><span>10</span></div>
                 <div class="bet2"><span>2</span><span>/</span><span>1</span></div>
             </div>
             <div class="confirm"></div>
@@ -153,7 +153,7 @@
         </div>
         <script>
             //use jquery UI to enable draggble
-            var num=document.querySelector(".bet1").children[2];
+            var num=document.querySelector("#b1").children[2];
             $("#bar1").draggable({ 
                 axis: 'x',
                 drag:function(e,ui){
@@ -174,7 +174,7 @@
                 }
             });
 	       //self-implement of button draggble
-            var bar2=document.querySelector("#bar2"),
+            /*var bar2=document.querySelector("#bar2"),
                 barcontainer=document.querySelectorAll(".barcontainer")[1],
                 ison=false,
                 current;
@@ -190,6 +190,7 @@
                 console.log("outter")
             });
             $(barcontainer).on("mousemove",function(e){
+
                 if(ison){
 
                     var _x=e.offsetX+parseInt(bar2.style.left);
@@ -198,7 +199,27 @@
             });
             $(barcontainer).on("mouseup",function(e){
                 ison=false;
-            })
+            })*/
+            var num2 = document.querySelector("#b2").children[2];
+            $("#bar2").draggable({ 
+                axis: 'x',
+                drag:function(e,ui){
+                    //console.log(e,ui)
+                    if(ui.offset.left>337){
+                        return false;
+                       
+                    }
+                    else if(ui.offset.left<38){
+                        
+                        return false;
+                    }
+                    else{
+                        //change the number you want
+                        num2.innerText=parseInt(ui.offset.left);
+
+                    }
+                }
+            });
 
 
 
