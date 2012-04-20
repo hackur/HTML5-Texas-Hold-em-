@@ -36,10 +36,10 @@ class Tester(object):
 	def __init__(self,queue,exchange,host='localhost',port=5672):
 		user1 = User(1,1)
 		user2 = User(2,2)
-		user3 = User(3,3)
+#		user3 = User(3,3)
 		self.queue = queue
 		self.exchange =exchange
-		self.users = [user1,user2,user3]
+		self.users = [user1,user2]#,user3]
 		self.pKeys = {}
 		self.boundQueue = 0
 
@@ -59,15 +59,15 @@ class Tester(object):
 
 		self.channel.basic_publish(exchange='dealer_exchange_1',
 								routing_key="dealer",
-								body=json.dumps({'method':'sit','source':'IAMGOD','user_id':1, "room_id":1, "seat":1,"private_key":self.users[0].private_key, "stake":200}))
+								body=json.dumps({'method':'sit','source':'IAMGOD','user_id':1, "room_id":1, "seat":1,"private_key":self.users[0].private_key, "stake":10}))
 
 		self.channel.basic_publish(exchange='dealer_exchange_1',
 								routing_key="dealer",
-								body=json.dumps({'method':'sit','source':'IAMGOD','user_id':2, "room_id":1, "seat":2,"private_key":self.users[1].private_key, "stake":150}))
+								body=json.dumps({'method':'sit','source':'IAMGOD','user_id':2, "room_id":1, "seat":2,"private_key":self.users[1].private_key, "stake":7}))
 
-		self.channel.basic_publish(exchange='dealer_exchange_1',
-								routing_key="dealer",
-								body=json.dumps({'method':'sit','source':'IAMGOD','user_id':3, "room_id":1, "seat":3,"private_key":self.users[2].private_key, "stake":500}))
+#		self.channel.basic_publish(exchange='dealer_exchange_1',
+#								routing_key="dealer",
+#								body=json.dumps({'method':'sit','source':'IAMGOD','user_id':3, "room_id":1, "seat":3,"private_key":self.users[2].private_key, "stake":500}))
 
 	def on_queue_declared(self, frame):
 		for user in self.users:
@@ -132,52 +132,51 @@ class Tester(object):
 		if len(self.pKeys) == 2:
 			self.pKeys = {}
 			#	print "all in!!!!!!!!!!!!!!!!!!!
-			return
 			self.channel.basic_publish(exchange='dealer_exchange_1',
 						routing_key="dealer",
 						body=json.dumps({'method':'action','action':2,'user_id':1,
 							"room_id":1, "private_key":self.users[0].private_key, "amount":20}))
+#
+#			self.channel.basic_publish(exchange='dealer_exchange_1',
+#						routing_key="dealer",
+#						body=json.dumps({'method':'action','action':2,'user_id':2,
+#							"room_id":1, "private_key":self.users[1].private_key, "amount":20}))
 
-			self.channel.basic_publish(exchange='dealer_exchange_1',
-						routing_key="dealer",
-						body=json.dumps({'method':'action','action':2,'user_id':2,
-							"room_id":1, "private_key":self.users[1].private_key, "amount":20}))
-
-			self.channel.basic_publish(exchange='dealer_exchange_1',
-						routing_key="dealer",
-						body=json.dumps({'method':'action','action':4,'user_id':3,
-							"room_id":1, "private_key":self.users[1].private_key, "amount":20}))
-			return
-
-			self.channel.basic_publish(exchange='dealer_exchange_1',
-						routing_key="dealer",
-						body=json.dumps({'method':'action','action':3,'user_id':1,
-							"room_id":1, "private_key":self.users[0].private_key, "amount":40}))
-
-			self.channel.basic_publish(exchange='dealer_exchange_1',
-						routing_key="dealer",
-						body=json.dumps({'method':'action','action':2,'user_id':2,
-							"room_id":1, "private_key":self.users[1].private_key, "amount":20}))
-
-			self.channel.basic_publish(exchange='dealer_exchange_1',
-						routing_key="dealer",
-						body=json.dumps({'method':'action','action':2,'user_id':3,
-							"room_id":1, "private_key":self.users[1].private_key, "amount":20}))
-
-			self.channel.basic_publish(exchange='dealer_exchange_1',
-						routing_key="dealer",
-						body=json.dumps({'method':'action','action':3,'user_id':2,
-							"room_id":1, "private_key":self.users[0].private_key, "amount":100}))
-
-			self.channel.basic_publish(exchange='dealer_exchange_1',
-						routing_key="dealer",
-						body=json.dumps({'method':'action','action':3,'user_id':3,
-							"room_id":1, "private_key":self.users[1].private_key, "amount":150}))
-
-			self.channel.basic_publish(exchange='dealer_exchange_1',
-						routing_key="dealer",
-						body=json.dumps({'method':'action','action':2,'user_id':1,
-							"room_id":1, "private_key":self.users[1].private_key, "amount":40}))
+#			self.channel.basic_publish(exchange='dealer_exchange_1',
+#						routing_key="dealer",
+#						body=json.dumps({'method':'action','action':4,'user_id':3,
+#							"room_id":1, "private_key":self.users[1].private_key, "amount":20}))
+#			return
+#
+#			self.channel.basic_publish(exchange='dealer_exchange_1',
+#						routing_key="dealer",
+#						body=json.dumps({'method':'action','action':3,'user_id':1,
+#							"room_id":1, "private_key":self.users[0].private_key, "amount":40}))
+#
+#			self.channel.basic_publish(exchange='dealer_exchange_1',
+#						routing_key="dealer",
+#						body=json.dumps({'method':'action','action':2,'user_id':2,
+#							"room_id":1, "private_key":self.users[1].private_key, "amount":20}))
+#
+#			self.channel.basic_publish(exchange='dealer_exchange_1',
+#						routing_key="dealer",
+#						body=json.dumps({'method':'action','action':2,'user_id':3,
+#							"room_id":1, "private_key":self.users[1].private_key, "amount":20}))
+#
+#			self.channel.basic_publish(exchange='dealer_exchange_1',
+#						routing_key="dealer",
+#						body=json.dumps({'method':'action','action':3,'user_id':2,
+#							"room_id":1, "private_key":self.users[0].private_key, "amount":100}))
+#
+#			self.channel.basic_publish(exchange='dealer_exchange_1',
+#						routing_key="dealer",
+#						body=json.dumps({'method':'action','action':3,'user_id':3,
+#							"room_id":1, "private_key":self.users[1].private_key, "amount":150}))
+#
+#			self.channel.basic_publish(exchange='dealer_exchange_1',
+#						routing_key="dealer",
+#						body=json.dumps({'method':'action','action':2,'user_id':1,
+#							"room_id":1, "private_key":self.users[1].private_key, "amount":40}))
 
 #			self.channel.basic_publish(exchange='dealer_exchange_1',
 #						routing_key="dealer",
