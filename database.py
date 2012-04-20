@@ -87,6 +87,10 @@ class FamilyPosition(Base):
 	def __init__(self,name):
 		self.name=name
 
+reply_relation=Table("reply_relation",Base.metadata,
+	Column("sender",Integer,ForeignKey("email.id")),
+	Column("reply_to",Integer,ForeignKey("email.id"))
+)
 class Email(Base):
 	__tablename__	= "email"
 	id			= Column(Integer, primary_key=True, autoincrement=True)
@@ -97,8 +101,8 @@ class Email(Base):
 	content		= Column(Text)
 	sent_date	= Column(DateTime)
 	status		= Column(Integer)
-	reply_to_id	= Column(Integer, ForeignKey(email.id))
-	reply_to	= relationship("Email", primaryjoin=(reply_to_id == Email.id), backref=backref("replys"))
+	reply_to_id	= Column(Integer, ForeignKey("email.id"))
+	reply_to	= relationship("Email", backref=backref('follow_emails', remote_side=[id]))
 
 class DatabaseConnection(object):
 	__single	= None
@@ -163,6 +167,15 @@ def init_database():
 	db_connection.addItem(huaqin)
 	db_connection.addItem(mamingcao)
 	db_connection.addItem(room)
+
+	email	= Email()
+	email.from_user = ting
+	email.to_user	= mile
+	email.content	= "aassdd"
+	email.send_date	= datetime.now()
+	email.reply_to_id	= None
+	db_connection.addItem(email)
+
 	# ting.friends = [mile, mamingcao]
 	# mile.friends = [ting]
 	db_connection.commit_session()
