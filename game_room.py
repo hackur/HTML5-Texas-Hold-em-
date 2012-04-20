@@ -80,8 +80,8 @@ class GameRoom(object):
 	(GAME_WAIT,GAME_PLAY) = (0,1)
 	(A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND) = (1,2,3,4,5,6,7)
 
-	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START,MSG_POT,MSG_STAND_UP,MSG_SHOWDOWN) \
-				= ('sit','bhc','phc','winner','next','action','public','start','pot','standup','showdown')
+	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START,MSG_POT,MSG_STAND_UP,MSG_SHOWDOWN,MSG_EMOTICON) \
+				= ('sit','bhc','phc','winner','next','action','public','start','pot','standup','showdown','emoticon')
 	def __init__(self, room_id, owner, dealer, num_of_seats = 9, blind = 10,min_stake=100,max_stake=2000):
 		self.room_id    = room_id
 		self.owner      = owner
@@ -807,9 +807,6 @@ class GameRoom(object):
 
 		msg = {}
 		for seat in go_away_list:
-			go_away_dict = {}
-			go_away_dict["user_id"] = seat._user.id
-			go_away_dict["seat_no"] = seat.seat_id
 			msg[seat._user.id] = {"seat_no":seat.seat_id}
 			seat.status = Seat.SEAT_EMPTY
 			self.audit_list.append({"user": seat.get_user().id})
@@ -830,3 +827,11 @@ class GameRoom(object):
 	#			seat.set_user(None)
 	#			seat.status = Seat.SEAT_EMPTY
 	#			self.audit_list.append({"user": user_id})
+	def send_emoticons(self, args):
+		matched = [seat for seat in self.seats if args["user_id"] == seat._user.id]
+		if len(matched) > 0:
+			msg = {"user_id": args["user_id"], "emoticon": args["emoticon"]}
+			self.broadcast(msg, GameRoom.MSG_EMOTICON)
+		else:
+			print "USER NOT SEATED"
+			return

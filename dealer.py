@@ -79,6 +79,7 @@ class Dealer(object):
 
 	def cmd_action(self, args):
 		#print "-------user trying to bet"
+		print "action in dealer %d" % args["action"]
 		current_room    = self.room_list[args["room_id"]]
 		current_room.user_action(args)
 
