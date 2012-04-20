@@ -46,12 +46,9 @@ class HeadPortraitHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		#db_connection  = DatabaseConnection()
-
 		user			= self.session['user']
 		directory		= "uploads/" + user.username
 		head_portrait	= self.request.files['head_portrait'][0]
-		#print head_portrait
 
 		if not os.path.exists(directory):
 			os.makedirs(directory)
@@ -80,7 +77,6 @@ class EmailListHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		#db_connection  = DatabaseConnection()
 		page	= self.get_argument('page', 1)
 		start	= (page - 1) * self.PAGE_SIZE
 		end		= start + self.PAGE_OFFSET
@@ -95,7 +91,6 @@ class EmailListHandler(tornado.web.RequestHandler):
 		for email in emails:
 			email_list.push({
 								"id": email.id,
-								"title": email.title,
 								"date": email.sent_date,
 								"from": email.from_user.username
 							})
@@ -112,7 +107,6 @@ class EmailViewHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		#db_connection  = DatabaseConnection()
 		email_id= self.get_argument('email')
 		user	= self.session['user']
 		email	= self.db_connection.query(Email).filter_by(to_user = user).filter_by(id = email_id).one()
@@ -123,17 +117,18 @@ class EmailSendHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		user			= self.session['user']
-		destination		= self.get_argument('destination')
-		content			= self.get_argument('conent')
-		sent_date		= self.get_argument('datetime')
-		email			= Email()
-		email.from_id	= user.id
-		email.to_id		= destination
-		email.content	= content
-		email.sent_date	= sent_date
-		email.satus		= 0
-		#db_connection  = DatabaseConnection()
+		user				= self.session['user']
+		destination			= self.get_argument('destination')
+		content				= self.get_argument('conent')
+		sent_date			= self.get_argument('datetime')
+		reply_to			= self.get_argument('reply_to')
+		email				= Email()
+		email.from_id		= user.id
+		email.to_id			= destination
+		email.content		= content
+		email.sent_date		= sent_date
+		email.satus			= 0
+		email.reply_to_id	= reply_to
 		self.db_connection.start_session()
 		self.db_connection.addItem(email)
 		self.db_connection.commit_session()

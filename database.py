@@ -90,7 +90,6 @@ class FamilyPosition(Base):
 class Email(Base):
 	__tablename__	= "email"
 	id			= Column(Integer, primary_key=True, autoincrement=True)
-	title		= Column(String(255))
 	from_user_id= Column(Integer, ForeignKey("user.id"))
 	from_user	= relationship("User", primaryjoin=(from_user_id==User.id), backref=backref('out_mails'))
 	to_user_id	= Column(Integer, ForeignKey("user.id"))
@@ -98,6 +97,8 @@ class Email(Base):
 	content		= Column(Text)
 	sent_date	= Column(DateTime)
 	status		= Column(Integer)
+	reply_to_id	= Column(Integer, ForeignKey(email.id))
+	reply_to	= relationship("Email", primaryjoin=(reply_to_id == Email.id), backref=backref("replys"))
 
 class DatabaseConnection(object):
 	__single	= None

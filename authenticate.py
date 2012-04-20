@@ -9,7 +9,6 @@ def authenticate(functor):
 		self.db_connection	= DatabaseConnection()
 		self.db_connection.start_session()
 		self.session['user'] = self.db_connection.query(User).filter_by(id = self.session['user_id']).one()
-
 		self.db_connection.commit_session()
 		functor(self)
 		self.db_connection.close()

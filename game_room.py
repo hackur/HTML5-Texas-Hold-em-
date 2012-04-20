@@ -510,7 +510,10 @@ class GameRoom(object):
 
 		for seat in player_list:
 			print "player names: =============:", seat.get_user().username
-			print "seat.table_amount = %d, self.min_amount = %d" %(seat.table_amount, self.min_amount)
+			print "seat.table_amount = %d, " %(seat.table_amount)
+			print "min_amount = %d" % (self.min_amount)
+			print "num_of_check = %d" % (self.num_of_checks)
+			print "non_fold_move =" , self.non_fold_move
 			if seat.table_amount == self.min_amount and self.num_of_checks == 0 and self.non_fold_move == True:
 				i += 1
 				continue
