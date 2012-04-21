@@ -222,9 +222,12 @@ var funs = {
 	'public':	msg_public_card,
 	'start':    msg_start_game,
 	'pot':  	msg_pot,
-	'standup':	msg_standup
+	'standup':	msg_standup,
+	'chat':		msg_chat
 };
-
+function msg_chat(data){
+	chat_dialog.receive(data);
+};
 function _board_msg_handler(data){
 	
 	funs[data.msgType](data);

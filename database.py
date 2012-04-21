@@ -70,7 +70,7 @@ class User(Base):
 		self.max_reward		= max_reward
 
 	def __repr__(self):
-		return "<User('%s','%s', '%s', '%s', '%s')>" % (self.id, self.username, self.password, self.queue, self.friends)
+		return "<User('%s','%s', '%s', '%s')>" % (self.id, self.username, self.password, self.friends)
 
 class Family(Base):
 	__tablename__="family"

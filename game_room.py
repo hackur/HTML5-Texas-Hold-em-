@@ -80,8 +80,8 @@ class GameRoom(object):
 	(GAME_WAIT,GAME_PLAY) = (0,1)
 	(A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND,A_STANDUP) = (1,2,3,4,5,6,7,8)
 
-	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START,MSG_POT,MSG_STAND_UP,MSG_SHOWDOWN,MSG_EMOTICON) \
-				= ('sit','bhc','phc','winner','next','action','public','start','pot','standup','showdown','emoticon')
+	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START,MSG_POT,MSG_STAND_UP,MSG_SHOWDOWN,MSG_EMOTICON, MSG_CHAT) \
+				= ('sit','bhc','phc','winner','next','action','public','start','pot','standup','showdown','emoticon', 'chat')
 	def __init__(self, room_id, owner, dealer, num_of_seats=9, blind=10, min_stake=100, max_stake=2000):
 		self.room_id    = room_id
 		self.owner      = owner
@@ -212,7 +212,7 @@ class GameRoom(object):
 		self.seats[seat_no].player_stake = int(stake)
 		self.seats[seat_no].status = Seat.SEAT_WAITING
 		self.occupied_seat += 1
-		message = {'seat_no': seat_no, "info": self.seats[seat_no].to_listener()}
+		message = {'status':'success', 'seat_no': seat_no, "info": self.seats[seat_no].to_listener()}
 		self.broadcast(message,GameRoom.MSG_SIT)
 		print len(filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats))
 		if len(filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)) == 2 and not self.t:
@@ -861,3 +861,7 @@ class GameRoom(object):
 		else:
 			print "USER NOT SEATED"
 			return
+	def chat(self, user, seat, content):
+		if self.seats[seat].is_empty() == False and self.seats[seat].get_user().id == user:
+			msg	= {"user_id": user, "seat": seat, "content":content}
+			self.broadcast(msg, GameRoom.MSG_CHAT)

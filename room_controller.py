@@ -104,6 +104,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
+		self.mongodb = self.application.settings['_db']
 		user		= self.session['user']
 		seat		= self.get_argument('seat')
 		stake		= self.get_argument('stake')
@@ -141,9 +142,10 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 		if self.request.connection.stream.closed():
 			self.channel.close()
 			return
-
 		if messages['status'] == 'success':
-			self.session['is_site_down']	= True
+			board_message = self.mongodb.board.find_one({"user_id":self.session['user_id']});
+			board_message['is_sit_down'] = True
+			self.mongodb.board.update({"user_id":self.session['user_id']}, board_message)
 
 		self.write(json.dumps(messages))
 		self.channel.close();
@@ -167,7 +169,7 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 		arguments				= {'routing_key':'dealer', 'message':json.dumps(message)}
 		self.channel			= Channel(self.application.channel,queue, exchange, [])
 		self.channel.publish_message("dealer", json.dumps(message));
-		self.finish("{\'status\':\'success\'}");
+		self.finish("{\"status\":\"success\"}");
 
 
 ###BoardListenMessageHandler shouldn't touch database at all. Even in authenticate

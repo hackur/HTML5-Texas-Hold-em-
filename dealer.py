@@ -83,6 +83,10 @@ class Dealer(object):
 		current_room    = self.room_list[args["room_id"]]
 		current_room.user_action(args)
 
+	def cmd_chat(self, args):
+		print args
+		room	= self.room_list[args['room']]
+		room.chat(args['user'], args['seat'], args['content'])
 
 	def cmd_sit(self, args):
 		print "sit received"
@@ -113,7 +117,7 @@ class Dealer(object):
 		print "Entered Room"
 
 		current_room = self.room_list[args["room_id"]]
-		current_room.add_audit({'user':args["user_id"]})
+		#current_room.add_audit({'user':args["user_id"]})
 
 		routing_key = args['source']
 		message     = {'status':'success', "room":current_room.to_listener()}

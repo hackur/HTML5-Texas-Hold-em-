@@ -16,6 +16,8 @@
 		<script src="seat.js"></script>
 		<script src="index.js"></script>
 		<script src="pot.js"></script>
+		<script src="chat.js"></script>
+
 		<script>
 
 			var login = function(){
@@ -35,6 +37,7 @@
 			function init(){
 				table_init();
 				login();
+				chat_dialog.init()
 			}
 			$(init);
 		</script>
@@ -111,6 +114,15 @@
 				<img src="./image/l1.png" />
 			</div> -->
 
+			<div id="chat-dialog" style="position:absolute; background-color:white;">
+				<div id="chat-history"></div>
+				<div id="chat-input-container" style="position:absolute; background-color:white;">
+					<div id="chat-input-wrapper" style="position:absolute; background-color:white;">
+						<input id="chat-input" class="input" type="text"/>
+					</div>
+					<button id="chat-sent-btn" style="position:absolute; background-color:white;left:240px;">sent</button>
+				</div>
+			</div>
 		</div>
 	</body>
 </html>
