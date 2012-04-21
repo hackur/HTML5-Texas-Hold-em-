@@ -189,6 +189,7 @@ class GameRoom(object):
 									GameRoom.MSG_NEXT)
 		else:
 			#TODO
+			self.actions[action](user_id)
 			pass
 
 	def clearCountDown(self):
@@ -434,7 +435,9 @@ class GameRoom(object):
 			self.discard_game(user_id)
 		else:
 			print "STAND UP"
-			go_away_list = filter(lambda seat: seat.get_user().id == user_id, self.seats)
+			print user_id
+			go_away_list = filter(lambda seat: not seat.is_empty() and seat.get_user().id == user_id, self.seats)
+			print go_away_list
 			self.kick_out(go_away_list)
 
 	def all_in(self, user_id):
@@ -833,14 +836,18 @@ class GameRoom(object):
 			self.broadcast(msg,GameRoom.MSG_START)
 
 	def kick_out(self, go_away_list):
-		msg = {}
-		for seat in go_away_list:
-			msg[seat._user.id] = {"seat_no":seat.seat_id}
-			seat.status = Seat.SEAT_EMPTY
-			seat.set_user(None)
-			seat.kicked_out = False
-		print "broadcasting standup msg"
-		self.broadcast(msg, GameRoom.MSG_STAND_UP)
+		if len(go_away_list) == 0:
+			print "no one to kick out"
+		else:
+			msg = {}
+			for seat in go_away_list:
+				msg[seat._user.id] = {"seat_no":seat.seat_id}
+				print "user id:%d, seat id:%d" %(seat._user.id, seat.seat_id)
+				seat.status = Seat.SEAT_EMPTY
+				seat.set_user(None)
+				seat.kicked_out = False
+			print "broadcasting standup msg"
+			self.broadcast(msg, GameRoom.MSG_STAND_UP)
 
 	def send_emoticons(self, args):
 		matched = [seat for seat in self.seats if args["user_id"] == seat._user.id]
