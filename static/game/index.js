@@ -121,10 +121,9 @@ var enter = function(){
 				}
 
 				if (!window.user_info.userIsSat) {
-					for (var i = 0; i < SeatList.length; i++) {
-						if(data.room.seats[i] == null) {						
+					for(var i = 0; i < data.room.seats.length; i++ ) {
+						if (data.room.seats[i] == null ) {
 							SeatList[i].showSeatdownbg();
-
 						}
 					}
 				}

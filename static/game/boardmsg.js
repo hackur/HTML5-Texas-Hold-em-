@@ -19,10 +19,12 @@ function msg_sit(data){
 	SeatList[seatID].sit(username,stake,userid);
 	if(username == window.user_info.username){
 		window.user_info.sit_no = seatID;
+		window.user_info.userIsSat = true;
+		for (var i = 0; i < SeatList.length; i++) {
+			SeatList[i].removeSeatdownbg();
+		}
 	}
-	for (var i = 0; i < SeatList.length; i++) {
-	SeatList[i].removeSeatdownbg();
-	}
+	SeatList[data.seat_no].removeSeatdownbg();
 }
 function msg_bhc(data){ 
 	/*
@@ -160,8 +162,8 @@ function msg_action(data){
 	//*document.getElementById("money" + data.seat_no).innerHTML = data.stake;*/
 	SeatList[data.seat_no].setStake(data.stake,data.table);
 	SeatList[data.seat_no].removeCountdown(data.seat_no);
+	
 	//send_chips(data.seat_no, data.table);
-
 }
 function msg_public_card(data){
 	/***
@@ -195,6 +197,20 @@ function msg_pot(data){
 function msg_standup(data){
 	console.log("Stand up");
 	console.log(data);
+	$.each(data,function(userid, info) {
+		console.log([userid, info.seat_no], "+++++");
+		if (info.seat_no) {
+			SeatList[info.seat_no].seatStand();
+			if(window.user_info.sit_no == info.seat_no) {
+				for (var i = 0; i < 9; i++) {
+					if (!SeatList[i].getIsSat()) {
+						SeatList[i].showSeatdownbg();
+					} 
+				}
+				window.user_info.userIsSat = false;
+			}
+		}		
+	});
 }
 var funs = {
 	'sit':		msg_sit,

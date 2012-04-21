@@ -136,8 +136,17 @@ function Seat(id,pos){
 		divWin_last_card02.removeAttr("style");
 	};
 
+	seatObj.seatStand = function() {
+		seatObj.username 	= "";
+		seatObj.stake 		= "";
+		seatObj.userid		= "";
+		divName.html("name");
+		divMoney.html("money");
+		seatObj.setIsSat(false);
+	}
+
 	seatObj.showSeatdownbg = function() {
-		divSeatdownbg.show();		
+		divSeatdownbg.show();
 	};
 
 	seatObj.removeSeatdownbg = function() {
