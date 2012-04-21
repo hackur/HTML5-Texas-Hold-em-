@@ -59,10 +59,16 @@ var info_init = function() {
 			$("#change_por")[0].style.display = "none";
 		});
 	});
+	$("#reply").click(function() {
+		$("#replyFrame")[0].style.display = "block";
+		sendEmail();
+	});
+
 	for(var i = 0; i <= bigframe.length; i++) {
 		frameControl(bigframe[i], i);
 	}
 	recharge.drag();
+
 };
 
 var frameControl = function(frame, i) {
@@ -137,6 +143,38 @@ var getEmailInfo = function() {
 		data: {},
 		success: function(data) {
 			console.log(data);			
+		},
+		dataType: "json"
+	});
+};
+
+var sendEmail = function() {
+	$("#sureButton").click(function() {
+		var msg = $("#text1").html();
+		var des = 1;
+		console.log(msg);
+		$.ajax({
+			type: "post",
+			url:  "/send-email",
+			data: {content: msg, destination: des},
+			success: function(data) {
+				console.log(data);
+				alert("send success...");
+				$("#replyFrame")[0].style.display = "none";	
+			},
+			dataType: "json"
+		});
+	});
+};
+
+var viewEmail = function() {
+	var email = 1;
+	$.ajax({
+		type: "post",
+		url:  "/view-email",
+		data: {email: email},
+		success: function(data) {
+			console.log(data);
 		},
 		dataType: "json"
 	});

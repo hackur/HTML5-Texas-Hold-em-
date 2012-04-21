@@ -16,7 +16,7 @@
 		<script src="recharge.js"></script>
 		<script type="text/javascript">
 		var login = function(){
-					var username = "mile";
+					var username = "huaqin";
 					var password = "123";
 					$.post(
 						"../../login",
@@ -25,6 +25,7 @@
 							console.log("Login success");
 							getUserImage();
 							getEmailInfo();
+							viewEmail();
 						},
 						'json'
 					);
@@ -92,6 +93,11 @@
 					<span id="content">内容：</span>
 				</div>
 				<div id="reply">回 复</div>
+				<div id="replyFrame">
+					<div id="text1" contentEditable="true">
+					</div>
+					<div id="sureButton">确 定</div>
+				</div>
 				<div id="delete">删 除</div>
 			</div>
 

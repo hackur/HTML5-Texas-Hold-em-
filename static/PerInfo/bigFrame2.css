@@ -33,6 +33,34 @@
 	position: absolute;
 	background-image: url(./image/btE.png);
 	line-height: 42px;
+	cursor: pointer;
+}
+#replyFrame {
+	top: 20px;
+	left: 120px;
+	height: 388px;
+	width: 644px;
+	position: absolute;
+	display: none;
+	background-image: url(./image/comFrame.png);
+	z-index: 10;
+}
+#text1 {
+	top: 103px;
+	left: 76px;
+	height: 171px;
+	width: 482px;
+	position: absolute;
+}
+#sureButton {
+	top: 280px;
+	left: 76px;
+	height: 54px;
+	width: 124px;
+	position: absolute;
+	background-image: url(./image/btE.png);
+	line-height: 42px;
+	cursor: pointer;
 }
 #delete {
 	top: 300px;

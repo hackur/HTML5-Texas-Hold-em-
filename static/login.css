@@ -18,13 +18,37 @@
 	position: absolute;
 	background-image: url('./images/login/pw.png');
 }
+#account {
+	top: 5px;
+	left: 5px;
+	width: 206px;
+	height: 37px;
+	position: absolute;
+	border:none;
+	background-color: black;
+	font-size: xx-large;
+	font-weight: bold;
+	color: white;
+}
+#password {
+	top: 5px;
+	left: 5px;
+	width: 206px;
+	height: 37px;
+	position: absolute;
+	border:none;
+	background-color: black;
+	font-size: xx-large;
+	font-weight: bold;
+	color: white;
+}
 .linput {
 	width: 215px;
 	height: 50px;
 	
 	position: absolute;
 
-	-webkit-border-radius: .4em;
+	/*-webkit-border-radius: .4em;
 	-moz-border-radius: .4em;
 	border-radius: .4em;
 	outline: none;
@@ -33,29 +57,20 @@
 	background-color: black;
 	color: white;
 	font-size: xx-large;
-	font-weight: bold;
-	/*background-image: url('./images/login/input.png');*/
+	font-weight: bold;*/
+	background-image: url('./images/login/input.png');
 }
-/*
-#linput2 {
-	width: 215px;
-	height: 50px;
+#input1 {
+	top: 150px;
+	left: 670px;
+}
+#input2 {
+	
 	top: 210px;
 	left: 670px;
-	position: absolute;
-
-	-webkit-border-radius: .4em;
-	-moz-border-radius: .4em;
-	border-radius: .4em;
-	outline: none;
-
-	background-color: black;
-	color: white;
-	font-size: xx-large;
-	font-weight: bold;
-	/*background-image: url('./images/login/input.png');
+	
 }
-*/
+
 #lcheck {
 	width: 26px;
 	height: 27px;
@@ -63,14 +78,12 @@
 	left: 580px;
 	position: absolute;
 	z-index: 1;
-	/*background-image: url('./images/login/nocheck.png');*/
-	margin-left:10px;
-    vertical-align:middle;
+	background-image: url('./images/login/nocheck.png');
     cursor:pointer;
 }
-/*#lcheck:hover {
+#lcheck:hover {
 	background-image: url('./images/login/check.png');	
-}*/
+}
 #lisauto {
 	width: 137px;
 	height: 26px;
@@ -101,8 +114,9 @@
 	left: 550px;
 	position: absolute;
 	z-index: 1;
-	/*background-image: url('./images/login/login1.png');*/
-
+	background-image: url('./images/login/login1.png');
+	cursor:pointer;
+/*
 	text-align: center;
 	padding:2px 20px;
 	line-height:2em;
@@ -111,18 +125,17 @@
 	background: -webkit-gradient(linear, left top, left 24, from(#FF6900), color-stop(0%, #FF9800), to(#FF6900));
 	background: -moz-linear-gradient(top, #FF6900, #FF9800 0, #FF6900 24px);
 	background: -o-linear-gradient(top, #FF6900, #FF9800 0, #FF6900 24px);
-	cursor:pointer;
 	letter-spacing: 4px;
 	margin-left:10px;
 	color:#FFF;
 	font-weight:bold;
-	font-size:x-large;
+	font-size:x-large;*/
 }
 #llogin:hover {
-	background: -webkit-gradient(linear, left top, left 24, from(#FF9800), color-stop(0%, #FF6900), to(#FF9800));
+	/*background: -webkit-gradient(linear, left top, left 24, from(#FF9800), color-stop(0%, #FF6900), to(#FF9800));
     background: -moz-linear-gradient(top, #FF9800, #FF6900 0, #FF9800 24px);
-    background:-o-linear-gradient(top, #FF6900, #FF6900 0, #FF9800 24px);
-	/*background-image: url('./images/login/login2.png');*/
+    background:-o-linear-gradient(top, #FF6900, #FF6900 0, #FF9800 24px);*/
+	background-image: url('./images/login/login2.png');
 }
 #lcancel {
 	width: 172px;
@@ -131,8 +144,9 @@
 	left: 740px;
 	position: absolute;
 	z-index: 1;
-	/*background-image: url('./images/login/cancel1.png');*/
-	text-align: center;
+	background-image: url('./images/login/cancel1.png');
+	cursor:pointer;
+/*	text-align: center;
 	padding:2px 20px;
 	line-height:2em;
 	border:1px solid #FF1500;
@@ -140,18 +154,18 @@
 	background: -webkit-gradient(linear, left top, left 24, from(#FF6900), color-stop(0%, #FF9800), to(#FF6900));
 	background: -moz-linear-gradient(top, #FF6900, #FF9800 0, #FF6900 24px);
 	background: -o-linear-gradient(top, #FF6900, #FF9800 0, #FF6900 24px);
-	cursor:pointer;
 	letter-spacing: 4px;
 	margin-left:10px;
 	color:#FFF;
 	font-weight:bold;
-	font-size:x-large;
+	font-size:x-large;*/
 }
 #lcancel:hover {
-	/*background-image: url('./images/login/cancel2.png');*/
-	background: -webkit-gradient(linear, left top, left 24, from(#FF9800), color-stop(0%, #FF6900), to(#FF9800));
+	background-image: url('./images/login/cancel2.png');
+	/*background: -webkit-gradient(linear, left top, left 24, from(#FF9800), color-stop(0%, #FF6900), to(#FF9800));
     background: -moz-linear-gradient(top, #FF9800, #FF6900 0, #FF9800 24px);
     background:-o-linear-gradient(top, #FF6900, #FF6900 0, #FF9800 24px);
+*/
 }
 #lvisitor {
 	width: 256px;
@@ -160,7 +174,9 @@
 	left: 615px;
 	position: absolute;
 	z-index: 1;
-	/*background-image: url('./images/login/visitor1.png');*/
+	background-image: url('./images/login/visitor1.png');
+	cursor:pointer;
+	/*
 	text-align: center;
 	padding:2px 20px;
 	line-height:2em;
@@ -169,16 +185,16 @@
 	background: -webkit-gradient(linear, left top, left 24, from(#FF6900), color-stop(0%, #FF9800), to(#FF6900));
 	background: -moz-linear-gradient(top, #FF6900, #FF9800 0, #FF6900 24px);
 	background: -o-linear-gradient(top, #FF6900, #FF9800 0, #FF6900 24px);
-	cursor:pointer;
 	letter-spacing: 4px;
 	margin-left:10px;
 	color:#FFF;
 	font-weight:bold;
-	font-size: 40px;
+	font-size: 40px;*/
 }
 #lvisitor:hover {
-	/*background-image: url('./images/login/visitor2.png');*/
-	background: -webkit-gradient(linear, left top, left 24, from(#FF9800), color-stop(0%, #FF6900), to(#FF9800));
+	background-image: url('./images/login/visitor2.png');
+	/*background: -webkit-gradient(linear, left top, left 24, from(#FF9800), color-stop(0%, #FF6900), to(#FF9800));
     background: -moz-linear-gradient(top, #FF9800, #FF6900 0, #FF9800 24px);
     background:-o-linear-gradient(top, #FF6900, #FF6900 0, #FF9800 24px);
+*/
 }
