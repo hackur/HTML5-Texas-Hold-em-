@@ -154,38 +154,42 @@ class GameRoom(object):
 		action          = args["action"]
 		private_key     = args["private_key"]
 		user_id         = args["user_id"]
-		seat_no			= self.current_seat
-		if self.is_valid_seat(user_id, seat_no) and self.is_valid_rights(action, seat_no):
-			self.clearCountDown()
-			seat = self.seats[seat_no]
-			if action != GameRoom.A_RAISESTAKE:
-				if action in self.amount_limits:
-					broadcast_msg = {	'action':action,
-										'seat_no':seat_no,
-										'stake':seat.player_stake-self.amount_limits[action],
-										'table':seat.table_amount+self.amount_limits[action]}
+		if self.status == GameRoom.GAME_PLAY:
+			seat_no			= self.current_seat
+			if self.is_valid_seat(user_id, seat_no) and self.is_valid_rights(action, seat_no):
+				self.clearCountDown()
+				seat = self.seats[seat_no]
+				if action != GameRoom.A_RAISESTAKE:
+					if action in self.amount_limits:
+						broadcast_msg = {	'action':action,
+											'seat_no':seat_no,
+											'stake':seat.player_stake-self.amount_limits[action],
+											'table':seat.table_amount+self.amount_limits[action]}
+					else:
+						broadcast_msg = {	'action':action,
+											'seat_no':seat_no,
+											'stake':seat.player_stake,
+											'table':seat.table_amount}
+					self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
+					self.actions[action](user_id)
 				else:
-					broadcast_msg = {	'action':action,
+					amount			= int(args['amount'])
+					broadcast_msg	= {	'action':action,
 										'seat_no':seat_no,
-										'stake':seat.player_stake,
-										'table':seat.table_amount}
-				self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
-				self.actions[action](user_id)
-			else:
-				amount			= int(args['amount'])
-				broadcast_msg	= {	'action':action,
-									'seat_no':seat_no,
-									'stake':seat.player_stake-amount,
-									'table':seat.table_amount+amount}
-				self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
-				self.actions[action](user_id,amount)
+										'stake':seat.player_stake-amount,
+										'table':seat.table_amount+amount}
+					self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
+					self.actions[action](user_id,amount)
 
-			if self.status != GameRoom.GAME_WAIT:
-				next_seat = self.seats[self.current_seat]
-				self.broadcast({"seat_no":next_seat.seat_id,
-								'rights':next_seat.rights,
-								'amount_limits':self.amount_limits},
-								GameRoom.MSG_NEXT)
+				if self.status != GameRoom.GAME_WAIT:
+					next_seat = self.seats[self.current_seat]
+					self.broadcast({"seat_no":next_seat.seat_id,
+									'rights':next_seat.rights,
+									'amount_limits':self.amount_limits},
+									GameRoom.MSG_NEXT)
+		else:
+			#TODO
+			pass
 
 	def clearCountDown(self):
 		if self.countdown:
@@ -424,12 +428,13 @@ class GameRoom(object):
 			self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
 
 	def stand_up(self, user_id):
-		if self.stand_up == GameRoom.GAME_PLAY:
+		if self.status == GameRoom.GAME_PLAY:
 			print "STAND UP"
 			self.seats[self.current_seat].kicked_out = True
 			self.discard_game(user_id)
 		else:
-			go_away_list = filter(lambda seat: seat.get_user().id = user_id, self.seats)
+			print "STAND UP"
+			go_away_list = filter(lambda seat: seat.get_user().id == user_id, self.seats)
 			self.kick_out(go_away_list)
 
 	def all_in(self, user_id):
