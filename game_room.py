@@ -21,7 +21,7 @@ class Seat(object):
 		self.handcards = []
 		self.table_amount = 0
 		self.player_stake = 0
-		self.time_out_flag = False
+		self.kicked_out = False
 
 	def __str__(self):
 		return "seat[%d], user[%d]" % (self.seat_id, self._user.id)
@@ -78,7 +78,7 @@ class Seat(object):
 
 class GameRoom(object):
 	(GAME_WAIT,GAME_PLAY) = (0,1)
-	(A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND) = (1,2,3,4,5,6,7)
+	(A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND,A_STANDUP) = (1,2,3,4,5,6,7,8)
 
 	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START,MSG_POT,MSG_STAND_UP,MSG_SHOWDOWN,MSG_EMOTICON) \
 				= ('sit','bhc','phc','winner','next','action','public','start','pot','standup','showdown','emoticon')
@@ -120,7 +120,9 @@ class GameRoom(object):
 						GameRoom.A_CALLSTAKE	:self.call_stake,
 						GameRoom.A_RAISESTAKE	:self.raise_stake,
 						GameRoom.A_CHECK		:self.check,
-						GameRoom.A_DISCARDGAME	:self.discard_game}
+						GameRoom.A_DISCARDGAME	:self.discard_game,
+						GameRoom.A_STANDUP		:self.stand_up
+						}
 
 	def to_listener(self):
 		result = {}
@@ -264,12 +266,11 @@ class GameRoom(object):
 				if self.same_amount_on_table():
 					self.round_finish()
 				elif self.check_next(self.current_seat) == self.small_blind:
-					self.current_seat	= self.info_next(self.current_seat, [1,2,3,5])
+					pass
 				else:
 					self.min_amount = self.blind
-					self.current_seat	= self.info_next(self.current_seat, [1,2,3,5])
 		if self.status != GameRoom.GAME_WAIT:
-			self.current_seat	= self.info_next(self.current_seat, [1,2,3,5])
+			self.current_seat	= self.info_next(self.current_seat, [1,2,3,5,8])
 			print "next seat in action =>", self.current_seat
 			next_seat = self.seats[self.current_seat]
 			self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
@@ -332,17 +333,17 @@ class GameRoom(object):
 				if len(filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)) < 2:
 					self.round_finish()
 				elif self.check_next(seat_no) == self.big_blind and self.big_blind_move == False:
-					self.current_seat = self.info_next(seat_no, [1,3,4,5])
+					self.current_seat = self.info_next(seat_no, [1,3,4,5,8])
 					self.big_blind_move = True
 				else:
 					self.round_finish()
 			else:
-				self.current_seat = self.info_next(seat_no, [1,2,3,5])
+				self.current_seat = self.info_next(seat_no, [1,2,3,5,8])
 		else:
 			if self.same_amount_on_table():                 # all players have put down equal amount of money, next round
 				self.round_finish()
 			else:
-				self.current_seat = self.info_next(seat_no, [1,2,3,5])
+				self.current_seat = self.info_next(seat_no, [1,2,3,5,8])
 
 	def raise_stake(self, user_id,  amount):
 		print "RAISE!"
@@ -362,7 +363,7 @@ class GameRoom(object):
 			if self.seats[seat_no].player_stake == 0:
 				self.seats[seat_no].status = Seat.SEAT_ALL_IN
 			print "player stake: %d" % self.seats[seat_no].player_stake
-			self.current_seat   = self.info_next(seat_no, [1, 2, 3, 5])
+			self.current_seat   = self.info_next(seat_no, [1,2,3,5,8])
 		else:
 			print "RAISE INVALID AMOUNT OF MONEY! GET OUT OF HERE!!!!"
 			self.discard_game(user_id)
@@ -381,7 +382,7 @@ class GameRoom(object):
 			self.num_of_checks += 1
 			print "num_of_checks: ", self.num_of_checks
 			if self.num_of_checks < len(player_list):
-				self.current_seat = self.info_next(seat_no, [1,3,4,5])
+				self.current_seat = self.info_next(seat_no, [1,3,4,5,8])
 			else:
 				self.round_finish()
 
@@ -394,7 +395,7 @@ class GameRoom(object):
 							'table': seat.table_amount
 						}
 		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
-		seat.time_out_flag = True
+		seat.kicked_out = True
 		self.discard_game(user_id)
 
 		if self.status != GameRoom.GAME_WAIT:
@@ -423,6 +424,11 @@ class GameRoom(object):
 			print "I'm here!!!!!"
 			self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
 
+	def stand_up(self, user_id):
+		print "STAND UP"
+		self.seats[self.current_seat].kicked_out = True
+		self.discard_game(user_id)
+
 	def all_in(self, user_id):
 		print "FULL POWER! ALL INNNNNNNNN!!!!!!!!"
 		print "num_of_checks: ", self.num_of_checks
@@ -446,17 +452,17 @@ class GameRoom(object):
 				if len(filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)) < 2:
 					self.round_finish()
 				elif self.check_next(seat_no) == self.big_blind and self.big_blind_move == False:
-					self.current_seat = self.info_next(seat_no, [1,3,4,5])
+					self.current_seat = self.info_next(seat_no, [1,3,4,5,8])
 					self.big_blind_move = True
 				else:
 					self.round_finish()
 			else:
-				self.current_seat = self.info_next(seat_no, [1,2,3,5])
+				self.current_seat = self.info_next(seat_no, [1,2,3,5,8])
 		else:
 			if self.same_amount_on_table(True):                 # all players have put down equal amount of money, next round
 				self.round_finish()
 			else:
-				self.current_seat = self.info_next(seat_no, [1,2,3,5])
+				self.current_seat = self.info_next(seat_no, [1,2,3,5,8])
 
 	def info_next(self, current_position, rights):
 		next_seat = self.check_next(current_position)
@@ -593,7 +599,7 @@ class GameRoom(object):
 				self.flop_flag = True
 			else:
 				self.poker_controller.getOne()
-			self.current_seat	= self.info_next(self.current_dealer, [1,3,4,5])
+			self.current_seat	= self.info_next(self.current_dealer, [1,3,4,5,8])
 			card_list			= [ str(card) for card in self.poker_controller.publicCard ]
 			broadcast_msg		= {'cards':card_list}
 			self.broadcast(broadcast_msg, GameRoom.MSG_PUBLIC_CARD)
@@ -602,6 +608,9 @@ class GameRoom(object):
 				self.merge_pots()
 				self.broadcast_pot()
 			self.num_of_checks = 0
+
+			go_away_list = filter(lambda seat: seat.kicked_out == True, self.seats)
+			self.kick_out(go_away_list)
 			return
 
 	def broadcast_pot(self):
@@ -612,15 +621,19 @@ class GameRoom(object):
 	def distribute_ante(self):
 		ante_dict = {}
 		rank_list = self.poker_controller.rank_users()
-		print rank_list
-		for i in xrange(len(rank_list)):
+		temp_list = list(rank_list)
+		for i in xrange(len(temp_list)):
 			print "rank list"
-			for item in rank_list[i]:
-				print item.get_user().id;
+			for j in xrange(len(temp_list[i])):
+				print temp_list[i][j].status
+				if temp_list[i][j].status == Seat.SEAT_EMPTY:
+					rank_list[i].remove(rank_list[i][j])
+			temp = [rank_list[i][j].get_user().id for j in xrange(len(rank_list[i]))]
+			print temp
 
 			for owner, ante in self.pot.iteritems():
 				ante = ante["amount"]
-				share_list = filter(lambda seat: seat.get_user().id in owner and seat.status != Seat.SEAT_WAITING, rank_list[i])
+				share_list = filter(lambda seat: seat.get_user().id in owner and (seat.status != Seat.SEAT_WAITING or seat.status != Seat.SEAT_EMPTY), rank_list[i])
 				for user in share_list:
 					if user in ante_dict:
 						ante_dict[user] += math.floor(ante/len(share_list))
@@ -668,7 +681,7 @@ class GameRoom(object):
 			key = list(k)
 			for user_id in list(k):
 				for seat in player_list:
-					if seat._user.id== user_id and seat.status == Seat.SEAT_WAITING:
+					if seat._user.id == user_id and (seat.status == Seat.SEAT_WAITING or seat.status == Seat.SEAT_EMPTY):
 						key.remove(user_id)
 			index = tuple(key)
 			if index not in new_pot:
@@ -799,34 +812,31 @@ class GameRoom(object):
 		self.big_blind_move = False
 		self.current_seat = None
 
-		player_list		= filter(lambda seat: not seat.is_empty() and seat.player_stake != 0 and seat.time_out_flag == False, self.seats)
-		go_away_list	= filter(lambda seat: (not seat.is_empty() and seat.player_stake == 0) or seat.time_out_flag == True, self.seats)
+		player_list		= filter(lambda seat: not seat.is_empty() and seat.player_stake != 0 and seat.kicked_out == False, self.seats)
+		go_away_list	= filter(lambda seat: (not seat.is_empty() and seat.player_stake == 0) or seat.kicked_out == True, self.seats)
 
 		for seat in player_list:
 			seat.status = Seat.SEAT_WAITING
 
-		msg = {}
-		for seat in go_away_list:
-			msg[seat._user.id] = {"seat_no":seat.seat_id}
-			seat.status = Seat.SEAT_EMPTY
-			self.audit_list.append({"user": seat.get_user().id})
-			seat.set_user(None)
-			seat.time_out_flag = False
+		if len(go_away_list) != 0:
+			self.kick_out(go_away_list)
 
-		print "broadcasting standup msg"
-		self.broadcast(msg, GameRoom.MSG_STAND_UP)
 		if len(player_list) >= 2 and not self.t:
 			timeout = 5
 			self.t = self.ioloop.add_timeout(time.time() + timeout, self.start_game)
 			msg = {'to':timeout }
 			self.broadcast(msg,GameRoom.MSG_START)
 
-	#def stand_up(self, user_id):
-	#	for seat in self.seats:
-	#		if not seat.is_empty() and user_id == seat.get_user().id:
-	#			seat.set_user(None)
-	#			seat.status = Seat.SEAT_EMPTY
-	#			self.audit_list.append({"user": user_id})
+	def kick_out(self, go_away_list):
+		msg = {}
+		for seat in go_away_list:
+			msg[seat._user.id] = {"seat_no":seat.seat_id}
+			seat.status = Seat.SEAT_EMPTY
+			seat.set_user(None)
+			seat.kicked_out = False
+		print "broadcasting standup msg"
+		self.broadcast(msg, GameRoom.MSG_STAND_UP)
+
 	def send_emoticons(self, args):
 		matched = [seat for seat in self.seats if args["user_id"] == seat._user.id]
 		if len(matched) > 0:
