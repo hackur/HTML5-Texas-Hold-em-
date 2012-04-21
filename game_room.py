@@ -189,8 +189,10 @@ class GameRoom(object):
 									GameRoom.MSG_NEXT)
 		else:
 			#TODO
-			self.actions[action](user_id)
-			pass
+			if action != GameRoom.A_STANDUP:
+				return
+			else:
+				self.actions[action](user_id)
 
 	def clearCountDown(self):
 		if self.countdown:
