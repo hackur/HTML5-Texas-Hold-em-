@@ -183,8 +183,8 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		self.clean_matured_message(timestamp)
 
 		if len(self.session['messages']) > 0:
-			messages = self.session['messages']
-			self.finish(json.dumps(messages))
+			messages = self.mongodb.find_one({"user_id":self.session["user_id"]})
+			self.finish(json.dumps(messages["list"]))
 			return
 
 		binding_keys= (self.session['public_key'], self.session['private_key'])
