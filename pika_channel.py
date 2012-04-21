@@ -97,9 +97,9 @@ class Channel(object):
 		pika.log.info('PikaClient: Basic Cancel Ok')
 		print "connection close---"
 		if self.request and not self.request.request.connection.stream.closed():
-			if len(self.request.session['messages']) > 0:
-				print self.request.session['messages']
-				self.request.write(json.dumps(self.request.session['messages']));
+			if len(self.request.board_messages) > 0:
+				print self.request.board_messages
+				self.request.write(json.dumps(self.request.board_messages));
 			try:
 				self.request.finish()
 			except:

@@ -25,16 +25,13 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-#		db_connection	= DatabaseConnection()
 		message			= None
-
-		# Only for using  apache ab to test
-		#self.session['user'] = db_connection.query(User).filter_by(username = "ting").one()
-
 		user			= self.session['user']
 		room_id			= self.get_argument('room_id')
 		room			= self.db_connection.query(Room).filter_by(id = room_id).one()
-
+		self.mongodb	= self.application.settings['_db']
+		self.mongodb.board.remove({"user_id":self.session["user_id"]})
+		self.mongodb.board.save({"user_id":self.session["user_id"], "list": []})
 		user.room	= room
 		user.room_id= room.id
 		self.db_connection.addItem(user)
@@ -178,6 +175,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
+		self.mongodb = self.application.settings['_db']
 		user		= self.session['user']
 		timestamp	= int(self.get_argument('timestamp'))
 		queue		= str(user.username)  + '_broadcast'
@@ -195,15 +193,26 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		self.channel.consume()
 
 	def clean_matured_message(self, timestamp):
-		self.session['messages'] = filter(lambda x: int(x['timestamp']) > timestamp,self.session['messages'])
+		board_messages = self.mongodb.board.find_one({"user_id":self.session["user_id"]})
+		print "========================[start]========================="
+		print board_messages
+		print "========================[ end ]========================="
+		if board_messages is not None:
+			board_messages["list"] = filter(lambda x: int(x['timestamp']) > timestamp, board_messages["list"])
+			self.mongodb.board.update({"user_id": self.session["user_id"]}, board_messages)
+
 
 	def on_connection_close(self):
 		self.channel.close()
 
 	def message_call_back(self, argument):
-		messages= self.channel.get_messages()
+		new_messages	= self.channel.get_messages()
 		print "------message receive start------"
-		print messages
+		print new_messages
 		print "------message receive end------"
-		self.session['messages'].extend(messages)
+		user_id			= self.session['user_id']
+		board_messages	= self.mongodb.board.find_one({"user_id": user_id})
+		board_messages["list"].extend(new_messages)
+		self.mongodb.board.update({"user_id": user_id}, board_messages)
+		self.board_messages = board_messages["list"]
 		self.channel.close();
