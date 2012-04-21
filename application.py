@@ -35,6 +35,11 @@ application = None
 def on_channel_open(channel):
 	pika.log.info('PikaClient: Channel Open')
 	application.channel = channel
+	channel.add_on_close_callback(on_close_callback)
+
+def on_close_callback(msg1, msg2):
+	print "channel closed"
+	print msg1, msg2
 
 def on_connected(connection):
 	print "pika connected"
@@ -48,7 +53,8 @@ if __name__ == '__main__':
 		"uploaded_image_path": os.path.join(os.path.dirname(__file__), "uploads"),
 		"PokerUITest": os.path.join(os.path.dirname(__file__), "PokerUITest"),
 		#'session_storage':"dir"
-		"session_storage":"mongodb:///db"
+		"session_storage":"mongodb:///db",
+		"session_regeneration_interval": None
 	}
 
 

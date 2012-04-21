@@ -222,6 +222,8 @@ class GameRoom(object):
 
 	def start_game(self):
 		self.t		= None
+		if len(filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)) < 2 and not self.t:
+			return
 		self.status	= GameRoom.GAME_PLAY
 		self.poker_controller.start()
 		self.assign_role()
