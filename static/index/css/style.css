@@ -1,0 +1,16 @@
+
+.background {
+	height: 640px;
+	width: 960px;
+	top:0;
+	left:0;
+	position:absolute;
+	background-size: 100%;
+}
+
+.view {
+	display: none;
+	overflow: hidden;
+	height: 640px;
+	width: 960px;
+}

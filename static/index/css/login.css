@@ -1,0 +1,200 @@
+
+#lbg {
+	background-image:url('../img/login/loginbg.png');
+}
+#laccount {
+	width: 88px;
+	height: 43px;
+	top: 155px;
+	left: 570px;
+	position: absolute;
+	background-image: url('../img/login/account.png');
+}
+#lpw {
+	width: 88px;
+	height: 43px;
+	top: 215px;
+	left: 570px;
+	position: absolute;
+	background-image: url('../img/login/pw.png');
+}
+#account {
+	top: 5px;
+	left: 5px;
+	width: 206px;
+	height: 37px;
+	position: absolute;
+	border:none;
+	background-color: black;
+	font-size: xx-large;
+	font-weight: bold;
+	color: white;
+}
+#password {
+	top: 5px;
+	left: 5px;
+	width: 206px;
+	height: 37px;
+	position: absolute;
+	border:none;
+	background-color: black;
+	font-size: xx-large;
+	font-weight: bold;
+	color: white;
+}
+.linput {
+	width: 215px;
+	height: 50px;
+	
+	position: absolute;
+
+	/*-webkit-border-radius: .4em;
+	-moz-border-radius: .4em;
+	border-radius: .4em;
+	outline: none;
+	border: 1px;
+
+	background-color: black;
+	color: white;
+	font-size: xx-large;
+	font-weight: bold;*/
+	background-image: url('../img/login/input.png');
+}
+#input1 {
+	top: 150px;
+	left: 670px;
+}
+#input2 {
+	
+	top: 210px;
+	left: 670px;
+	
+}
+
+#lcheck {
+	width: 26px;
+	height: 27px;
+	top: 275px;
+	left: 580px;
+	position: absolute;
+	z-index: 1;
+	background-image: url('../img/login/nocheck.png');
+    cursor:pointer;
+}
+#lcheck:hover {
+	background-image: url('../img/login/check.png');	
+}
+#lisauto {
+	width: 137px;
+	height: 26px;
+	top: 275px;
+	left: 610px;
+	position: absolute;
+	background-image: url('../img/login/isauto.png');
+}
+#lforgetpw {
+	width: 120px;
+	height: 27px;
+	top: 266px;
+	left: 780px;
+	position: absolute;
+	/*background-image: url('../img/login/forgetpw.png');*/
+	color:black;
+    font-size:27px;
+    margin:6px 0 0 10px;
+    text-decoration:none;
+}
+#lforgetpw:hover {
+	text-decoration:underline;
+}
+#llogin {
+	width: 172px;
+	height: 58px;
+	top: 340px;
+	left: 550px;
+	position: absolute;
+	z-index: 1;
+	background-image: url('../img/login/login1.png');
+	cursor:pointer;
+/*
+	text-align: center;
+	padding:2px 20px;
+	line-height:2em;
+	border:1px solid #FF1500;
+	border-radius:3px;
+	background: -webkit-gradient(linear, left top, left 24, from(#FF6900), color-stop(0%, #FF9800), to(#FF6900));
+	background: -moz-linear-gradient(top, #FF6900, #FF9800 0, #FF6900 24px);
+	background: -o-linear-gradient(top, #FF6900, #FF9800 0, #FF6900 24px);
+	letter-spacing: 4px;
+	margin-left:10px;
+	color:#FFF;
+	font-weight:bold;
+	font-size:x-large;*/
+}
+#llogin:hover {
+	/*background: -webkit-gradient(linear, left top, left 24, from(#FF9800), color-stop(0%, #FF6900), to(#FF9800));
+    background: -moz-linear-gradient(top, #FF9800, #FF6900 0, #FF9800 24px);
+    background:-o-linear-gradient(top, #FF6900, #FF6900 0, #FF9800 24px);*/
+	background-image: url('../img/login/login2.png');
+}
+#lcancel {
+	width: 172px;
+	height: 58px;
+	top: 340px;
+	left: 740px;
+	position: absolute;
+	z-index: 1;
+	background-image: url('../img/login/cancel1.png');
+	cursor:pointer;
+/*	text-align: center;
+	padding:2px 20px;
+	line-height:2em;
+	border:1px solid #FF1500;
+	border-radius:3px;
+	background: -webkit-gradient(linear, left top, left 24, from(#FF6900), color-stop(0%, #FF9800), to(#FF6900));
+	background: -moz-linear-gradient(top, #FF6900, #FF9800 0, #FF6900 24px);
+	background: -o-linear-gradient(top, #FF6900, #FF9800 0, #FF6900 24px);
+	letter-spacing: 4px;
+	margin-left:10px;
+	color:#FFF;
+	font-weight:bold;
+	font-size:x-large;*/
+}
+#lcancel:hover {
+	background-image: url('../img/login/cancel2.png');
+	/*background: -webkit-gradient(linear, left top, left 24, from(#FF9800), color-stop(0%, #FF6900), to(#FF9800));
+    background: -moz-linear-gradient(top, #FF9800, #FF6900 0, #FF9800 24px);
+    background:-o-linear-gradient(top, #FF6900, #FF6900 0, #FF9800 24px);
+*/
+}
+#lvisitor {
+	width: 256px;
+	height: 83px;
+	top: 480px;
+	left: 615px;
+	position: absolute;
+	z-index: 1;
+	background-image: url('../img/login/visitor1.png');
+	cursor:pointer;
+	/*
+	text-align: center;
+	padding:2px 20px;
+	line-height:2em;
+	border:1px solid #FF1500;
+	border-radius:3px;
+	background: -webkit-gradient(linear, left top, left 24, from(#FF6900), color-stop(0%, #FF9800), to(#FF6900));
+	background: -moz-linear-gradient(top, #FF6900, #FF9800 0, #FF6900 24px);
+	background: -o-linear-gradient(top, #FF6900, #FF9800 0, #FF6900 24px);
+	letter-spacing: 4px;
+	margin-left:10px;
+	color:#FFF;
+	font-weight:bold;
+	font-size: 40px;*/
+}
+#lvisitor:hover {
+	background-image: url('../img/login/visitor2.png');
+	/*background: -webkit-gradient(linear, left top, left 24, from(#FF9800), color-stop(0%, #FF6900), to(#FF9800));
+    background: -moz-linear-gradient(top, #FF9800, #FF6900 0, #FF9800 24px);
+    background:-o-linear-gradient(top, #FF6900, #FF6900 0, #FF9800 24px);
+*/
+}
