@@ -106,10 +106,6 @@ class FamilyPosition(Base):
 	def __init__(self,name):
 		self.name=name
 
-reply_relation=Table("reply_relation",Base.metadata,
-	Column("sender",Integer,ForeignKey("email.id")),
-	Column("reply_to",Integer,ForeignKey("email.id"))
-)
 class Email(Base):
 	__tablename__	= "email"
 	id			= Column(Integer, primary_key=True, autoincrement=True)
@@ -121,7 +117,7 @@ class Email(Base):
 	sent_date	= Column(DateTime)
 	status		= Column(Integer)
 	reply_to_id	= Column(Integer, ForeignKey("email.id"))
-	reply_to	= relationship("Email", backref=backref('follow_emails', remote_side=[id]))
+	reply_to	= relationship("Email", backref=backref('follow_emails', remote_side=[id], uselist=False))
 
 class DatabaseConnection(object):
 	__single	= None
@@ -202,6 +198,9 @@ if __name__ == "__main__":
 	email.reply_to_id	= None
 	db_connection.addItem(email)
 
-	# ting.friends = [mile, mamingcao]
-	# mile.friends = [ting]
+	ting.friends = [mile, mamingcao]
+	mile.friends = [ting]
+	db_connection.addItem(ting)
+	db_connection.addItem(mile)
+
 	db_connection.commit_session()
