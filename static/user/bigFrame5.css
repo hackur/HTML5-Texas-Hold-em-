@@ -70,17 +70,44 @@
 	background-image: url(./image/fw.png);
 	line-height: 45px;
 }
-#name1 {
+.name {
 	position: absolute;
-	top: 4px;
-	left: 4px;
 	width: 290px;
 	height: 40px;
 	line-height: 35px;
+	cursor: pointer;
 }
-#name1:hover {
+.name:hover {
 	background-image: url(./image/pitch2.png);
 
+}
+#name0 {
+	top: 4px;
+	left: 4px;
+}
+#name1 {
+	top: 54px;
+	left: 4px;
+}
+#name2 {
+	top: 104px;
+	left: 4px;
+}
+#name3 {
+	top: 154px;
+	left: 4px;
+}
+#name4 {
+	top: 204px;
+	left: 4px;
+}
+#name5 {
+	top: 254px;
+	left: 4px;
+}
+#name6 {
+	top: 304px;
+	left: 4px;
 }
 #line7 {
 	top: 40px;

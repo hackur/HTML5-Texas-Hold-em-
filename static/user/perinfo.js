@@ -69,20 +69,6 @@ var info_init = function() {
 	}
 	recharge.drag();
 
-	$("#lobby").click(function(){
-		window.location = "/static/room/room.html";
-	});
-	$("#quick_acc").click(function(){
-		$.ajax({
-			type:"get",
-			url:"/fast_enter",
-			success:function(data){
-				localStorage["current_room_id"] = data;
-				window.location = "/static/game/game.html";
-			}
-		});
-	});
-	getUserImage();
 };
 
 var frameControl = function(frame, i) {
@@ -191,5 +177,40 @@ var viewEmail = function() {
 			console.log(data);
 		},
 		dataType: "json"
+	});
+};
+
+var buddyInfo = function() {
+	$.ajax({
+		type: "post",
+		url:  "/buddy-info",
+		data: {},
+		success: function(data) {
+			console.log(data);
+			//console.log(data.leftfriendId)
+			for(var i = 0; i < data.friends.length; i++) {
+				$("#name" + i).html(data.friends[i].name);
+				view_friend(data.friends[i], i);
+			}
+		},
+		dataType: "json"
+	});
+};
+
+var view_friend = function(friend, i) {
+	
+
+	$("#name" + i).click(function() {
+		$("#fID").html("ID名称：");
+		$("#ffamily").html("家族：");
+		$("#fpos").html("职位：");
+		$("#frank").html("等级：");
+		$("#fpro").html("资产：");
+		
+		$("#fID").html($("#fID").html() + friend.id);
+		$("#ffamily").html($("#ffamily").html() + friend.family);
+		$("#fpos").html($("#fpos").html() + friend.position);
+		$("#frank").html($("#frank").html() + friend.level);
+		$("#fpro").html($("#fpro").html() + friend.asset);			
 	});
 };
