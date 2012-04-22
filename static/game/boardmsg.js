@@ -96,6 +96,7 @@ function msg_winner(data){
 		var seat = getSeatById(userid);
 		console.log([userid, seat,info.seat_no,"+++++++++++++"]);
 		seat.setStake(info.stake,0);
+		SeatList[info.seat_no].removeCountdown();
 		SeatList[info.seat_no].showWinCard();
         for (var i = 0, k = 0;  i <= info.handcards.length - 1 && k <= 1; i++) {
             for (var j = 0; j <= public_card.length - 1; j++) {
@@ -202,6 +203,10 @@ function msg_standup(data){
 		console.log([userid, info.seat_no], "+++++");
 		if (info.seat_no) {
 			SeatList[info.seat_no].seatStand();
+			SeatList[info.seat_no].removeCountdown();
+			if (!window.user_info.userIsSat) {
+				SeatList[info.seat_no].showSeatdownbg();
+			} 
 			if(window.user_info.sit_no == info.seat_no) {
 				SeatList[info.seat_no].removeStand();
 				for (var i = 0; i < 9; i++) {

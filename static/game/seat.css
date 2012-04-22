@@ -200,6 +200,12 @@
 	height:32px;
 	width:28px;
 	position: absolute;
+	-moz-transition: all 1s; 
+	-webkit-transition: all 1s;  
+	-ms-transition: all 1s;  
+	-o-transition: all 1s;  
+	transition-timing-function: ease-out;
+	transition: all 1s;  
 	background-image: url(./image/seat1.png);
 }
 

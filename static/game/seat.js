@@ -40,10 +40,11 @@ function Seat(id,pos){
 	divWin_last_card02.appendTo(divWin);
 	divSeat.addClass(cur_pos);
 	divSeat.appendTo($("#container"));
-	
+
 	var IsSat = false;
 	var table = 0;
 	var chips = [];
+	var Inter_val = 0;
 	seatObj.getIsSat = function() {
 			return IsSat;
 	};
@@ -148,17 +149,19 @@ function Seat(id,pos){
 	seatObj.showSeatdownbg = function() {
 		divSeatdownbg.show();
 		var i = 1;
-		/*setInterval(function() {
+		Inter_val = setInterval(function() {
 			if (i % 2 != 0) {
-				divSeatdownbg.animate({top : 0}, 2000);
+				divSeatdownbg.css("top", "5px");
 			} else {
-				divSeatdownbg.animate({top : 0}, 2000);
+				divSeatdownbg.css("top", "35px");
 			}
 			i++;
-		}, 2000);)*/
+		}, 1000);
 	};
 
 	seatObj.removeSeatdownbg = function() {
+		divSeatdownbg.stop();
+		clearInterval(Inter_val);
 		divSeatdownbg.removeAttr("style");
 	};
 
@@ -209,6 +212,7 @@ function Seat(id,pos){
 		});*/
 			actionButton.send_action_stand();
 			seatObj.removeStand();
+			seatObj.removeCountdown();
 		});
 	};
 
