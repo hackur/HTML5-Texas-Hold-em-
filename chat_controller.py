@@ -16,14 +16,13 @@ class SentChatMessageHandler(tornado.web.RequestHandler):
 		if 'is_sit_down' in board_messages and board_messages['is_sit_down'] == True:
 			message				= {}
 			user				= self.session['user']
-			queue				= '%s_chat_queue' % (str(user.username))
 			exchange			= str(user.room.exchange)
 			message["method"]	= "chat"
 			message["seat"]		= int(self.get_argument("seat"))
 			message["user"]		= user.id
 			message["content"]	= self.get_argument("message")
 			message["room"]		= user.room.id
-			self.channel		= Channel(self.application.channel, queue, exchange,[])
+			self.channel		= Channel(self.application.channel, exchange)
 			self.channel.publish_message("dealer", json.dumps(message))
 			result	= "{\"status\":\"success\"}"
 		else:
