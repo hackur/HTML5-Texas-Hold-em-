@@ -1,0 +1,103 @@
+/*market*/
+#bigFrame3 {
+	display: none;
+}
+#member {
+	top: 30px;
+	left: 40px;
+	height: 67px;
+	width: 103px;
+	position: absolute;
+	background-image: url(./image/member.png);
+}
+#yellowDia {
+	top: 150px;
+	left: 40px;
+	height: 67px;
+	width: 103px;
+	position: absolute;
+	background-image: url(./image/yellowDia.png);
+}
+#redDia {
+	top: 260px;
+	left: 40px;
+	height: 67px;
+	width: 103px;
+	position: absolute;
+	background-image: url(./image/redDia.png);
+}
+.light {
+	height: 139px;
+	width: 178px;
+	position: absolute;
+	background-image: url(./image/light.png);
+}
+#light1 {
+	top: -5px;
+	left: 0px;	
+}
+#light2 {
+	top: 109px;
+	left: 0px;	
+}
+#light3 {
+	top: 222px;
+	left: 0px;	
+}
+.line {
+	height: 14px;
+	width: 590px;
+	position: absolute;
+	background-image: url(./image/line.png);
+}
+#line1 {
+	top: 115px;
+	left: 0px;	
+}
+#line2 {
+	top: 230px;
+	left: 0px;	
+}
+#content1 {
+	top: 30px;
+	left: 200px;
+	position: absolute;
+}
+#content2 {
+	top: 150px;
+	left: 200px;
+	position: absolute;
+}
+#content3 {
+	top: 260px;
+	left: 200px;
+	position: absolute;
+}
+.purchase {
+	height: 68px;
+	width: 101px;
+	position: absolute;
+	background-image: url(./image/purchase.png);
+	line-height: 60px;
+	cursor: pointer;
+}
+#purchase1 {
+	top: 30px;
+	left: 450px;
+}
+#purchase2 {
+	top: 150px;
+	left: 450px;
+}
+#purchase3 {
+	top: 260px;
+	left: 450px;
+}
+.sale {
+	height: 53px;
+	width: 61px;
+	position: absolute;
+	background-image: url(./image/sale.png);
+	top: -4px;
+	left: 43px;
+}/* end #bigFrame3 */

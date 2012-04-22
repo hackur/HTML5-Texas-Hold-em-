@@ -1,0 +1,72 @@
+
+#rightFrame {
+	top: 260px;
+	left: 666px;
+	width: 270px;
+	height: 360px;
+	position: absolute;
+}
+#span1 {
+	color: white;
+	font-weight: bolder;
+}
+#range {
+	top: 35px;
+	left: 0px;
+	width: 273px;
+	height: 83px;
+	position: absolute;
+	background-image: url(./image/yellowBT.png);
+	color: white;
+	font-weight: bolder;
+	line-height: 75px;
+	cursor: pointer;
+}
+#lobby {
+	top: 120px;
+	left: 0px;
+	width: 273px;
+	height: 83px;
+	position: absolute;
+	background-image: url(./image/yellowBT.png);
+	color: white;
+	font-weight: bolder;
+	line-height: 75px;
+	cursor: pointer;
+}
+#quick_acc {
+	top: 205px;
+	left: 0px;
+	width: 273px;
+	height: 83px;
+	position: absolute;
+	background-image: url(./image/blueBT.png);
+	color: white;
+	font-weight: bolder;
+	line-height: 75px;
+	cursor: pointer;
+}
+#help {
+	top: 300px;
+	left: 0px;
+	width: 133px;
+	height: 62px;
+	position: absolute;
+	background-image: url(./image/buttonTwo.png);
+	color: white;
+	font-weight: bolder;
+	line-height: 58px;
+	cursor: pointer;
+}
+#setting {
+	top: 300px;
+	left: 140px;
+	width: 133px;
+	height: 62px;
+	position: absolute;
+	background-image: url(./image/buttonTwo.png);
+	color: white;
+	font-weight: bolder;
+	line-height: 58px;
+	cursor: pointer;
+}

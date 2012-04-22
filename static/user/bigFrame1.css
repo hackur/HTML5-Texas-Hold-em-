@@ -1,0 +1,159 @@
+/* person info */
+#bigFrame1 {
+	display: none;
+}
+#portrait_box {
+	top: 5px;
+	left: 3px;
+	width: 119px;
+	height: 140px;
+	position: absolute;
+	cursor: pointer;
+	background-image: url(./image/portrait_box.png);
+}
+#change_por {
+	display: none;
+	top: 40px;
+	left: 130px;
+	width: 644px;
+	height: 388px;
+	position: absolute;
+	background-image: url(./image/comFrame.png);
+	z-index: 10;
+}
+
+#boxOption1 {
+	top: 115px;
+	left: 215px;
+	width: 27px;
+	height: 27px;
+	position: absolute;
+	background-image: url(./image/nocheck.png);
+	cursor: pointer;
+}
+#male {
+	top: 111px;
+	left: 245px;
+	width: 34px;
+	height: 38px;
+	position: absolute;
+	background-image: url(./image/male.png);
+}
+#boxOption1:hover {
+	background-image: url(./image/check.png);
+}
+#boxOption2 {
+	top: 115px;
+	left: 320px;
+	width: 27px;
+	height: 27px;
+	position: absolute;
+	background-image: url(./image/nocheck.png);
+	cursor: pointer;
+}
+#boxOption2:hover {
+	background-image: url(./image/check.png);
+}
+#female {
+	top: 111px;
+	left: 345px;
+	width: 34px;
+	height: 38px;
+	position: absolute;
+	background-image: url(./image/female.png);
+}
+#row1 {
+	line-height: 144px;
+	font-weight: bolder;
+}
+#row2 {
+	top:120px;
+	left: 100px;
+	position: absolute;
+}
+#row3 {
+	top:155px;
+	left: 100px;
+	position: absolute;
+}
+#row4 {
+	top:185px;
+	left: 100px;
+	position: absolute;
+}
+#isetting {
+	top: 277px;
+	left: 72px;
+	width: 124px;
+	height: 54px;
+	position: absolute;
+	background-image: url(./image/btE.png);
+	line-height: 45px;
+	cursor: pointer;
+}
+#icancel {
+	top: 277px;
+	left: 441px;
+	width: 124px;
+	height: 54px;
+	position: absolute;
+	background-image: url(./image/btE.png);
+	line-height: 45px;
+	cursor: pointer;
+}
+
+#ID {
+	top: 30px;
+	left: 150px;
+	position: absolute;
+}
+#family {
+	top: 70px;
+	left: 150px;
+	position: absolute;
+}
+#rank {
+	top: 70px;
+	left: 350px;
+	position: absolute;
+}
+#pos {
+	top: 110px;
+	left: 150px;
+	position: absolute;
+}
+#property {
+	top: 110px;
+	left: 350px;
+	position: absolute;
+}
+#winRate {
+	top: 150px;
+	left: 40px;
+	position: absolute;
+}
+#winBiggestStake {
+	top: 150px;
+	left: 290px;
+	position: absolute;
+}
+#totalInnings {
+	top: 200px;
+	left: 40px;
+	position: absolute;
+}
+#victoryInnings {
+	top: 200px;
+	left: 290px;
+	position: absolute;
+}
+#latestOnline {
+	top: 250px;
+	left: 40px;
+	position: absolute;
+}
+#idiograph {
+	top: 300px;
+	left: 40px;
+	position: absolute;
+}/* end person info*/

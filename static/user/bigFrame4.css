@@ -1,0 +1,140 @@
+/* recharge */
+#bigFrame4 {
+	display: none;
+}
+#line3 {
+	top: 50px;
+}
+#line4 {
+	top: 100px;
+}
+#line5 {
+	top: 150px;
+}
+#line6 {
+	top: 200px;
+}
+
+#convert1 {
+	top: 10px;
+	left: 13px;
+	position: absolute;
+	width: 350px;
+	height: 38px;
+	line-height: 33px;
+}
+#convert1:hover {
+	background-image: url(./image/pitch1.png);
+}
+#convert2 {
+	top: 63px;
+	left: 13px;
+	position: absolute;
+	width: 350px;
+	height: 38px;
+	line-height: 33px;
+}
+#convert2:hover {
+	background-image: url(./image/pitch1.png);
+}
+#convert3 {
+	top: 113px;
+	left: 13px;
+	position: absolute;
+	width: 350px;
+	height: 38px;
+	line-height: 33px;
+}
+#convert3:hover {
+	background-image: url(./image/pitch1.png);
+}
+#convert4 {
+	top: 161px;
+	left: 13px;
+	position: absolute;
+	width: 350px;
+	height: 38px;
+	line-height: 33px;
+}
+#convert4:hover {
+	background-image: url(./image/pitch1.png);
+}
+.rpurchase {
+	width: 124px;
+	height: 54px;
+	position: absolute;
+	background-image: url(./image/btE.png);
+	line-height: 45px;
+	cursor: pointer;
+}
+#rpurchase1 {
+	top: 5px;
+	left: 440px;
+}
+#rpurchase2 {
+	top: 57px;
+	left: 440px;
+}
+#rpurchase3 {
+	top: 108px;
+	left: 440px;
+}
+#rpurchase4 {
+	top: 158px;
+	left: 440px;
+}
+#rrunway {
+	top: 265px;
+	left: 50px;
+	height: 16px;
+	width: 328px;
+	position: absolute;
+	background-image: url(./image/rrunway.png);
+}
+#exchange {
+	width: 124px;
+	height: 54px;
+	position: absolute;
+	background-image: url(./image/btE.png);
+	line-height: 45px;
+	top: 222px;
+	left: 440px;
+	cursor: pointer;
+}
+#rrunner {
+	width: 78px;
+	height: 44px;
+	position: absolute;
+	background-image: url(./image/rrunner.png);
+	top: 255px;
+	left: 45px;
+	cursor: pointer;
+}
+#min {
+	top: 290px;
+	left: 50px;
+	color: white;
+	position: absolute;
+	font-weight: bolder;
+}
+#max {
+	top: 290px;
+	left: 330px;
+	color: white;
+	position: absolute;
+	font-weight: bolder;
+}
+#current {
+	top: 230px;
+	left: 200px;
+	color: white;
+	position: absolute;
+	font-weight: bolder;
+}
+#notation { 
+	top: 320px;
+	left: 200px;
+	color: yellow;
+	position: absolute;
+	font-weight: bolder;
+}/* end #bigFrame4 */
