@@ -215,8 +215,8 @@ var view_friend = function(friend, i) {
 		$("#frank").html($("#frank").html() + friend.level);
 		$("#fpro").html($("#fpro").html() + friend.asset);
 		var url = "../." + friend.head_portrait;
-		var image = $('<img id="image2" src=' + url + ' />').appendTo($("#por_box"));
-		$("#image2").css({'width': 102, 'height': 126, 'top': 6, 'left': 8, 'position': 'absolute'});
+		$("#image3")[0].src = url;
+		$("#image3").css({'width': 102, 'height': 126, 'top': 6, 'left': 8, 'position': 'absolute'});
 						
 	});
 };
