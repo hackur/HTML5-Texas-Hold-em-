@@ -217,8 +217,10 @@ function Seat(id,pos){
 		$("#stand").removeClass("stand1");
 		$("#stand").addClass("stand2");
 	};
+	seatObj.appendMessage = function(message){
+		message.appendTo(divSeat);
+	}
 	//seatObj.sendChip = function(chip)
-
 	seatObj.id = id;
 	seatObj.pos = pos;
 	seatObj.setIsSat(false);

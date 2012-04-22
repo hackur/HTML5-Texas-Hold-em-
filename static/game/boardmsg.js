@@ -214,6 +214,9 @@ function msg_standup(data){
 		}
 	});
 }
+function msg_chat(data){
+	chat_dialog.receive(data);
+};
 var funs = {
 	'sit':		msg_sit,
 	'bhc':		msg_bhc,
@@ -226,9 +229,6 @@ var funs = {
 	'pot':  	msg_pot,
 	'standup':	msg_standup,
 	'chat':		msg_chat
-};
-function msg_chat(data){
-	chat_dialog.receive(data);
 };
 function _board_msg_handler(data){
 	

@@ -183,9 +183,8 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		queue		= str(user.username)  + '_broadcast'
 		exchange	= self.session['exchange']
 		self.clean_matured_message(timestamp)
-
-		if len(self.session['messages']) > 0:
-			messages = self.mongodb.find_one({"user_id":self.session["user_id"]})
+		messages = self.mongodb.find_one({"user_id":self.session["user_id"]})
+		if len(messages) > 0:
 			self.finish(json.dumps(messages["list"]))
 			return
 
