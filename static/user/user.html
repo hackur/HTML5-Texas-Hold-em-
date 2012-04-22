@@ -15,25 +15,8 @@
 		<script src="perinfo.js"></script>
 		<script src="recharge.js"></script>
 		<script type="text/javascript">
-		var login = function(){
-					var username = "ting";
-					var password = "123";
-					$.post(
-						"../../login",
-						{username:username, password:password},
-						function(data){
-							console.log("Login success");
-							getUserImage();
-							getEmailInfo();
-							//viewEmail();
-							buddyInfo();
-						},
-						'json'
-					);
-			};
 			function init(){
 				info_init();
-				login();
 			}
 			$(init);
 			//$(info_init);
