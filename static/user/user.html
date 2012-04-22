@@ -15,8 +15,25 @@
 		<script src="perinfo.js"></script>
 		<script src="recharge.js"></script>
 		<script type="text/javascript">
+		var login = function(){
+					var username = "ting";
+					var password = "123";
+					$.post(
+						"../../login",
+						{username:username, password:password},
+						function(data){
+							console.log("Login success");
+							getUserImage();
+							getEmailInfo();
+							//viewEmail();
+							buddyInfo();
+						},
+						'json'
+					);
+			};
 			function init(){
 				info_init();
+				login();
 			}
 			$(init);
 			//$(info_init);
@@ -145,7 +162,14 @@
 					<span id="frank">等级：</span>
 					<span id="fpro">资产：</span>
 				</div>
-				<div id="name1">少年</div>
+				<div id="name1" class="name">少年</div>
+				<div id="name2" class="name">少年</div>
+				<div id="name3" class="name">少年</div>
+				<div id="name4" class="name">少年</div>
+				<div id="name5" class="name">少年</div>
+				<div id="name6" class="name">少年</div>
+				<div id="name0" class="name">少年</div>
+
 				<div id="line7" class="line"></div>
 				<div id="line8" class="line"></div>
 				<div id="line9" class="line"></div>
