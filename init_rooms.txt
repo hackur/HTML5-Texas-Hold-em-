@@ -1,0 +1,3 @@
+#Blind,MaxStake,MinStake,MaxPlayer
+10,1000,100,9
+100,20000,1000,3
