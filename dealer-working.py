@@ -9,7 +9,7 @@ from game_room import GameRoom
 from sqlalchemy.orm import sessionmaker,relationship, backref
 
 import database
-from database import DatabaseConnection,User,Room
+from database import DatabaseConnection,User,Room, DealerInfo
 import tornado.ioloop
 from pika.adapters.tornado_connection import TornadoConnection
 
@@ -27,9 +27,18 @@ class Dealer(object):
 	def init_database(self):
 		database.init_database()
 		self.db_connection = DatabaseConnection()
+		self.db_connection.start_session()
+
+		info = DealerInfo()
+		info.exchange = self.exchange
+		info.rooms = 0
+		self.db_connection.addItem(info)
+		self.db_connection.commit_session()
 
 	def on_queue_bound(self, frame):
-		self.channel.basic_consume(consumer_callback=self.on_message, queue=self.queue_name, no_ack=True)
+		self.channel.basic_consume(
+				consumer_callback=self.on_message,
+				queue=self.queue_name, no_ack=True)
 
 
 	def on_queue_declared(self, frame):
@@ -152,14 +161,6 @@ class Dealer(object):
 	def cmd_create_room(self, args):
 		print "creating room"
 		self.room_list[args['room_id']] = GameRoom(args["room_id"], args["user_id"], self)
-
-#	def cmd_exit(self, args):
-#		print "exiting room"
-#		current_room = self.room_list[args["room_id"]]
-#		current_room.user_action[]
-#		self.room_list[args["room_id"]].exit_room(args["user_id"])
-#		print room.status for room in room_list
-
 
 
 import argparse

@@ -11,11 +11,24 @@ class Room(Base):
 	exchange	= Column(String(255))
 	blind		= Column(Integer)
 	player		= Column(Integer)
+	max_stake	= Column(Integer)
+	min_stake	= Column(Integer)
 	max_player	= Column(Integer)
-	def __init__(self, exchange, blind=10,player=0,max_player=9):
+	roomType	= Column(Integer)
+
+	def __init__(self, exchange, blind=10,max_player=9,
+			max_stake=1000,min_stake=100):
 		self.exchange	= exchange
+		self.max_stake = max_stake
+		self.min_stake = min_stake
+		self.blind = blind
+		self.max_player = max_player
+		self.player =	0
+		self.roomType = 0
+
 	def __repr__(self):
-		return "<Room('%s','%s','%s','%s')>" % (self.id, self.exchange, self.queues,self.owner)
+		return "<Room('%s','%s')>" % (self.id, self.exchange)
+
 class HeadPortrait(Base):
 	__tablename__	= "head_portrait"
 	id		= Column(Integer, primary_key = True, autoincrement = True)
@@ -24,6 +37,11 @@ class HeadPortrait(Base):
 
 
 
+class DealerInfo(Base):
+	__tablename__	= "dealer_info"
+	id			= Column(Integer,primary_key=True, autoincrement=True)
+	exchange	= Column(String(255))
+	rooms		= Column(Integer)
 
 #imtermediate table
 friendShip=Table("friendShip",Base.metadata,
@@ -148,10 +166,17 @@ class DatabaseConnection(object):
 
 def init_database():
 	db_connection  = DatabaseConnection()
-	db_connection.init("sqlite:///:memory:")
+	db_connection.init("sqlite:///db.sqlite")
+	db_connection.connect()
+
+if __name__ == "__main__":
+	import os
+	os.remove("db.sqlite")
+	db_connection  = DatabaseConnection()
+	db_connection.init("sqlite:///db.sqlite")
 	db_connection.connect()
 	db_connection.start_session()
-	room        = Room(exchange="dealer_exchange_1",blind=10,max_player=9,player=0)
+	#room        = Room(exchange="dealer_exchange_1",blind=10,max_player=9)
 	ting        = User(username="ting", password=hashlib.md5("123").hexdigest(), stake = 200)
 	mile        = User(username="mile", password=hashlib.md5("123").hexdigest(), stake = 100)
 	mamingcao   = User(username="mamingcao", password=hashlib.md5("123").hexdigest(), stake = 200)
@@ -167,7 +192,7 @@ def init_database():
 	db_connection.addItem(mile)
 	db_connection.addItem(huaqin)
 	db_connection.addItem(mamingcao)
-	db_connection.addItem(room)
+	#db_connection.addItem(room)
 
 	email	= Email()
 	email.from_user = ting
@@ -180,4 +205,3 @@ def init_database():
 	# ting.friends = [mile, mamingcao]
 	# mile.friends = [ting]
 	db_connection.commit_session()
-

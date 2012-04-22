@@ -13,19 +13,26 @@ from pika.adapters.tornado_connection import TornadoConnection
 PORT = 8888
 
 class IndexHandler(tornado.web.RequestHandler):
-	@tornado.web.asynchronous
 	def get(self):
-		self.render("test.html")
+		if 'user_id' in self.session:
+			self.redirect("/static/user/user.html")
+		else:
+			self.redirect("/static/index/index.html")
 
 class UIIndexHandler(tornado.web.RequestHandler):
-	@tornado.web.asynchronous
 	def get(self):
 		self.render("uitest.html")
 
 class UIIndexTestHandler(tornado.web.RequestHandler):
-	@tornado.web.asynchronous
 	def get(self):
-		self.render("static/game/game.html",username=self.get_argument('username'),password="123")
+		self.render("static/game/game.html")
+
+class LoginPageHandler(tornado.web.RequestHandler):
+	def get(self):
+		if 'user_id' in self.session:
+			self.redirect("/static/user/user.html")
+			return
+		self.render("static/index/index.html")
 
 class IndexTestHandler(tornado.web.RequestHandler):
 	def get(self):
@@ -38,9 +45,9 @@ def on_channel_open(channel):
 	application.channel = channel
 	channel.add_on_close_callback(on_close_callback)
 
-def on_close_callback(msg1, msg2):
-	print "channel closed"
-	print msg1, msg2
+def on_close_callback(msg1,msg2):
+	print "CHANNEL CLOSED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+	print msg1,msg2
 
 def on_connected(connection):
 	print "pika connected"
@@ -55,7 +62,8 @@ if __name__ == '__main__':
 		"PokerUITest": os.path.join(os.path.dirname(__file__), "PokerUITest"),
 		#'session_storage':"dir"
 		"session_storage":"mongodb:///db",
-		"session_regeneration_interval": None
+		"session_age":65536,
+		"session_regeneration_interval":None
 	}
 
 
@@ -68,6 +76,7 @@ if __name__ == '__main__':
 		(r"/$", IndexHandler),
 		(r"/test", IndexTestHandler),
 		(r"/static/game/game.html", UIIndexTestHandler),
+		(r"/static/index/index.html", LoginPageHandler),
 
 		(r"/uitest.html", UIIndexHandler),
 		(r"/test.html", IndexHandler),
@@ -80,6 +89,10 @@ if __name__ == '__main__':
 		(r"/list-email",EmailListHandler),
 		(r"/sent-email",EmailSendHandler),
 		(r"/send-chat",SentChatMessageHandler),
+		(r"/create_room",CreateRoomHandler),
+		(r"/list_room",ListRoomHandler),
+		(r"/fast_enter",FastEnterRoomHandler),
+
 		(r"/userinfo", UserInfoHandler),
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),

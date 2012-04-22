@@ -9,50 +9,61 @@ from game_room import GameRoom
 from sqlalchemy.orm import sessionmaker,relationship, backref
 
 import database
-from database import DatabaseConnection,User,Room
+from database import DatabaseConnection,User,Room, DealerInfo
 import tornado.ioloop
 from pika.adapters.tornado_connection import TornadoConnection
 
 import json
 
 class Dealer(object):
-	#   users = []
-	# waiting_list = {}
-	suit = ["DIAMOND", "HEART", "SPADE", "CLUB"]
-	face = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
-#   room_list = []
-	number_of_players = 9
-
-	def __init__(self,queue,exchange,num_of_seats=9,blind=100,host='localhost',port=5672):
-		self.queue      = queue
+	def __init__(self,exchange,host,port):
 		self.exchange   = exchange
 		self.host       = host
 		self.port       = port
 		self.room_list  = {}
-		self.users      = []
 
 
 	def init_database(self):
 		database.init_database()
 		self.db_connection = DatabaseConnection()
+		db_connection = self.db_connection
+		db_connection.start_session()
+
+
+		info = db_connection.query(DealerInfo).filter_by(exchange = self.exchange).first()
+
+		if not info:
+			info = DealerInfo()
+		else:
+			print "WARNING, dealer %s already in database" % self.exchange
+
+
+		info.exchange = self.exchange
+		info.rooms = 0
+		db_connection.addItem(info)
+		db_connection.commit_session()
 
 	def on_queue_bound(self, frame):
-		self.channel.basic_consume(consumer_callback=self.on_message, queue=self.queue, no_ack=True)
+		self.channel.basic_consume(
+				consumer_callback=self.on_message,
+				queue=self.queue_name, no_ack=True)
 
 
 	def on_queue_declared(self, frame):
-		self.channel.queue_bind(exchange    = self.exchange,
-				queue       = self.queue,
+		self.queue_name = frame.method.queue
+		self.channel.queue_bind(
+				exchange    = self.exchange,
+				queue       = self.queue_name,
 				routing_key = 'dealer',
 				callback=self.on_queue_bound)
 
 
 	def on_exchange_declared(self,frame):
-		self.channel.queue_declare(queue    = self.queue,
+		self.channel.queue_declare(
 				auto_delete = True,
 				durable     = False,
 				exclusive   = False,
-				callback=self.on_queue_declared)
+				callback	=	self.on_queue_declared)
 
 
 	def on_channel_open(self,channel):
@@ -69,8 +80,8 @@ class Dealer(object):
 
 	def start(self):
 		credentials = pika.PlainCredentials('guest', 'guest')
-		param = pika.ConnectionParameters(host="localhost",
-						port=5672,
+		param = pika.ConnectionParameters(self.host,
+						port=self.port,
 						virtual_host="/",
 						credentials=credentials)
 
@@ -112,29 +123,51 @@ class Dealer(object):
 				body        = json.dumps(msg))
 
 	def cmd_enter(self,args):
-		if args['room_id'] not in self.room_list:
-			self.cmd_create_room(args)
-		print "Entered Room"
-
-		current_room = self.room_list[args["room_id"]]
-		#current_room.add_audit({'user':args["user_id"]})
-
 		routing_key = args['source']
-		message     = {'status':'success', "room":current_room.to_listener()}
+		if args['room_id'] not in self.room_list:
+			#self.cmd_create_room(args)
+			message     = {'status':'failed'}
+		else:
+			print "Entered Room"
+			current_room = self.room_list[args["room_id"]]
+
+			message     = {'status':'success', "room":current_room.to_listener()}
+
 		self.channel.basic_publish( exchange    = self.exchange,
 				routing_key = routing_key,
 				body        = json.dumps(message))
 
+
 	def cmd_create_room(self, args):
 		print "creating room"
-		self.room_list[args['room_id']] = GameRoom(args["room_id"], args["user_id"], self)
 
-#	def cmd_exit(self, args):
-#		print "exiting room"
-#		current_room = self.room_list[args["room_id"]]
-#		current_room.user_action[]
-#		self.room_list[args["room_id"]].exit_room(args["user_id"])
-#		print room.status for room in room_list
+
+		blind		= int(args["blind"])
+		max_stake	= int(args["max_stake"])
+		min_stake	= int(args["min_stake"])
+		max_player	= int(args["max_player"])
+		routing_key = args['source']
+
+		db_connection = self.db_connection
+		db_connection.start_session()
+
+		newRoom = Room(self.exchange,blind,max_player,
+				max_stake,
+				min_stake)
+		db_connection.addItem(newRoom)
+		db_connection.commit_session()
+
+		self.room_list[newRoom.id] = GameRoom(
+				newRoom.id, args["user_id"], self,
+				max_player,blind,min_stake,max_stake)
+		print newRoom
+		message = {"room_id":newRoom.id}
+
+		self.channel.basic_publish( exchange    = self.exchange,
+				routing_key = routing_key,
+				body        = json.dumps(message))
+
+
 
 	def on_message(self, channel, method, header, body):
 		message = "message received, thanks!"
@@ -146,58 +179,58 @@ class Dealer(object):
 		self.connection.close()
 
 
+	def handle_init_file(self,fname):
+		db_connection = self.db_connection
+		db_connection.start_session()
+		info = db_connection.query(Room).filter_by(exchange = self.exchange)
+		for room in info:
+			db_connection.delete(room)
+
+		db_connection.commit_session()
+
+		with open(fname) as f:
+			for line in f:
+				if line[0] == '#':
+					continue
+
+				(blind,max_stake,min_stake,max_player) = ( int(x) for x in line.strip().split(','))
+				db_connection.start_session()
+
+				newRoom = Room(self.exchange,blind,max_player,
+						max_stake,
+						min_stake)
+				db_connection.addItem(newRoom)
+				db_connection.commit_session()
+				self.room_list[newRoom.id] = GameRoom(
+						newRoom.id, 1, self,
+						max_player,blind,min_stake,max_stake)
+				print newRoom
+
+
+import argparse
 if __name__ == "__main__":
-	parser = OptionParser()
-	parser.add_option('-q', '--queue', action='store', dest='queue_id', help='name of the queue to be assigned')
-	parser.add_option('-e', '--exchange', action='store', dest='exchange_id', help='name of the exchange to be assigned')
-	(options, args) = parser.parse_args(sys.argv)
+	parser = argparse.ArgumentParser(description='Manage room creation')
+	parser.add_argument('--exchange-name','-E',default='dealer_exchange_1',help="hello world")
+	parser.add_argument('--rabbitmq-host','-H',default='localhost')
+	parser.add_argument('--rabbitmq-port','-P',default='5672',type=int)
+	parser.add_argument('--init-file','-F',default='init_rooms.txt')
+	args = parser.parse_args()
 
-	if not options.queue_id :
-		options.queue_id = "dealer_queue_1"
 
-	print "queue :" + options.queue_id
 
-	if not options.exchange_id:
-		options.exchange_id = "dealer_exchange_1"
+	exchange_id = args.exchange_name
+	rabbitmqServer = args.rabbitmq_host
+	port = args.rabbitmq_port
 
-	print "queue :" + options.exchange_id
+	print exchange_id,rabbitmqServer,port
 
-	dealer = Dealer(queue = options.queue_id, exchange = options.exchange_id)
+
+	dealer = Dealer(exchange = exchange_id,host=rabbitmqServer,port=port)
 	dealer.init_database()
 
 
 	dealer.start()
+	dealer.handle_init_file(args.init_file)
 	ioloop = tornado.ioloop.IOLoop.instance()
 
 	ioloop.start()
-	# print dealer.seats
-
-
-	# db = DatabaseConnection()
-
-	# users = {}
-	# for user in db.query(User):
-	#   users[user.id] = user.username
-
-	# print users
-	# # print len(users)
-	# players = []
-	# for i in xrange(len(users)):
-	#   players.append(PokerController.User())
-	#   players[i].name = users[i+1]
-	#   # print players[i].name
-	#   i += 1
-
-	# print len(players)
-	# PokerController.PokerController.init(players)
-	# PokerController.PokerController.getFlop()
-
-	# #get the next one
-	# PokerController.PokerController.getOne()
-
-	# #get the next final card
-	# PokerController.PokerController.getOne()
-	# r = PokerController.PokerController.getWinner()
-	# for user in r["winners"]:
-	#   print "WINNER IS: " + user.name
-

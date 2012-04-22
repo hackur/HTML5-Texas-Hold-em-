@@ -3,9 +3,10 @@ from database import *
 def authenticate(functor):
 	def _authenticate(self):
 		if 'user_id' not in self.session:
-			self.write(json.dumps({'status':'failed', 'content':'unauthenticated'}))
+			self.write(json.dumps('unauthenticated'))
 			self.finish()
 			return
+
 		self.db_connection	= DatabaseConnection()
 		self.db_connection.start_session()
 		self.session['user'] = self.db_connection.query(User).filter_by(id = self.session['user_id']).one()

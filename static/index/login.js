@@ -1,4 +1,5 @@
 
+var user_link = "../user/user.html";
 
 function login_check() {
 	$('#llogin').click(function() {
@@ -8,9 +9,17 @@ function login_check() {
 		url:"/login",
 		data:{username:$('#account').val(), password:$('#password').val()},
 		success:function(data){
+			var result = JSON.parse(data);
 			console.log(data);
+			if(result.status == "success"){
+				window.location = user_link;
+			}
+			else{
+				alert("incorrect password");
+
+			}
 		},
-		dataTye:'json',
+	//	dataType:'json',
 		});
 		return false;
 	});
@@ -35,13 +44,22 @@ function login_check() {
 		url:"/guest-login",
 		data: test_data,
 		success:function(data){
+			var result = JSON.parse(data);
 			if(flag == 0) {	
-				result = JSON.parse(data);
 				localStorage.setItem('username', result.username);
 				localStorage.setItem('password', result.password);
 			}
+			console.log(result);
+			console.log(result['status']);
+			if(result.status == "success"){
+				window.location = user_link;
+			}
+			else{
+				alert("incorrect password");
+
+			}
 		},
-		dataTye:'json',
+		//dataType:'json',
 	});				
 
 	return false;

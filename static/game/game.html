@@ -9,9 +9,10 @@
 		<link rel="stylesheet" type="text/css" href="sit_down_dialog.css" />
 		<link rel="stylesheet" type="text/css" href="seat.css" />
 		<link rel="stylesheet" type="text/css" href="message_box.css" />
-		<script src="jquery.min.js"></script>
-		<script src="poker_lib.js"></script>
-		<script src="sit_transit.js"> </script>
+		<script src="jquery.min.js"		> </script>
+		<script src="util.js"     		> </script>
+		<script src="poker_lib.js"		> </script>
+		<script src="sit_transit.js"	> </script>
 		<script src="sit_down_dialog.js"> </script>
 		<script src="seat.js"></script>
 		<script src="index.js"></script>
@@ -20,9 +21,8 @@
 
 		<script>
 
+			/*
 			var login = function(){
-					var username = "{{ username }}";
-					var password = "{{ password }}";
 					$.post(
 						"/login",
 						{username:username, password:password},
@@ -34,9 +34,11 @@
 						'json'
 					);
 			};
+			*/
 			function init(){
 				table_init();
-				login();
+				fetch_user_info();
+				//login();
 				chat_dialog.init()
 			}
 			$(init);

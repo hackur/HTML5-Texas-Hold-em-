@@ -1,9 +1,10 @@
 
 function fetchRoom(){
-	$.get(
-		"/list_room",
-		{},
-		function(data){
+	$.ajax({
+		type:'get',
+		url:"/list_room",
+		data:{},
+		success:function(data){
 			console.log(data);
 			$("#createroom").click(function(){
 				$("#setting").show();
@@ -25,12 +26,13 @@ function fetchRoom(){
 				item.click(function(){
 					console.log(id);
 					localStorage["current_room_id"] = id;
-					window.location="./game.html";
+					window.location="../game/game.html";
 				});
 			});
 		},
-		'json'
-	);
+		dataType:'json',
+		cache:false
+	});
 }
 function create_room(){
 	console.log($("#blind").val());
@@ -44,7 +46,7 @@ function create_room(){
 				min_stake:min_stake,max_stake:max_stake},
 				function(data){
 					localStorage["current_room_id"]= data.room_id;
-					window.location="./game.html";
+					window.location="../game/game.html";
 					console.log(data);
 				},
 				'json'

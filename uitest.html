@@ -1,11 +1,53 @@
 <html>
 	<head>
 		<title> Room UI Test </title>
+		<script src="/static/game/jquery.min.js"></script>
 	</head>
 	<body>
 		<a href="/static/game/game.html?username=mamingcao"> mamingcao</a>
 		<a href="/static/game/game.html?username=ting" >ting</a>
 		<a href="/static/game/game.html?username=mile" >mile</a>
 		<a href="/static/game/game.html?username=huaqin" > huaqin</a>
+
+		<script>
+			function create_room(){
+				console.log($("#blind").val());
+				var blind = $("#blind").val();
+				var max_stake = $("#max_stake").val();
+				var min_stake = $("#min_stake").val();
+				var max_player = $("#max_player").val();
+				$.post(
+					"/create_room",
+					{blind:blind,max_player:max_player,
+						min_stake:min_stake,max_stake:max_stake},
+					function(data){
+						localStorage["current_room_id"]= data.room_id;
+						console.log(data);
+					},
+					'json'
+				);
+
+			}
+		</script>
+		<form method="post" action="javascript:create_room()">
+			<p> 
+			Blind: <input id="blind" type="text" name="blind" value="10" />
+			</p>
+			<p>
+			Max stake :
+				<input type="text" id="max_stake" value="2000" />
+			</p>
+			<p>
+			min stake :
+				<input type="text" id="min_stake" value="100" />
+			</p>
+			<p>
+			max player :
+				<input type="text" id="max_player" value="9" />
+			</p>
+
+			<input type="submit" value="Submit" />
+
+		</form>
 	</body>
 </html>

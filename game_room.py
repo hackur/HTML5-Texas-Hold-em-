@@ -82,7 +82,9 @@ class GameRoom(object):
 
 	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START,MSG_POT,MSG_STAND_UP,MSG_SHOWDOWN,MSG_EMOTICON, MSG_CHAT) \
 				= ('sit','bhc','phc','winner','next','action','public','start','pot','standup','showdown','emoticon', 'chat')
-	def __init__(self, room_id, owner, dealer, num_of_seats=9, blind=10, min_stake=100, max_stake=2000):
+	def __init__(self, room_id, owner, dealer,
+			num_of_seats = 9, blind = 10,
+			min_stake=100,max_stake=2000):
 		self.room_id    = room_id
 		self.owner      = owner
 		self.status     = GameRoom.GAME_WAIT
@@ -142,6 +144,7 @@ class GameRoom(object):
 		self.msg_count += 1
 		msg['timestamp']= self.msg_count
 		msg['msgType']	= msgType
+		print "Broadcasting ",self.broadcast_key
 		self.dealer.broadcast(self.broadcast_key, msg)
 
 	def direct_message(self, msg, destination,msgType):
@@ -512,7 +515,7 @@ class GameRoom(object):
 				if seat.player_stake == 0:
 					#if smaller_than_min_amount == True:
 					i += 1
-					print "all in name: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", seat.get_user().username
+					print "all in name:----------------------------------------- ", seat.get_user().username
 				else:
 					return False
 		print "i: %d, length of player list: %d" %(i, len(player_list))

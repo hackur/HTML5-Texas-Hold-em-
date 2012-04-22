@@ -29,6 +29,7 @@
 		},expire * 1000);
 		return contentbox;
 	}
+
 	message_box.showMessage = showMessage;
 
 
