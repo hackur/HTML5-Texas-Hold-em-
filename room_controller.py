@@ -214,6 +214,6 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		user_id			= self.session['user_id']
 		board_messages	= self.mongodb.board.find_one({"user_id": user_id})
 		board_messages["message-list"].extend(new_messages)
-		self.mongodb.board.update({"user_id": user_id}, board_messages)
+		self.mongodb.board.save(board_messages)
 		self.board_messages = board_messages["message-list"]
 		self.channel.close();
