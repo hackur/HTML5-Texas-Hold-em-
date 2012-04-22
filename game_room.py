@@ -155,7 +155,10 @@ class GameRoom(object):
 		private_key     = args["private_key"]
 		user_id         = args["user_id"]
 		if action == GameRoom.A_STANDUP:
+			self.clearCountDown()
+			print "user_id: %d" % user_id
 			self.actions[action](user_id)
+			return
 		if self.status == GameRoom.GAME_PLAY:
 			seat_no			= self.current_seat
 			if self.is_valid_seat(user_id, seat_no) and self.is_valid_rights(action, seat_no):
@@ -407,9 +410,13 @@ class GameRoom(object):
 			print "next seat no....................................................", next_seat.seat_id
 			self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
 
-	def discard_game(self, user_id):
+	def discard_game(self, user_id, standup=False):
 		print "FOLD!!"
-		seat_no = self.current_seat
+		seat_no = self.user_seat[user_id]
+		if standup:
+			del self.user_seat[user_id]
+		print "user_id:", user_id
+		print seat_no
 		print self.current_seat
 		self.seats[seat_no].status = Seat.SEAT_WAITING  # set the status of this seat to empty
 														# remove the player from player list
@@ -426,15 +433,16 @@ class GameRoom(object):
 			self.round_finish()
 		else:
 			print "I'm here!!!!!"
-			self.current_seat = self.info_next(seat_no, self.seats[seat_no].rights)
+			self.current_seat = self.info_next(self.current_seat, self.seats[self.current_seat].rights)
 
 	def stand_up(self, user_id):
 		if self.status == GameRoom.GAME_PLAY:
 			print "STAND UP"
-			self.seats[self.current_seat].kicked_out = True
-			self.discard_game(user_id)
+			seat_no = self.user_seat[user_id]
+			self.seats[seat_no].kicked_out = True
+			self.discard_game(user_id, True)
 		else:
-			print "STAND UP"
+			print "STAND UP BELOW"
 			print user_id
 			go_away_list = filter(lambda seat: not seat.is_empty() and seat.get_user().id == user_id, self.seats)
 			print go_away_list

@@ -114,6 +114,7 @@
 		window.removeEventListener(event_up, 	sit_silder_up);
 		document.getElementById("sit_down_dialog").style.display = "none";
 		/**TODO Clear button event listener **/
+		$("#submitButton").unbind("click");
 	}
 
 	sit_dialog.show = show;
