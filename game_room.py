@@ -154,6 +154,8 @@ class GameRoom(object):
 		action          = args["action"]
 		private_key     = args["private_key"]
 		user_id         = args["user_id"]
+		if action == GameRoom.A_STANDUP:
+			self.actions[action](user_id)
 		if self.status == GameRoom.GAME_PLAY:
 			seat_no			= self.current_seat
 			if self.is_valid_seat(user_id, seat_no) and self.is_valid_rights(action, seat_no):
@@ -187,12 +189,6 @@ class GameRoom(object):
 									'rights':next_seat.rights,
 									'amount_limits':self.amount_limits},
 									GameRoom.MSG_NEXT)
-		else:
-			#TODO
-			if action != GameRoom.A_STANDUP:
-				return
-			else:
-				self.actions[action](user_id)
 
 	def clearCountDown(self):
 		if self.countdown:
@@ -838,6 +834,8 @@ class GameRoom(object):
 			self.t = self.ioloop.add_timeout(time.time() + timeout, self.start_game)
 			msg = {'to':timeout }
 			self.broadcast(msg,GameRoom.MSG_START)
+		else:
+			return
 
 	def kick_out(self, go_away_list):
 		if len(go_away_list) == 0:
