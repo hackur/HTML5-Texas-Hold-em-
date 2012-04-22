@@ -31,7 +31,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		room			= self.db_connection.query(Room).filter_by(id = room_id).one()
 		self.mongodb	= self.application.settings['_db']
 		self.mongodb.board.remove({"user_id":self.session["user_id"]})
-		self.mongodb.board.save({"user_id":self.session["user_id"], "list": []})
+		self.mongodb.board.save({"user_id":self.session["user_id"], "message-list": []})
 		user.room	= room
 		user.room_id= room.id
 		self.db_connection.addItem(user)
@@ -183,9 +183,9 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		queue		= str(user.username)  + '_broadcast'
 		exchange	= self.session['exchange']
 		self.clean_matured_message(timestamp)
-		messages = self.mongodb.find_one({"user_id":self.session["user_id"]})
-		if len(messages) > 0:
-			self.finish(json.dumps(messages["list"]))
+		messages = self.mongodb.board.find_one({"user_id":self.session["user_id"]})
+		if len(messages["message-list"]) > 0:
+			self.finish(json.dumps(messages["message-list"]))
 			return
 
 		binding_keys= (self.session['public_key'], self.session['private_key'])
@@ -199,7 +199,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		print board_messages
 		print "========================[ end ]========================="
 		if board_messages is not None:
-			board_messages["list"] = filter(lambda x: int(x['timestamp']) > timestamp, board_messages["list"])
+			board_messages["message-list"] = filter(lambda x: int(x['timestamp']) > timestamp, board_messages["message-list"])
 			self.mongodb.board.update({"user_id": self.session["user_id"]}, board_messages)
 
 
@@ -213,7 +213,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		print "------message receive end------"
 		user_id			= self.session['user_id']
 		board_messages	= self.mongodb.board.find_one({"user_id": user_id})
-		board_messages["list"].extend(new_messages)
+		board_messages["message-list"].extend(new_messages)
 		self.mongodb.board.update({"user_id": user_id}, board_messages)
-		self.board_messages = board_messages["list"]
+		self.board_messages = board_messages["message-list"]
 		self.channel.close();
