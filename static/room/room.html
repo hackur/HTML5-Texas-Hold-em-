@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Main Room</title>
+		<link rel="stylesheet" type="text/css" href="css/room.css"/>
+		<script src="../jquery.min.js"></script>
+		<script src="room.js"></script>
+	</head>
+	<body>
+        <div id="container">
+            <div id="header">
+                <div id="backTo"></div>
+                <div id="createroom"></div>
+                <div id="refresh"></div>
+            </div>
+            <div id="grid">
+                <ul id="gridcontent">
+                    <!--data template-->
+					<!--
+                    <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+
+                    </li>
+					-->
+                    <!--template end-->
+                     
+
+                </ul>
+            </div>
+        <div id="setting">
+			<form method="post" action="javascript:create_room()">
+				<p> 
+				Blind: <input id="blind" type="text" name="blind" value="10" />
+				</p>
+				<p>
+				Max stake :
+					<input type="text" id="max_stake" value="2000" />
+				</p>
+				<p>
+				min stake :
+					<input type="text" id="min_stake" value="100" />
+				</p>
+				<p>
+				max player :
+					<input type="text" id="max_player" value="9" />
+				</p>
+
+				<input type="submit" value="Submit" />
+
+			</form>
+        </div>
+            <div id="room">
+                <ul>
+                    <li class="normalroom">
+                        <img class="roomhover" src="img/lefthover.png"/>
+                        <img src="img/normalroom.png"/>
+                    </li>  
+                    <li class="advancedroom">
+                        <img class="roomhover" src="img/middlehover.png"/>
+                        <img src="img/advancedroom.png"/>
+                    </li>  
+                    <li class="responseroom">
+                        <img class="roomhover" src="img/middlehover.png"/>
+                        <img src="img/responseroom.png"/>
+                    </li>  
+                    <li class="competitionroom">
+                        <img class="roomhover" src="img/middlehover.png"/>
+                        <img src="img/competitionroom.png"/>
+                    </li>  
+                    <li class="familybattleroom">
+                        <img class="roomhover" src="img/righthover.png"/>
+                        <img src="img/familybattleroom.png"/>
+                    </li>  
+                </ul>
+            </div>
+            
+        </div>
+       
+    </body>
+</html>
+
