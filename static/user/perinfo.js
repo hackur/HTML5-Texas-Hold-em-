@@ -47,7 +47,9 @@ function decide_event(){
 
 var info_init = function() {
 	decide_event();
-
+	getUserImage();
+	getEmailInfo();
+	buddyInfo();
 	window.bigframe = ["#info","#email","#market","#recharge","#friend"];
 
 	document.getElementById('bigFrame1').style.display = "block";
