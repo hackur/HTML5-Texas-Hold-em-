@@ -147,6 +147,15 @@ function Seat(id,pos){
 
 	seatObj.showSeatdownbg = function() {
 		divSeatdownbg.show();
+		var i = 1;
+		/*setInterval(function() {
+			if (i % 2 != 0) {
+				divSeatdownbg.animate({top : 0}, 2000);
+			} else {
+				divSeatdownbg.animate({top : 0}, 2000);
+			}
+			i++;
+		}, 2000);)*/
 	};
 
 	seatObj.removeSeatdownbg = function() {
@@ -176,10 +185,38 @@ function Seat(id,pos){
 	};
 	seatObj.getChips = function(){
 		return chips;
-	}
+	};
 	seatObj.cleanChips = function(){
 		chips = [];
-	}
+	};
+
+	seatObj.showStand = function() {
+		$("#stand").removeClass("stand2");
+		$("#stand").addClass("stand1");
+		$(".stand1").click(function() {
+			/*console.log([seatObj.userid, "+++++____++++____+++___"])
+			var message = { action: 8 };
+			var msg = JSON.stringify(message);
+			$.ajax({
+			type: "post",
+			url: "/post-board-message",
+			data: {message:msg},
+			success: function(data) {
+				console.log("Below is stand_up data:++++++++++++++++++");
+				console.log(data);
+			},
+			dataType: "json"
+		});*/
+			actionButton.send_action_stand();
+			seatObj.removeStand();
+		});
+	};
+
+	seatObj.removeStand = function() {
+		$(".stand1").unbind("click");
+		$("#stand").removeClass("stand1");
+		$("#stand").addClass("stand2");
+	};
 	//seatObj.sendChip = function(chip)
 
 	seatObj.id = id;

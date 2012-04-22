@@ -6,6 +6,7 @@
 	var A_RAISESTAKE	= 3;
 	var A_CHECK			= 4;
 	var A_DISCARDGAME	= 5;
+	var A_STAND       = 8;
 	var limits;
 
 	var buttons = { 
@@ -49,6 +50,22 @@
 		);
 		disable_all();
 
+	}
+	function send_action_stand(){
+		console.log("SEND ACTION!!");
+		var message = { action: A_STAND };
+		var msg = JSON.stringify(message);
+		console.log(msg);
+		$.ajax({
+			type:'post',
+			url:"/post-board-message",
+			data:{message:msg},
+			success:function(data){
+				console.log(data);
+			},
+			dataType:'json'
+			}
+		);
 	}
 	function action_allin(){
 		send_action(A_ALLIN);
@@ -174,6 +191,7 @@
 
 	actionButton.enable_buttons = enable_buttons;
 	actionButton.disable_all = disable_all;
+	actionButton.send_action_stand = send_action_stand;
 
 	function unit_test(){
 		enable_buttons([2,3,4]);

@@ -23,6 +23,7 @@ function msg_sit(data){
 		for (var i = 0; i < SeatList.length; i++) {
 			SeatList[i].removeSeatdownbg();
 		}
+		SeatList[data.seat_no].showStand();
 	}
 	SeatList[data.seat_no].removeSeatdownbg();
 }
@@ -54,7 +55,7 @@ function msg_phc(data){
 }
 function msg_winner(data){
 	//We have a winner in this game
-	message_box.showMessage("We have a winner! ",3)
+	message_box.showMessage("We have a winner! ",3);
 	console.log(data);
 
     function distribute(){
@@ -202,6 +203,7 @@ function msg_standup(data){
 		if (info.seat_no) {
 			SeatList[info.seat_no].seatStand();
 			if(window.user_info.sit_no == info.seat_no) {
+				SeatList[info.seat_no].removeStand();
 				for (var i = 0; i < 9; i++) {
 					if (!SeatList[i].getIsSat()) {
 						SeatList[i].showSeatdownbg();
@@ -209,7 +211,7 @@ function msg_standup(data){
 				}
 				window.user_info.userIsSat = false;
 			}
-		}		
+		}
 	});
 }
 var funs = {

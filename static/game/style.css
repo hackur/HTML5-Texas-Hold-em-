@@ -127,3 +127,18 @@ body {
 	left:265px;
 }
 
+#stand {
+	top:10px;
+	left:831px;
+	height:57px;
+	width:125px;
+	position: absolute;
+}
+
+.stand1 {
+	background-image: url(./image/back_stand1.png);
+}
+
+.stand2 {
+	background-image: url(./image/back_stand2.png);
+}
