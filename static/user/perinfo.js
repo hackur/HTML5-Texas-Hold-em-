@@ -82,6 +82,7 @@ var info_init = function() {
 			}
 		});
 	});
+	getUserImage();
 };
 
 var frameControl = function(frame, i) {
