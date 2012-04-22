@@ -145,7 +145,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 		if messages['status'] == 'success':
 			board_message = self.mongodb.board.find_one({"user_id":self.session['user_id']});
 			board_message['is_sit_down'] = True
-			self.mongodb.board.update({"user_id":self.session['user_id']}, board_message)
+			self.mongodb.board.save(board_message)
 
 		self.write(json.dumps(messages))
 		self.channel.close();
