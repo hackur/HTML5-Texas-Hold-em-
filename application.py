@@ -92,6 +92,7 @@ if __name__ == '__main__':
 		(r"/create_room",CreateRoomHandler),
 		(r"/list_room",ListRoomHandler),
 		(r"/fast_enter",FastEnterRoomHandler),
+		(r"/buddy-info",BuddyInfoHandler),
 
 		(r"/userinfo", UserInfoHandler),
 		(r"/guest-login", GuestLoginHandler),

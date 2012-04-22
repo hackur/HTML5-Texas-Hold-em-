@@ -90,7 +90,7 @@ class EmailListHandler(tornado.web.RequestHandler):
 		emails		= all_emails.slice(start, end)
 		email_list	= list()
 		for email in emails:
-			email_list.push({
+			email_list.append({
 								"id": email.id,
 								"date": email.sent_date,
 								"from": email.from_user.username
@@ -111,7 +111,7 @@ class EmailViewHandler(tornado.web.RequestHandler):
 		email_id= self.get_argument('email')
 		user	= self.session['user']
 		email	= self.db_connection.query(Email).filter_by(to_user = user).filter_by(id = email_id).one()
-		message = {"status":"success", "email":email}
+		message	= {"status":"success", "email":email}
 		self.finish(json.dumps(message))
 
 class EmailSendHandler(tornado.web.RequestHandler):
@@ -135,4 +135,25 @@ class EmailSendHandler(tornado.web.RequestHandler):
 		message	= {"status":"success"}
 		self.finish(json.dumps(message))
 
+class BuddyInfoHandler(tornado.web.RequestHandler):
+	@tornado.web.asynchronous
+	@authenticate
+	def post(self):
+		user		= self.session['user']
+		
+		message = {
+			"userId": user.id,
+			"friends": list()
+		}
+		for friend in user.friends:
+			message["friends"].append({
+						"id": friend.id,
+						"head_portrait": "#",
+						"family": friend.family,
+						"name": friend.username,
+						"position": "-1",
+						"level": friend.level,
+						"asset": friend.asset,
+					})
+		self.finish(json.dumps(message))
 
