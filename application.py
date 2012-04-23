@@ -87,7 +87,7 @@ if __name__ == '__main__':
 		(r"/personal-archive",PersonalArchiveHandler),
 		(r"/head-portrait-upload",HeadPortraitHandler),
 		(r"/list-email",EmailListHandler),
-		(r"/sent-email",EmailSendHandler),
+		(r"/send-email",EmailSendHandler),
 		(r"/send-chat",SentChatMessageHandler),
 		(r"/create_room",CreateRoomHandler),
 		(r"/list_room",ListRoomHandler),
