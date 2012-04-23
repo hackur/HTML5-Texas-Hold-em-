@@ -23,6 +23,7 @@
 	};
 
 	function disable_all(){
+		console.log("disable_all");
 		$.each(buttons,function(key,value){
 			$(value).removeClass("buttonEnable");
 			$(value).addClass("buttonDisable");
@@ -89,8 +90,8 @@
 	function raise_update_value(height,maxHeight){
 		var min = limits[A_RAISESTAKE][0];
 		var max = limits[A_RAISESTAKE][1];
-		var steps = (max - min) / window.room_info.blind;
-		var value = Math.round(height/maxHeight * steps) * window.room_info.blind +  min;
+		var steps = (max - min) / 1;
+		var value = Math.round(height/maxHeight * steps) +  min;
 		cur_raise_value = value;
 
 		$("#raise_amount").html(value);
@@ -166,9 +167,13 @@
 	}
 
 	function enable_buttons(rights,_limits){
+		console.log(["enable_buttons",rights,_limits]);
 		var allRight = [A_ALLIN,A_CHECK,A_RAISESTAKE,A_CALLSTAKE,A_DISCARDGAME];
 		limits = _limits;
 		$.each(rights,function(index,value){
+			if(!buttons[value]){
+				return;
+			}
 			var bid = buttons[value];
 			$(bid).addClass("buttonEnable");
 			$(bid).removeClass("buttonHide");

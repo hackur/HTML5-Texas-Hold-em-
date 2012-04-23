@@ -159,6 +159,7 @@ class GameRoom(object):
 		private_key     = args["private_key"]
 		user_id         = args["user_id"]
 		seat_no			= self.current_seat
+		print "USER ACTION!---"
 		if not self.is_valid_seat(user_id, seat_no):
 			# The seat is not valid, two cases:
 			# 1. The game haven't start yet
@@ -166,8 +167,11 @@ class GameRoom(object):
 			if action == GameRoom.A_STANDUP:
 				print "user_id: %d" % user_id
 				self.actions[action](user_id)
+			else:
+				print "INVALID!!"
 			return
 
+		print "USER ACTION!"
 		#if action == GameRoom.A_STANDUP:
 		#	self.clearCountDown()
 		#	print "user_id: %d" % user_id
@@ -202,11 +206,14 @@ class GameRoom(object):
 
 				if self.status != GameRoom.GAME_WAIT:
 					next_seat = self.seats[self.current_seat]
+					print "NEXT!"
 					self.broadcast({"seat_no":next_seat.seat_id,
 									'rights':next_seat.rights,
 									'to':self.action_timeout,
 									'amount_limits':self.amount_limits},
 									GameRoom.MSG_NEXT)
+		else:
+			print "GAME WAITING..."
 
 	def clearCountDown(self):
 		if self.countdown:
@@ -301,13 +308,16 @@ class GameRoom(object):
 		if user_id in self.user_seat:
 			return self.seats[self.user_seat[user_id]]
 		else:
+
+			print "User ",user_id," has no seat"
 			return None
 
 	def is_valid_seat(self, user_id, current_seat):
 		request_seat = self.get_seat(user_id)
 		if not request_seat:
+			print "....no request seat"
 			return False
-		if current_seat:
+		if current_seat != None:
 			valid_seat = self.seats[current_seat]
 			if valid_seat == request_seat:
 				print "VALID SEAT"
@@ -316,6 +326,7 @@ class GameRoom(object):
 				print "INVALID SEAT"
 				return False
 		else:
+			print "NO CURRENT_SEAT"
 			return False
 
 	def is_valid_rights(self, command, seat_no):
