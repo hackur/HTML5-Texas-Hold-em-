@@ -20,6 +20,16 @@
 	position: absolute;
 	background-image: url(./image/inputFrame.png);
 }
+#addressee {
+	top: 63px;
+	left: 76px;
+	position: absolute;
+}
+#addressee_input {
+	top: 60px;
+	left: 180px;
+	position: absolute;
+}
 #content {
 	top: 20px;
 	left: 30px;

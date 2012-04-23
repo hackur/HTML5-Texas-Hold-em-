@@ -110,7 +110,7 @@ class EmailViewHandler(tornado.web.RequestHandler):
 	def post(self):
 		email_id= self.get_argument('email')
 		user	= self.session['user']
-		email	= self.db_connection.query(Email).filter_by(to_user = user).filter_by(id = email_id).one()
+		email	= self.db_connection.query(Email).filter_by(to_user = user).filter_by(id = email_id).first()
 		message	= {"status":"success", "email":email}
 		self.finish(json.dumps(message))
 

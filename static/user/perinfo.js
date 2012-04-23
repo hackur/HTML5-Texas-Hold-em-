@@ -48,8 +48,9 @@ function decide_event(){
 var info_init = function() {
 	decide_event();
 	getUserImage();
-	getEmailInfo();
+	listEmail();
 	buddyInfo();
+	viewEmail();
 	window.bigframe = ["#info","#email","#market","#recharge","#friend"];
 
 	document.getElementById('bigFrame1').style.display = "block";
@@ -151,7 +152,7 @@ var getUserImage = function() {
 	});
 };
 
-var getEmailInfo = function() {
+var listEmail = function() {
 	$.ajax({
 		type: "post",
 		url:  "/list-email",
@@ -166,8 +167,7 @@ var getEmailInfo = function() {
 var sendEmail = function() {
 	$("#sureButton").click(function() {
 		var msg = $("#text1").html();
-		var des = 1;
-		console.log(msg);
+		var des = parseInt($("#addressee_input").html());
 		$.ajax({
 			type: "post",
 			url:  "/send-email",
@@ -213,7 +213,6 @@ var buddyInfo = function() {
 };
 
 var view_friend = function(friend, i) {
-	
 
 	$("#name" + i).click(function() {
 		$("#fID").html("ID名称：");
