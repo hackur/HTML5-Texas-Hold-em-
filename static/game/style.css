@@ -115,6 +115,7 @@ body {
 .potChip{
 	height:49px;
 	width:49px;
+	display:block;
 }
 
 
@@ -133,6 +134,9 @@ body {
 	height:57px;
 	width:125px;
 	position: absolute;
+	color: white;
+	font-size: 20px;
+	text-align:center;
 }
 
 .stand1 {

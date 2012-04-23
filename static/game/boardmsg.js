@@ -206,7 +206,9 @@ function msg_standup(data){
 	console.log(data);
 	$.each(data,function(userid, info) {
 		console.log([userid, info.seat_no], "+++++");
-		if (info.seat_no) {
+		if (info.seat_no != undefined) {
+			console.log([userid, info.seat_no], "Stand!");
+
 			SeatList[info.seat_no].seatStand();
 			SeatList[info.seat_no].removeCountdown();
 			if (!window.user_info.userIsSat) {

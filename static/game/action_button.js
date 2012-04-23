@@ -53,20 +53,7 @@
 
 	}
 	function send_action_stand(){
-		console.log("SEND ACTION!!");
-		var message = { action: A_STAND };
-		var msg = JSON.stringify(message);
-		console.log(msg);
-		$.ajax({
-			type:'post',
-			url:"/post-board-message",
-			data:{message:msg},
-			success:function(data){
-				console.log(data);
-			},
-			dataType:'json'
-			}
-		);
+		send_action(A_STAND);
 	}
 	function action_allin(){
 		send_action(A_ALLIN);
@@ -171,7 +158,7 @@
 		var allRight = [A_ALLIN,A_CHECK,A_RAISESTAKE,A_CALLSTAKE,A_DISCARDGAME];
 		limits = _limits;
 		$.each(rights,function(index,value){
-			if(!buttons[value]){
+			if(buttons[value] == undefined){
 				return;
 			}
 			var bid = buttons[value];

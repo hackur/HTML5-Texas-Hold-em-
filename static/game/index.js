@@ -66,6 +66,7 @@ var enter = function(){
 							
 							if( SeatList[i].username == window.user_info.username) {
 								sit_transit.transit(i);
+								SeatList[i].showStand();
 								console.log("-----------------------" + i);
 								window.user_info.userIsSat = true;
 							}
