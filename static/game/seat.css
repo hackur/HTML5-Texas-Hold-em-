@@ -167,11 +167,13 @@
 }
 /* player name */
 .name {
-	font-size: 20px;
+	font-size: 18px;
 	color: white;
-	position: absolute;
-	top: 70px;
-	left: 50px;
+	position: relative;
+	top: -78px;
+	/* left: 50px; */
+	text-align: center; 
+	margin: 0px auto;
 }/* end */
 
 /* money for players */
