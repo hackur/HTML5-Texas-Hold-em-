@@ -54,6 +54,8 @@ class GuestLoginHandler(tornado.web.RequestHandler):
 		else:
 			message		= {'status':'success', 'username':user.username, 'password':password}
 			self.session['user_id'] = user.id
+			user.last_login	= datetime.now()
+
 		self.set_header('Access-Control-Allow-Origin', '*')
 		self.write(json.dumps(message))
 		db_connection.commit_session()

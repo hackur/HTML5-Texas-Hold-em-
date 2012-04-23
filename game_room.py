@@ -114,6 +114,7 @@ class GameRoom(object):
 		self.raise_person	= None
 		self.non_fold_move	= False
 		self.countdown = None
+		self.action_timeout = 30
 		self.seats = [ Seat(x) for x in xrange(num_of_seats) ]
 
 		self.poker_controller = PokerController(self.seats)
@@ -157,11 +158,21 @@ class GameRoom(object):
 		action          = args["action"]
 		private_key     = args["private_key"]
 		user_id         = args["user_id"]
-		if action == GameRoom.A_STANDUP:
-			self.clearCountDown()
-			print "user_id: %d" % user_id
-			self.actions[action](user_id)
+		seat_no			= self.current_seat
+		if not self.is_valid_seat(user_id, seat_no):
+			# The seat is not valid, two cases:
+			# 1. The game haven't start yet
+			# 2. The someone other than the next player trying to standup
+			if action == GameRoom.A_STANDUP:
+				print "user_id: %d" % user_id
+				self.actions[action](user_id)
 			return
+
+		#if action == GameRoom.A_STANDUP:
+		#	self.clearCountDown()
+		#	print "user_id: %d" % user_id
+		#	self.actions[action](user_id)
+		#	return
 		if self.status == GameRoom.GAME_PLAY:
 			seat_no			= self.current_seat
 			if self.is_valid_seat(user_id, seat_no) and self.is_valid_rights(action, seat_no):
@@ -193,6 +204,7 @@ class GameRoom(object):
 					next_seat = self.seats[self.current_seat]
 					self.broadcast({"seat_no":next_seat.seat_id,
 									'rights':next_seat.rights,
+									'to':self.action_timeout,
 									'amount_limits':self.amount_limits},
 									GameRoom.MSG_NEXT)
 
@@ -283,7 +295,7 @@ class GameRoom(object):
 			self.current_seat	= self.info_next(self.current_seat, [1,2,3,5,8])
 			print "next seat in action =>", self.current_seat
 			next_seat = self.seats[self.current_seat]
-			self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
+			self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits,'to':self.action_timeout},GameRoom.MSG_NEXT)
 
 	def get_seat(self, user_id):
 		if user_id in self.user_seat:
@@ -411,11 +423,12 @@ class GameRoom(object):
 		if self.status != GameRoom.GAME_WAIT:
 			next_seat = self.seats[self.current_seat]
 			print "next seat no....................................................", next_seat.seat_id
-			self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits},GameRoom.MSG_NEXT)
+			self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits,'to':self.action_timeout},GameRoom.MSG_NEXT)
 
 	def discard_game(self, user_id, standup=False):
 		print "FOLD!!"
-		seat_no = self.user_seat[user_id]
+		seat_no = self.get_seat(user_id).seat_id
+
 		if standup:
 			del self.user_seat[user_id]
 		print "user_id:", user_id
@@ -441,7 +454,10 @@ class GameRoom(object):
 	def stand_up(self, user_id):
 		if self.status == GameRoom.GAME_PLAY:
 			print "STAND UP"
-			seat_no = self.user_seat[user_id]
+			seat = self.get_seat(user_id)
+			if not seat:
+				return
+			seat_no = seat.seat_id
 			self.seats[seat_no].kicked_out = True
 			self.discard_game(user_id, True)
 		else:
@@ -491,7 +507,7 @@ class GameRoom(object):
 		self.seats[next_seat].rights = rights
 		callback = functools.partial(self.discard_game_timeout,self.seats[next_seat].get_user().id)
 		#self.countdown = Timer(20, self.discard_game, args=[self.seats[next_seat].get_private_key()])
-		self.countdown = self.ioloop.add_timeout(time.time() + 10, callback)
+		self.countdown = self.ioloop.add_timeout(time.time() + self.action_timeout, callback)
 
 		print "seat no. for next player: ", self.seats[next_seat].get_user().username
 		self.calculate_proper_amount(next_seat, rights)

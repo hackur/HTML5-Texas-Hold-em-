@@ -70,6 +70,19 @@ var info_init = function() {
 		frameControl(bigframe[i], i);
 	}
 	recharge.drag();
+	$("#lobby").click(function(){
+		window.location = "/static/room/room.html";
+	});
+	$("#quick_acc").click(function(){
+		$.ajax({
+			type:"get",
+			url:"/fast_enter",
+			success:function(data){
+				localStorage["current_room_id"] = data;
+				window.location = "/static/game/game.html";
+			}
+		});
+	});
 
 };
 

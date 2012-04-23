@@ -38,7 +38,7 @@ class PersonalArchiveHandler(tornado.web.RequestHandler):
 					"won_games": user.won_games,
 					"max_reward": user.max_reward,
 					"last_login": user.last_login.strftime("%Y-%m-%d %H:%M:%S"),
-					"signature": user.signature
+					"signature": user.signature or "This guy is too lazy to leave a signature"
 				}
 		self.write(json.dumps(message))
 		self.finish()
@@ -140,7 +140,7 @@ class BuddyInfoHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
 		user		= self.session['user']
-		
+
 		message = {
 			"userId": user.id,
 			"friends": list()

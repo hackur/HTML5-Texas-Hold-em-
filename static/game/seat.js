@@ -85,11 +85,11 @@ function Seat(id,pos){
 		divStake.hide();
 	}
 
-	seatObj.setCountdown = function(position) {
+	seatObj.setCountdown = function(timeout) {
 		divCount.removeClass("countdown down");
 		divCount.addClass("countdown down");
 		divCount.show();
-		divCount.animate({ top : divCount.height() }, 10000, function() {
+		divCount.animate({ top : divCount.height() }, parseInt(timeout)*1000, function() {
 					divCount.hide();
 					divCount.removeAttr("style");
 				}

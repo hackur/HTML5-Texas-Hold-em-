@@ -57,6 +57,7 @@ function msg_winner(data){
 	//We have a winner in this game
 	message_box.showMessage("We have a winner! ",3);
 	console.log(data);
+	actionButton.disable_all();
 
     function distribute(){
         /* We have to wait for while here 
@@ -144,13 +145,16 @@ function msg_next(data){
 	console.log("msg_next=========================================");
 	console.log(data);
 	//time_bar(data.seat_no);
-	SeatList[data.seat_no].setCountdown(data.seat_no);
+	SeatList[data.seat_no].setCountdown(data.to);
 
 	console.log(window.user_info.username);
 	console.log(SeatList[data.seat_no].username);
 	if( SeatList[data.seat_no].username == window.user_info.username )
 	{ 
 		actionButton.enable_buttons(data.rights,data.amount_limits);
+	}
+	else{
+		actionButton.disable_all();
 	}
 	//collect_chips();
 }
@@ -191,6 +195,7 @@ function msg_start_game(data){
 		seconds--;
 	};
 	countDown();
+	actionButton.disable_all();
 	
 }
 function msg_pot(data){
@@ -215,6 +220,7 @@ function msg_standup(data){
 					} 
 				}
 				window.user_info.userIsSat = false;
+				actionButton.disable_all();
 			}
 		}
 	});
