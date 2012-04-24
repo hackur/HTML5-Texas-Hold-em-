@@ -8,10 +8,12 @@
         <!--<meta name="viewport" content="width=device-width,maximum-scale=0.5, initial-scale=0.5, user-scalable=no" /> -->
 		<!--         <meta name="viewport" content="width=device-width, maximum-scale=0.5, initial-scale=0.5, user-scalable=no" />  -->
 
+		 <link rel="stylesheet"  href="../jquery.mobile-1.1.0.min.css" />  
         <LINK href="./css/style.css" rel="stylesheet" type="text/css">
         <LINK href="./css/login.css" rel="stylesheet" type="text/css">
 
 		<script src ="../jquery.min.js"></script>
+		<script src="../jquery.mobile-1.1.0.min.js"></script>
 		<script src="login.js"></script>
 		<script>
 			$(document).ready(function() {
@@ -51,7 +53,9 @@
 				<!-- <input type="submit" id="llogin" value='登陆'/> -->
 				<div id="llogin"></div>
 				<!-- <button type="reset" id="lcancel">取消</button> -->
-				<div id="lcancel"></div>
+				<a data-rel="dialog" href="register.html">
+				<div id="lcancel"  > </div>
+				</a>
 				<!-- <input type="button" id="lvisitor" value='游客登陆'/> -->
 				<div id="lvisitor"></div>
 			</form>

@@ -2,6 +2,7 @@
 var user_link = "../user/user.html";
 
 function login_check() {
+	console.log("LOGIN CHECK!!");
 	$('#llogin').click(function() {
 
 		$.ajax({
@@ -63,5 +64,12 @@ function login_check() {
 	});				
 
 	return false;
+	});
+//	register();
+}
+function register(){
+		console.log("reg!!");
+	$("#lcancel").bind("vclick",function(){
+		console.log("Hello World");
 	});
 }
