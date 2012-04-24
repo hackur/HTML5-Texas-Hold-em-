@@ -102,25 +102,26 @@ class Dealer(object):
 	def cmd_sit(self, args):
 		print "sit received"
 		self.db_connection.start_session()
-		source          = args['source']
-		private_key     = args['private_key']
+		source			= args['source']
+		private_key		= args['private_key']
 		stake			= args['stake']
-		user            = self.db_connection.query(User).filter_by(id=args['user_id']).first()
-		current_room    = self.room_list[args["room_id"]]
-		(status, msg)   = current_room.sit(user, int(args["seat"]), source, private_key,stake)
+		user			= self.db_connection.query(User).filter_by(id=args['user_id']).first()
+		current_room	= self.room_list[args["room_id"]]
+		(status, msg)	= current_room.sit(user, int(args["seat"]), source, private_key,stake)
 
 		if status:
-			message = {"status": "success" }
+			message	= {"status": "success" }
 		else:
 			message = {"status": "failed", "msg": msg}
 		self.channel.basic_publish( exchange    = self.exchange,
-				routing_key = source,
-				body        = json.dumps(message))
+									routing_key = source,
+									body        = json.dumps(message))
+		self.db_connection.close()
 
 	def broadcast(self, routing_key, msg):
-		self.channel.basic_publish(exchange     = self.exchange,
-				routing_key = routing_key,
-				body        = json.dumps(msg))
+		self.channel.basic_publish(	exchange	= self.exchange,
+									routing_key	= routing_key,
+									body		= json.dumps(msg))
 
 	def cmd_enter(self,args):
 		routing_key = args['source']

@@ -27,5 +27,5 @@ class UserInfoHandler(tornado.web.RequestHandler):
 		# 'n': username
 		# 's': stake
 		# 'l': level
-		msg = {'n':user.username,'s':user.stake,'l':user.level}
+		msg = {'n':user.username,'s':user.asset,'l':user.level}
 		self.write(json.dumps(msg))

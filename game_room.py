@@ -5,6 +5,7 @@ from poker_controller import PokerController
 from operator import attrgetter
 import sys
 from tornado import ioloop
+from database import *
 import functools
 
 class Seat(object):
@@ -19,8 +20,9 @@ class Seat(object):
 		self._rights = []
 		self._role = None
 		self.handcards = []
-		self.table_amount = 0
-		self.player_stake = 0
+		self.table_amount	= 0
+		self.player_stake	= 0
+		self.original_stake	= 0
 		self.kicked_out = False
 
 	def __str__(self):
@@ -113,8 +115,9 @@ class GameRoom(object):
 		self.big_blind_move = False
 		self.raise_person	= None
 		self.non_fold_move	= False
-		self.countdown = None
+		self.countdown		= None
 		self.action_timeout = 30
+		self.db_connection	= DatabaseConnection()
 		self.seats = [ Seat(x) for x in xrange(num_of_seats) ]
 
 		self.poker_controller = PokerController(self.seats)
@@ -223,23 +226,36 @@ class GameRoom(object):
 	def sit(self, player, seat_no, direct_key, private_key,stake):
 		print "direct_key.........................................", direct_key
 		print "seat request =>%d\n" % (seat_no)
+
+		hand_stake = int(stake)
 		if seat_no > len(self.seats):
 			return (False, "Seat number is too large: %s we have %s" % (seat_no,len(self.seats)))
+
 		if not self.seats[seat_no].is_empty():
 			return (False, "Seat Occupied")
 
+		if hand_stake > player.asset:
+			print "stake ", hand_stake
+			print "player asset", player.asset
+			return (False, "invalid stake amount.")
+
 		self.user_seat[player.id] = seat_no
 		self.seats[seat_no].sit(player, private_key)
-		self.seats[seat_no].player_stake = int(stake)
-		self.seats[seat_no].status = Seat.SEAT_WAITING
+		self.seats[seat_no].status			= Seat.SEAT_WAITING
+		self.seats[seat_no].player_stake	= hand_stake
+		self.seats[seat_no].original_stake	= hand_stake
 		self.occupied_seat += 1
-		message = {'status':'success', 'seat_no': seat_no, "info": self.seats[seat_no].to_listener()}
+		message	=	{
+						'status':'success',
+						'seat_no': seat_no,
+						'info': self.seats[seat_no].to_listener()
+					}
 		self.broadcast(message,GameRoom.MSG_SIT)
 		print len(filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats))
 		if len(filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)) == 2 and not self.t:
-			timeout = 5
-			self.t = self.ioloop.add_timeout(time.time() + timeout, self.start_game)
-			msg = {'to':timeout }
+			timeout	= 5
+			msg		= {'to':timeout }
+			self.t	= self.ioloop.add_timeout(time.time() + timeout, self.start_game)
 			self.broadcast(msg,GameRoom.MSG_START)
 		return ( True, "" )
 
@@ -259,7 +275,12 @@ class GameRoom(object):
 				card_list   = [ str(card) for card in seat.handcards ]
 				seat_list.append(seat.seat_id)
 
-				msg_sent = {"dealer":self.current_dealer, "small_blind":self.small_blind,"big_blind": self.big_blind, "cards": card_list,"Cards in hand": card_list}
+				msg_sent = {	"dealer": self.current_dealer,
+								"small_blind": self.small_blind,
+								"big_blind": self.big_blind,
+								"cards": card_list,
+								"Cards in hand": card_list
+							}
 				self.direct_message(msg_sent,seat.get_private_key(),GameRoom.MSG_PHC)
 
 		self.broadcast({"seat_list":seat_list},GameRoom.MSG_BHC) # HC for Have Card
@@ -451,7 +472,7 @@ class GameRoom(object):
 
 		player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING or seat.status == Seat.SEAT_ALL_IN, self.seats)
 		#TODO Database update
-		user.stake += self.seats[seat_no].player_stake  # update user's stake
+		#user.stake += self.seats[seat_no].player_stake  # update user's stake
 
 		if len(player_list) == 1:
 			self.round_finish()
@@ -590,8 +611,8 @@ class GameRoom(object):
 			winner_dict = {}
 			msg_dict	= {}
 			ante_dict	= self.distribute_ante()
-			winner_dict = {k:v for k, v in ante_dict.iteritems() if v > 0} #filter(lambda seat: winner_dict[seat] != 0, ante_dict)
-			name_of_hand = self.poker_controller.poker.name_of_hand
+			winner_dict	= {k:v for k, v in ante_dict.iteritems() if v > 0} #filter(lambda seat: winner_dict[seat] != 0, ante_dict)
+			name_of_hand= self.poker_controller.poker.name_of_hand
 			print "winner_dict: ", winner_dict
 			if len(player_list) > 1:
 				for seat in player_list:
@@ -619,19 +640,18 @@ class GameRoom(object):
 				pot			= [amount["pid"] for users, amount in self.pot.iteritems() if winner._user.id in users]
 				winner.player_stake += reward
 				msg_dict[winner._user.id] = {	"isWin": True,
-												"earned": reward, #winner_dict[winner_dict.keys()[0]],
+												"earned": reward,
 												"pot": pot,
-												"stake": winner.player_stake, #winner_dict.keys()[0].player_stake,
+												"stake": winner.player_stake,
 												"handcards": card_list,
 												"seat_no": winner.seat_id,
 												"pattern": name_of_hand(winner.combination[0])
-											} #winner_dict.keys()[0].seat_id}
-
+											}
+			self.update_to_db(player_list)
 			self.broadcast(msg_dict ,GameRoom.MSG_WINNER)
 			self.status = GameRoom.GAME_WAIT
 			self.dispose_and_restart()
-			print msg_dict
-			#sys.exit()
+
 		else:
 			print "length of playing list: ", len(playing_list)
 			print "number of checks: ", self.num_of_checks
@@ -653,11 +673,10 @@ class GameRoom(object):
 				self.create_pot(player_list)
 				self.merge_pots()
 				self.broadcast_pot()
-			self.num_of_checks = 0
 
+			self.num_of_checks = 0
 			go_away_list = filter(lambda seat: seat.kicked_out == True, self.seats)
 			self.kick_out(go_away_list)
-			return
 
 	def broadcast_pot(self):
 		pot_info= [ (users,info) for users,info in self.pot.iteritems() ]
@@ -896,8 +915,19 @@ class GameRoom(object):
 			self.broadcast(msg, GameRoom.MSG_EMOTICON)
 		else:
 			print "USER NOT SEATED"
-			return
+
 	def chat(self, user, seat, content):
 		if self.seats[seat].is_empty() == False and self.seats[seat].get_user().id == user:
 			msg	= {"user_id": user, "seat": seat, "content":content}
 			self.broadcast(msg, GameRoom.MSG_CHAT)
+
+	def update_to_db(self, player_list):
+		self.db_connection.start_session()
+		for player in filter(lambda x: x.is_empty() == False, player_list):
+			user		= player.get_user()
+			user.asset	+= player.player_stake - player.original_stake
+			player.original_stake = player.player_stake
+			self.db_connection.addItem(user)
+
+		self.db_connection.commit_session()
+		self.db_connection.close()

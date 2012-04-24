@@ -137,6 +137,7 @@ class DatabaseConnection(object):
 
 	def start_session(self):
 		self.session	= self.Session()
+		self.session.expire_on_commit = False
 
 	def commit_session(self):
 		self.session.commit()
@@ -157,7 +158,7 @@ class DatabaseConnection(object):
 		self.session.merge(object)
 
 	def close(self):
-		self.session.expunge_all()
+	#	self.session.expunge_all()
 		self.session.close()
 
 def init_database():
@@ -184,6 +185,8 @@ if __name__ == "__main__":
 	ting.last_login	= datetime.strptime("2012-04-13 12:02:20", "%Y-%m-%d %H:%M:%S")
 	ting.signature	= "software engineer"
 	ting.asset		= 12000
+	mile.asset		= 1000
+	mamingcao.asset	= 2000
 	db_connection.addItem(ting)
 	db_connection.addItem(mile)
 	db_connection.addItem(huaqin)
