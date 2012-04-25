@@ -51,7 +51,7 @@ function Seat(id,pos){
 	seatObj.setIsSat = function(newIsSat) {
 			IsSat = newIsSat;
 	};
-
+	seatObj.player= undefined;
 	seatObj.sit = function(_username,_stake,_user_id) {	
 				seatObj.username 	= _username;
 				seatObj.stake 		= _stake;
@@ -59,8 +59,16 @@ function Seat(id,pos){
 
 				divName.html(_username);
 				divMoney.html(_stake);
-				//document.getElementById("money" + id.slice(-1)).innerHTML = _stake;
 				seatObj.setIsSat(true);
+				$.ajax({
+					type: 'post',
+					data: {id:seatObj.userid},
+					url	: 'player-archive',
+					success:function(data){
+						seatObj.player = Player(data);
+					},
+					dataType:'json'
+				});
 	};
 
 	seatObj.setStake = function(newstake,newtable) {
@@ -89,10 +97,12 @@ function Seat(id,pos){
 		divCount.removeClass("countdown down");
 		divCount.addClass("countdown down");
 		divCount.show();
-		divCount.animate({ top : divCount.height() }, parseInt(timeout)*1000, function() {
-					divCount.hide();
-					divCount.removeAttr("style");
-				}
+		divCount.animate(
+			{ top : divCount.height() }, 
+			parseInt(timeout)*1000, function() {
+				divCount.hide();
+				divCount.removeAttr("style");
+			}
 		);
 	};
 
@@ -218,9 +228,117 @@ function Seat(id,pos){
 
 	return seatObj;
 };
+function Player(){
+	var player			= {};
+	player.id			= undefined;
+	player.username		= undefined;
+	player.family		= undefined;
+	player.position		= undefined;
+	player.level		= undefined;
+	player.asset		= undefined;
+	player.family_score = undefined;
+	player.total_game	= undefined;
+	player.won_game		= undefined;
+	player.percentage	= undefined;
+	player.max_reward	= undefined;
+	player.last_login	= undefined;
+
+
+	player.init = function(display_css, data){
+		player.displayer_css= displayer_css;
+		player.id			= data.id;
+		player.head_portrait= data.head_portrait;
+		player.username		= data.username;
+		player.family		= data.family;
+		player.position		= data.position;
+		player.level		= data.level;
+		player.asset		= data.asset;
+		player.family_score	= data.family_score;
+		player.total_game	= data.total_game;
+		player.won_game		= data.won_game;
+		player.percentage	= data.percentage;
+		player.max_reward	= data.max_reward;
+		player.last_login	= data.last_login;
+	};
+	player.show	= function(position){
+		player_info.show(player);
+	};
+	player.hide	= function(){
+		player_info.hide();;
+	}
+}
+
+
 function seatInit(){
 	window.SeatList = [];
 	for(i = 0; i < 9 ;i ++){
 			SeatList.push(Seat(i,i));
 	}
 }
+(function($){
+	var display_css		= "player-info-display-css";
+	var dialog			= $('<div id="player-info-dialog" class="player-info"></div>');
+	var dialog_bottom	= $('<div id="player-info-bottom"></div>');
+	var dialog_content	= $('<div id="player-info-content"></div>');
+	var portrait_box	= $('<div  id="portrait_box"></div>');
+	var pusername		= $('<span id="username"></span>');
+	var pfamily			= $('<span id="family"></span>');
+	var plevel			= $('<span id="level"></span>');
+	var pposition		= $('<span id="position"></span>');
+	var passet			= $('<span id="asset"></span>');
+	var pfamily_score	= $('<span id="family_score"></span>');
+	var ppercentage		= $('<span id="percentage"></span>');
+	var pmax_reward		= $('<span id="max_reward"></span>');
+	var ptotal_games	= $('<span id="total_games"></span>');
+	var pwon_games		= $('<span id="won_games"></span>');
+	var plast_login		= $('<span id="last_login"></span>');
+	var plast_login		= $('<span id="last_login"></span>');
+	var phead_portrait	= $('<img id="player_head_portrait" src="../.#" style="width: 102px; height: 126px; top: 6px; left: 8px; position: absolute; ">');
+	var add_friend_btn	= $('<div id="add_friend_btn">加为好友</div>');
+	var send_stake_btn	= $('<div id="send_stake_btn">赠送好友</div>');
+	dialog_content.appendTo(dialog);
+	dialog_bottom.appendTo(dialog);
+
+	portrait_box.appendTo(dialog_content);
+	username.appendTo(dialog_content);
+	family.appendTo(dialog_content);
+	level.appendTo(dialog_content);
+	position.appendTo(dialog_content);
+	asset.appendTo(dialog_content);
+	family_score.appendTo(dialog_content);
+	percentage.appendTo(dialog_content);
+	max_reward.appendTo(dialog_content);
+	total_reward.appendTo(dialog_content);
+	won_games.appendTo(dialog_content);
+	last_login.appendTo(dialog_content);
+
+	add_friend_btn.appendTo(dialogBottom);
+	send_stake_btn.appendTo(dialogBottom);
+
+	dialog.show = function(player){
+		head_portrait.attr('src', player.head_portrait);
+		username.text('ID名称：'+player.username);	
+		family.text('家族：'+player.family);	
+		position.text('职位：'+player.position);	
+		level.text('等级：'+player.level);	
+		asset.text('资产：'+player.asset);	
+		family_score.text('家族积分：'+player.family_score);
+		percentage.text('胜率：'+player.percentage);
+		max_reward.text('赢得最大赌注：'+player.max_reward);
+		total_games.text('总局数：'+player.total_games);
+		won_games.text('胜利局数：'+player.won_games);
+		last_login.text('最近上线时间：'+player.last_login);
+		dialog.addClass(display_css);
+	};
+	dialog.hide	= function(){
+		dialog.removeClass(display_css);
+	};
+	add_friend_btnt.click(function(){
+		console.log("add_friend_btnt.click");
+	});	
+	send_stake_btnt.click(function(){
+		console.log("send_stake_btnt.click");
+	});	
+	$('#container').append(dialog);
+	window.player_info = dialog;
+})($);

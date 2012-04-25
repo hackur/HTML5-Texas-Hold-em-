@@ -43,6 +43,41 @@ class PersonalArchiveHandler(tornado.web.RequestHandler):
 		self.write(json.dumps(message))
 		self.finish()
 
+class PlayerArchiveHandler(tornado.web.RequestHandler):
+	@tornado.web.asynchronous
+	@authenticate
+	def post(self):
+		player_id	= self.get_argument("id", -1);
+		player		= self.db_connection.query(User).filter_by(id = player_id);
+		portrait	= "#"
+		family		= "-1"
+		position	= "-1"
+		percentage	= 0
+		if player.head_portrait is not None:
+			portrait = player.head_portrait.url
+		if player.family is not None:
+			family	= player.family.name
+			position= player.family_position.name
+		if player.total_games > 0:
+			percentage = (player.won_games * 1.0) / player.total_games
+		message	= {
+					"status": "success",
+					"name": player.username,
+					"head_portrait": portrait,
+					"family": family,
+					"position": position,
+					"level": player.level,
+					"asset": player.asset,
+					"percentage": percentage,
+					"total_games": player.total_games,
+					"won_games": player.won_games,
+					"max_reward": player.max_reward,
+					"last_login": player.last_login.strftime("%Y-%m-%d %H:%M:%S"),
+					"signature": player.signature or "This guy is too lazy to leave a signature"
+				}
+		self.write(json.dumps(message))
+		self.finish()
+
 class HeadPortraitHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate

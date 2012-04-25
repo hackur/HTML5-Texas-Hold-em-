@@ -96,6 +96,7 @@ if __name__ == '__main__':
 		(r"/post-board-message", BoardActionMessageHandler),
 		(r"/enter", EnterRoomHandler),
 		(r"/personal-archive",PersonalArchiveHandler),
+		(r"/player-archive", PlayerArchiveHandler),
 		(r"/head-portrait-upload",HeadPortraitHandler),
 		(r"/list-email",EmailListHandler),
 		(r"/send-email",EmailSendHandler),
