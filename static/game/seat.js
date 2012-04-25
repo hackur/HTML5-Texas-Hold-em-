@@ -63,7 +63,7 @@ function Seat(id,pos){
 				$.ajax({
 					type: 'post',
 					data: {id:seatObj.userid},
-					url	: 'player-archive',
+					url	: '../../player-archive',
 					success:function(data){
 						seatObj.player = Player(data);
 					},
@@ -281,19 +281,18 @@ function seatInit(){
 	var dialog_bottom	= $('<div id="player-info-bottom"></div>');
 	var dialog_content	= $('<div id="player-info-content"></div>');
 	var portrait_box	= $('<div  id="portrait_box"></div>');
-	var pusername		= $('<span id="username"></span>');
-	var pfamily			= $('<span id="family"></span>');
-	var plevel			= $('<span id="level"></span>');
-	var pposition		= $('<span id="position"></span>');
-	var passet			= $('<span id="asset"></span>');
-	var pfamily_score	= $('<span id="family_score"></span>');
-	var ppercentage		= $('<span id="percentage"></span>');
-	var pmax_reward		= $('<span id="max_reward"></span>');
-	var ptotal_games	= $('<span id="total_games"></span>');
-	var pwon_games		= $('<span id="won_games"></span>');
-	var plast_login		= $('<span id="last_login"></span>');
-	var plast_login		= $('<span id="last_login"></span>');
-	var phead_portrait	= $('<img id="player_head_portrait" src="../.#" style="width: 102px; height: 126px; top: 6px; left: 8px; position: absolute; ">');
+	var username		= $('<span id="username"></span>');
+	var family			= $('<span id="family"></span>');
+	var level			= $('<span id="level"></span>');
+	var position		= $('<span id="position"></span>');
+	var asset			= $('<span id="asset"></span>');
+	var family_score	= $('<span id="family_score"></span>');
+	var percentage		= $('<span id="percentage"></span>');
+	var max_reward		= $('<span id="max_reward"></span>');
+	var total_games		= $('<span id="total_games"></span>');
+	var won_games		= $('<span id="won_games"></span>');
+	var last_login		= $('<span id="last_login"></span>');
+	var head_portrait	= $('<img id="player_head_portrait" src="../.#" style="width: 102px; height: 126px; top: 6px; left: 8px; position: absolute; ">');
 	var add_friend_btn	= $('<div id="add_friend_btn">加为好友</div>');
 	var send_stake_btn	= $('<div id="send_stake_btn">赠送好友</div>');
 	dialog_content.appendTo(dialog);
@@ -308,13 +307,16 @@ function seatInit(){
 	family_score.appendTo(dialog_content);
 	percentage.appendTo(dialog_content);
 	max_reward.appendTo(dialog_content);
-	total_reward.appendTo(dialog_content);
+	total_games.appendTo(dialog_content);
 	won_games.appendTo(dialog_content);
 	last_login.appendTo(dialog_content);
+	head_portrait.appendTo(portrait_box);
 
-	add_friend_btn.appendTo(dialogBottom);
-	send_stake_btn.appendTo(dialogBottom);
-
+	add_friend_btn.appendTo(dialog_bottom);
+	send_stake_btn.appendTo(dialog_bottom);
+	dialog.init = function(){
+		dialog.appendTo($('#container'))
+	};
 	dialog.show = function(player){
 		head_portrait.attr('src', player.head_portrait);
 		username.text('ID名称：'+player.username);	
@@ -333,12 +335,12 @@ function seatInit(){
 	dialog.hide	= function(){
 		dialog.removeClass(display_css);
 	};
-	add_friend_btnt.click(function(){
+	add_friend_btn.click(function(){
 		console.log("add_friend_btnt.click");
 	});	
-	send_stake_btnt.click(function(){
+	send_stake_btn.click(function(){
 		console.log("send_stake_btnt.click");
 	});	
-	$('#container').append(dialog);
 	window.player_info = dialog;
+
 })($);

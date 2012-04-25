@@ -48,7 +48,7 @@ class PlayerArchiveHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
 		player_id	= self.get_argument("id", -1);
-		player		= self.db_connection.query(User).filter_by(id = player_id);
+		player		= self.db_connection.query(User).filter_by(id = player_id).first();
 		portrait	= "#"
 		family		= "-1"
 		position	= "-1"
