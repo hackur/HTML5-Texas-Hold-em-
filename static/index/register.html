@@ -20,14 +20,18 @@
 
 		<div data-role="content" data-theme="c">
             <label for="username">Username:</label>
-            <input type="text" name="username" id="username" />
-            <label for="password">Password:</label>
-            <input type="password" name="password" id="password" />
+			<input type="text" name="username" id="username"
+					placeholder="Please enter your username" required 
+			/>
+			<label for="regpassword">Password:</label>
+            <input type="password" name="password" id="regpassword" />
             <label for="repassword">Retype Password:</label>
             <input type="password" name="repassword" id="repassword" />
             <fieldset data-role="controlgroup">
                 <legend>Sex :</legend>
-                <input type="radio" name="sex" id="radio-choice-1" value="male" checked="checked" />
+				<input type="radio" name="sex" 
+					id="radio-choice-1" value="male" checked="checked" />
+
                 <label for="radio-choice-1">Gentleman</label>
             <input type="radio" name="sex" id="radio-choice-2" value="lady"/>
             <label for="radio-choice-2">Lady</label>
