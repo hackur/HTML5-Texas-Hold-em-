@@ -75,12 +75,10 @@ class User(Base):
 					primaryjoin=id==friendShip.c.leftFriendId,
 					secondaryjoin=id==friendShip.c.rightFriendId
 					)
-	stake		= Column(Integer)
 
-	def __init__(self, username, password, stake, total_games=0, won_games = 0, level = 0, asset = 0, max_reward = 0, **kwargs):
+	def __init__(self, username, password, total_games=0, won_games = 0, level = 0, asset = 0, max_reward = 0, **kwargs):
 		self.username		= username
 		self.password		= password
-		self.stake			= stake
 		self.total_games	= total_games
 		self.won_games		= won_games
 		self.level			= level
@@ -174,10 +172,10 @@ if __name__ == "__main__":
 	db_connection.connect()
 	db_connection.start_session()
 	#room        = Room(exchange="dealer_exchange_1",blind=10,max_player=9)
-	ting        = User(username="ting", password=hashlib.md5("123").hexdigest(), stake = 200)
-	mile        = User(username="mile", password=hashlib.md5("123").hexdigest(), stake = 100)
-	mamingcao   = User(username="mamingcao", password=hashlib.md5("123").hexdigest(), stake = 200)
-	huaqin      = User(username="huaqin", password=hashlib.md5("123").hexdigest(), stake = 500)
+	ting        = User(username="ting", password=hashlib.md5("123").hexdigest())
+	mile        = User(username="mile", password=hashlib.md5("123").hexdigest())
+	mamingcao   = User(username="mamingcao", password=hashlib.md5("123").hexdigest())
+	huaqin      = User(username="huaqin", password=hashlib.md5("123").hexdigest())
 	ting.level	= 12
 	ting.total_games= 100
 	ting.won_games	= 40
