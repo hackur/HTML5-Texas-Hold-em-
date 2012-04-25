@@ -214,7 +214,7 @@ function msg_standup(data){
 			if (!window.user_info.userIsSat) {
 				SeatList[info.seat_no].showSeatdownbg();
 			} 
-			if(window.user_info.sit_no == info.seat_no) {
+			else if(parseInt(window.user_info.sit_no) == parseInt(info.seat_no)) {
 				SeatList[info.seat_no].removeStand();
 				for (var i = 0; i < 9; i++) {
 					if (!SeatList[i].getIsSat()) {
@@ -222,6 +222,7 @@ function msg_standup(data){
 					} 
 				}
 				window.user_info.userIsSat = false;
+				window.user_info.sit_no = undefined;
 				actionButton.disable_all();
 			}
 		}

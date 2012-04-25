@@ -36,6 +36,10 @@ class LoginPageHandler(tornado.web.RequestHandler):
 				return
 		self.render("static/index/index.html")
 
+class IndexPageHandler(tornado.web.RequestHandler):
+	def get(self):
+		self.redirect("/static/index/index.html")
+
 class UserPageHandler(tornado.web.RequestHandler):
 	@authenticate
 	def get(self):
@@ -80,7 +84,7 @@ if __name__ == '__main__':
 	pika.log.setup(color=True)
 	pika.log.info("Starting Tornado HTTPServer on port %i" % PORT)
 	application = tornado.web.Application([
-		(r"/$", LoginPageHandler),
+		(r"/?$", IndexPageHandler),
 		(r"/test", IndexTestHandler),
 		(r"/static/game/game.html", UIIndexTestHandler),
 		(r"/static/index/index.html", LoginPageHandler),
