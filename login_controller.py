@@ -39,6 +39,7 @@ class GuestLoginHandler(tornado.web.RequestHandler):
 			username		= "GUEST_" + hashlib.md5(str(time.time()) + str(random())).hexdigest()[0:8]
 			password		= hashlib.md5(str(time.time()) + str(random())).hexdigest()
 			user			= User(username = username, password = hashlib.md5(password).hexdigest(), stake = 3000)
+			user.asset = 3000;
 			print username,password
 			db_connection.start_session()
 			db_connection.addItem(user)

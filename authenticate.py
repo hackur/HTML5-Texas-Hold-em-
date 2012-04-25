@@ -2,14 +2,22 @@ import json
 from database import *
 def authenticate(functor):
 	def _authenticate(self):
-		if 'user_id' not in self.session:
-			self.write(json.dumps('unauthenticated'))
+		if not 'user_id' in self.session:
+			print "REDIRECT!!!!!!!!!!!!"
+			self.redirect("/static/index/index.html")
 			self.finish()
 			return
 
 		self.db_connection	= DatabaseConnection()
 		self.db_connection.start_session()
-		self.session['user'] = self.db_connection.query(User).filter_by(id = self.session['user_id']).one()
+		user = self.db_connection.query(User).filter_by(id = self.session['user_id']).first()
+		if not user:
+			self.redirect("/static/index/index.html")
+			del self.session['user_id']
+			return
+
+		self.user = user
+		self.session['user']  = user
 		self.db_connection.commit_session()
 		functor(self)
 		self.db_connection.close()

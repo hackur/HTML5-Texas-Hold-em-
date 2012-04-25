@@ -13,7 +13,7 @@ class PersonalArchiveHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		user		= self.session['user']
+		user		= self.user
 		portrait	= "#"
 		family		= "-1"
 		position	= "-1"

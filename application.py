@@ -12,27 +12,34 @@ from database import *
 from pika.adapters.tornado_connection import TornadoConnection
 PORT = 8888
 
-class IndexHandler(tornado.web.RequestHandler):
-	def get(self):
-		if 'user_id' in self.session:
-			self.redirect("/static/user/user.html")
-		else:
-			self.redirect("/static/index/index.html")
-
 class UIIndexHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.render("uitest.html")
 
 class UIIndexTestHandler(tornado.web.RequestHandler):
+	@authenticate
 	def get(self):
 		self.render("static/game/game.html")
 
 class LoginPageHandler(tornado.web.RequestHandler):
 	def get(self):
 		if 'user_id' in self.session:
-			self.redirect("/static/user/user.html")
-			return
+			user_id =  self.session['user_id']
+			db = DatabaseConnection()
+			db.start_session()
+			user = DatabaseConnection().query(User).filter_by(id =user_id).first()
+			db.commit_session()
+			if not user:
+				del self.session['user_id']
+			else:
+				self.redirect("/static/user/user.html")
+				return
 		self.render("static/index/index.html")
+
+class UserPageHandler(tornado.web.RequestHandler):
+	@authenticate
+	def get(self):
+		self.render("static/user/user.html")
 
 class IndexTestHandler(tornado.web.RequestHandler):
 	def get(self):
@@ -73,13 +80,13 @@ if __name__ == '__main__':
 	pika.log.setup(color=True)
 	pika.log.info("Starting Tornado HTTPServer on port %i" % PORT)
 	application = tornado.web.Application([
-		(r"/$", IndexHandler),
+		(r"/$", LoginPageHandler),
 		(r"/test", IndexTestHandler),
 		(r"/static/game/game.html", UIIndexTestHandler),
 		(r"/static/index/index.html", LoginPageHandler),
+		(r"/static/user/user.html", UserPageHandler),
 
 		(r"/uitest.html", UIIndexHandler),
-		(r"/test.html", IndexHandler),
 		(r"/sit-down", SitDownBoardHandler),
 		(r"/listen-board-message", BoardListenMessageHandler),
 		(r"/post-board-message", BoardActionMessageHandler),
