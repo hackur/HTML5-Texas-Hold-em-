@@ -15,12 +15,27 @@
 <div data-role="dialog">
 	
 		<div data-role="header" data-theme="d">
-			<h1>Register</h1>
+			<h1>User Registration</h1>
 		</div>
 
 		<div data-role="content" data-theme="c">
-			<h1>Delete page?</h1>
-			<p>This is a regular page, styled as a dialog. To create a dialog, just link to a normal page and include a transition and <code>data-rel="dialog"</code> attribute.</p>
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" />
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" />
+            <label for="repassword">Retype Password:</label>
+            <input type="password" name="repassword" id="repassword" />
+            <fieldset data-role="controlgroup">
+                <legend>Sex :</legend>
+                <input type="radio" name="sex" id="radio-choice-1" value="male" checked="checked" />
+                <label for="radio-choice-1">Gentleman</label>
+            <input type="radio" name="sex" id="radio-choice-2" value="lady"/>
+            <label for="radio-choice-2">Lady</label>
+            <input type="radio" name="sex" id="radio-choice-3" value="None"/>
+            <label for="radio-choice-3">I would rather not to say</label>
+
+            </fieldset>
+
 			<a href="docs-dialogs.html" data-role="button" data-rel="back" data-theme="b">Register</a>       
 			<a href="docs-dialogs.html" data-role="button" data-rel="back" data-theme="c">Cancel</a>    
 		</div>

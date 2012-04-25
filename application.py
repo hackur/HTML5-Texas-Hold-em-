@@ -73,7 +73,7 @@ if __name__ == '__main__':
 		"PokerUITest": os.path.join(os.path.dirname(__file__), "PokerUITest"),
 		#'session_storage':"dir"
 		"session_storage":"mongodb:///db",
-		"session_age":65536,
+		"session_age":None,
 		"session_regeneration_interval":None
 	}
 
