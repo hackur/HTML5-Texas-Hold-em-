@@ -34,7 +34,7 @@
 			_suit = card.charAt(1);
 			_rank = card.charAt(0);
 		}
-		if (card.length == 3) {
+		else if (card.length == 3) {
 			_suit = card.charAt(2);
 			_rank = "10";
 		}

@@ -22,23 +22,23 @@ function decide_event(){
 			navigator.userAgent.match(/webOS/i) ||
 			navigator.userAgent.match(/BlackBerry/)
 	){
-		event_up = "touchend";
-		event_down = "touchstart"; 
-		event_move = "touchmove";
+		window.event_up = "touchend";
+		window.event_down = "touchstart"; 
+		window.event_move = "touchmove";
 		window.touch_enable = true;
 	}
 	else{
-		event_up = "mouseup"; 
-		event_down = "mousedown"; 
-		event_move = "mousemove";
+		window.event_up = "mouseup"; 
+		window.event_down = "mousedown"; 
+		window.event_move = "mousemove";
 		window.touch_enable = false;
 	}
 
 	if( $.browser.webkit ) {
-			eventTransitionEnd = "webkitTransitionEnd";
+			window.eventTransitionEnd = "webkitTransitionEnd";
 	} else if( $.browser.mozilla ) {
-			eventTransitionEnd = "transitionend";
+			window.eventTransitionEnd = "transitionend";
 	} else if ($.browser.opera) {
-			eventTransitionEnd = "oTransitionEnd";
+			window.eventTransitionEnd = "oTransitionEnd";
 	}
 }
