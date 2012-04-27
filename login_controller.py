@@ -96,6 +96,7 @@ class SinaWeiboLoginBack(tornado.web.RequestHandler):
 			user  = User(username="", password="")
 			user.accountType = User.USER_TYPE_SINA_WEIBO
 			user.accountID   = uid
+			user.asset = 3000;
 
 		user.screen_name = user_info.screen_name
 		user.gender	= user_info.gender
@@ -106,6 +107,7 @@ class SinaWeiboLoginBack(tornado.web.RequestHandler):
 		db_connection.addItem(user)
 		db_connection.commit_session()
 		db_connection.close()
+		self.session['user_id'] = user.id
 		self.redirect("/static/user/user.html")
 
 	@tornado.web.asynchronous
