@@ -327,12 +327,17 @@ function seatInit(){
 
 	add_friend_btn.appendTo(dialog_bottom);
 	send_stake_btn.appendTo(dialog_bottom);
-
+	var presentBar = slider_bar();
+	
+			
 	dialog_content.appendTo(dialog);
 	dialog_bottom.appendTo(dialog);
-
+	
 	dialog.init = function(){
-		dialog.appendTo($('#container'))
+		dialog.appendTo($('#container'));
+		presentBar.setPosition(170,363);
+		presentBar.create(dialog_content,10,1000,10);
+				
 	};
 	dialog.show = function(player){
 		dialog_content.css("display","block");
