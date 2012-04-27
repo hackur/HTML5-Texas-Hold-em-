@@ -5,7 +5,6 @@ def authenticate(functor):
 		if not 'user_id' in self.session:
 			print "REDIRECT!!!!!!!!!!!!"
 			self.redirect("/static/index/index.html")
-			self.finish()
 			return
 
 		self.db_connection	= DatabaseConnection()
