@@ -142,7 +142,10 @@ var take_place = function(seatID, seatObj) {
 		{
 			console.log(seatObj);
 			console.log(this);
-			sit_dialog.show(seatObj);
+			console.log("sliderbaris clicked");
+			
+			sit_down_dialog.show(seatObj);
+			//sit_dialog.show();
 		}
 		else if(seatObj.getIsSat()) {
 			console.log(seatObj.getIsSat());

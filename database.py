@@ -166,8 +166,10 @@ def init_database():
 
 if __name__ == "__main__":
 	import os
+
 	if os.path.isfile("./db.sqlite"):
 		os.remove("db.sqlite")
+
 	db_connection  = DatabaseConnection()
 	db_connection.init("sqlite:///db.sqlite")
 	db_connection.connect()

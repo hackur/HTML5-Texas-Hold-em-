@@ -6,7 +6,7 @@
 
 		<link rel="stylesheet" type="text/css" href="style.css" />
 		<link rel="stylesheet" type="text/css" href="button.css" />
-		<link rel="stylesheet" type="text/css" href="sit_down_dialog.css" />
+		<link rel="stylesheet" type="text/css" href="sliderbar_dialog.css" />
 		<link rel="stylesheet" type="text/css" href="seat.css" />
 		<link rel="stylesheet" type="text/css" href="message_box.css" />
 		<script src="jquery.min.js"		> </script>
@@ -14,6 +14,7 @@
 		<script src="poker_lib.js"		> </script>
 		<script src="sit_transit.js"	> </script>
 		<script src="sit_down_dialog.js"> </script>
+		<script src="sliderbar_dialog.js"></script>
 		<script src="seat.js"></script>
 		<script src="index.js"></script>
 		<script src="pot.js"></script>
@@ -26,8 +27,15 @@
 				//login();
 				chat_dialog.init();
 				player_info.init();
-				// player_info.show();
+				sit_down_dialog_init();
+				
 			}
+		function sit_down_dialog_init() {
+			sit_down_dialog = slider_bar_dialog();	
+			sit_down_dialog.init();
+			sit_down_dialog.slider_bar_setTitle("Title");
+			
+		}
 			$(init);
 		</script>
 		<script src="action_button.js"></script>
@@ -66,18 +74,7 @@
 				</div>
 
 			</div>
-			<div id="sit_down_dialog">
-				<div id="testdiv">
-					<p>
-						<label for="amount">Amount:</label>
-						<label id="sit_dialog_amount" />
-					</p>
-					<div id="sit_slider_bar" class="ui-slider ui-slider-horizontal ui-widget-content ui-corner-all">
-						<div id="sit_slider_button" class="ui-slider-handle"></div>
-					</div>
-					<div id="submitButton"></div>
-				</div>
-			</div>
+			
 
 			<div id="buttonWraper">
 				<div id="btFold" class="button">Fold</div>
@@ -114,6 +111,9 @@
 					<div id="chat-send-btn" >Send</div>
 				</div>
 			</div>
+		</div>
+		<div id = "sit_down_dialog">
+			
 		</div>
 	</body>
 </html>

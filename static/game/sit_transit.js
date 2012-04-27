@@ -1,6 +1,3 @@
-
-
-
 (function(sit_transit,$,undefined){
 	var len = 9;
 
