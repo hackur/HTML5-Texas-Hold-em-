@@ -65,7 +65,7 @@ def in_ioloop(fn):
                 fn(*args, **kwargs)
                 return
         except AttributeError:
-            print "ERROR"
+			print "ERROR in ioloop"
             pass
 
         get_ioloop().add_callback(partial(fn, *args, **kwargs))
