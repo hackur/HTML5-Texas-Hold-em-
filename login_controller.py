@@ -90,7 +90,7 @@ class SinaWeiboLoginBack(tornado.web.RequestHandler):
 
 	@in_ioloop
 	def got_user_info(self,uid,user_info):
-		user = self.db_connection.query(User).filter_by(accountType=User.USER_TYPE_SINA_WEIBO,\
+		user = db_connection.query(User).filter_by(accountType=User.USER_TYPE_SINA_WEIBO,\
 							accountID=uid).first()
 		if user == None:
 			user  = User(username="", password="")
@@ -102,11 +102,11 @@ class SinaWeiboLoginBack(tornado.web.RequestHandler):
 		user.headPortrait_url = user_info.profile_image_url #avatar_large?
 
 		user.last_login	= datetime.now()
-		self.db_connection.start_session()
-		self.db_connection.addItem(user)
-		self.db_connection.commit_session()
-		self.db_connection.close()
-		self.redirect("/static/user/user.html")
+		db_connection.start_session()
+		db_connection.addItem(user)
+		db_connection.commit_session()
+		db_connection.close()
+		redirect("/static/user/user.html")
 
 	@tornado.web.asynchronous
 	def get(self):
