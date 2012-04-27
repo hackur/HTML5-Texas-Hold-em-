@@ -19,7 +19,7 @@ function login_check() {
 				alert("incorrect password");
 
 			}
-		},
+		}
 	//	dataType:'json',
 		});
 		return false;
@@ -59,7 +59,7 @@ function login_check() {
 				alert("incorrect password");
 
 			}
-		},
+		}
 		//dataType:'json',
 	});				
 

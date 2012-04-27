@@ -139,13 +139,13 @@
 	background-image: url('../img/login/login2.png');
 }
 #lcancel {
-	width: 172px;
-	height: 58px;
+	width: 200px;
+	height: 48px;
 	top: 340px;
-	left: 740px;
+	left: 730px;
 	position: absolute;
 	z-index: 1;
-	background-image: url('../img/login/cancel1.png');
+	background-image: url('../img/login/sinaweibo.png');
 	cursor:pointer;
 /*	text-align: center;
 	padding:2px 20px;
@@ -161,13 +161,15 @@
 	font-weight:bold;
 	font-size:x-large;*/
 }
+/*
 #lcancel:hover {
 	background-image: url('../img/login/cancel2.png');
-	/*background: -webkit-gradient(linear, left top, left 24, from(#FF9800), color-stop(0%, #FF6900), to(#FF9800));
+	background: -webkit-gradient(linear, left top, left 24, from(#FF9800), color-stop(0%, #FF6900), to(#FF9800));
     background: -moz-linear-gradient(top, #FF9800, #FF6900 0, #FF9800 24px);
     background:-o-linear-gradient(top, #FF6900, #FF6900 0, #FF9800 24px);
-*/
 }
+*/
+
 #lvisitor {
 	width: 256px;
 	height: 83px;
