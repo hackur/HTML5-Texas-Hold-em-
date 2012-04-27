@@ -1,6 +1,6 @@
 import hashlib
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey,Text,Table,DateTime
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey,Text,Table,DateTime,BigInteger
 from sqlalchemy.orm import sessionmaker,relationship, backref
 from datetime import datetime
 from pprint import pprint
@@ -29,13 +29,6 @@ class Room(Base):
 	def __repr__(self):
 		return "<Room('%s','%s')>" % (self.id, self.exchange)
 
-class HeadPortrait(Base):
-	__tablename__	= "head_portrait"
-	id		= Column(Integer, primary_key = True, autoincrement = True)
-	path	= Column(String(255))
-	url		= Column(String(255))
-
-
 
 class DealerInfo(Base):
 	__tablename__	= "dealer_info"
@@ -50,6 +43,8 @@ friendShip=Table("friendShip",Base.metadata,
 )
 class User(Base):
 	__tablename__	= "user"
+
+	(USER_TYPE_NORMAL,USER_TYPE_SINA_WEIBO) = (0,1)
 	id		= Column(Integer, primary_key=True, autoincrement=True)
 	username	= Column(String(255))
 	password	= Column(String(255))
@@ -65,16 +60,24 @@ class User(Base):
 	last_login	= Column(DateTime)
 	signature	= Column(String(255))
 	asset		= Column(Integer) #need to be changed
-	head_portrait_id	= Column(Integer, ForeignKey("head_portrait.id"))
-	head_portrait		= relationship("HeadPortrait", backref=backref('user'), uselist=False)
+	accountType	= Column(Integer) #0 Normal, 1: Sina Weibo
+	accountID = Column(BigInteger)
+	screen_name  = Column(String(255))
+	gender	  = Column(String(1))
+
 	#type in family
 	family_position_id	= Column(Integer,ForeignKey('familyPosition.id'))
 	family_position		= relationship("FamilyPosition", backref=backref('members',order_by=id))
+
+	headPortrait_path	= Column(String(255))
+	headPortrait_url		= Column(String(255))
+
 	friends		= relationship("User",
 					secondary=friendShip,
 					primaryjoin=id==friendShip.c.leftFriendId,
 					secondaryjoin=id==friendShip.c.rightFriendId
 					)
+
 
 	def __init__(self, username, password, total_games=0, won_games = 0, level = 0, asset = 0, max_reward = 0, **kwargs):
 		self.username		= username
@@ -87,6 +90,8 @@ class User(Base):
 
 	def __repr__(self):
 		return "<User('%s','%s', '%s', '%s')>" % (self.id, self.username, self.password, self.friends)
+
+
 
 class Family(Base):
 	__tablename__="family"
@@ -174,11 +179,11 @@ if __name__ == "__main__":
 	db_connection.init("sqlite:///db.sqlite")
 	db_connection.connect()
 	db_connection.start_session()
-	#room        = Room(exchange="dealer_exchange_1",blind=10,max_player=9)
-	ting        = User(username="ting", password=hashlib.md5("123").hexdigest())
-	mile        = User(username="mile", password=hashlib.md5("123").hexdigest())
+	#room		= Room(exchange="dealer_exchange_1",blind=10,max_player=9)
+	ting		= User(username="ting", password=hashlib.md5("123").hexdigest())
+	mile		= User(username="mile", password=hashlib.md5("123").hexdigest())
 	mamingcao   = User(username="mamingcao", password=hashlib.md5("123").hexdigest())
-	huaqin      = User(username="huaqin", password=hashlib.md5("123").hexdigest())
+	huaqin	  = User(username="huaqin", password=hashlib.md5("123").hexdigest())
 	ting.level	= 12
 	ting.total_games= 100
 	ting.won_games	= 40

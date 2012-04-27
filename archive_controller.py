@@ -7,7 +7,7 @@ import tornado.httpserver
 import tornado.web
 from authenticate import *
 from datetime import datetime
-from database import DatabaseConnection,User,Family,FamilyPosition,Email,HeadPortrait
+from database import DatabaseConnection,User,Family,FamilyPosition,Email
 import hashlib
 
 class PersonalArchiveHandler(tornado.web.RequestHandler):
@@ -19,8 +19,8 @@ class PersonalArchiveHandler(tornado.web.RequestHandler):
 		family		= "-1"
 		position	= "-1"
 		percentage	= 0
-		if user.head_portrait is not None:
-			portrait = user.head_portrait.url
+		if user.headPortrait_url is not None:
+			portrait = user.headPortrait_url
 		if user.family is not None:
 			family	= user.family.name
 			position= user.family_position.name
@@ -55,7 +55,7 @@ class PlayerArchiveHandler(tornado.web.RequestHandler):
 		position	= "-1"
 		percentage	= 0
 		if player.head_portrait is not None:
-			portrait = player.head_portrait.url
+			portrait = player.headPortrait_url
 		if player.family is not None:
 			family	= player.family.name
 			position= player.family_position.name
@@ -96,24 +96,16 @@ class HeadPortraitHandler(tornado.web.RequestHandler):
 		filename = m.hexdigest()
 		output_file		= open(directory + "/" + filename, 'wb')
 		output_file.write(head_portrait['body'])
-		
-		
+
+
 		output_file.seek(0)
 		output_file.close()
 
-		if user.head_portrait is not None:
-			old_portrait = user.head_portrait
-			self.db_connection.delete(old_portrait)
-			os.remove(old_portrait.path)
-
-		portrait			= HeadPortrait()
-		portrait.url		= "/" + directory + '/' + filename
-		portrait.path		= "./" + directory + '/' + filename
-		user.head_portrait	= portrait
-		self.db_connection.addItem(portrait)
+		user.headPortrait_url		= "/" + directory + '/' + filename
+		user.headPortrait_path		= "./" + directory + '/' + filename
 		self.db_connection.addItem(user)
 		self.db_connection.commit_session()
-		message = {"status":"success","url":user.head_portrait.url}
+		message = {"status":"success","url":user.headPortrait_url}
 		self.finish(json.dumps(message))
 
 class EmailListHandler(tornado.web.RequestHandler):
