@@ -110,6 +110,8 @@ if __name__ == '__main__':
 		(r"/userinfo", UserInfoHandler),
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),
+        (r"/weibologin",SinaWeiboLogin),
+        (r"/weibologinCallback",SinaWeiboLoginBack),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path2'])),
 		(r"/uploads/(.*)", tornado.web.StaticFileHandler, dict(path=settings['uploaded_image_path'])),
 	#	(r"/(.*.html)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),

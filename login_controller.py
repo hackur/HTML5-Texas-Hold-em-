@@ -61,3 +61,27 @@ class GuestLoginHandler(tornado.web.RequestHandler):
 		self.write(json.dumps(message))
 		db_connection.commit_session()
 		self.finish()
+
+from weibo import APIClient
+
+APP_KEY = '3994352852' # app key
+APP_SECRET = 'c75a6d36c510a4dae255e75a5e8cb956' # app secret
+CALLBACK_URL = 'http://gigiduck.com:8888/weibologinCallback/' # callback url
+class SinaWeiboLogin(tornado.web.RequestHandler):
+    def get(self):
+        client = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
+        url = client.get_authorize_url(display="mobile")
+        print url
+        self.redirect(url)
+
+class SinaWeiboLoginBack(tornado.web.RequestHandler):
+    def get(self):
+        code = self.get_argument('code')
+        client = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
+        r = client.request_access_token(code)
+        client.set_access_token(access_token, expires_in)
+        print client.get.users__show()
+
+
+
+
