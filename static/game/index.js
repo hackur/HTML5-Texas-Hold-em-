@@ -157,6 +157,21 @@ var take_place = function(seatID, seatObj) {
 			}
 		}
 			seatObj.player.show(seatObj.player);
+			var info_hide = function(e) {
+				var infoWindow = $("#player-info-content");
+				var infoWindowPosition = infoWindow.offset();
+				var infoWindowSize = {"width": infoWindow.width(), "height": infoWindow.height()};
+				pos = get_event_position(e);
+				console.log(infoWindowSize["width"]);
+				console.log(pos[0]);
+				if(pos[0] < infoWindowPosition["left"] || pos[0] > infoWindowPosition["left"]+infoWindowSize["width"]) {
+					seatObj.player.hide();	
+				}
+				e.stopPropagation();
+				window.removeEventListener("click", info_hide, true);
+				return false;
+			}
+			window.addEventListener("click", info_hide, true);
 		}
 	});
 };

@@ -273,7 +273,7 @@ function Player(data){
 		player_info.show(player);
 	};
 	player.hide	= function(){
-		player_info.hide();;
+		player_info.hide();
 	};
 	player.init(data)
 	return player;
@@ -359,7 +359,8 @@ function seatInit(){
 		dialog.addClass(display_css);
 	};
 	dialog.hide	= function(){
-		dialog.removeClass(display_css);
+		dialog_content.hide();
+		dialog_bottom.hide();
 	};
 	add_friend_btn.click(function(){
 		console.log("add_friend_btnt.click");
