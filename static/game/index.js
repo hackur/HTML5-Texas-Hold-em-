@@ -69,7 +69,7 @@ var enter = function(){
 								SeatList[i].showStand();
 								console.log("-----------------------" + i);
 								window.user_info.userIsSat = true;
-								window.user_info.sit_no = seatID;
+								window.user_info.sit_no = i;
 							}
 						}
 					}
