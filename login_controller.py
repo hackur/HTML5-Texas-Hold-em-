@@ -106,7 +106,7 @@ class SinaWeiboLoginBack(tornado.web.RequestHandler):
 		db_connection.addItem(user)
 		db_connection.commit_session()
 		db_connection.close()
-		redirect("/static/user/user.html")
+		self.redirect("/static/user/user.html")
 
 	@tornado.web.asynchronous
 	def get(self):
