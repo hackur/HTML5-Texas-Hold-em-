@@ -1,0 +1,48 @@
+#sliderbar_dialog{
+	background-image: url(./image/sit_down_dialog.png);
+	padding: 15px;
+	top: 113px;
+	left: 175px;
+	height: 360px;
+	width: 606px;
+	position: absolute;
+	opacity: 1.0;
+	z-index:10;
+}
+
+#testdiv { 
+	width: 444px;
+	height: 170px;
+	top: 103px;
+	left: 91px;
+	position: absolute;
+	font-family: 文泉驿微米黑, 微软雅黑, 黑体, 宋体;
+	color: #FFFFFF;
+	font-size:20px;
+}
+#sliderbar_title {
+	width: 459px;
+	height:52px;
+	top:47px;
+	left:87px;
+	position: absolute;
+	text-align: center;
+	font-family: 文泉驿微米黑, 微软雅黑, 黑体, 宋体;
+	font-size:33px;
+	color: #FFFFFF;
+}
+#submitButton {
+	background-image: url(./image/sure.png); 
+	position: absolute; 
+	width: 79px; height:41px;
+	top: 282px; left: 482px;
+}
+#submitButton:hover { background-image: url(./image/sure-hover.png);}
+
+.sit_slider_bar{position:absolute; top: 104px; left: 44px; width: 366px; height: 15px; background-image: url(./image/sliderbar.png);}
+#slider_bar{position:absolute; top: 104px; left: 44px; width: 366px; height: 15px; background-image: url(./image/sliderbar.png);}
+.sit_slider_button{position:absolute; top: -11px; left: 30px; width: 62px; height: 36px; background-image: url(./image/slider.png);}
+#slider_button{position:absolute; top: -11px; left: 30px; width: 62px; height: 36px; background-image: url(./image/slider.png);}
+#sit_slider_textMax{position:absolute; top: 126px; left: 398px; width: 60px; height: 34px;}
+#sit_slider_textMin{position:absolute; top: 126px; left: 29px; width: 60px; height: 34px;}
+
