@@ -545,3 +545,27 @@
 	margin-top:12px;
 	color: white;
 }
+.card-name{
+	position: absolute;
+	color: white;
+	font-weight: bold;
+	background: rgba(22, 44, 47, 0.8);
+	border: 2px #797D7E;
+	top: -10px;
+	left: 8px;
+	border-radius: 4px;
+	width: 120px;
+	text-align: center;
+}
+.card-name-win{
+	position: absolute;
+	color: white;
+	font-weight: bold;
+	background: rgba(22, 44, 47, 0.8);
+	border: 2px #797D7E;
+	top: -10px;
+	left: 8px;
+	border-radius: 4px;
+	width: 120px;
+	text-align: center;
+}

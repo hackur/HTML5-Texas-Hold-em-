@@ -41,10 +41,15 @@ function msg_phc(data){
 	//Private message: you got hand card
 	console.log("msg_phc is ----------------------------------------------:");
 	console.log(data);
+	var seatId = window.user_info.sit_no;
 
 	//set_hand_cards(data.cards[0], data.cards[1]);
+	console.log(data.cards);
 	poker_lib.setCard(data.cards[0], '#cards_in_hand1');
 	poker_lib.setCard(data.cards[1], '#cards_in_hand2');
+	SeatList[seatId].cards	= [];
+	SeatList[seatId].cards.push(poker_lib.evaluateCard(data.cards[0]));
+	SeatList[seatId].cards.push(poker_lib.evaluateCard(data.cards[1]));
 
 	dealCard.set_hc(['#cards_in_hand1','#cards_in_hand2']);
 
@@ -95,6 +100,12 @@ function msg_winner(data){
 			return;
 		}
 		var seat = getSeatById(userid);
+		seat.cards = [];
+		if(info.isWin == false){
+			seat.showCardName(info.handcards);
+		}else{
+			seat.showWinCardName(info.handcards);
+		}
 		console.log([userid, seat,info.seat_no,"+++++++++++++"]);
 		seat.setStake(info.stake,0);
 		SeatList[info.seat_no].removeCountdown();
@@ -126,6 +137,8 @@ function msg_winner(data){
 		 }
 		$("#cards_in_hand1").fadeOut("fast");
 		$("#cards_in_hand2").fadeOut("fast");
+		$(".card-name").remove();
+		$(".card-name-win").remove();
 		$.each(data,function(userid,info){
 			if (info.seat_no != undefined) {
 				SeatList[info.seat_no].removeCard();
@@ -173,13 +186,18 @@ function msg_action(data){
 }
 function msg_public_card(data){
 	/***
-	 * Public cards is updated
-	 * */
-	 console.log("msg_public_card ==================================");
-	 console.log(data);
-	 public_card = data.cards;
-	 dealCard.send_public_card(data.cards);
-
+	* Public cards is updated
+	* */
+	console.log("msg_public_card ==================================");
+	console.log(data);
+	public_card = data.cards;
+	dealCard.send_public_card(data.cards);
+	var cards	= []; 
+	var seatId	= window.user_info.sit_no;
+	for(var i=0;i<data.cards.length;i++){
+		cards.push(poker_lib.evaluateCard(data.cards[i]));
+	}
+	SeatList[seatId].showCardName(cards);
 }
 function msg_start_game(data){
 	console.log("msg_start_game================================");

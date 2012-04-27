@@ -11,7 +11,6 @@ function Seat(id,pos){
 			<div id="countdown0"></div>
 		</div>
 		*/
-	console.log([id,pos,"-------------------------!!!!!!!!!"]);
 	var divSeat = $('<div class="seat"></div>');
 	var divSeatbg = $('<div class="seatbg"></div>');
 	var divSeatdownbg = $('<div class="countdown win seat_dowm_bg"></div>');
@@ -49,7 +48,24 @@ function Seat(id,pos){
 	var IsSat = false;
 	var table = 0;
 	var chips = [];
-	var Inter_val = 0;
+	var Inter_val	= 0;
+	var position	= pos; 
+	seatObj.player= undefined;
+	seatObj.cards = [];
+	seatObj.showCardName = function(public_cards){
+		var temp = seatObj.cards;
+		temp = temp.concat(public_cards);
+		var name = window.getHandCardName( window.identifyCard(temp));
+		$('.card-name').remove();
+		divSeat.append($("<div class='card-name'>" + name + "</div>"));
+	};
+	seatObj.showWinCardName = function(public_cards){
+		var temp = seatObj.cards;
+		temp = temp.concat(public_cards);
+		var name = window.getHandCardName( window.identifyCard(temp));
+		$('.card-name').remove();
+		divSeat.append($("<div class='card-name-win'>" + name + "赢!</div>"));
+	};
 	seatObj.getIsSat = function() {
 			return IsSat;
 	};
