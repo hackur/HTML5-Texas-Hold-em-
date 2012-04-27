@@ -373,7 +373,7 @@
 	border: 1px solid #35888E;
 	overflow: hidden;
 }*/
-#portrait {
+.portrait {
 	width: 67px;
 	height: 85px;
 	position: absolute;

@@ -84,7 +84,6 @@ var info_init = function() {
 			}
 		});
 	});
-
 };
 
 var frameControl = function(frame, i) {
@@ -134,7 +133,6 @@ var getUserImage = function() {
 			console.log(data);
 			var url = data.head_portrait;
 			$("#image1").attr("src", url);
-			
 			$("#property").html($("#property").html() + data.asset);
 			$("#family").html($("#family").html() + data.family);
 			$("#rank").html($("#rank").html() + data.level);
@@ -212,7 +210,6 @@ var buddyInfo = function() {
 };
 
 var view_friend = function(friend, i) {
-
 	$("#name" + i).click(function() {
 		$("#fID").html("ID名称：");
 		$("#ffamily").html("家族：");
@@ -225,9 +222,8 @@ var view_friend = function(friend, i) {
 		$("#fpos").html($("#fpos").html() + friend.position);
 		$("#frank").html($("#frank").html() + friend.level);
 		$("#fpro").html($("#fpro").html() + friend.asset);
-		var url = "../." + friend.head_portrait;
+		var url = friend.head_portrait;
 		$("#image3")[0].src = url;
 		$("#image3").css({'width': 102, 'height': 126, 'top': 6, 'left': 8, 'position': 'absolute'});
-						
 	});
 };

@@ -25,8 +25,8 @@ function Seat(id,pos){
 	var divChip = $('<div class="chip"> </div>');
 	var divStake = $('<div class="tstake"></div>');
 	var cur_pos = "seatPos" + pos;
-	var portrait_border = $('<div id="portrait_border"></div>');
-	var portrait = $('<img id="portrait" />');
+	var portrait_border = $('<div class="portrait_border"></div>');
+	var portrait = $('<img class="portrait"/>');
 
 	divStake.appendTo(divChip);
 	divSeatbg.appendTo(divSeat);
@@ -87,9 +87,7 @@ function Seat(id,pos){
 					url	: '/player-archive',
 					success:function(data){
 						console.log("-----------------")
-						console.log(seatObj.player);
 						seatObj.player = Player(data);
-						console.log(seatObj.player);
 						portrait.attr("src", seatObj.player.head_portrait);
 					},
 					dataType:'json'
@@ -178,6 +176,9 @@ function Seat(id,pos){
 		seatObj.userid		= "";
 		divName.html("name");
 		divMoney.html("money");
+		portrait.remove()
+		portrait = $('<img class="portrait" />');
+		portrait.appendTo(divSeat);
 		seatObj.setIsSat(false);
 	}
 
@@ -268,6 +269,7 @@ function Player(data){
 	player.percentage	= undefined;
 	player.max_reward	= undefined;
 	player.last_login	= undefined;
+	player.friends		= undefined;
 
 
 	player.init = function(data){
@@ -284,14 +286,18 @@ function Player(data){
 		player.percentage	= data.percentage;
 		player.max_reward	= data.max_reward;
 		player.last_login	= data.last_login;
+		player.friends		= data.friends;
 	};
-	player.show	= function(){
+
+	player.show	= function(player){
 		player_info.show(player);
 	};
 	player.hide	= function(){
 		player_info.hide();
 	};
-	player.init(data)
+	player.init(data);
+	console.log("==================");
+	console.log(player);
 	return player;
 }
 
@@ -358,7 +364,6 @@ function seatInit(){
 	dialog.show = function(player){
 		dialog_content.css("display","block");
 		dialog_bottom.css("display","block");
-		console.log(player.head_portrait);
 		head_portrait.attr('src', player.head_portrait);
 		username.text('ID名称：'+player.username);	
 		family.text('家族：'+player.family);	

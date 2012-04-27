@@ -643,7 +643,6 @@ class GameRoom(object):
 												"earned": reward,
 												"pot": pot,
 												"stake": winner.player_stake,
-												"handcards": card_list,
 												"seat_no": winner.seat_id,
 												"pattern": name_of_hand(winner.combination[0])
 											}

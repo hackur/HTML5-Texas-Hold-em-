@@ -152,27 +152,29 @@ var take_place = function(seatID, seatObj) {
 			console.log(seatObj.getIsSat());
 			//customer information
 			// alert("[IsSat == 1] Customer Information!");
+			console.log(".............");
+			console.log(seatObj.player);
 			for (key in seatObj.player) {
 				if (seatObj.player[key] == undefined) {
 					seatObj.player[key] = "N/A";
 			}
 		}
-			seatObj.player.show(seatObj.player);
-			var info_hide = function(e) {
-				var infoWindow = $("#player-info-content");
-				var infoWindowPosition = infoWindow.offset();
-				var infoWindowSize = {"width": infoWindow.width(), "height": infoWindow.height()};
-				pos = get_event_position(e);
-				console.log(infoWindowSize["width"]);
-				console.log(pos[0]);
-				if(pos[0] < infoWindowPosition["left"] || pos[0] > infoWindowPosition["left"]+infoWindowSize["width"]) {
-					seatObj.player.hide();	
-				}
-				e.stopPropagation();
+		seatObj.player.show(seatObj.player);
+		var info_hide = function(e) {
+			var infoWindow = $("#player-info-content");
+			var infoWindowPosition = infoWindow.offset();
+			var infoWindowSize = {"width": infoWindow.width(), "height": infoWindow.height()};
+			pos = get_event_position(e);
+			console.log(infoWindowSize["width"]);
+			console.log(pos[0]);
+			if(pos[0] < infoWindowPosition["left"] || pos[0] > infoWindowPosition["left"]+infoWindowSize["width"]) {
+				console.log("I'm hiding my self!");
+				seatObj.player.hide();	
 				window.removeEventListener("click", info_hide, true);
-				return false;
 			}
-			window.addEventListener("click", info_hide, true);
+			e.stopPropagation();
+		}
+		window.addEventListener("click", info_hide, true);
 		}
 	});
 };

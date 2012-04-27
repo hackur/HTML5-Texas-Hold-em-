@@ -54,7 +54,7 @@ class PlayerArchiveHandler(tornado.web.RequestHandler):
 		family		= "-1"
 		position	= "-1"
 		percentage	= 0
-		if player.head_portrait is not None:
+		if player.headPortrait_url is not None:
 			portrait = player.headPortrait_url
 		if player.family is not None:
 			family	= player.family.name
@@ -75,7 +75,9 @@ class PlayerArchiveHandler(tornado.web.RequestHandler):
 					"max_reward": player.max_reward,
 					"last_login": player.last_login.strftime("%Y-%m-%d %H:%M:%S"),
 					"signature": player.signature or "This guy is too lazy to leave a signature",
+					"friends": str(player.friends),
 				}
+		print player.friends
 		self.write(json.dumps(message))
 		self.finish()
 
