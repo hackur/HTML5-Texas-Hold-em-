@@ -147,7 +147,13 @@ var take_place = function(seatID, seatObj) {
 		else if(seatObj.getIsSat()) {
 			console.log(seatObj.getIsSat());
 			//customer information
-			alert("[IsSat == 1] Customer Information!");
+			// alert("[IsSat == 1] Customer Information!");
+			for (key in seatObj.player) {
+				if (seatObj.player[key] == undefined) {
+					seatObj.player[key] = "N/A";
+			}
+		}
+			seatObj.player.show(seatObj.player);
 		}
 	});
 };

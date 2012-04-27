@@ -115,11 +115,11 @@ var uploadImage = function() {
 			var data = JSON.parse(xhr.responseText);
 			console.log(data);
 			if(data.status == "success") {
-				var url = "../." + data.url;
+				var url = data.url;
+				console.log(data.url);
 				console.log(url);
 				status.html("upload success");
-				var image = $('<img id="image1" src=' + url + ' />').appendTo($("#portrait_box"));
-				$("#image1").css({'width': 102, 'height': 126, 'top': 6, 'left': 8, 'position': 'absolute'});
+				$("#image1").attr("src", url);
 			}
 		}
 	});
@@ -132,9 +132,8 @@ var getUserImage = function() {
 		data: {},
 		success: function(data) {
 			console.log(data);
-			var url = "../." + data.head_portrait;
-			var image = $('<img id="image2" src=' + url + ' />').appendTo($("#portrait_box"));
-			$("#image2").css({'width': 102, 'height': 126, 'top': 6, 'left': 8, 'position': 'absolute'});
+			var url = data.head_portrait;
+			$("#image1").attr("src", url);
 			
 			$("#property").html($("#property").html() + data.asset);
 			$("#family").html($("#family").html() + data.family);

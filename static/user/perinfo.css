@@ -107,6 +107,12 @@ body {
 	height: 130px;
 	position: absolute;
 }
-
+#image1 {
+	width: 102px;
+	height: 126px;
+	top: 6px;
+	left: 8px;
+	position: absolute;
+}
 
 

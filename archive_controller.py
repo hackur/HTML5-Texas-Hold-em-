@@ -8,6 +8,7 @@ import tornado.web
 from authenticate import *
 from datetime import datetime
 from database import DatabaseConnection,User,Family,FamilyPosition,Email,HeadPortrait
+import hashlib
 
 class PersonalArchiveHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
@@ -73,7 +74,7 @@ class PlayerArchiveHandler(tornado.web.RequestHandler):
 					"won_games": player.won_games,
 					"max_reward": player.max_reward,
 					"last_login": player.last_login.strftime("%Y-%m-%d %H:%M:%S"),
-					"signature": player.signature or "This guy is too lazy to leave a signature"
+					"signature": player.signature or "This guy is too lazy to leave a signature",
 				}
 		self.write(json.dumps(message))
 		self.finish()
@@ -86,21 +87,28 @@ class HeadPortraitHandler(tornado.web.RequestHandler):
 		directory		= "uploads/" + user.username
 		head_portrait	= self.request.files['head_portrait'][0]
 
+
 		if not os.path.exists(directory):
 			os.makedirs(directory)
-		output_file		= open(directory + "/" + head_portrait['filename'], 'wb')
+
+		m = hashlib.md5()
+		m.update(head_portrait['body'])
+		filename = m.hexdigest()
+		output_file		= open(directory + "/" + filename, 'wb')
 		output_file.write(head_portrait['body'])
+		
+		
 		output_file.seek(0)
 		output_file.close()
 
 		if user.head_portrait is not None:
-			old_portrait		= user.head_portrait
-			db_connection.delete(old_portrait)
+			old_portrait = user.head_portrait
+			self.db_connection.delete(old_portrait)
 			os.remove(old_portrait.path)
 
 		portrait			= HeadPortrait()
-		portrait.url		= "./" + directory + '/' + head_portrait['filename']
-		portrait.path		= "./" + directory + '/' + head_portrait['filename']
+		portrait.url		= "/" + directory + '/' + filename
+		portrait.path		= "./" + directory + '/' + filename
 		user.head_portrait	= portrait
 		self.db_connection.addItem(portrait)
 		self.db_connection.addItem(user)
@@ -146,7 +154,7 @@ class EmailViewHandler(tornado.web.RequestHandler):
 		email_id= self.get_argument('email')
 		user	= self.session['user']
 		email	= self.db_connection.query(Email).filter_by(to_user = user).filter_by(id = email_id).first()
-		message	= {"status":"success", "email":email}
+		message	= {"status":"success", "email":str(email)}
 		self.finish(json.dumps(message))
 
 class EmailSendHandler(tornado.web.RequestHandler):

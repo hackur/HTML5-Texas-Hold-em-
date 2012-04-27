@@ -579,8 +579,8 @@ class GameRoom(object):
 		playing_list= filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)
 		print "-----------no more stake------------"
 		print self.no_more_stake()
-		print "__________len(playing_list)_________"
-		print len(playing_list)
+		print "__________len(player_list)_________"
+		print len(player_list)
 		print "_____len(public card)---------------"
 		print len(self.poker_controller.publicCard)
 
@@ -726,6 +726,7 @@ class GameRoom(object):
 
 		player_list = sorted(player_list, key = attrgetter("table_amount"))
 		min_bet		= player_list[0].table_amount
+		print "min_bet:", min_bet
 		for x in xrange(len(player_list)):
 			player_list[x].table_amount -= min_bet
 			if player_list[x].status == Seat.SEAT_PLAYING or player_list[x].status == Seat.SEAT_ALL_IN:
@@ -737,6 +738,8 @@ class GameRoom(object):
 			self.pot[pot_owner] = {"amount":0,"pid":len(self.pot)}
 
 		self.pot[pot_owner]["amount"] += min_bet * len(player_list)
+		print "amount: %d" %self.pot[pot_owner]["amount"]
+		print "self.pot: ", self.pot
 		self.create_pot(player_list)
 
 	def merge_pots(self):
@@ -861,6 +864,7 @@ class GameRoom(object):
 		print "big_blind: ",        big_blind
 
 	def dispose_and_restart(self, blind = 10, min_stake=100, max_stake=2000):
+		print "DISPOSING"
 		self.blind	= blind
 		self.pot	= {}
 		self.t		= None
@@ -906,6 +910,7 @@ class GameRoom(object):
 				seat.set_user(None)
 				seat.kicked_out = False
 			print "broadcasting standup msg"
+			print msg
 			self.broadcast(msg, GameRoom.MSG_STAND_UP)
 
 	def send_emoticons(self, args):

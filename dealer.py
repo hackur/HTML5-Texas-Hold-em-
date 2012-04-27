@@ -14,6 +14,7 @@ import tornado.ioloop
 from pika.adapters.tornado_connection import TornadoConnection
 
 import json
+import os
 
 class Dealer(object):
 	def __init__(self,exchange,host,port):
@@ -188,7 +189,9 @@ class Dealer(object):
 			db_connection.delete(room)
 
 		db_connection.commit_session()
-
+	#	if os.path.isfile(fname):
+		print len(fname)
+		print os.getcwd()
 		with open(fname) as f:
 			for line in f:
 				if line[0] == '#':
