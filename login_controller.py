@@ -79,8 +79,12 @@ class SinaWeiboLoginBack(tornado.web.RequestHandler):
         code = self.get_argument('code')
         client = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
         r = client.request_access_token(code)
+        access_token = r.access_token
+        expires_in = r.expires_in
         client.set_access_token(access_token, expires_in)
-        print client.get.users__show()
+        uid = client.get.account__get_uid().uid
+        print uid
+        print client.get.users__show(uid=uid)
 
 
 
