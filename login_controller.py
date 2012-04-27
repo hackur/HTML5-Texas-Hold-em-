@@ -74,6 +74,8 @@ class SinaWeiboLogin(tornado.web.RequestHandler):
 
 class SinaWeiboLoginBack(tornado.web.RequestHandler):
 	def get(self):
+		db_connection	= DatabaseConnection()
+		db_connection.start_session()
 		code = self.get_argument('code')
 		client = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
 		r = client.request_access_token(code)
@@ -83,20 +85,21 @@ class SinaWeiboLoginBack(tornado.web.RequestHandler):
 		uid = client.get.account__get_uid().uid
 		print uid
 		user_info = client.get.users__show(uid=uid)
-		user = self.db_connection.query(User).filter_by(accountType=User.USER_TYPE_SINA_WEIBO,\
+		user = db_connection.query(User).filter_by(accountType=User.USER_TYPE_SINA_WEIBO,\
 							accountID=uid).first()
 		if user == None:
 			user  = User(username="", password="")
 			user.accountType = User.USER_TYPE_SINA_WEIBO
 			user.accountID   = uid
+			user.asset = 3000;
 
 		user.screen_name = user_info.screen_name
 		user.gender	  = user_info.gender
 		user.headPortrait_url = user_info.profile_image_url #avatar_large?
 
 		user.last_login	= datetime.now()
-		self.db_connection.start_session()
-		self.db_connection.addItem(user)
-		self.db_connection.commit_session()
-		self.db_connection.close()
+		db_connection.addItem(user)
+		db_connection.commit_session()
+		db_connection.close()
+		self.session['user_id'] = user.id
 		self.redirect("/static/user/user.html")
