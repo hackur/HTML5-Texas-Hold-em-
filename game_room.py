@@ -320,6 +320,7 @@ class GameRoom(object):
 				else:
 					self.min_amount = self.blind
 		if self.status != GameRoom.GAME_WAIT:
+			self.non_fold_move = True
 			if self.same_amount_on_table():
 				self.round_finish()
 			else:
