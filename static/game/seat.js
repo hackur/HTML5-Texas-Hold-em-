@@ -111,12 +111,12 @@ function Seat(id,pos){
 	};
 	seatObj.showAction = function(action) {
 		if (action != undefined) {
-			actionBox = $("<p class='actionBox'>"+action+"</p>");
+			var actionBox = $("<p class='actionBox'>"+action+"</p>");
 			actionBox.appendTo(divSeat);
+			setTimeout(function() {
+				actionBox.remove();
+			}, 5000);
 		}
-		setTimeout(function() {
-			actionBox.remove();
-		}, 5000);
 	};
 
 	seatObj.clearStake = function(){
