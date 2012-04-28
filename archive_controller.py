@@ -15,7 +15,7 @@ class PersonalArchiveHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
 		user		= self.user
-		portrait	= "#"
+		portrait	= None
 		family		= "-1"
 		position	= "-1"
 		percentage	= 0
@@ -50,7 +50,7 @@ class PlayerArchiveHandler(tornado.web.RequestHandler):
 	def post(self):
 		player_id	= self.get_argument("id", -1);
 		player		= self.db_connection.query(User).filter_by(id = player_id).first();
-		portrait	= "#"
+		portrait	= None
 		family		= "-1"
 		position	= "-1"
 		percentage	= 0
@@ -185,7 +185,7 @@ class BuddyInfoHandler(tornado.web.RequestHandler):
 		for friend in user.friends:
 			message["friends"].append({
 						"id": friend.id,
-						"head_portrait": "#",
+						"head_portrait": None,
 						"family": friend.family,
 						"name": friend.username,
 						"position": "-1",

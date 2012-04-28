@@ -17,7 +17,7 @@ function msg_sit(data){
 	var userid = data.info.uid;
 	var public_card = [];
 	SeatList[seatID].sit(username,stake,userid);
-	if(username == window.user_info.username){
+	if( userid == window.user_info.id){
 		window.user_info.sit_no = seatID;
 		window.user_info.userIsSat = true;
 		for (var i = 0; i < SeatList.length; i++) {
@@ -168,7 +168,7 @@ function msg_next(data){
 
 	console.log(window.user_info.username);
 	console.log(SeatList[data.seat_no].username);
-	if( SeatList[data.seat_no].username == window.user_info.username )
+	if( SeatList[data.seat_no].userid == window.user_info.id )
 	{ 
 		actionButton.enable_buttons(data.rights,data.amount_limits);
 	}

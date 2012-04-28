@@ -2,6 +2,12 @@
 body {
 	text-align: center;
 }
+div{
+	-moz-user-select: none; 
+	-khtml-user-select: none; 
+	-webkit-user-select: none; 
+	-o-user-select: none; 
+}
 #background {
 	top: 0px;
 	left: 0px;

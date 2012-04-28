@@ -880,23 +880,20 @@ class GameRoom(object):
 		print "small_blind: ",      small_blind
 		print "big_blind: ",        big_blind
 
-	def dispose_and_restart(self, blind = 10, min_stake=100, max_stake=2000):
+	def dispose_and_restart(self):
 		print "DISPOSING"
-		self.blind	= blind
 		self.pot	= {}
 		self.t		= None
 		self.min_amount		= 0
 		self.flop_flag		= False
 		self.num_of_checks	= 0
 		self.amount_limits	= {}
-		self.min_stake		= min_stake
-		self.max_stake		= max_stake
-		self.raise_amount	= blind
 		self.big_blind		= False
 		self.raise_person	= None
 		self.non_fold_move	= False
 		self.big_blind_move = False
 		self.current_seat = None
+		self.raise_amount = self.blind
 
 		player_list		= filter(lambda seat: not seat.is_empty() and seat.player_stake != 0 and seat.kicked_out == False, self.seats)
 		go_away_list	= filter(lambda seat: (not seat.is_empty() and seat.player_stake == 0) or seat.kicked_out == True, self.seats)

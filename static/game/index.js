@@ -5,11 +5,6 @@ var table_init = function() {
 		e.preventDefault();
 	};
 
-	//window.cardpos = [["300px", "70px"],["505px", "70px"],["710px", "70px"],["665px","335px"]];	//clockwise #seat4,#seat3,#seat2,#seat1
-	
-	//TODO GET cardpos from css. not hard code here
-	window.cardpos = [["390px","360px"],["665px","360px"],["710px", "70px"],["505px", "70px"],["300px", "70px"]];
-
 	seatInit();
 
 	actionButton.disable_all();
@@ -24,22 +19,39 @@ var table_init = function() {
 };
 
 var fetch_user_info = function(){
-	$.get(
-		"/userinfo",
-		{},
-		function(data){
+	$.ajax({
+		type:'get',
+		url:"/userinfo",
+		data:{},
+		success:function(data){
 			console.log("Below is user data:");
 			console.log(data);
 			window.user_info = {};
 			user_info.username = data.n;
 			user_info.asset = data.s;
 			user_info.level = data.l;
-			console.log(window.user_info);
+			user_info.id	=data.id;
 			enter();
 		},
-		'json'
-	);
+		dataType:'json',
+		cache:false
+	});
 };
+
+$(function(){
+	$("#backBtn").bind("vclick",function(){
+		if(window.user_info.userIsSat){
+			actionButton.send_action_stand();
+			setTimeout(function(){
+				history.go(-1);
+			},500);
+		}
+		else{
+			history.go(-1);
+		}
+	});
+});
+
 var enter = function(){
 	var room = localStorage["current_room_id"];
 	$.post(
@@ -64,7 +76,7 @@ var enter = function(){
 									data.room.seats[i].uid
 							);
 							
-							if( SeatList[i].username == window.user_info.username) {
+							if( SeatList[i].userid == window.user_info.id) {
 								sit_transit.transit(i);
 								SeatList[i].showStand();
 								console.log("-----------------------" + i);
@@ -139,13 +151,31 @@ var listenBoardMessage = function(timestamp) {
 
 var take_place = function(seatID, seatObj) {
 	seatObj.getSeatDIV().click(function() {
-		if(!seatObj.getIsSat() && !window.user_info.userIsSat)
-		{
+		if(!seatObj.getIsSat() && !window.user_info.userIsSat){
+
 			console.log(seatObj);
 			console.log(this);
 			console.log("sliderbaris clicked");
-			
-			sit_down_dialog.show(seatObj);
+			$.mobile.showPageLoadingMsg();
+			$.ajax({
+				type:'get',
+				url:"/userinfo",
+				data:{},
+				success:function(data){
+					console.log("Below is user data:");
+					console.log(data);
+					window.user_info = {};
+					user_info.username = data.n;
+					user_info.asset = data.s;
+					user_info.level = data.l;
+					user_info.id	=data.id;
+					$.mobile.hidePageLoadingMsg()
+					sit_down_dialog.show(seatObj);
+				},
+				dataType:'json',
+				cache:false
+			});
+
 			//sit_dialog.show();
 		}
 		else if(seatObj.getIsSat()) {
@@ -157,48 +187,28 @@ var take_place = function(seatID, seatObj) {
 			for (key in seatObj.player) {
 				if (seatObj.player[key] == undefined) {
 					seatObj.player[key] = "N/A";
+				}
 			}
-		}
-		seatObj.player.show(seatObj.player);
-		var info_hide = function(e) {
-			var infoWindow = $("#player-info-content");
-			var infoWindowPosition = infoWindow.offset();
-			var infoWindowSize = {"width": infoWindow.width(), "height": infoWindow.height()};
-			pos = get_event_position(e);
-			console.log(infoWindowSize["width"]);
-			console.log(pos[0]);
-			if(pos[0] < infoWindowPosition["left"] || pos[0] > infoWindowPosition["left"]+infoWindowSize["width"]) {
-				console.log("I'm hiding my self!");
-				seatObj.player.hide();	
-				window.removeEventListener("click", info_hide, true);
+			seatObj.player.show(seatObj.player);
+			var info_hide = function(e) {
+				var infoWindow = $("#player-info-content");
+				var infoWindowPosition = infoWindow.offset();
+				var infoWindowSize = {"width": infoWindow.width(), "height": infoWindow.height()};
+				pos = get_event_position(e);
+				console.log(infoWindowSize["width"]);
+				console.log(pos[0]);
+				if(pos[0] < infoWindowPosition["left"] || pos[0] > infoWindowPosition["left"]+infoWindowSize["width"]) {
+					console.log("I'm hiding my self!");
+					seatObj.player.hide();	
+					window.removeEventListener("click", info_hide, true);
+				}
+				e.stopPropagation();
 			}
-			e.stopPropagation();
-		}
-		window.addEventListener("click", info_hide, true);
+			window.addEventListener("click", info_hide, true);
 		}
 	});
 };
 
-var send_chips = function(chipId, tstake, callback) {
-	var _id = chipId;
-	
-
-	console.log("*************************");
-	var seatid = "#seat" + _id;
-	var pos = SeatList[_id].pos;
-	var chipPos = windows.cardpos[SeatList[_id].pos];
-	//set the chips original top and left 
-	
-	//show it and animate
-	var chip = $('<img class="chip5"/>');
-	chip.css("top",chipPos[1]);
-	chip.css("left",chipPos[0]);
-	var chipClass = "chip" + pos;
-	chip.appendTo("#gametable");
-	chip.addClass(chipClass + " chip" );
-	$("#tstake" + chipId).html(tstake);
-	
-};
 
 /*  ctPos is number */
 var time_bar = function(ctPos) {

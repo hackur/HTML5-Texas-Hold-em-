@@ -9,7 +9,9 @@
 		<link rel="stylesheet" type="text/css" href="sliderbar_dialog.css" />
 		<link rel="stylesheet" type="text/css" href="seat.css" />
 		<link rel="stylesheet" type="text/css" href="message_box.css" />
-		<script src="jquery.min.js"		> </script>
+		<script src="../jquery.min.js"		> </script>
+		<script src="../jquery.mobile-1.1.0.min.js"	> </script>
+		<link rel="stylesheet"  href="../jquery.mobile-1.1.0.min.css" />  
 		<script src="util.js"     		> </script>
 		<script src="poker_lib.js"		> </script>
 		<script src="sit_transit.js"	> </script>
@@ -33,7 +35,7 @@
 		function sit_down_dialog_init() {
 			sit_down_dialog = slider_bar_dialog();	
 			sit_down_dialog.init();
-			sit_down_dialog.slider_bar_setTitle("账目");
+			sit_down_dialog.slider_bar_setTitle("购买坐下");
 			
 		}
 			$(init);
@@ -49,7 +51,12 @@
 	<body id="bd">
 		<div id="container" class="view">
 			<div id="gbg" class="background"></div>
-			<div id="stand" class="stand2 ">Stand</div>
+			<div id="stand" class="stand2 ">
+				<img src="./image/back_icon.png"> </img>
+			</div>
+			<div id="backBtn" class="stand1 ">
+				<img src="./image/back_icon.png"> </img>
+			</div>
 			<div id="gametable">
 				<div id="send_cards">
 					<img id="backpng1" src="./pokers/back.png" />
@@ -87,17 +94,6 @@
 				<div id="btAllin" class="button">All-IN</div>
 				<div id="btCheck" class="button buttonHide">Check</div>
 			</div>
-<!-- 
-			<div id="stakeholder" >
-				<img src="./image/l1.png" style="display:none" />
-				<img src="./image/l1.png" />
-				<img src="./image/l1.png" />
-				<img src="./image/l1.png" />
-				<img src="./image/l1.png" />
-				<img src="./image/l1.png" />
-				<img src="./image/l1.png" />
-				<img src="./image/l1.png" />
-			</div> -->
 
 			<div id="chat-dialog">
 				<div id="chat-history" class="chat-history-collapse"></div>

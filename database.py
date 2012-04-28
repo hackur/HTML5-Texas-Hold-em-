@@ -87,6 +87,7 @@ class User(Base):
 
 	def __init__(self, username, password, total_games=0, won_games = 0, level = 0, asset = 0, max_reward = 0, **kwargs):
 		self.username		= username
+		self.screen_name	= username
 		self.password		= password
 		self.total_games	= total_games
 		self.won_games		= won_games

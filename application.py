@@ -85,15 +85,14 @@ if __name__ == '__main__':
 	pika.log.info("Starting Tornado HTTPServer on port %i" % PORT)
 	application = tornado.web.Application([
 		(r"/?$", IndexPageHandler),
-		(r"/test", IndexTestHandler),
+		(r"/listen-board-message", BoardListenMessageHandler),
+		(r"/post-board-message", BoardActionMessageHandler),
 		(r"/static/game/game.html", UIIndexTestHandler),
 		(r"/static/index/index.html", LoginPageHandler),
 		(r"/static/user/user.html", UserPageHandler),
 
 		(r"/uitest.html", UIIndexHandler),
 		(r"/sit-down", SitDownBoardHandler),
-		(r"/listen-board-message", BoardListenMessageHandler),
-		(r"/post-board-message", BoardActionMessageHandler),
 		(r"/enter", EnterRoomHandler),
 		(r"/personal-archive",PersonalArchiveHandler),
 		(r"/player-archive", PlayerArchiveHandler),
@@ -111,6 +110,7 @@ if __name__ == '__main__':
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),
         (r"/weibologin",SinaWeiboLogin),
+		(r"/test", IndexTestHandler),
         (r"/weibologinCallback/?",SinaWeiboLoginBack),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path2'])),
 		(r"/uploads/(.*)", tornado.web.StaticFileHandler, dict(path=settings['uploaded_image_path'])),
