@@ -320,7 +320,7 @@ class GameRoom(object):
 				else:
 					self.min_amount = self.blind
 		if self.status != GameRoom.GAME_WAIT:
-			if same_amount_on_table():
+			if self.same_amount_on_table():
 				self.round_finish()
 			else:
 				self.current_seat	= self.info_next(self.current_seat, [1,2,3,5,8])
@@ -467,8 +467,6 @@ class GameRoom(object):
 		if standup:
 			del self.user_seat[user_id]
 		print "user_id:", user_id
-		print seat_no
-		print self.current_seat
 		self.seats[seat_no].status = Seat.SEAT_WAITING  # set the status of this seat to empty
 														# remove the player from player list
 		user = self.seats[seat_no].get_user()           # get user info from database
@@ -477,11 +475,15 @@ class GameRoom(object):
 		#TODO Database update
 		#user.stake += self.seats[seat_no].player_stake  # update user's stake
 
+		print "-=-=-=-=-=-", seat_no
+		print "-=-=-=-=-=-", self.current_seat
 		if len(player_list) == 1:
 			self.round_finish()
 		elif self.same_amount_on_table():
 			print "finishing this round after folding!!"
 			self.round_finish()
+		elif seat_no != self.current_seat:
+			return
 		else:
 			print "I'm here!!!!!"
 			self.current_seat = self.info_next(self.current_seat, self.seats[self.current_seat].rights)
