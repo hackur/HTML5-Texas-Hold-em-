@@ -328,6 +328,8 @@ class GameRoom(object):
 				next_seat = self.seats[self.current_seat]
 				self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits,'to':self.action_timeout},GameRoom.MSG_NEXT)
 
+		self.update_total_games();
+
 	def get_seat(self, user_id):
 		if user_id in self.user_seat:
 			return self.seats[self.user_seat[user_id]]
@@ -934,7 +936,21 @@ class GameRoom(object):
 		self.db_connection.start_session()
 		for player in filter(lambda x: x.is_empty() == False, player_list):
 			user		= player.get_user()
-			user.asset	+= player.player_stake - player.original_stake
+			difference	= player.player_stake - player.original_stake
+			user.asset	+= difference
+			if difference > 0:
+				user.won_games += 1;
+			player.original_stake = player.player_stake
+			self.db_connection.addItem(user)
+
+		self.db_connection.commit_session()
+		self.db_connection.close()
+
+	def update_total_games(self):
+		self.db_connection.start_session()
+		for player in filter(lambda x: x.is_empty() == False and x.status == Seat.SEAT_PLAYING, self.seats):
+			user			= player.get_user()
+			user.total_games+= 1
 			player.original_stake = player.player_stake
 			self.db_connection.addItem(user)
 

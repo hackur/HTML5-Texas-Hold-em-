@@ -34,7 +34,7 @@ class PersonalArchiveHandler(tornado.web.RequestHandler):
 					"position": position,
 					"level": user.level,
 					"asset": user.asset,
-					"percentage": percentage,
+					"percentage": "%.2f%%" % (percentage * 100),
 					"total_games": user.total_games,
 					"won_games": user.won_games,
 					"max_reward": user.max_reward,
