@@ -197,6 +197,7 @@
 	top: 8px;
 	left: 33px;
 	overflow : hidden;
+	z-index: 2;
 }/* end countdown */
 
 .countdown .seat_dowm_bg {
@@ -551,10 +552,10 @@
 	font-weight: bold;
 	background: rgba(22, 44, 47, 0.8);
 	border: 2px #797D7E;
-	top: -10px;
-	left: 8px;
+	top: 34px;
+	left: 118px;
 	border-radius: 4px;
-	width: 120px;
+	width: 100px;
 	text-align: center;
 }
 .card-name-win{
@@ -563,9 +564,20 @@
 	font-weight: bold;
 	background: rgba(22, 44, 47, 0.8);
 	border: 2px #797D7E;
-	top: -10px;
-	left: 8px;
+	top: 34px;
+	left: 118px;
 	border-radius: 4px;
+	width: 10px;
+	text-align: center;
+}
+.actionBox {
+	position: absolute;
+	background: rgba(22,44,47,0.8);
+	color: white;
+	border: 2px #797D7E;
+	top: -20px;
+	left: 9px;
 	width: 120px;
+	border-radius: 4px;
 	text-align: center;
 }

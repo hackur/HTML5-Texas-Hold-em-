@@ -166,11 +166,8 @@ div{
 	height:57px;
 	width:125px;
 	position: absolute;
-	color: white;
-	font-size: 20px;
-	text-align:center;
+	text-align: center;
 }
-
 .stand1 {
 	background-image: url(./image/back_stand1.png);
 }

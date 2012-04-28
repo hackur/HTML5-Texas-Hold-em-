@@ -69,7 +69,7 @@ class PlayerArchiveHandler(tornado.web.RequestHandler):
 					"position": position,
 					"level": player.level,
 					"asset": player.asset,
-					"percentage": percentage,
+					"percentage": "%.2f%%" % (percentage * 100),
 					"total_games": player.total_games,
 					"won_games": player.won_games,
 					"max_reward": player.max_reward,
@@ -77,7 +77,7 @@ class PlayerArchiveHandler(tornado.web.RequestHandler):
 					"signature": player.signature or "This guy is too lazy to leave a signature",
 					"friends": str(player.friends),
 				}
-		print player.friends
+		print "-=-=-=-=-=-=-=-=-", percentage
 		self.write(json.dumps(message))
 		self.finish()
 

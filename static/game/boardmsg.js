@@ -186,6 +186,7 @@ function msg_action(data){
 	console.log(data);
 	//*document.getElementById("money" + data.seat_no).innerHTML = data.stake;*/
 	SeatList[data.seat_no].setStake(data.stake,data.table);
+	SeatList[data.seat_no].showAction(actionName[(data.action).toString()])
 	SeatList[data.seat_no].removeCountdown(data.seat_no);
 	
 	//send_chips(data.seat_no, data.table);
@@ -269,6 +270,16 @@ var funs = {
 	'standup':	msg_standup,
 	'chat':		msg_chat
 };
+
+var actionName = {
+	"1": "全下",
+	"2": "跟注",
+	"3": "加注",
+	"4": "看牌",
+	"5": "弃牌",
+	"8": "站起"
+};
+
 function _board_msg_handler(data){
 	
 	funs[data.msgType](data);

@@ -109,6 +109,16 @@ function Seat(id,pos){
 				chips.push(newChip);
 			}
 	};
+	seatObj.showAction = function(action) {
+		if (action != undefined) {
+			actionBox = $("<div class='actionBox'>"+action+"</div>");
+			actionBox.appendTo(divSeat);
+			setTimeout(function() {
+				actionBox.remove()
+			}, 3000);
+		}
+	};
+
 	seatObj.clearStake = function(){
 		table = 0;
 		divStake.hide();
@@ -273,7 +283,7 @@ function Player(data){
 	player.init = function(data){
 		player.id			= data.id;
 		player.head_portrait= data.head_portrait;
-		player.username		= data.username;
+		player.username		= data.name;
 		player.family		= data.family;
 		player.position		= data.position;
 		player.level		= data.level;
@@ -285,6 +295,8 @@ function Player(data){
 		player.max_reward	= data.max_reward;
 		player.last_login	= data.last_login;
 //		player.friends		= data.friends;
+		console.log(data.username);
+		console.log(player.username);
 	};
 
 	player.show	= function(player){

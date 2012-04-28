@@ -234,7 +234,7 @@ class GameRoom(object):
 		if not self.seats[seat_no].is_empty():
 			return (False, "Seat Occupied")
 
-		if hand_stake > player.asset:
+		if hand_stake > player.asset or hand_stake < self.min_stake:
 			print "stake ", hand_stake
 			print "player asset", player.asset
 			return (False, "invalid stake amount.")
