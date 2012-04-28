@@ -21,8 +21,8 @@
 		var new_coin = $("<img class='potChip'></img>");
 		var new_amount = $("<span></span>");
 		//new_coin.hide();
-		new_coin.appendTo(new_pot);
 		new_amount.appendTo(new_pot);
+		new_coin.appendTo(new_pot);
 		new_pot.appendTo(pot_container);
 		pots[pid] = potObj;
 		potObj.coinElement = new_coin;

@@ -171,7 +171,9 @@ var take_place = function(seatID, seatObj) {
 					user_info.id	=data.id;
 					$.mobile.hidePageLoadingMsg()
 					if(user_info.asset < window.room_info.min_stake){
-						alert("You don't have enough money!!");
+						message_box.showMessage("您只有:" +user_info.asset,2);
+						message_box.showMessage("最少携带:" + room_info.min_stake,2);
+						message_box.showMessage("你木有足够的钱'_'",2);
 					}
 					else{
 						sit_down_dialog.show(seatObj);
