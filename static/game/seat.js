@@ -284,7 +284,7 @@ function Player(data){
 		player.percentage	= data.percentage;
 		player.max_reward	= data.max_reward;
 		player.last_login	= data.last_login;
-		player.friends		= data.friends;
+//		player.friends		= data.friends;
 	};
 
 	player.show	= function(player){

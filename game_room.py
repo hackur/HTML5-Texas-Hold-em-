@@ -320,10 +320,13 @@ class GameRoom(object):
 				else:
 					self.min_amount = self.blind
 		if self.status != GameRoom.GAME_WAIT:
-			self.current_seat	= self.info_next(self.current_seat, [1,2,3,5,8])
-			print "next seat in action =>", self.current_seat
-			next_seat = self.seats[self.current_seat]
-			self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits,'to':self.action_timeout},GameRoom.MSG_NEXT)
+			if same_amount_on_table():
+				self.round_finish()
+			else:
+				self.current_seat	= self.info_next(self.current_seat, [1,2,3,5,8])
+				print "next seat in action =>", self.current_seat
+				next_seat = self.seats[self.current_seat]
+				self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits,'to':self.action_timeout},GameRoom.MSG_NEXT)
 
 	def get_seat(self, user_id):
 		if user_id in self.user_seat:
