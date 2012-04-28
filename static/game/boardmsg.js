@@ -99,14 +99,17 @@ function msg_winner(data){
 		if(info.isWin == undefined){
 			return;
 		}
-		var seat = getSeatById(userid);
-		seat.cards = [];
-		if(info.isWin == false){
-			seat.showCardName(info.handcards);
-		}else{
-			seat.showWinCardName(info.handcards);
+		var seat	= getSeatById(userid);
+		seat.cards	= [];
+		var cards	= [];	
+		for(var i=0;i<info.handcards.length;i++){
+			cards.push(poker_lib.evaluateCard(info.handcards[i]));
 		}
-		console.log([userid, seat,info.seat_no,"+++++++++++++"]);
+		if(info.isWin == false){
+			seat.showCardName(cards);
+		}else{
+			seat.showWinCardName(cards);
+		}
 		seat.setStake(info.stake,0);
 		SeatList[info.seat_no].removeCountdown();
 		SeatList[info.seat_no].showWinCard();
@@ -115,7 +118,6 @@ function msg_winner(data){
                 if (info.handcards[i] == public_card[j]) {
                     break;
                 } else if (j == public_card.length - 1) {
-                    console.log([info.handcards[i], "++++++++++++++++++++++++"]);
                     if (k == 0) {
                         SeatList[info.seat_no].setWinCard(info.handcards[i], 1);
                         k++;

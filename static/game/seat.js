@@ -56,15 +56,13 @@ function Seat(id,pos){
 		var temp = seatObj.cards;
 		temp = temp.concat(public_cards);
 		var name = window.getHandCardName( window.identifyCard(temp));
-		$('.card-name').remove();
-		divSeat.append($("<div class='card-name'>" + name + "</div>"));
+		$('#card-name-'+position).remove();
+		divSeat.append($("<div class='card-name' id='card-name-"+position+"'>" + name + "</div>"));
 	};
 	seatObj.showWinCardName = function(public_cards){
-		var temp = seatObj.cards;
-		temp = temp.concat(public_cards);
-		var name = window.getHandCardName( window.identifyCard(temp));
-		$('.card-name').remove();
-		divSeat.append($("<div class='card-name-win'>" + name + "赢!</div>"));
+		var name = window.getHandCardName( window.identifyCard(public_cards));
+		$('#card-name-'+position).remove();
+		divSeat.append($("<div class='card-name-win' id='card-name-"+position+"'>" + name + "赢!</div>"));
 	};
 	seatObj.getIsSat = function() {
 			return IsSat;
