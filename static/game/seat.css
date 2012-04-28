@@ -570,7 +570,7 @@
 	width: 10px;
 	text-align: center;
 }
-.actionBox {
+/*.actionBox {
 	position: absolute;
 	background: rgba(22,44,47,0.8);
 	color: white;
@@ -580,4 +580,173 @@
 	width: 120px;
 	border-radius: 4px;
 	text-align: center;
+}*/
+p.actionBox
+{
+	position: absolute;
+	width: 49px;
+	height: 18px;
+	text-align: center;
+	background-color: white;
+	border: 3px solid #666;
+	-webkit-border-radius: 30px;
+	-moz-border-radius: 30px;
+	border-radius: 30px;
+/*	-webkit-box-shadow: 2px 2px 4px #888;
+	-moz-box-shadow: 2px 2px 4px #888;*/
+/*	animation: testing 3s;
+	-webkit-animation: testing 3s;
+	-moz-animation: testing 3s;*/
+	/*box-shadow: 2px 2px 4px #888;*/
+	font-size: 15px;
+}
+/*@keyframes testing {
+	0% {left: 0px; top: 0px}
+	100% {left: 30px; top: 30px}
+}
+@-moz-keyframes testing {
+	0% {left: 0px; top: 0px}
+	100% {left: 30px; top: 30px}
+}
+@-webkit-keyframes testing {
+	0% {left: 0px; top: 0px}
+	100% {left: 30px; top: 30px}
+}*/
+p.actionBox:before  
+{  
+    content: ' ';  
+    position: absolute;  
+    width: 0;  
+    height: 0;  
+    top: 18px; 
+    border: 5px solid;  
+}  
+p.actionBox:after  
+{  
+    content: ' ';  
+    position: absolute;  
+    width: 0;  
+    height: 0;  
+    top: 17px;  
+    border: 3px solid;  
+}  
+
+.seatPos8 p.actionBox {
+	top: -18px;
+	left: 113px;	
+}
+.seatPos0 p.actionBox {
+	top: -18px;
+	left: 113px;
+}
+.seatPos1 p.actionBox {
+	top: -18px;
+	left: 113px;
+}
+.seatPos2 p.actionBox {
+	top: -34px;
+	left: 110px;
+}
+.seatPos3 p.actionBox {
+	top: -34px;
+	left: 110px;
+}
+.seatPos4 p.actionBox {
+	top: -34px;
+	left: 110px;
+}
+.seatPos5 p.actionBox {
+	top: -34px;
+	left: 110px;
+}
+.seatPos6 p.actionBox {
+	top: -34px;
+	left: -38px;
+}
+.seatPos7 p.actionBox {
+	top: --34px;
+	left: -38px;
+}
+
+.seatPos8 p.actionBox:before {
+    left: 2px;
+    border-color: #666 transparent transparent #666;  
+}
+.seatPos0 p.actionBox:before {
+    left: 2px;  
+    border-color: #666 transparent transparent #666;    
+}
+.seatPos1 p.actionBox:before {
+    left: 2px; 
+    border-color: #666 transparent transparent #666;    
+}
+.seatPos2 p.actionBox:before {
+    left: 2px;
+    border-color: #666 transparent transparent #666;    
+}
+.seatPos3 p.actionBox:before {
+    left: 2px;
+    border-color: #666 transparent transparent #666;    
+}
+.seatPos4 p.actionBox:before {
+    left: 2px; 
+    border-color: #666 transparent transparent #666;    
+}
+.seatPos5 p.actionBox:before {
+    left: 2px;
+    border-color: #666 transparent transparent #666;    
+}
+.seatPos6 p.actionBox:before {
+    right: 2px; 
+    border-color: #666 #666 transparent transparent;  
+}
+.seatPos7 p.actionBox:before {
+    right: 2px;
+    border-color: #666 #666 transparent transparent;   
+}
+
+.seatPos8 p.actionBox:after  
+{   
+    left: 4px;  
+    border-color: #fff transparent transparent #fff;  
+}
+.seatPos0 p.actionBox:after  
+{   
+    left: 4px;  
+    border-color: #fff transparent transparent #fff;  
+}
+.seatPos1 p.actionBox:after  
+{   
+    left: 4px;  
+    border-color: #fff transparent transparent #fff;  
+}
+.seatPos2 p.actionBox:after  
+{   
+    left: 4px;  
+    border-color: #fff transparent transparent #fff;  
+}
+.seatPos3 p.actionBox:after  
+{   
+    left: 4px;  
+    border-color: #fff transparent transparent #fff;  
+}
+.seatPos4 p.actionBox:after  
+{   
+    left: 4px;  
+    border-color: #fff transparent transparent #fff;  
+}
+.seatPos5 p.actionBox:after  
+{   
+    left: 4px;  
+    border-color: #fff transparent transparent #fff;  
+}
+.seatPos6 p.actionBox:after  
+{   
+    right: 4px;  
+    border-color: #fff #fff transparent transparent;  
+}
+.seatPos7 p.actionBox:after  
+{   
+    right: 4px;  
+    border-color: #fff #fff transparent transparent; 
 }
