@@ -101,14 +101,16 @@ function msg_winner(data){
 		}
 		var seat	= getSeatById(userid);
 		seat.cards	= [];
-		var cards	= [];	
-		for(var i=0;i<info.handcards.length;i++){
-			cards.push(poker_lib.evaluateCard(info.handcards[i]));
-		}
-		if(info.isWin == false){
-			seat.showCardName(cards);
-		}else{
-			seat.showWinCardName(cards);
+		if(info.handcards != undefined){
+			var cards	= [];
+			for(var i=0;i<info.handcards.length;i++){
+				cards.push(poker_lib.evaluateCard(info.handcards[i]));
+			}
+			if(info.isWin == false){
+				seat.showCardName(cards);
+			}else{
+				seat.showWinCardName(cards);
+			}
 		}
 		seat.setStake(info.stake,0);
 		SeatList[info.seat_no].removeCountdown();
