@@ -170,7 +170,12 @@ var take_place = function(seatID, seatObj) {
 					user_info.level = data.l;
 					user_info.id	=data.id;
 					$.mobile.hidePageLoadingMsg()
-					sit_down_dialog.show(seatObj);
+					if(user_info.asset < window.room_info.min_stake){
+						alert("You don't have enough money!!");
+					}
+					else{
+						sit_down_dialog.show(seatObj);
+					}
 				},
 				dataType:'json',
 				cache:false
