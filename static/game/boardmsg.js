@@ -195,15 +195,16 @@ function msg_public_card(data){
 	* Public cards is updated
 	* */
 	console.log("msg_public_card ==================================");
-	console.log(data);
 	public_card = data.cards;
 	dealCard.send_public_card(data.cards);
-	var cards	= []; 
-	var seatId	= window.user_info.sit_no;
-	for(var i=0;i<data.cards.length;i++){
-		cards.push(poker_lib.evaluateCard(data.cards[i]));
+	if(window.user_info.userIsSat){
+		var seatId	= window.user_info.sit_no;
+		var cards	= []; 
+		for(var i=0;i<data.cards.length;i++){
+			cards.push(poker_lib.evaluateCard(data.cards[i]));
+		}
+		SeatList[seatId].showCardName(cards);
 	}
-	SeatList[seatId].showCardName(cards);
 }
 function msg_start_game(data){
 	console.log("msg_start_game================================");
