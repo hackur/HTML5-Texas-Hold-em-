@@ -101,20 +101,22 @@ function msg_winner(data){
 		}
 		var seat	= getSeatById(userid);
 		seat.cards	= [];
-		if(info.handcards != undefined){
-			var cards	= [];
-			for(var i=0;i<info.handcards.length;i++){
-				cards.push(poker_lib.evaluateCard(info.handcards[i]));
-			}
-			if(info.isWin == false){
-				seat.showCardName(cards);
-			}else{
-				seat.showWinCardName(cards);
-			}
-		}
 		seat.setStake(info.stake,0);
 		SeatList[info.seat_no].removeCountdown();
 		SeatList[info.seat_no].showWinCard();
+
+		if(info.handcards == undefined){
+			return;
+		}
+		var cards	= [];
+		for(var i=0;i<info.handcards.length;i++){
+			cards.push(poker_lib.evaluateCard(info.handcards[i]));
+		}
+		if(info.isWin == false){
+			seat.showCardName(cards);
+		}else{
+			seat.showWinCardName(cards);
+		}
         for (var i = 0, k = 0;  i <= info.handcards.length - 1 && k <= 1; i++) {
             for (var j = 0; j <= public_card.length - 1; j++) {
                 if (info.handcards[i] == public_card[j]) {
