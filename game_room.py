@@ -381,7 +381,8 @@ class GameRoom(object):
 		print "call amount: :", amount
 		self.num_of_checks = 0
 		self.non_fold_move = True
-		self.seats[seat_no].bet(amount)
+		self.seats[seat_no].get_user().asset -= self.seats[seat_no].bet(amount)
+		self.seats[seat_no].get_user().update()
 		if self.seats[seat_no].player_stake == 0:
 			self.seats[seat_no].status = Seat.SEAT_ALL_IN
 		print "player stake: ", self.seats[seat_no].player_stake
@@ -416,7 +417,8 @@ class GameRoom(object):
 		self.raise_stake	= seat_no
 		if self.is_proper_amount(amount, command):
 			print "This is a proper amount"
-			self.seats[seat_no].bet(amount)
+			self.seats[seat_no].get_user().asset -= self.seats[seat_no].bet(amount)
+			self.seats[seat_no].get_user().update()
 			print "table amount for seat "+ str(seat_no) + ": " + str(self.seats[seat_no].table_amount)
 			self.raise_amount	= amount
 			self.min_amount     = self.seats[seat_no].table_amount
@@ -523,7 +525,9 @@ class GameRoom(object):
 		self.seats[seat_no].table_amount += amount
 		if self.min_amount < self.seats[seat_no].table_amount:
 			self.min_amount = self.seats[seat_no].table_amount
-		self.seats[seat_no].player_stake -= amount
+		self.seats[seat_no].player_stake	-= amount
+		self.seats[seat_no].get_user().asset-= amount
+		self.seats[seat_no].get_user().update()
 		if self.flop_flag == False:
 			if self.same_amount_on_table(True):
 				# At end of first round, small_blind and dealer are out of money
@@ -636,6 +640,9 @@ class GameRoom(object):
 													"seat_no": seat.seat_id,
 													"pattern": name_of_hand(seat.combination[0])
 													}
+						seat.get_user().asset		+= winner_dict[seat]
+						seat.get_user().won_games	+= 1
+						seat.get_user().update()
 					else:
 						msg_dict[seat._user.id] = {	"isWin": False,
 													"stake": seat.player_stake,
@@ -646,7 +653,10 @@ class GameRoom(object):
 				reward		= winner_dict[winner]
 				card_list	= [str(card) for card in winner.handcards]
 				pot			= [amount["pid"] for users, amount in self.pot.iteritems() if winner._user.id in users]
-				winner.player_stake += reward
+				winner.player_stake			+= reward
+				winner.get_user().asset		+= reward
+				winner.get_user().won_games += 1
+				winner.get_user().update()
 				msg_dict[winner._user.id] = {	"isWin": True,
 												"earned": reward,
 												"pot": pot,
@@ -654,7 +664,7 @@ class GameRoom(object):
 												"seat_no": winner.seat_id,
 												"pattern": name_of_hand(winner.combination[0])
 											}
-			self.update_to_db(player_list)
+			#self.update_to_db(player_list)
 			self.broadcast(msg_dict ,GameRoom.MSG_WINNER)
 			self.status = GameRoom.GAME_WAIT
 			self.dispose_and_restart()
@@ -934,26 +944,21 @@ class GameRoom(object):
 			self.broadcast(msg, GameRoom.MSG_CHAT)
 
 	def update_to_db(self, player_list):
-		self.db_connection.start_session()
 		for player in filter(lambda x: x.is_empty() == False, player_list):
 			user		= player.get_user()
 			difference	= player.player_stake - player.original_stake
 			user.asset	+= difference
 			if difference > 0:
-				user.won_games += 1;
-			player.original_stake = player.player_stake
-			self.db_connection.addItem(user)
+				user.won_games += 1
 
-		self.db_connection.commit_session()
-		self.db_connection.close()
+			if difference > user.max_reward:
+				user.max_reward = difference
+
+			player.original_stake = player.player_stake
+			user.update()
 
 	def update_total_games(self):
-		self.db_connection.start_session()
 		for player in filter(lambda x: x.is_empty() == False and x.status == Seat.SEAT_PLAYING, self.seats):
 			user			= player.get_user()
 			user.total_games+= 1
-			player.original_stake = player.player_stake
-			self.db_connection.addItem(user)
-
-		self.db_connection.commit_session()
-		self.db_connection.close()
+			user.update()

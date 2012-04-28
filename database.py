@@ -61,22 +61,28 @@ class User(Base):
 	signature	= Column(String(255))
 	asset		= Column(Integer) #need to be changed
 	accountType	= Column(Integer) #0 Normal, 1: Sina Weibo
-	accountID = Column(BigInteger)
-	screen_name  = Column(String(255))
-	gender	  = Column(String(1))
+	accountID	= Column(BigInteger)
+	screen_name = Column(String(255))
+	gender		= Column(String(1))
 
 	#type in family
 	family_position_id	= Column(Integer,ForeignKey('familyPosition.id'))
 	family_position		= relationship("FamilyPosition", backref=backref('members',order_by=id))
 
 	headPortrait_path	= Column(String(255))
-	headPortrait_url		= Column(String(255))
+	headPortrait_url	= Column(String(255))
 
 	friends		= relationship("User",
 					secondary=friendShip,
 					primaryjoin=id==friendShip.c.leftFriendId,
 					secondaryjoin=id==friendShip.c.rightFriendId
 					)
+	def update(self):
+		self.db_connection	= DatabaseConnection()
+		self.db_connection.start_session()
+		self.db_connection.addItem(self)
+		self.db_connection.commit_session()
+		self.db_connection.close()
 
 
 	def __init__(self, username, password, total_games=0, won_games = 0, level = 0, asset = 0, max_reward = 0, **kwargs):
