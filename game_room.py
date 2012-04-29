@@ -497,7 +497,7 @@ class GameRoom(object):
 		#user.stake += self.seats[seat_no].player_stake  # update user's stake
 
 		print "seat number =>%d" % (seat_no)
-		print "current seat=>%d" %d (self.current_seat)
+		print "current seat=>%d" % (self.current_seat)
 		if len(player_list) == 1:
 			self.round_finish()
 		elif self.same_amount_on_table():
