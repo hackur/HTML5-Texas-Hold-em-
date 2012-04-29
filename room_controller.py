@@ -89,9 +89,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		room			= self.db_connection.query(Room).filter_by(id = room_id).one()
 		self.mongodb	= self.application.settings['_db']
 		self.mongodb.board.remove({"user_id":self.session["user_id"]})
-		self.mongodb.board.save({"user_id":self.session["user_id"], "message-list": []})
-		user.room	= room
-		user.room_id= room.id
+		self.mongodb.board.save({"user_id":self.session["user_id"], "room_id":room.id, "message-list": []})
 		self.db_connection.addItem(user)
 		self.db_connection.commit_session()
 		queue				= str(user.username) + '_init'
@@ -107,7 +105,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		message				= {	'method'		: 'enter',
 								'user_id'		: user.id,
 								#'source'		: routing_key,
-								'room_id'		: user.room.id,
+								'room_id'		: room.id,
 								'private_key'	: private_key}
 
 		arguments			= {'routing_key': 'dealer', 'message': message}
@@ -179,15 +177,26 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			self.write(json.dumps({'status':'success'}))
 			self.finish()
 		else:
+			messages		= self.mongodb.board.find_one({"user_id":self.session["user_id"]})
+			room			= self.db_connection.query(Room).filter_by(id = messages["room_id"]).one()
 			queue_name		= str(user.username) + '_sit'
 			exchange_name   = self.session['exchange']
+			user.room		= room
+			user.room_id	= room.id
+			self.db_connection.addItem(user)
+			self.db_connection.commit_session()
 			#exchange_name	= str(user.room.exchange)
 			#source_key		= "%s_%s" % (exchange_name, queue_name)
 
-			message			= {'method':'sit', 'user_id':user.id,'seat':seat,
-							#'source':source_key,
-							'room_id':user.room.id,
-							'private_key':self.session['private_key'] ,'stake':stake}
+			message			=	{
+									'method':'sit',
+									'user_id':user.id,
+									'seat':seat,
+									#'source':source_key,
+									'room_id':user.room.id,
+									'private_key':self.session['private_key'] ,
+									'stake':stake
+								}
 
 			arguments		= {'routing_key': 'dealer', 'message':message}
 			self.channel	= Channel(self.application.channel, exchange_name)

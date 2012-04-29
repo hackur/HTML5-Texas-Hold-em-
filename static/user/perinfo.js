@@ -95,6 +95,10 @@ var info_init = function() {
 	$('#mail_page_next').bind("vclick",function(){
 		listEmail(window.EmailCurrentPage + 1);	
 	});
+	$('#mail_page_btn').bind("vclick",function(){
+		listEmail($('#mail_page_input').val()); 
+	});
+
 	for(var i = 0; i < bigframe.length; i++) {
 		frameControl(bigframe[i], i);
 	}

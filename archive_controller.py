@@ -122,7 +122,10 @@ class EmailListHandler(tornado.web.RequestHandler):
 		if page > pages:
 			current = pages
 		else:
-			current	= page
+			if page <= 0:
+				current	= 1
+			else:
+				current = page
 		start		= (current - 1) * self.PAGE_SIZE
 		end			= start + self.PAGE_OFFSET
 		print "[%d,%d, %d, %d] " % (page,pages, start, end)
