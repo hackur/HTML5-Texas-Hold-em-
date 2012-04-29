@@ -362,4 +362,8 @@ body{
     background:url(../img/confirmhoversuck.png);
 }
 
+html {
+	overflow:hidden;
+}
+
 

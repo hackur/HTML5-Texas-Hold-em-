@@ -17,7 +17,6 @@ function login_check() {
 			}
 			else{
 				alert("incorrect password");
-
 			}
 		}
 	//	dataType:'json',
@@ -56,8 +55,8 @@ function login_check() {
 				window.location = user_link;
 			}
 			else{
-				alert("incorrect password");
-
+				localStorage.removeItem("username");
+				localStorage.removeItem("password");
 			}
 		}
 		//dataType:'json',

@@ -31,7 +31,8 @@ class Room(Base):
 	def update(self):
 		self.db_connection	= DatabaseConnection()
 		self.db_connection.start_session()
-		self.db_connection.addItem(self)
+		#self.db_connection.addItem(self)
+		self.db_connection.session.merge(self)
 		self.db_connection.commit_session()
 		self.db_connection.close()
 
@@ -86,7 +87,8 @@ class User(Base):
 	def update(self):
 		self.db_connection	= DatabaseConnection()
 		self.db_connection.start_session()
-		self.db_connection.addItem(self)
+		#self.db_connection.addItem(self)
+		self.db_connection.merge(self)
 		self.db_connection.commit_session()
 		self.db_connection.close()
 
@@ -237,6 +239,8 @@ if __name__ == "__main__":
 
 	ting.friends = [mile, mamingcao]
 	mile.friends = [ting]
+
+
 	db_connection.addItem(ting)
 	db_connection.addItem(mile)
 
