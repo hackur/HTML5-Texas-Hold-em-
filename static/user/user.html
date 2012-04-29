@@ -10,10 +10,13 @@
 		<link rel="stylesheet" type="text/css" href="bigFrame4.css">
 		<link rel="stylesheet" type="text/css" href="bigFrame5.css">
 		<link rel="stylesheet" type="text/css" href="rightFrame.css">
+		<link rel="stylesheet" type="text/css" href="user.css">
 		<script src="jquery.min.js"></script>
+		<script src="../jquery.mobile-1.1.0.min.js"></script>
 		<script src="jquery.form.js"></script>
 		<script src="perinfo.js"></script>
 		<script src="recharge.js"></script>
+		<script src="email.js"></script>
 		<script type="text/javascript">
 			$(info_init);
 		</script>
@@ -21,14 +24,14 @@
 	<body>
 		<div id="background">
 			<div id="btFrame">
-				<div id="info">个人信息</div>
-				<div id="email">邮 箱</div>
-				<div id="market">商 城</div>
-				<div id="recharge">充 值</div>
-				<div id="friend">好 友</div>
+				<div id="info" class="frame-header">个人信息</div>
+				<div id="email" class="frame-header">邮 箱</div>
+				<div id="market" class="frame-header">商 城</div>
+				<div id="recharge" class="frame-header">充 值</div>
+				<div id="friend" class="frame-header">好 友</div>
 			</div>
 
-			<div id="bigFrame1" class="bigFrame">
+			<div id="info_frame" class="bigFrame" style="display:none;">
 				<div id="portrait_box">
 					<img id="image1" />
 				</div>
@@ -68,24 +71,36 @@
 				<span id="idiograph">个性签名：</span>
 			</div>
 
-			<div id="bigFrame2" class="bigFrame">
+			<div id="bigFrame2" class="bigFrame" style="display:none;">
 				<span id="sender">发件人：</span>
 				<span id="time">时间：</span>
 				<div id="inputFrame">
 					<span id="content">内容：</span>
 				</div>
 				<div id="reply">回 复</div>
-				<div id="replyFrame">
-					<span id="addressee">收件人ID：</span>
-					<input id="addressee_input" />
-					<div id="text1" contentEditable="true">
-					</div>
-					<div id="sureButton">确 定</div>
-				</div>
 				<div id="delete">删 除</div>
 			</div>
+			<div id="replyFrame">
+				<span id="receiver">收件人ID：</span>
+				<textarea id="text1" rows="10" cols="50"></textarea>
+				<div id="sureButton">确 定</div>
+				<div id="replay-cancel-btn">取消</div>
+			</div>
+			<div id="mail_list_frame" class="bigFrame" style="display:none;">
+				<div id="mail_list_container">
+					<div id= "mail_list" ></div>		
+				</div>
+				<div id="mail_list_navigator">
+					<div id="mail_page_last">上一页</div>
+					<div id="mail_page_next">下一页</div>
+					<div id="mail_page">
+						<input id="mail_page_input" value="1" type="text"/>
+					</div>
+					<div id="mail_page_btn">Go</div>
+				</div>
+			</div>
 
-			<div id="bigFrame3" class="bigFrame">
+			<div id="market_frame" class="bigFrame" style="display:none;">
 				<div id="light1" class="light"></div>
 				<div id="member">
 					<div id="sale1" class="sale"></div>
@@ -110,7 +125,7 @@
 				<div id="purchase3" class="purchase">购 买</div>	
 			</div>
 
-			<div id="bigFrame4" class="bigFrame">
+			<div id="recharge_frame" class="bigFrame" style="display:none;">
 				<div id="convert1">1RMB=1钻石</div>
 				<div id="rpurchase1" class="rpurchase">购 买</div>
 				<div id="convert2">5RMB=5钻石</div>
@@ -133,7 +148,7 @@
 				<div id="line6" class="line"></div>
 			</div>
 
-			<div id="bigFrame5" class="bigFrame">
+			<div id="friend_frame" class="bigFrame" style="display:none;">
 				<div id="rightInfo">
 					<div id="por_box">
 						<img id="image3" src="">

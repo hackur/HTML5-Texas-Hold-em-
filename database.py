@@ -124,7 +124,7 @@ class Email(Base):
 	to_user_id	= Column(Integer, ForeignKey("user.id"))
 	to_user		= relationship("User", primaryjoin=(to_user_id==User.id), backref=backref('in_mails'))
 	content		= Column(Text)
-	sent_date	= Column(DateTime)
+	send_date	= Column(DateTime)
 	status		= Column(Integer)
 	reply_to_id	= Column(Integer, ForeignKey("email.id"))
 	reply_to	= relationship("Email", backref=backref('follow_emails', remote_side=[id], uselist=False))
@@ -190,7 +190,7 @@ if __name__ == "__main__":
 	ting		= User(username="ting", password=hashlib.md5("123").hexdigest())
 	mile		= User(username="mile", password=hashlib.md5("123").hexdigest())
 	mamingcao   = User(username="mamingcao", password=hashlib.md5("123").hexdigest())
-	huaqin	  = User(username="huaqin", password=hashlib.md5("123").hexdigest())
+	huaqin		= User(username="huaqin", password=hashlib.md5("123").hexdigest())
 	ting.level	= 12
 	ting.total_games= 100
 	ting.won_games	= 40
@@ -210,7 +210,21 @@ if __name__ == "__main__":
 	email.from_user = ting
 	email.to_user	= mile
 	email.content	= "aassdd"
-	email.send_date	= datetime.now()
+	email.send_date	= datetime.strptime("2012-04-13 12:02:20", "%Y-%m-%d %H:%M:%S")
+	email.reply_to_id	= None
+	db_connection.addItem(email)
+	email	= Email()
+	email.from_user = mile
+	email.to_user	= ting
+	email.content	= "hahahahahaah"
+	email.send_date	= datetime.strptime("2012-04-12 12:02:20", "%Y-%m-%d %H:%M:%S")
+	email.reply_to_id	= None
+	db_connection.addItem(email)
+	email	= Email()
+	email.from_user = mile
+	email.to_user	= ting
+	email.content	= "hahahahahaauauuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu\uyyyyyyyyyah"
+	email.send_date	= datetime.strptime("2012-04-22 12:02:20", "%Y-%m-%d %H:%M:%S")
 	email.reply_to_id	= None
 	db_connection.addItem(email)
 

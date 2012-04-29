@@ -48,26 +48,54 @@ function decide_event(){
 var info_init = function() {
 	decide_event();
 	getUserImage();
-	listEmail();
+	listEmail(1);
 	buddyInfo();
 	viewEmail();
-	window.bigframe = ["#info","#email","#market","#recharge","#friend"];
+	bindSendFriendEmail();
+	window.bigframe = [	{header:"#info",	content:"#info_frame", background:"url(./image/left.png)"},
+						{header:"#email",	content:"#mail_list_frame", background:"url(./image/middle.png)"},
+						{header:"#market",	content:"#market_frame", background:"url(./image/middle.png)"},
+						{header:"#recharge",content:"#recharge_frame", background:"url(./image/middle.png)"},
+						{header:"#friend",	content:"#friend_frame", background:"url(./image/right.png)"}];
 
-	document.getElementById('bigFrame1').style.display = "block";
-	$("#info")[0].style.backgroundImage = "url(./image/left.png)";
-	$("#portrait_box").click(function() {
+	$(bigframe[0].content).css("display", "block");
+	$(bigframe[0].header).css("background-image", "url(./image/left.png)");
+	$("#portrait_box").bind("vclick", function() {
 		$("#change_por")[0].style.display = "block";
 		uploadImage();
-		$("#icancel").click(function() {
+		$("#icancel").bind("vclick", function() {
 			$("#change_por")[0].style.display = "none";
 		});
 	});
-	$("#reply").click(function() {
-		$("#replyFrame")[0].style.display = "block";
+	$("#reply").bind("vclick", function() {
+		$("#receiver").text("收件人ID："+window.SelectedEmail.senderName);
+		$("#replyFrame textarea").unbind("keyup");
+		$("#replyFrame").css("display","block");
 		sendEmail();
 	});
-
-	for(var i = 0; i <= bigframe.length; i++) {
+	$('#replay-cancel-btn').bind('vclick', function(){
+		$("#replyFrame").css("display","none"); 
+	});
+	$("#delete").bind("vclick",function(){
+		var emailId = window.SelectedEmail.id;
+		$.ajax({
+			type: "post",
+			url:  "/delete-email",
+			data: {email_id:emailId},
+			success: function(data) {
+				listEmail();
+				$('#email').click();
+			},
+			dataType: "json"
+		});
+	});
+	$('#mail_page_last').bind("vclick",function(){
+		listEmail(window.EmailCurrentPage - 1);	
+	});
+	$('#mail_page_next').bind("vclick",function(){
+		listEmail(window.EmailCurrentPage + 1);	
+	});
+	for(var i = 0; i < bigframe.length; i++) {
 		frameControl(bigframe[i], i);
 	}
 	recharge.drag();
@@ -87,23 +115,11 @@ var info_init = function() {
 };
 
 var frameControl = function(frame, i) {
-	$(frame).click(function() {	
-		document.getElementById('bigFrame' + (i+1)).style.display = "block";
-		for(var j = 0; j <= 4; j++) {
-			if( j != i) {
-				document.getElementById('bigFrame' + (j+1)).style.display = "none";
-				$(bigframe[j])[0].style.backgroundImage = "";		//not "url()"
-			}
-		}
-		if( i == 0) {
-			$(frame)[0].style.backgroundImage = "url(./image/left.png)";
-		}
-		if( i == 4) {
-			$(frame)[0].style.backgroundImage = "url(./image/right.png)";	
-		}
-		if( i > 0 && i < 4) {
-			$(frame)[0].style.backgroundImage = "url(./image/middle.png)";	
-		}
+	$(frame.header).bind("vclick", function() {
+		$('.bigFrame').css("display", "none");
+		$('.frame-header').css("background-image", "none");
+		$(frame.content).css("display","block");
+		$(frame.header).css("background-image",frame.background);
 	});
 };
 
@@ -149,30 +165,41 @@ var getUserImage = function() {
 	});
 };
 
-var listEmail = function() {
+var listEmail = function(page) {
 	$.ajax({
 		type: "post",
 		url:  "/list-email",
-		data: {},
+		data: {page:page},
 		success: function(data) {
-			console.log(data);			
+			$('#mail_list').html('');
+			for(var k = 0; k < data.emails.length; k++){
+				var email = Email(data.emails[k]);
+				$('#mail_list').append(email.toHTML());
+				window.EmailList.push(email);
+			}
+			window.EmailCurrentPage = data.current;
+			window.EmailTotal		= data.total;
+			window.EmailTotalPages	= data.pages;
+			console.log(data);
 		},
 		dataType: "json"
 	});
 };
 
 var sendEmail = function() {
-	$("#sureButton").click(function() {
-		var msg = $("#text1").html();
-		var des = parseInt($("#addressee_input").html());
+	$("#sureButton").unbind("vclick");
+	$("#sureButton").bind("vclick",function() {
+		var reply_to_id = window.SelectedEmail.id
+		var msg = $("#text1").val();
+		var des = window.SelectedEmail.senderId;
 		$.ajax({
 			type: "post",
 			url:  "/send-email",
-			data: {content: msg, destination: des},
+			data: {content: msg, destination: des, reply_to:reply_to_id},
 			success: function(data) {
 				console.log(data);
-				alert("send success...");
-				$("#replyFrame")[0].style.display = "none";	
+				$("#replyFrame").css("display", "none");
+				window.SelectedEmail = null;
 			},
 			dataType: "json"
 		});
@@ -217,7 +244,7 @@ var view_friend = function(friend, i) {
 		$("#frank").html("等级：");
 		$("#fpro").html("资产：");
 		
-		$("#fID").html($("#fID").html() + friend.id);
+		$("#fID").html($("#fID").html() + friend.name);
 		$("#ffamily").html($("#ffamily").html() + friend.family);
 		$("#fpos").html($("#fpos").html() + friend.position);
 		$("#frank").html($("#frank").html() + friend.level);
@@ -225,5 +252,34 @@ var view_friend = function(friend, i) {
 		var url = friend.head_portrait;
 		$("#image3")[0].src = url;
 		$("#image3").css({'width': 102, 'height': 126, 'top': 6, 'left': 8, 'position': 'absolute'});
+
+		window.SelectedFriend = friend;
 	});
 };
+var bindSendFriendEmail = function(){
+	$('#fsend').bind("vclick",function(){
+		console.log("fsend start");
+		$('#email').click();
+		$("#receiver").text("收件人ID："+window.SelectedFriend.name);
+		$("#replyFrame textarea").unbind("keyup");
+		$("#replyFrame").css("display","block");
+		$("#replyFrame").css("display","block"); 
+		$("#sureButton").unbind("vclick");
+		$("#sureButton").bind("vclick",function() {
+			var des = window.SelectedFriend.id
+			var msg = $("#text1").val();
+			$.ajax({
+				type: "post",
+				url:  "/send-email",
+				data: {content: msg, destination: des},
+				success: function(data) {
+					$("#replyFrame").css("display", "none");	
+					window.SelectedFriend = null;
+				},
+				dataType: "json"
+			});
+		});
+		console.log("fsend end");
+	});
+}
+window.SelectedFriend = null;

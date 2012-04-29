@@ -116,28 +116,31 @@ class EmailListHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
 		page	= self.get_argument('page', 1)
-		start	= (page - 1) * self.PAGE_SIZE
-		end		= start + self.PAGE_OFFSET
-		user	= self.session['user']
-
-		all_emails	= self.db_connection.query(Email).filter_by(to_user = user).order_by(Email.sent_date)
-
+		user		= self.session['user']
+		all_emails	= self.db_connection.query(Email).filter_by(to_user = user).order_by(Email.send_date)
 		total_emails= all_emails.count()
 		pages		= math.ceil(total_emails / self.PAGE_SIZE)
+		if page > pages:
+			current = pages
+		start		= (current - 1) * self.PAGE_SIZE
+		end			= start + self.PAGE_OFFSET
 		emails		= all_emails.slice(start, end)
 		email_list	= list()
 		for email in emails:
 			email_list.append({
 								"id": email.id,
-								"date": email.sent_date,
-								"from": email.from_user.username
+								"date": email.send_date.strftime("%Y-%m-%d %H:%M:%S"),
+								"sender_name": email.from_user.username,
+								"sender_id":email.from_user.id,
+								"message": email.content
 							})
 
 		message =	{
-						"status": "success",
-						"total": total_emails,
-						"pages": pages,
-						"emails": email_list
+						"status":	"success",
+						"total":	int(total_emails),
+						"pages":	int(pages),
+						"current":	int(current),
+						"emails":	email_list
 					}
 		self.finish(json.dumps(message))
 
@@ -155,22 +158,35 @@ class EmailSendHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		user				= self.session['user']
+		user_id				= self.session['user_id']
 		destination			= self.get_argument('destination')
 		content				= self.get_argument('content')
 		reply_to			= self.get_argument('reply_to', None)
 		email				= Email()
-		email.from_id		= user.id
-		email.to_id			= destination
+		email.from_user_id	= user_id
+		email.to_user_id	= destination
 		email.content		= content
-		email.sent_date		= datetime.now()
-		email.satus			= 0
+		email.send_date		= datetime.now()
+		email.status		= 0
 		email.reply_to_id	= reply_to
 		self.db_connection.start_session()
 		self.db_connection.addItem(email)
 		self.db_connection.commit_session()
 		message	= {"status":"success"}
 		self.finish(json.dumps(message))
+
+class EmailDeleteHandler(tornado.web.RequestHandler):
+	@tornado.web.asynchronous
+	@authenticate
+	def post(self):
+		user_id = self.session['user_id']
+		email_id= self.get_argument('email_id')
+		self.db_connection.start_session()
+		self.db_connection.query(Email).filter(Email.id==email_id).filter(Email.to_user_id == user_id).delete()
+		self.db_connection.commit_session()
+		message = {"status":"success"}
+		self.finish(json.dumps(message))
+
 
 class BuddyInfoHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous

@@ -106,6 +106,7 @@ if __name__ == '__main__':
 		(r"/buddy-info",BuddyInfoHandler),
 		(r"/view-email",EmailViewHandler),
 
+		(r"/delete-email",EmailDeleteHandler),
 		(r"/userinfo", UserInfoHandler),
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),

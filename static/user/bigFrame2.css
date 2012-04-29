@@ -20,7 +20,7 @@
 	position: absolute;
 	background-image: url(./image/inputFrame.png);
 }
-#addressee {
+#receiver {
 	top: 63px;
 	left: 76px;
 	position: absolute;
@@ -34,6 +34,7 @@
 	top: 20px;
 	left: 30px;
 	position: absolute;
+	text-align: left;
 }
 #reply {
 	top: 300px;
@@ -61,10 +62,22 @@
 	height: 171px;
 	width: 482px;
 	position: absolute;
+	text-align: left;
+	overflow:auto;
 }
 #sureButton {
 	top: 280px;
 	left: 76px;
+	height: 54px;
+	width: 124px;
+	position: absolute;
+	background-image: url(./image/btE.png);
+	line-height: 42px;
+	cursor: pointer;
+}
+#replay-cancel-btn{
+	top: 280px;
+	left: 440px;
 	height: 54px;
 	width: 124px;
 	position: absolute;
