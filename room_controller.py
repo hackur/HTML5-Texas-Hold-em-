@@ -178,7 +178,11 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			self.finish()
 		else:
 			messages		= self.mongodb.board.find_one({"user_id":self.session["user_id"]})
-			room			= self.db_connection.query(Room).filter_by(id = messages["room_id"]).one()
+			room			= self.db_connection.query(Room).filter_by(id = messages["room_id"]).first()
+			if room is None:
+				self.finish(json.dumps({'status':'failed'}))
+				return
+
 			queue_name		= str(user.username) + '_sit'
 			exchange_name   = self.session['exchange']
 			user.room		= room
