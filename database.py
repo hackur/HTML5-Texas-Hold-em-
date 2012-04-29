@@ -7,7 +7,7 @@ from pprint import pprint
 Base	= declarative_base()
 class Room(Base):
 	__tablename__	= "room"
-	id		= Column(Integer,primary_key=True, autoincrement=True)
+	id			= Column(Integer,primary_key=True, autoincrement=True)
 	exchange	= Column(String(255))
 	blind		= Column(Integer)
 	player		= Column(Integer)
@@ -16,18 +16,24 @@ class Room(Base):
 	max_player	= Column(Integer)
 	roomType	= Column(Integer)
 
-	def __init__(self, exchange, blind=10,max_player=9,
-			max_stake=1000,min_stake=100):
+	def __init__(self, exchange, blind = 10, max_player = 9, max_stake = 1000, min_stake = 100):
 		self.exchange	= exchange
-		self.max_stake = max_stake
-		self.min_stake = min_stake
-		self.blind = blind
+		self.max_stake	= max_stake
+		self.min_stake	= min_stake
+		self.blind		= blind
 		self.max_player = max_player
-		self.player =	0
-		self.roomType = 0
+		self.player		= 0
+		self.roomType	= 0
 
 	def __repr__(self):
 		return "<Room('%s','%s')>" % (self.id, self.exchange)
+
+	def update(self):
+		self.db_connection	= DatabaseConnection()
+		self.db_connection.start_session()
+		self.db_connection.addItem(self)
+		self.db_connection.commit_session()
+		self.db_connection.close()
 
 
 class DealerInfo(Base):
@@ -154,7 +160,8 @@ class DatabaseConnection(object):
 
 	def query(self, object):
 		return self.session.query(object)
-
+	def execute(self, statement):
+		return self.session.execute(statement)
 	def addItem(self, item):
 		self.session.add(item)
 
@@ -168,7 +175,7 @@ class DatabaseConnection(object):
 		self.session.merge(object)
 
 	def close(self):
-	#	self.session.expunge_all()
+		self.session.expunge_all()
 		self.session.close()
 
 def init_database():

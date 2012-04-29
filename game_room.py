@@ -6,6 +6,7 @@ from operator import attrgetter
 import sys
 from tornado import ioloop
 from database import *
+from sqlalchemy import update
 import functools
 
 class Seat(object):
@@ -84,20 +85,20 @@ class GameRoom(object):
 
 	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START,MSG_POT,MSG_STAND_UP,MSG_SHOWDOWN,MSG_EMOTICON, MSG_CHAT) \
 				= ('sit','bhc','phc','winner','next','action','public','start','pot','standup','showdown','emoticon', 'chat')
-	def __init__(self, room_id, owner, dealer,
+	def __init__(self, room, owner, dealer,
 			num_of_seats = 9, blind = 10,
 			min_stake=100,max_stake=2000):
-		self.room_id    = room_id
+		self.room		= room
 		self.owner      = owner
 		self.status     = GameRoom.GAME_WAIT
 		self.dealer     = dealer
-		self.broadcast_key  = "broadcast_%s_%d.testing" % (self.dealer.exchange, self.room_id)
+		self.broadcast_key  = "broadcast_%s_%d.testing" % (self.dealer.exchange, self.room.id)
 		self.occupied_seat  = 0
 		self.suit		= ["DIAMOND", "HEART", "SPADE", "CLUB"]
 		self.face		= ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
-		self.msg_count	= 0
-		self.blind		= blind
-		self.min_amount = 0
+		self.msg_count		= 0
+		self.blind			= blind
+		self.min_amount		= 0
 		self.current_dealer = 0
 		self.small_blind	= 0
 		self.big_blind		= 0
@@ -224,7 +225,8 @@ class GameRoom(object):
 			self.countdown = None
 
 	def sit(self, player, seat_no, direct_key, private_key,stake):
-		print "direct_key.........................................", direct_key
+		print "user sit [Start]"
+		print "direct_key	=>", direct_key
 		print "seat request =>%d\n" % (seat_no)
 
 		hand_stake = int(stake)
@@ -251,12 +253,14 @@ class GameRoom(object):
 						'info': self.seats[seat_no].to_listener()
 					}
 		self.broadcast(message,GameRoom.MSG_SIT)
-		print len(filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats))
 		if len(filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)) == 2 and not self.t:
 			timeout	= 5
 			msg		= {'to':timeout }
 			self.t	= self.ioloop.add_timeout(time.time() + timeout, self.start_game)
 			self.broadcast(msg,GameRoom.MSG_START)
+		self.room.player += 1
+		self.room.update();
+		print "user sit [End]"
 		return ( True, "" )
 
 	def start_game(self):
@@ -431,11 +435,11 @@ class GameRoom(object):
 			self.discard_game(user_id)
 
 	def check(self, user_id):
-		print "CHECK!"
+		print "check [Start]"
 		print "flop_flag: ", self.flop_flag
 		self.non_fold_move = True
-		command = 4
-		seat_no = self.current_seat
+		command		= 4
+		seat_no		= self.current_seat
 		player_list = filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)
 		self.min_amount = 0         # may cause bugs`
 		if self.flop_flag == False:         #Before flop, sb. called check
@@ -447,8 +451,10 @@ class GameRoom(object):
 				self.current_seat = self.info_next(seat_no, [1,3,4,5,8])
 			else:
 				self.round_finish()
+		print "check [End]"
 
 	def discard_game_timeout(self,user_id):
+		print "discard game timeout [Start]"
 		# put before discard in order to send fold msg before the potential round/game finish msg
 		seat = self.seats[self.current_seat]
 		broadcast_msg = {	'action': GameRoom.A_DISCARDGAME,
@@ -462,11 +468,21 @@ class GameRoom(object):
 
 		if self.status != GameRoom.GAME_WAIT:
 			next_seat = self.seats[self.current_seat]
-			print "next seat no....................................................", next_seat.seat_id
-			self.broadcast({"seat_no":next_seat.seat_id,'rights':next_seat.rights,'amount_limits':self.amount_limits,'to':self.action_timeout},GameRoom.MSG_NEXT)
+			print "next seat no =>%d" %d (next_seat.seat_id)
+			self.broadcast(
+				{
+					"seat_no":next_seat.seat_id,
+					'rights':next_seat.rights,
+					'amount_limits':self.amount_limits,
+					'to':self.action_timeout
+				},
+				GameRoom.MSG_NEXT
+			)
+		print "discard game timeout [End]"
+
 
 	def discard_game(self, user_id, standup=False):
-		print "FOLD!!"
+		print "discard game [Start]"
 		seat_no = self.get_seat(user_id).seat_id
 
 		if standup:
@@ -480,18 +496,20 @@ class GameRoom(object):
 		#TODO Database update
 		#user.stake += self.seats[seat_no].player_stake  # update user's stake
 
-		print "-=-=-=-=-=-", seat_no
-		print "-=-=-=-=-=-", self.current_seat
+		print "seat number =>%d" % (seat_no)
+		print "current seat=>%d" %d (self.current_seat)
 		if len(player_list) == 1:
 			self.round_finish()
 		elif self.same_amount_on_table():
 			print "finishing this round after folding!!"
 			self.round_finish()
 		elif seat_no != self.current_seat:
-			return
+			pass
+		#	return
 		else:
 			print "I'm here!!!!!"
 			self.current_seat = self.info_next(self.current_seat, self.seats[self.current_seat].rights)
+		print "discard game [End]"
 
 	def stand_up(self, user_id):
 		if self.status == GameRoom.GAME_PLAY:
@@ -585,19 +603,16 @@ class GameRoom(object):
 			return False
 
 	def round_finish(self):
-		print "ROUND FINISHED!!!!"
+		print "Round Finish[Start]"
 		self.clearCountDown();
 		player_list	= filter(lambda seat: seat.status == Seat.SEAT_PLAYING or seat.table_amount > 0, self.seats)
 		playing_list= filter(lambda seat: seat.status == Seat.SEAT_PLAYING, self.seats)
-		print "-----------no more stake------------"
-		print self.no_more_stake()
-		print "__________len(player_list)_________"
-		print len(player_list)
-		print "_____len(public card)---------------"
-		print len(self.poker_controller.publicCard)
+		print "no more stake => %d" % (self.no_more_stake())
+		print "len(player_list) => %d" % (len(player_list))
+		print "len(public card) => %d" % (len(self.poker_controller.publicCard))
 
 		if self.no_more_stake() or len(playing_list) < 2 or len(self.poker_controller.publicCard) == 5:
-			print "GAME FINISHED!!!"
+			print "Game Finish!!!"
 			if len(self.poker_controller.publicCard) < 3:
 				self.poker_controller.getFlop()
 				self.poker_controller.getOne()
@@ -614,7 +629,6 @@ class GameRoom(object):
 			elif len(self.poker_controller.publicCard) == 4:
 				self.poker_controller.getOne()
 
-			print "We have a winner!"
 			self.create_pot(player_list)
 			self.merge_pots()
 			self.broadcast_pot()
@@ -694,6 +708,8 @@ class GameRoom(object):
 			self.num_of_checks = 0
 			go_away_list = filter(lambda seat: seat.kicked_out == True, self.seats)
 			self.kick_out(go_away_list)
+
+		print "Round Finish[End]"
 
 	def broadcast_pot(self):
 		pot_info= [ (users,info) for users,info in self.pot.iteritems() ]
@@ -913,9 +929,8 @@ class GameRoom(object):
 			return
 
 	def kick_out(self, go_away_list):
-		if len(go_away_list) == 0:
-			print "no one to kick out"
-		else:
+		print "kick out [Start]"
+		if len(go_away_list) > 0:
 			msg = {}
 			for seat in go_away_list:
 				msg[seat._user.id] = {"seat_no":seat.seat_id}
@@ -923,9 +938,11 @@ class GameRoom(object):
 				seat.status = Seat.SEAT_EMPTY
 				seat.set_user(None)
 				seat.kicked_out = False
-			print "broadcasting standup msg"
-			print msg
+
+			self.room.player -= len(go_away_list)
+			self.room.update();
 			self.broadcast(msg, GameRoom.MSG_STAND_UP)
+		print "kick out [End]"
 
 	def send_emoticons(self, args):
 		matched = [seat for seat in self.seats if args["user_id"] == seat._user.id]
@@ -941,6 +958,7 @@ class GameRoom(object):
 			self.broadcast(msg, GameRoom.MSG_CHAT)
 
 	def update_to_db(self, player_list):
+		#self.db_connection.start_session()
 		for player in filter(lambda x: x.is_empty() == False, player_list):
 			user		= player.get_user()
 			difference	= player.player_stake - player.original_stake
@@ -953,9 +971,14 @@ class GameRoom(object):
 
 			player.original_stake = player.player_stake
 			user.update()
+			#self.db_connection.query(User).filter_by(id=user.id).update({User.won_games: User.won_games + 1, User.max_reward:user.max_reward})
+		#self.db_connection.commit_session()
 
 	def update_total_games(self):
+		#self.db_connection.start_session()
 		for player in filter(lambda x: x.is_empty() == False and x.status == Seat.SEAT_PLAYING, self.seats):
 			user			= player.get_user()
 			user.total_games+= 1
 			user.update()
+			#self.db_connection.query(User).filter_by(id=user.id).update({User.total_games: User.total_games + 1})
+		#self.db_connection.commit_session()

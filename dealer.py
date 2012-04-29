@@ -206,8 +206,8 @@ class Dealer(object):
 				db_connection.addItem(newRoom)
 				db_connection.commit_session()
 				self.room_list[newRoom.id] = GameRoom(
-						newRoom.id, 1, self,
-						max_player,blind,min_stake,max_stake)
+						newRoom, 1, self,
+						max_player, blind, min_stake, max_stake)
 				print newRoom
 
 
