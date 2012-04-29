@@ -103,7 +103,7 @@ if __name__ == '__main__':
 		(r"/create_room",CreateRoomHandler),
 		(r"/list_room",ListRoomHandler),
 		(r"/fast_enter",FastEnterRoomHandler),
-		(r"/buddy-info",BuddyInfoHandler),
+		(r"/buddy-info/(\w*)",BuddyInfoHandler),
 		(r"/view-email",EmailViewHandler),
 
 		(r"/delete-email",EmailDeleteHandler),

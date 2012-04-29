@@ -77,7 +77,6 @@ class PlayerArchiveHandler(tornado.web.RequestHandler):
 					"signature": player.signature or "This guy is too lazy to leave a signature",
 					"friends": str(player.friends),
 				}
-		print "-=-=-=-=-=-=-=-=-", percentage
 		self.write(json.dumps(message))
 		self.finish()
 
@@ -189,11 +188,37 @@ class EmailDeleteHandler(tornado.web.RequestHandler):
 
 
 class BuddyInfoHandler(tornado.web.RequestHandler):
+	def addBuddy(self):
+		user = self.session["user"]
+		friend_id = self.get_argument("user_id")
+		friend_list = user.friends
+		for friend in friend_list:
+			print friend.id
+			if friend_id == friend.id:
+				message = {"status": "friend already in the list"}
+				self.finish(json.dumps(message))
+				return
+		friend = self.db_connection.query(User).filter(User.id == friend_id).first()
+		if friend == None:
+			message = {"status": "friend doesn't exist"}
+			self.finish(json.dumps(message))
+			return
+		friend_list.append(friend)
+		self.db_connection.addItem(user)
+		self.db_connection.commit_session()
+		message = {"status": "friend added"}
+		print user.friends
+		self.finish(json.dumps(message))
+
+
 	@tornado.web.asynchronous
 	@authenticate
-	def post(self):
-		user		= self.session['user']
+	def post(self, action):
+		if action == "add":
+			self.addBuddy()
+			return
 
+		user = self.session['user']
 		message = {
 			"userId": user.id,
 			"friends": list()
@@ -209,4 +234,5 @@ class BuddyInfoHandler(tornado.web.RequestHandler):
 						"asset": friend.asset,
 					})
 		self.finish(json.dumps(message))
+
 

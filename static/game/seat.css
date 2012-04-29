@@ -552,8 +552,8 @@
 	font-weight: bold;
 	background: rgba(22, 44, 47, 0.8);
 	border: 2px #797D7E;
-	top: 34px;
-	left: 118px;
+	top: -20px;
+	left: 18px;
 	border-radius: 4px;
 	width: 100px;
 	text-align: center;
@@ -564,10 +564,10 @@
 	font-weight: bold;
 	background: rgba(22, 44, 47, 0.8);
 	border: 2px #797D7E;
-	top: 34px;
-	left: 118px;
+	top: -20px;
+	left: 18px;
 	border-radius: 4px;
-	width: 10px;
+	width: 100px;
 	text-align: center;
 }
 p.actionBox
@@ -616,27 +616,27 @@ p.actionBox:after
 	left: 113px;
 }
 .seatPos2 p.actionBox {
-	top: -34px;
-	left: 110px;
+	top: -18px;
+	left: 113px;
 }
 .seatPos3 p.actionBox {
-	top: -34px;
-	left: 110px;
+	top: -18px;
+	left: 113px;
 }
 .seatPos4 p.actionBox {
-	top: -34px;
-	left: 110px;
+	top: -18px;
+	left: 113px;
 }
 .seatPos5 p.actionBox {
-	top: -34px;
-	left: 110px;
+	top: -18px;
+	left: 113px;
 }
 .seatPos6 p.actionBox {
 	top: -34px;
 	left: -38px;
 }
 .seatPos7 p.actionBox {
-	top: --34px;
+	top: -34px;
 	left: -38px;
 }
 

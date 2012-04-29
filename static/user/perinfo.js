@@ -222,7 +222,7 @@ var viewEmail = function() {
 var buddyInfo = function() {
 	$.ajax({
 		type: "post",
-		url:  "/buddy-info",
+		url:  "/buddy-info/",
 		data: {},
 		success: function(data) {
 			console.log(data);

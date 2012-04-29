@@ -1,7 +1,7 @@
 import json
 from database import *
 def authenticate(functor):
-	def _authenticate(self):
+	def _authenticate(self,*arg):
 		if not 'user_id' in self.session:
 			print "REDIRECT!!!!!!!!!!!!"
 			self.redirect("/static/index/index.html")
@@ -18,7 +18,7 @@ def authenticate(functor):
 		self.user = user
 		self.session['user']  = user
 		self.db_connection.commit_session()
-		functor(self)
+		functor(self,*arg)
 		self.db_connection.close()
 	_authenticate.__name__ = functor.__name__
 	return _authenticate

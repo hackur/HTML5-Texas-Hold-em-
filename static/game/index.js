@@ -189,14 +189,16 @@ var take_place = function(seatID, seatObj) {
 			console.log(seatObj.getIsSat());
 			//customer information
 			// alert("[IsSat == 1] Customer Information!");
-			console.log(".............");
 			console.log(seatObj.player);
 			for (key in seatObj.player) {
 				if (seatObj.player[key] == undefined) {
-					seatObj.player[key] = "N/A";
+					seatObj.player[key] = "#";
 				}
 			}
+			window.SelectedSeat = seatObj;
 			seatObj.player.show(seatObj.player);
+			console.log(".............");
+			console.log(window.SelectedSeat);
 			var info_hide = function(e) {
 				var infoWindow = $("#player-info-content");
 				var infoWindowPosition = infoWindow.offset();
@@ -205,13 +207,17 @@ var take_place = function(seatID, seatObj) {
 				console.log(infoWindowSize["width"]);
 				console.log(pos[0]);
 				if(pos[0] < infoWindowPosition["left"] || pos[0] > infoWindowPosition["left"]+infoWindowSize["width"]) {
-					console.log("I'm hiding my self!");
+					console.log("I'm hiding myself!");
 					seatObj.player.hide();	
-					window.removeEventListener("click", info_hide, true);
+			e.stopPropagation();
+					window.removeEventListener("click", info_hide,true);
 				}
-				e.stopPropagation();
+//				$("#stand").bind("click", window.actionButton.send_action_stand());
+//				$("#backBtn").bind("click");
 			}
 			window.addEventListener("click", info_hide, true);
+//			$("#stand").unbind("click");
+//			$("#backBtn").unbind("click");
 		}
 	});
 };

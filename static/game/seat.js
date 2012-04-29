@@ -393,7 +393,6 @@ function seatInit(){
 		// won_games.text('胜利局数：'+player.won_games);
 		last_login.text('最近上线时间：'+player.last_login);
 		dialog.addClass(display_css);
-		
 	};
 	dialog.hide	= function(){
 		dialog_content.hide();
@@ -401,6 +400,17 @@ function seatInit(){
 	};
 	add_friend_btn.click(function(){
 		console.log("add_friend_btnt.click");
+
+		$.ajax({
+			type: 'post',
+			data: {"user_id": window.SelectedSeat.userid},
+			url	: '/buddy-info/add',
+			success:function(recvInfo){
+				console.log(recvInfo)
+				console.log("friend added!")
+			},
+			dataType:'json'
+		});
 	});	
 	send_stake_btn.click(function(){
 		console.log("send_stake_btnt.click");
