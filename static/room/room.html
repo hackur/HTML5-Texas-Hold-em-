@@ -3,19 +3,62 @@
 <html>
     <head>
 		<title>Main Room</title>
+		<meta charset="UTF-8">
 		<link rel="stylesheet" type="text/css" href="css/room.css"/>
+		<link rel="stylesheet" type="text/css" href="../game/sliderbar_dialog.css"/>
 		<script src="../jquery.min.js"></script>
+		<script src="../game/util.js"></script>
 		<script src="room.js"></script>
+		<script src="../game/sliderbar_dialog.js"></script>
+		<script src="../game/iscroll.js"></script>
 	</head>
+<!--	
+	<script>
+		var myScroll;
+		var a = 0;
+		function loaded() {
+		setHeight();	// Set the wrapper height. Not strictly needed, see setHeight() function below.
+
+		// Please note that the following is the only line needed by iScroll to work. Everything else here is to make this demo fancier.
+		myScroll = new iScroll('gridcontent', {desktopCompatibility:true});
+	}
+
+// Change wrapper height based on device orientation. Not strictly needed by iScroll, you may also use pure CSS techniques.
+function setHeight() {
+	var headerH = document.getElementById('header').offsetHeight,
+		footerH = document.getElementById('footer').offsetHeight,
+		wrapperH = window.innerHeight - headerH - footerH +100;
+	document.getElementById('grid').style.height = wrapperH + 'px';
+	document.getElementById('gridcontent').style.height = wrapperH + 400 + 'px'
+}
+
+// Check screen size on orientation change
+window.addEventListener('onorientationchange' in window ? 'orientationchange' : 'resize', setHeight, false);
+
+// Prevent the whole screen to scroll when dragging elements outside of the scroller (ie:header/footer).
+// If you want to use iScroll in a portion of the screen and still be able to use the native scrolling, do *not* preventDefault on touchmove.
+document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
+// Load iScroll when DOM content is ready.
+document.addEventListener('DOMContentLoaded', loaded, false);
+	</script>
+-->	
 	<body>
         <div id="container">
             <div id="header">
                 <div id="backTo"></div>
                 <div id="createroom"></div>
                 <div id="refresh"></div>
+                <div id="hallName">游戏大厅</div>
+            </div>
+            <div id = "smalltitles">
+            	<label id = "roomID">ID/房号</label>
+            	<label id = "maxminBlind">大/小盲注</label>
+            	<label id = "maxminTake">最大/最小携带</label>
+            	<label id = "onlineNum">在玩人数</label>
             </div>
             <div id="grid">
-                <ul id="gridcontent">
+                <ul id="normalroomcontent">
                     <!--data template-->
 					<!--
                     <li class="roomitem">
@@ -27,10 +70,140 @@
                     </li>
 					-->
                     <!--template end-->
-                     
+                </ul>
+                <ul id="advancedroomcontent">
+                    <!--data template-->
+					<!--
+                    <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
 
+                    </li>
+					-->
+                    <!--template end-->
+                    advancedRoomcontent
+                </ul>
+                <ul id="responseroomcontent">
+                    <!--data template-->
+					<!--
+                    <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+
+                    </li>
+					-->
+                    <!--template end-->
+                    responseroomcontent
+                </ul>
+                <ul id="competitionroomcontent">
+                    <!--data template-->
+					<!--
+                    <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+
+                    </li>
+					-->
+                    <!--template end-->
+                    competitionroomcontent
+                </ul>
+                <ul id="familybattleroomcontent">
+                    <!--data template-->
+					<!--
+                    <li class="roomitem">
+                        <span class="roomid">12</span>
+                        <span class="info1">300</span>
+                        <span class="info2">10K</span>
+                        <span class="numplaying">34</span>
+
+                    </li>
+					-->
+                    <!--template end-->
+                    familybattleroomcontent
                 </ul>
             </div>
+          
+        
+        <script>
+        	function initSetting() {
+        		var blindSliderBar = slider_bar();
+        		var personSliderBar = slider_bar();
+        		blindSliderBar.setPosition(70,52);
+        		blindSliderBar.setVar(changeBlind);
+        		blindSliderBar.create($("#blindBar"),2,100,2);
+        		personSliderBar.setPosition(70,119);
+        		personSliderBar.setVar(changePersonNum);
+        		personSliderBar.create($("#personNumBar"),2, 9, 1);
+        		console.log($("#confirmBtn"));
+        		$("#confirmBtn").click(submitRomeSetting);
+        		function submitRomeSetting() {
+        			create_room();
+        		}
+        		$("#cancelBtn").click(cancelSetting);
+        		function cancelSetting() {
+        			$("#settingDialog").hide();
+        			
+        		}
+        	    function changeBlind(val) {
+        	    	$("#curBlind").html( Math.round(val/2) +"/" + val);
+        	    }	
+        	    function changePersonNum(val) {
+        	    	$("#personNumShow").html(val);
+        	    }	
+        	}
+        	$(initSetting);
+        </script>
+        
+        <div id="settingDialog">
+        	<div id="settingTitle">
+        		设置
+        	</div> 
+        	<div id="settingTextArea">
+        		<p>
+        		<div id="blindAmount">
+        			盲注
+        		</div>
+        		<div id="curBlind">
+        			3
+        		</div>
+        		<div id="blindBar">
+        			
+        		</div>
+        		</p>
+        		<p>
+        		<div id="personNum">
+        			人数
+        		</div>
+        		<div id="personNumShow">
+        			2
+        		</div>
+        		<div id="personNumBar">
+        			
+        		</div>
+        		</p>
+        	</div>
+        	<div id=confirmBtn class="settingButton">
+        		确定
+        	</div>
+        	<div id="cancelBtn" class="settingButton">
+        		取消
+        	</div>
+        </div> 
+        <!--<script>
+        	$("#confirmBtn").click(submitRomeSetting);
+        	function submitRomeSetting() {
+        		create_room();
+        	}
+        </script>
+        -->
+        <!--
+        
         <div id="setting">
 			<form method="post" action="javascript:create_room()">
 				<p> 
@@ -53,25 +226,54 @@
 
 			</form>
         </div>
+        -->
+        <script>
+         var curStat = "normalroom"
+		 function nTabs(thisObj, Num) {
+            if (thisObj.className == curStat) return;
+            var tabObj = thisObj.parentNode.id;
+            console.log(thisObj);
+            fetchRoom(Num);
+            console.log(Num);
+            var tabList = document.getElementById(tabObj).getElementsByTagName("li");
+            for (i = 0; i < tabList.length; i++) {
+                if (i == Num) {
+                	console.log($(".roomhover")[i]);
+                	$(".roomhover")[i].style.opacity = 1;
+                    curStat = tabList[i].className;
+                 	
+                    document.getElementById(tabList[i].className + "content").style.display = "block";
+                } else {
+                	$(".roomhover")[i].style.opacity = 0;
+                    document.getElementById(tabList[i].className + "content").style.display = "none";
+                }
+            }
+        }
+        function initRoomSelect(){
+        	$(".roomhover")[0].style.opacity = 1;
+        }
+        $(initRoomSelect); 
+	</script>
+        
             <div id="room">
-                <ul>
-                    <li class="normalroom">
+                <ul id="tablist">
+                    <li class="normalroom" onclick="nTabs(this,0);">
                         <img class="roomhover" src="img/lefthover.png"/>
                         <img src="img/normalroom.png"/>
                     </li>  
-                    <li class="advancedroom">
+                    <li class="advancedroom" onclick="nTabs(this,1);">
                         <img class="roomhover" src="img/middlehover.png"/>
                         <img src="img/advancedroom.png"/>
                     </li>  
-                    <li class="responseroom">
+                    <li class="responseroom" onclick="nTabs(this,2);">
                         <img class="roomhover" src="img/middlehover.png"/>
                         <img src="img/responseroom.png"/>
                     </li>  
-                    <li class="competitionroom">
+                    <li class="competitionroom" onclick="nTabs(this,3);">
                         <img class="roomhover" src="img/middlehover.png"/>
                         <img src="img/competitionroom.png"/>
                     </li>  
-                    <li class="familybattleroom">
+                    <li class="familybattleroom" onclick="nTabs(this,4);">
                         <img class="roomhover" src="img/righthover.png"/>
                         <img src="img/familybattleroom.png"/>
                     </li>  

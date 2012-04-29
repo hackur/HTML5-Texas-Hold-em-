@@ -367,10 +367,15 @@ function seatInit(){
 	
 	dialog.init = function(){
 		dialog.appendTo($('#container'));
+		presentBar.setVar(changeNum);
 		presentBar.setPosition(170,363);
 		presentBar.create(dialog_content,10,1000,10);
-				
+		
 	};
+	function changeNum(num) {
+		
+	}
+	
 	dialog.show = function(player){
 		dialog_content.css("display","block");
 		dialog_bottom.css("display","block");
@@ -388,6 +393,7 @@ function seatInit(){
 		// won_games.text('胜利局数：'+player.won_games);
 		last_login.text('最近上线时间：'+player.last_login);
 		dialog.addClass(display_css);
+		
 	};
 	dialog.hide	= function(){
 		dialog_content.hide();

@@ -7,7 +7,7 @@ body{
     width:960px;
     margin:0px;
 	left:0px;
-    background:url(../img/room.png);
+    background:url(../img/room_background.png);
     position:absolute;
 }
 
@@ -28,7 +28,7 @@ body{
     float:left;
 }
 #header #backTo:hover{
-    background:url(../img/backTohoversuck.png);
+    /*background:url(../img/backTohoversuck.png);*/
 }
 #header #createroom{
     background:url(../img/createroom.png);
@@ -43,7 +43,13 @@ body{
     float:right;
 
 }
-
+#header #hallName {
+	color: #FFFFFF;
+	font-size: 33px;
+	position: absolute;
+	left: 336px;
+	top: 16px;
+}
 #room{
     bottom:0;
     position:absolute;
@@ -61,7 +67,7 @@ body{
 #room li{
     float:left;
     height:30px;
-    //background:orange;
+    /*background:orange;*/
     width:116px;
     top:17px;
     position:relative;
@@ -76,7 +82,7 @@ body{
 #room .roomhover{
     left:-33px;
     top:-16px;
-    //display: none;
+    /*display: none;*/
     opacity:0;
     -webkit-transition:opacity 0.4s ease;
     -moz-transition:opacity 0.4s ease;
@@ -98,18 +104,39 @@ body{
 }
 
 #room li:hover .roomhover{
-    //display: block;
-    opacity:1;
+    /*display: block;*/
+   /* opacity:1;*/
     
 }
 
-
+#smalltitles {
+	font-size: 20px;
+	color: #FFFFFF;
+	left: 85px;
+	top: 83px;
+	position: absolute;
+}
+#roomID {
+	
+}
+#maxminBlind {
+	margin-left: 109px;
+}
+#maxminTake {
+	margin-left: 135px;
+}
+#onlineNum {
+	margin-left: 120px;
+}
 #grid {
     height:457px;
-    overflow:hidden;
-    position: relative;
-    top: 45px;
-    width: 936px;
+   /* overflow:hidden;*/
+  	overflow-y: scroll;
+  	overflow-x: hidden;
+    position: absolute;
+    left: -8px;
+    top: 118px;
+    width: 955px;
 }
 #grid ul{
     list-style:none;
@@ -118,12 +145,39 @@ body{
     width: 930px;
 }
 
+#gridcontent {
+	z-index: 2;
+}
+#normalroomcontent {
+	display: block;
+	z-index: 2;
+	
+}
+#advancedroomcontent {
+	display: none;
+	z-index: 2;
+}
+#responseroomcontent {
+	display: none;
+	z-index: 2;
+}
+#competitionroomcontent {
+	display: none;
+	z-index: 2;
+}
+#familybattleroomcontent {
+	display: none;
+	z-index: 2;
+}
 #grid li{
     display: block;
     height:30px;
     color:white;
     font-size:18px;
     height: 57px;
+    width: 916px;
+    /*border-image:url("../img/bottom_line.png")0 0 30 0 stretch;*/
+    border-bottom:2px solid #001f56;
     -webkit-transition:background 0.3s ease-out;
     -moz-transition:background 0.3s ease-out;
     -o-transition:background 0.3s ease-out;
@@ -154,28 +208,108 @@ body{
 
 
 
-
-
 /*
 *
 *Setting panel star
 *
 */
-#setting {
-    background:lightblue;
-    height:385px;
-    width:622px;
-	position:absolute;
-	left:156px;
-	top:112px;
+#settingDialog { 
+	background-image: url(../../game/image/sit_down_dialog.png);
+	padding: 15px;
+	top: 113px;
+	left: 175px;
+	height: 360px;
+	width: 606px;
+	position: absolute;
+	opacity: 1.0;
+	z-index:10;
 	display:none;
 
 }
+#setting { 
+	background:#FFFFFF;
+	padding: 15px;
+	top: 113px;
+	left: 175px;
+	height: 360px;
+	width: 606px;
+	position: absolute;
+	opacity: 1.0;
+	z-index:10;
+	display:none;
+
+}
+#settingTitle {
+	width: 459px;
+	height:52px;
+	top:47px;
+	left:87px;
+	position: absolute;
+	text-align: center;
+	font-size:33px;
+	color: #FFFFFF;
+}
+
+#settingTextArea {
+	width: 444px;
+	height: 170px;
+	top: 103px;
+	left: 91px;
+	position: absolute;
+	color: #FFFFFF;
+	font-size:20px;
+}
+
+#blindAmount {
+	position: absolute;
+	left: 0px;
+	top: 20px;
+}
+#curBlind {
+	position:absolute;
+	left: 390px;
+	top: 20px;
+}
+
+#personNum{
+	position: absolute;
+	left: 0px;
+	top: 85px;
+	
+}
+#personNumShow {
+	position: absolute;
+	left: 390px;
+	top: 85px;
+}
+.settingButton {
+	background-image : url(../img/button.png);
+	font-size: 24px;
+	width: 117px;
+	height: 49px;
+	color: #FFFFFF;
+	text-align:center;
+	line-height:170%;
+	
+}
+#confirmBtn {
+	position: absolute;
+	left: 75px;
+	top: 282px;
+}
+#cancelBtn {
+	position: absolute;
+	left: 446px;
+	top: 282px;
+	
+}
+	
+
 #setting .barcontainer{
     clear:both;
     position: relative;
 }
-#setting >span{
+#setting .span{
     display: block;
     text-align:center;
 
