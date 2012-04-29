@@ -1,0 +1,89 @@
+#mail_list_frame{
+	position: absolute;
+	top: 82px;
+	width: 583px;
+	left: 25px;
+	color: white;
+	font-weight: bolder;
+	height: 358px;
+}
+#mail_list_container{
+	text-align: left;
+	width: 100%;
+	height: 330px;
+	position: absolute;
+}
+#mail_list_navigator{
+	position: absolute;
+	top: 300px;
+}
+#mail_list{
+	height: 100%;
+	padding-top: 10px;
+	width: 543px;
+	padding-left: 20px;
+	padding-right: 20px;
+	color: white;
+	font-weight: bolder;
+	position: absolute;
+}
+#mail_page_last{
+	left: 290px;
+	position: absolute;
+	width: 60px;
+	top: 25px;
+	background-color: rgba(210, 200, 130, 0.9);
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+#mail_page_next{
+	left: 360px;
+	position: absolute;
+	width: 60px;
+	top: 25px;
+	background-color: rgba(210, 200, 130, 0.9);
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+#mail_page{
+	float:left;
+}
+#mail_page_btn{
+	float:left;
+}
+.mail-item{
+	height:30px;
+}
+.mail-border{
+	height: 14px;
+	width: 543px;
+	position: absolute;
+	background-image: url(./image/line.png);
+}
+.mail-item .content{
+	padding-left: 10px;
+	border-radius:4px;
+}
+.mail-item .content:hover{
+	background-color:rgba(255,255,255,0.5);
+}
+
+#mail_page{
+	position: absolute;
+	left: 440px;
+	top: 25px;
+}
+#mail_page_input{
+	width: 30px;
+	position: absolute;
+}
+#mail_page_btn{
+	background-color: rgba(122, 144, 60, 0.6);
+	width: 40px;
+	left: 500px;
+	position: absolute;
+	top: 26px;
+}
+
