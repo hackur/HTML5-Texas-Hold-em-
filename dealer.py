@@ -160,7 +160,7 @@ class Dealer(object):
 		db_connection.commit_session()
 
 		self.room_list[newRoom.id] = GameRoom(
-				newRoom.id, args["user_id"], self,
+				newRoom, args["user_id"], self,
 				max_player,blind,min_stake,max_stake)
 		print newRoom
 		message = {"room_id":newRoom.id}
