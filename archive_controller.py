@@ -168,7 +168,6 @@ class EmailSendHandler(tornado.web.RequestHandler):
 		email.send_date		= datetime.now()
 		email.status		= 0
 		email.reply_to_id	= reply_to
-		self.db_connection.start_session()
 		self.db_connection.addItem(email)
 		self.db_connection.commit_session()
 		message	= {"status":"success"}
@@ -180,7 +179,6 @@ class EmailDeleteHandler(tornado.web.RequestHandler):
 	def post(self):
 		user_id = self.session['user_id']
 		email_id= self.get_argument('email_id')
-		self.db_connection.start_session()
 		self.db_connection.query(Email).filter(Email.id==email_id).filter(Email.to_user_id == user_id).delete()
 		self.db_connection.commit_session()
 		message = {"status":"success"}
