@@ -110,19 +110,22 @@ class HeadPortraitHandler(tornado.web.RequestHandler):
 		self.finish(json.dumps(message))
 
 class EmailListHandler(tornado.web.RequestHandler):
-	(PAGE_SIZE,PAGE_OFFSET) = (20, 19)
+	(PAGE_SIZE,PAGE_OFFSET) = (10, 9)
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		page	= self.get_argument('page', 1)
+		page		= int(self.get_argument('page', 1))
 		user		= self.session['user']
 		all_emails	= self.db_connection.query(Email).filter_by(to_user = user).order_by(Email.send_date)
 		total_emails= all_emails.count()
-		pages		= math.ceil(total_emails / self.PAGE_SIZE)
+		pages		= math.ceil((1.0 *total_emails) / self.PAGE_SIZE)
 		if page > pages:
 			current = pages
+		else:
+			current	= page
 		start		= (current - 1) * self.PAGE_SIZE
 		end			= start + self.PAGE_OFFSET
+		print "[%d,%d, %d, %d] " % (page,pages, start, end)
 		emails		= all_emails.slice(start, end)
 		email_list	= list()
 		for email in emails:
