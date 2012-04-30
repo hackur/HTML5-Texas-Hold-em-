@@ -731,3 +731,56 @@ p.actionBox:after
     right: 4px;  
     border-color: #fff #fff transparent transparent; 
 }
+
+.dealerBtn {
+	position: absolute;
+	border: 4px;
+	border-color: #A1A1A1;
+	padding-left: 4px;
+	background: white;
+	width: 14px;
+	border-radius: 60px;
+	border-style: outset;
+	margin: 0px;
+	font-family: Arial,Tahoma,Helvetica;
+	font-size: 14px;
+	display: none;
+}
+.seatPos0 p.dealerBtn {
+	top: 16px;
+	left: -5px;
+}
+.seatPos1 p.dealerBtn {
+	top: 16px;
+	left: -5px;
+}
+.seatPos2 p.dealerBtn {
+	top: 38px;
+	left: 123px;
+}
+.seatPos3 p.dealerBtn {
+	top: 91px;
+	left: 127px;
+}
+.seatPos4 p.dealerBtn {
+	top: 142px;
+	left: 49px;
+}
+.seatPos5 p.dealerBtn {
+	top: 142px;
+	left: 49px;
+}
+.seatPos6 p.dealerBtn {
+	top: 141px;
+	left: 37px;
+}
+.seatPos7 p.dealerBtn {
+	top: 95px;
+	left: -16px;
+}
+.seatPos8 p.dealerBtn {
+	top: 16px;
+	left: -5px;
+
+}
+

@@ -42,6 +42,7 @@ function msg_phc(data){
 	console.log("msg_phc is ----------------------------------------------:");
 	console.log(data);
 	var seatId = window.user_info.sit_no;
+	SeatList[parseInt(data.dealer)].showDealerBtn();
 
 	//set_hand_cards(data.cards[0], data.cards[1]);
 	console.log(data.cards);
@@ -89,6 +90,7 @@ function msg_winner(data){
             });
             seat.cleanChips();
             seat.clearStake();
+			seat.removeDealerBtn();
         });
 		pot_manager.reset();
     }

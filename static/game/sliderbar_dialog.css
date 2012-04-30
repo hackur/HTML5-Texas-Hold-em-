@@ -46,3 +46,20 @@
 #sit_slider_textMax{position:absolute; top: 126px; left: 398px; width: 60px; height: 34px;}
 #sit_slider_textMin{position:absolute; top: 126px; left: 29px; width: 60px; height: 34px;}
 
+
+
+#min_window_amount {
+	position: absolute;
+	color: white;
+	font-size: 18px;
+	top: -3px;
+	left: -45px;
+}
+#max_window_amount {
+	position: absolute;
+	color: white;
+	font-size: 18px;
+	top: -3px;
+	right: -45px;
+}
+

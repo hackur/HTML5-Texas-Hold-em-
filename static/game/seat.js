@@ -27,6 +27,7 @@ function Seat(id,pos){
 	var cur_pos = "seatPos" + pos;
 	var portrait_border = $('<div class="portrait_border"></div>');
 	var portrait = $('<img class="portrait"/>');
+	var dealerBtn = $("<p class='dealerBtn'>D</p>");
 
 	divStake.appendTo(divChip);
 	divSeatbg.appendTo(divSeat);
@@ -44,6 +45,7 @@ function Seat(id,pos){
 	// portrait_border.appendTo(divSeat);
 	portrait.appendTo(divSeat);
 	divSeat.appendTo($("#container"));
+	dealerBtn.appendTo(divSeat);
 
 	var IsSat = false;
 	var table = 0;
@@ -119,10 +121,18 @@ function Seat(id,pos){
 		}
 	};
 
+	seatObj.showDealerBtn = function() {
+		dealerBtn.fadeIn(500);
+	};
+
+	seatObj.removeDealerBtn = function() {
+		dealerBtn.css("display", "none");
+	};
+
 	seatObj.clearStake = function(){
 		table = 0;
 		divStake.hide();
-	}
+	};
 
 	seatObj.setCountdown = function(timeout) {
 		divCount.removeClass("countdown down");
