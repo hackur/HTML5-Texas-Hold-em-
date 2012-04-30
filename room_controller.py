@@ -103,8 +103,14 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		room_id			= self.get_argument('room_id')
 		room			= self.db_connection.query(Room).filter_by(id = room_id).one()
 		self.mongodb	= self.application.settings['_db']
-		self.mongodb.board.remove({"user_id":self.session["user_id"]})
-		self.mongodb.board.save({"user_id":self.session["user_id"], "room_id":room.id, "message-list": []})
+		msg = self.mongodb.board.find_one({"user_id":self.session["user_id"], "room_id":room.id})
+		if msg:
+			msg["message-list"] = []
+		else:
+			msg = {"user_id":self.session["user_id"], "room_id":room.id, "message-list": []}
+
+		self.mongodb.board.update({"user_id":self.session["user_id"]},msg)
+
 		self.db_connection.addItem(user)
 		self.db_connection.commit_session()
 		queue				= str(user.username) + '_init'

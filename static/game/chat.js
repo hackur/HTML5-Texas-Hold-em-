@@ -2,15 +2,23 @@
 	var obj		= {};
 	obj.message = [];
 
+	function sendMsg(){
+		console.log("click start");
+		obj.send();
+		$('#chat-input').val('');
+		console.log("click end");
+	}
 	obj.init = function (){
 		console.log("init sit dialog start");
-		$("#chat-send-btn").click(function(){
-			console.log("click start");
-			obj.send();
-			$('#chat-input').val('');
-			console.log("click end");
+		$("#chat-send-btn").bind(event_click,sendMsg);
+
+		$(window).keypress(function(e) {
+			if(e.keyCode == 13){
+				sendMsg();
+			}
 		});
-		$('#chat-history-btn').click(function(){
+		$("input:text:visible:first").focus();
+		$('#chat-history-btn').bind(event_click,function(){
 			obj.maximize();
 		});
 		console.log("init sit dialog end");
@@ -37,7 +45,7 @@
 		var message = $('#chat-input').val();
 		$.ajax({
 			type:'post',
-			url:'../../send-chat',
+			url:'/send-chat',
 			data:{seat:window.user_info.sit_no, message:message},
 			success:function(data){
 				console.log(data);
