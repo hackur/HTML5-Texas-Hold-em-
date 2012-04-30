@@ -26,7 +26,7 @@ class Room(Base):
 		self.roomType	= 0
 
 	def __repr__(self):
-		return "<Room('%s','%s')>" % (self.id, self.exchange)
+		return "<Room('%s','%s','%s')>" % (self.id, self.exchange,self.roomType)
 
 	def update(self):
 		self.db_connection	= DatabaseConnection()

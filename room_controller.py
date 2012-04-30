@@ -19,11 +19,13 @@ from database import DatabaseConnection,User,Room, DealerInfo
 from authenticate import *
 from pika_channel import Channel,PersistentChannel
 from sqlalchemy.sql import functions as SQLFunc
+from config_controller import ConfigReader
 
 class ListRoomHandler(tornado.web.RequestHandler):
 	@authenticate
 	def get(self):
 		roomType = self.get_argument('type',0)
+		print roomType
 		rooms = self.db_connection.query(Room).filter_by(roomType=roomType)
 		rooms = [(r.id,r.blind,r.player,r.max_player,r.min_stake,r.max_stake) for r in rooms]
 		self.write(json.dumps({"rooms":rooms}))
@@ -41,14 +43,26 @@ class FastEnterRoomHandler(tornado.web.RequestHandler):
 class CreateRoomHandler(tornado.web.RequestHandler):
 	def find_dealer(self):
 		dealer = self.db_connection.query(SQLFunc.min(DealerInfo.rooms)).one()
-		print dealer[0]
 		dealer = self.db_connection.query(DealerInfo).filter_by(rooms=dealer[0]).one()
-		print dealer
 		return dealer
 
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
+		roomType	= self.get_argument("roomType",None)
+		blind		= int(self.get_argument("blind"))
+		max_stake	= blind * 200
+		min_stake	= blind * 10
+		max_player	= self.get_argument("max_player")
+		room = ConfigReader.getObj("room")[roomType]
+
+		if blind < room[0] or blind > room[1]:
+			self.finish()
+			return
+		if (blind - room[0]) % room[2] != 0:
+			self.finish()
+			return
+
 		dealer = self.find_dealer()
 		self.channel	= Channel(
 				self.application.channel,
@@ -66,13 +80,14 @@ class CreateRoomHandler(tornado.web.RequestHandler):
 		self.finish()
 
 	def connected_call_back(self,userid):
-		blind		= self.get_argument("blind")
-		max_stake	= self.get_argument("max_stake")
-		min_stake	= self.get_argument("min_stake")
+		blind		= int(self.get_argument("blind"))
+		roomType	= int(self.get_argument("roomType",None))
+		max_stake	= blind * 200
+		min_stake	= blind * 10
 		max_player	= self.get_argument("max_player")
 
 		msg = {"method":"create_room","blind":blind,"max_stake":max_stake,"min_stake":min_stake,
-				"max_player":max_player,"user_id":userid,
+				"max_player":max_player,"user_id":userid,"roomType":roomType,
 				"source":self.channel.routing_key}
 
 		self.channel.publish_message("dealer",json.dumps(msg))
@@ -234,7 +249,6 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 		self.channel.close()
 
 class BoardActionMessageHandler(tornado.web.RequestHandler):
-	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
 		user					= self.session['user']
@@ -248,7 +262,6 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 		arguments				= {'routing_key':'dealer', 'message':json.dumps(message)}
 		self.channel			= Channel(self.application.channel,exchange)
 		self.channel.publish_message("dealer", json.dumps(message));
-		self.finish("{\"status\":\"success\"}");
 
 
 ###BoardListenMessageHandler shouldn't touch database at all. Even in authenticate

@@ -14,3 +14,25 @@
 	height: 640px;
 	width: 960px;
 }
+body{
+	-moz-user-select: none; 
+	-khtml-user-select: none; 
+	-webkit-user-select: none; 
+	-o-user-select: none; 
+}
+
+.generalBtnActive{
+	height:57px;
+	width:125px;
+	background-image: url(./images/button_active.png);
+	font-size: 24px;
+	color: #FFFFFF;
+	text-align:center;
+	line-height:170%;
+}
+.generalBtnActive:active{
+	height:57px;
+	width:125px;
+	background-image: url(./images/button_inactive.png);
+}
+

@@ -11,10 +11,17 @@ window.get_event_position = function(e){
 	}
 	return [e.clientX,e.clientY]
 }
-function decide_event(){
-	window.event_up = "touchend";
-	window.event_down = "touchstart"; 
-	window.event_move = "touchmove";
+function show_loading(){
+	$.mobile.showPageLoadingMsg();
+}
+function hide_loading(){
+	$.mobile.hidePageLoadingMsg()
+}
+//function decide_event(){
+	//window.event_up = "touchend";
+	//window.event_down = "touchstart"; 
+	//window.event_move = "touchmove";
+	//window.event_click = "click";
 	if(navigator.userAgent.match(/iPhone/i) ||
 	 		navigator.userAgent.match(/Android/i) ||
 			navigator.userAgent.match(/iPad/i) ||
@@ -25,12 +32,14 @@ function decide_event(){
 		window.event_up = "touchend";
 		window.event_down = "touchstart"; 
 		window.event_move = "touchmove";
+		window.event_click = "tap";
 		window.touch_enable = true;
 	}
 	else{
 		window.event_up = "mouseup"; 
 		window.event_down = "mousedown"; 
 		window.event_move = "mousemove";
+		window.event_click = "click";
 		window.touch_enable = false;
 	}
 
@@ -41,4 +50,4 @@ function decide_event(){
 	} else if ($.browser.opera) {
 			window.eventTransitionEnd = "oTransitionEnd";
 	}
-}
+//}

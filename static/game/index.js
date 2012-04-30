@@ -1,5 +1,4 @@
 var table_init = function() {
-	decide_event();
 
 	document.ontouchmove = function(e) {
 		e.preventDefault();
@@ -156,7 +155,7 @@ var take_place = function(seatID, seatObj) {
 			console.log(seatObj);
 			console.log(this);
 			console.log("sliderbaris clicked");
-			$.mobile.showPageLoadingMsg();
+			show_loading();
 			$.ajax({
 				type:'get',
 				url:"/userinfo",
@@ -169,7 +168,7 @@ var take_place = function(seatID, seatObj) {
 					user_info.asset = data.s;
 					user_info.level = data.l;
 					user_info.id	=data.id;
-					$.mobile.hidePageLoadingMsg()
+					hide_loading();
 					if(user_info.asset < window.room_info.min_stake){
 						message_box.showMessage("您只有:" +user_info.asset,2);
 						message_box.showMessage("最少携带:" + room_info.min_stake,2);

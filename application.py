@@ -8,6 +8,7 @@ from login_controller import *
 from user_controller import *
 from archive_controller import *
 from chat_controller import *
+from config_controller import *
 from database import *
 from pika.adapters.tornado_connection import TornadoConnection
 PORT = 8888
@@ -105,6 +106,8 @@ if __name__ == '__main__':
 		(r"/fast_enter",FastEnterRoomHandler),
 		(r"/buddy-info/(\w*)",BuddyInfoHandler),
 		(r"/view-email",EmailViewHandler),
+		(r"/config/(\w+)",ConfigHandler),
+
 
 		(r"/delete-email",EmailDeleteHandler),
 		(r"/userinfo", UserInfoHandler),

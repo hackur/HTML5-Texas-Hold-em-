@@ -149,6 +149,7 @@ class Dealer(object):
 		min_stake	= int(args["min_stake"])
 		max_player	= int(args["max_player"])
 		routing_key = args['source']
+		roomType	= int(args["roomType"])
 
 		db_connection = self.db_connection
 		db_connection.start_session()
@@ -156,6 +157,7 @@ class Dealer(object):
 		newRoom = Room(self.exchange,blind,max_player,
 				max_stake,
 				min_stake)
+		newRoom.roomType = roomType
 		db_connection.addItem(newRoom)
 		db_connection.commit_session()
 
@@ -172,7 +174,6 @@ class Dealer(object):
 
 
 	def on_message(self, channel, method, header, body):
-		message = "message received, thanks!"
 		obj = json.loads(body)
 		method = getattr(self,"cmd_" + obj['method'])
 		method(obj)

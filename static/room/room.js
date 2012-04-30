@@ -20,10 +20,6 @@ function fetchRoom(roomClass) {
 		},
 		success : function(data) {
 			console.log(data);
-			$("#createroom").click(function() {
-				$("#settingDialog").show();
-
-			});
 			$.each(data.rooms, function(index, room) {
 				var id = room[0];
 				var blind = parseInt(room[1]);
@@ -50,29 +46,112 @@ function fetchRoom(roomClass) {
 	});
 }
 
+$(function(){
+	$("#createroom").bind(event_click,function() {
+
+		$.get("/config/room", {}, 
+		function(data) {
+			var room = data[curRoomType];
+			if(room == undefined){
+				message_box.showMessage("暂不支持此类房间！",3);
+				return;
+			}
+			blindSliderBar.set_argument(room[0],room[1],room[2]);
+			$("#settingDialog").show();
+		}, 'json');
+
+	});
+
+	$("#refresh").bind(event_click,function(){
+		fetchRoom(curRoomType);
+	});
+});
+
 function create_room() {
+
 	console.log(parseInt($("#curBlind").html()));
 	//console.log($("#curBlind").val());
-	var blind = parseInt($("#curBlind").html());
-	//var max_stake = $("#max_stake").val();
-	//var min_stake = $("#min_stake").val();
-	var max_stake = 100;
-	var min_stake = 1000;
-	//var max_player = $("#personNumShow").val();
+	var blind = parseInt($("#curBlind").html()) * 2;
 	var max_player = parseInt($("#personNumShow").html());
 	$.post("/create_room", {
 		blind : blind,
 		max_player : max_player,
-		min_stake : min_stake,
-		max_stake : max_stake
+		roomType :curRoomType
 	}, function(data) {
-		localStorage["current_room_id"] = data.room_id;
-		window.location = "../game/game.html";
-		console.log(data);
+		if(data.room_id){
+			localStorage["current_room_id"] = data.room_id;
+			window.location = "../game/game.html";
+			console.log(data);
+		}
+		else{
+			//TODO SHOW ERROR
+		}
 	}, 'json');
 
 }
 
+function initSetting() {
+	$("#backTo").bind(event_click,function(){
+		history.go(-1);
+	});
+	console.log("----------------------------------------------");
+	window.blindSliderBar = slider_bar();
+	var personSliderBar = slider_bar();
+	blindSliderBar.setPosition(70,52);
+	blindSliderBar.setVar(changeBlind);
+	blindSliderBar.create($("#blindBar"),2,100,2);
+	personSliderBar.setPosition(70,119);
+	personSliderBar.setVar(changePersonNum);
+	personSliderBar.create($("#personNumBar"),2, 9, 1);
+	console.log($("#confirmBtn"));
+	$("#confirmBtn").click(submitRomeSetting);
+	function submitRomeSetting() {
+		create_room();
+	}
+	$("#cancelBtn").click(cancelSetting);
+	function cancelSetting() {
+		$("#settingDialog").hide();
+
+	}
+	function changeBlind(val) {
+		$("#curBlind").html( Math.round(val/2) +"/" + val);
+	}	
+	function changePersonNum(val) {
+		$("#personNumShow").html(val);
+	}	
+}
+$(initSetting);
 $(function() {
 	fetchRoom(0);
 });
+
+
+var curStat = "normalroom";
+var curRoomType = 0;
+function nTabs(thisObj, Num) {
+	if (thisObj.className == curStat) return;
+	var tabObj = thisObj.parentNode.id;
+	console.log(thisObj);
+	fetchRoom(Num);
+	curRoomType = Num;
+	console.log(Num);
+
+
+	var tabList = document.getElementById(tabObj).getElementsByTagName("li");
+	for (i = 0; i < tabList.length; i++) {
+		if (i == Num) {
+			console.log($(".roomhover")[i]);
+			$(".roomhover")[i].style.opacity = 1;
+			curStat = tabList[i].className;
+
+			document.getElementById(tabList[i].className + "content").style.display = "block";
+		} else {
+			$(".roomhover")[i].style.opacity = 0;
+			document.getElementById(tabList[i].className + "content").style.display = "none";
+		}
+	}
+}
+function initRoomSelect(){
+	$(".roomhover")[0].style.opacity = 1;
+}
+$(initRoomSelect); 

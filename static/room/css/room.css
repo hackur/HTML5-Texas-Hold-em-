@@ -31,15 +31,9 @@ body{
     /*background:url(../img/backTohoversuck.png);*/
 }
 #header #createroom{
-    background:url(../img/createroom.png);
-    height:48px;
-    width:127px;
     float:right;
 }
 #header #refresh{
-    background:url(../img/createroom.png);
-    height:48px;
-    width:127px;
     float:right;
 
 }
