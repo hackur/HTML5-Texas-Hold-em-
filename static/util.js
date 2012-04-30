@@ -32,7 +32,7 @@ function hide_loading(){
 		window.event_up = "touchend";
 		window.event_down = "touchstart"; 
 		window.event_move = "touchmove";
-		window.event_click = "tap";
+		window.event_click = "vclick";
 		window.touch_enable = true;
 	}
 	else{

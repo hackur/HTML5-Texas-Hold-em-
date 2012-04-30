@@ -27,8 +27,8 @@
 		$('#chat-history').removeClass("chat-history-collapse");
 		$('#chat-history').addClass("chat-history-expand");
 		$('#chat-history-btn').text("C");
-		$("#chat-history-btn").unbind('click');
-		$('#chat-history-btn').click(function(){
+		$("#chat-history-btn").unbind(event_click);
+		$('#chat-history-btn').bind(event_click,function(){
 			obj.minimize();
 		});
 	}
@@ -36,8 +36,8 @@
 		$('#chat-history').removeClass("chat-history-expand");
 		$('#chat-history').addClass("chat-history-collapse");
 		$('#chat-history-btn').text("E");
-		$("#chat-history-btn").unbind('click');
-		$('#chat-history-btn').click(function(){
+		$("#chat-history-btn").unbind(event_click);
+		$('#chat-history-btn').bind(event_click,function(){
 			obj.maximize();
 		});
 	}
