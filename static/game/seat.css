@@ -453,6 +453,15 @@
 	left: 225px;
 	color: white;
 }
+#send_amount{
+	position: absolute;
+	font-size: 18px;
+	font-family: 文泉驿微米黑, 微软雅黑, 黑体, 宋体;
+	top: 358px;
+	left: 100px;
+	color: white;
+
+}
 #asset {
 	position: absolute;
 	font-size: 18px;

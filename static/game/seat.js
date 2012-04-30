@@ -340,6 +340,7 @@ function seatInit(){
 	var add_friend_btn	= $('<div id="add_friend_btn"><div id="add_friend_text">加为好友</div></div>');
 	var send_stake_btn	= $('<div id="send_stake_btn"><div id="send_stake_text">赠送好友</div></div>');
 	var info_text		= $('<div id="info_text">信   息</div>')
+	var send_val		= $('<span id="send_amount"></span>');
 
 	portrait_box.appendTo(dialog_content);
 	info_text.appendTo(dialog_content);
@@ -359,6 +360,7 @@ function seatInit(){
 
 	add_friend_btn.appendTo(dialog_bottom);
 	send_stake_btn.appendTo(dialog_bottom);
+	send_val.appendTo(dialog_content);
 	var presentBar = slider_bar();
 	
 			
@@ -369,7 +371,7 @@ function seatInit(){
 		dialog.appendTo($('#container'));
 		presentBar.setVar(changeNum);
 		presentBar.setPosition(170,363);
-		presentBar.create(dialog_content,10,1000,10);
+		presentBar.create(dialog_content,1,100,1);
 		
 	};
 	function changeNum(num) {
@@ -393,12 +395,17 @@ function seatInit(){
 		// won_games.text('胜利局数：'+player.won_games);
 		last_login.text('最近上线时间：'+player.last_login);
 		dialog.addClass(display_css);
+		presentBar.setVar(function(value){
+			send_val.html("$" + value);
+		});
+		presentBar.set_argument(1,window.user_info.asset,1); //TODO Make a better amount
+	
 	};
 	dialog.hide	= function(){
 		dialog_content.hide();
 		dialog_bottom.hide();
 	};
-	add_friend_btn.click(function(){
+	add_friend_btn.bind(event_click,function(){
 		console.log("add_friend_btnt.click");
 
 		$.ajax({
@@ -406,8 +413,7 @@ function seatInit(){
 			data: {"user_id": window.SelectedSeat.userid},
 			url	: '/buddy-info/add',
 			success:function(recvInfo){
-				console.log(recvInfo)
-				console.log("friend added!")
+				message_box.showMessage(recvInfo.status,2);
 			},
 			dataType:'json'
 		});

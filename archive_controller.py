@@ -194,10 +194,11 @@ class EmailDeleteHandler(tornado.web.RequestHandler):
 class BuddyInfoHandler(tornado.web.RequestHandler):
 	def addBuddy(self):
 		user = self.session["user"]
-		friend_id = self.get_argument("user_id")
+		friend_id = int(self.get_argument("user_id"))
+		print "new friend ",friend_id
 		friend_list = user.friends
 		for friend in friend_list:
-			print friend.id
+			print "old friend: ",friend.id
 			if friend_id == friend.id:
 				message = {"status": "friend already in the list"}
 				self.finish(json.dumps(message))
