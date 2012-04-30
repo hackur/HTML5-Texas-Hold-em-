@@ -105,7 +105,6 @@ function msg_winner(data){
 		seat.cards	= [];
 		seat.setStake(info.stake,0);
 		SeatList[info.seat_no].removeCountdown();
-		SeatList[info.seat_no].showWinCard();
 
 		if(info.handcards == undefined){
 			return;
@@ -134,6 +133,7 @@ function msg_winner(data){
                 }
             }
         }
+		SeatList[info.seat_no].showWinCard();
 	});
 
 
