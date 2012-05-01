@@ -206,6 +206,8 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 
 			queue_name		= str(user.username) + '_sit'
 			exchange_name   = self.session['exchange']
+
+			self.session['room_id'] = room.id
 			user.room		= room
 			user.room_id	= room.id
 			self.db_connection.addItem(user)
@@ -265,10 +267,76 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 		message['method']		= 'action'
 		message['private_key']	= self.session['private_key']
 		message['room_id']		= user.room.id
-		arguments				= {'routing_key':'dealer', 'message':json.dumps(message)}
 		self.channel			= Channel(self.application.channel,exchange)
 		self.channel.publish_message("dealer", json.dumps(message));
 
+
+
+
+class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
+#TODO Merge these code with long-polling functions. avoid frequently db access
+	@authenticate
+	def open(self):
+		print "WebSocket opened","x" * 20
+		self.mongodb = self.application.settings['_db']
+		user		= self.session['user']
+		queue		= str(user.username)  + '_broadcast'
+		exchange	= self.session['exchange']
+		messages = self.mongodb.board.find_one({"user_id":self.session["user_id"]})
+		if len(messages["message-list"]) > 0:
+			self.write_message(json.dumps(messages["message-list"]))
+
+		binding_keys= (self.session['public_key'], self.session['private_key'])
+		self.channel= PersistentChannel(
+				self.application.channel,
+				queue, exchange, binding_keys, self,arguments = {"x-expires":int(15000)})
+		self.channel.add_message_action(self.message_call_back, None)
+		self.channel.connect()
+
+	def clean_matured_message(self, timestamp):
+		board_messages = self.mongodb.board.find_one({"user_id":self.session["user_id"]})
+		if board_messages is not None:
+			board_messages["message-list"] = filter(lambda x: int(x['timestamp']) > timestamp, board_messages["message-list"])
+			self.mongodb.board.update({"user_id": self.session["user_id"]}, board_messages)
+
+		return board_messages
+
+
+	def on_connection_close(self):
+		self.channel.close()
+
+	def message_call_back(self, argument):
+		new_messages	= self.channel.get_messages()
+		user_id			= self.session['user_id']
+		board_messages	= self.mongodb.board.find_one({"user_id": user_id})
+		board_messages["message-list"].extend(new_messages)
+		self.mongodb.board.save(board_messages)
+		self.board_messages = board_messages["message-list"]
+		self.write_message(json.dumps(new_messages))
+
+
+	def on_message(self, message):
+		print message
+		msg = json.loads(message)
+		if 'timestamp' in msg:
+			timestamp	= int(msg['timestamp'])
+			board_messages = self.clean_matured_message(timestamp)
+		elif 'action' in msg:
+			user					= self.session['user']
+			message					= msg
+			message['user_id']		= self.session['user_id']
+			message['method']		= 'action'
+			message['private_key']	= self.session['private_key']
+			message['room_id']		= self.session['room_id']
+			self.channel.publish_message("dealer", json.dumps(message));
+
+
+	def on_close(self):
+		self.channel.close();
+		print "WebSocket closed"
+
+	def allow_draft76(self):
+		return True
 
 ###BoardListenMessageHandler shouldn't touch database at all. Even in authenticate
 class BoardListenMessageHandler(tornado.web.RequestHandler):

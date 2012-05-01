@@ -38,6 +38,10 @@
 			message['amount'] = amount;
 		}
 		var msg = JSON.stringify(message);
+		if(window.ws){
+			window.ws.send(msg);
+			return;
+		}
 		console.log(msg);
 		$.ajax({
 			type:'post',

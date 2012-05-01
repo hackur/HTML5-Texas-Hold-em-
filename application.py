@@ -3,6 +3,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import tornado.process
+import tornado.websocket
 from room_controller import *
 from login_controller import *
 from user_controller import *
@@ -60,10 +61,12 @@ def on_channel_open(channel):
 def on_close_callback(msg1,msg2):
 	print "CHANNEL CLOSED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 	print msg1,msg2
+	exit(0)
 
 def on_connected(connection):
 	print "pika connected"
 	connection.channel(on_channel_open)
+
 
 if __name__ == '__main__':
 	settings = {
@@ -91,6 +94,7 @@ if __name__ == '__main__':
 		(r"/static/game/game.html", UIIndexTestHandler),
 		(r"/static/index/index.html", LoginPageHandler),
 		(r"/static/user/user.html", UserPageHandler),
+		(r"/sk",BoardListenMessageSocketHandler ),
 
 		(r"/uitest.html", UIIndexHandler),
 		(r"/sit-down", SitDownBoardHandler),

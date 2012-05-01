@@ -61,7 +61,7 @@ var enter = function(){
 			console.log(data);
 			if( data.status == "success" ) {
 				console.log("enter success!");
-				listenBoardMessage();
+				listenBoardMessage(data.room.timestamp); // TODO Add timestamp
 				console.log([data.room.seats, "++++++___________++++++++"]);
 				for(var i = 0; i < data.room.seats.length; i++ ) {
 					if(i < SeatList.length){
@@ -114,7 +114,64 @@ var enter = function(){
 };
 
 var index = 1;
+
+var curtimestamp = 0;
+function listenBoardMessageSocket(timestamp){
+	curtimestamp = timestamp;
+	var ws = 0;
+	var retry = 0 ;
+	function onopen(evt){
+		var msg = JSON.stringify({timestamp:timestamp});
+		ws.send(msg);
+	}
+	function onmessage(evt) {
+		var data = JSON.parse(evt.data);
+		var timestamp = 0;
+		retry = 0;
+		for(var i = 0; i < data.length; i++) {
+			timestamp = data[i].timestamp;
+			if(timestamp <= curtimestamp){
+				continue;
+			}
+			curtimestamp = timestamp;
+			//console.log(data[i]);
+			console.log(timestamp);
+			board_msg_handler.process(data[i]);
+		}
+		console.log(timestamp);
+		var msg = JSON.stringify({timestamp:timestamp});
+		ws.send(msg);
+	};
+	function onclose(evt){
+		message_box.showMessage("WebSocket closed",5);
+		setTimeout(function(){
+			message_box.showMessage("Retrying",5);
+			setup_ws();
+			retry += 1;
+			if (retry > 10){
+				window.location.reload();
+			}
+		},1000);
+	}
+	function setup_ws(){
+		var host = window.location.host;
+		ws = new WebSocket("ws://" + host +"/sk");
+		ws.onerror = onclose;
+		ws.onclose = onclose;
+		ws.onmessage = onmessage;
+		ws.onopen = onopen;
+		window.ws = ws;
+	}
+	setup_ws();
+
+}
 var listenBoardMessage = function(timestamp) {
+	try{
+		listenBoardMessageSocket(timestamp);
+		return;
+	}catch(err){
+		message_box.showMessage("Seems your browser doesn't support WebSocket...");
+	}
 	if(!timestamp) timestamp = -1;
 
 	$.ajax({
@@ -138,7 +195,7 @@ var listenBoardMessage = function(timestamp) {
 			console.log("listen board message replay error!!!");
 			console.log(textStatus);
 			if(index < 6) {
-				listenBoardMessage();
+				listenBoardMessage(timestamp);
 			}
 			index++;
 		},
