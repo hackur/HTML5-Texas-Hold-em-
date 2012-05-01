@@ -62,7 +62,6 @@ class Channel(object):
 	def on_room_message(self, channel, method, header, body):
 		pika.log.info('PikaCient: Message receive, delivery tag #%i' % method.delivery_tag)
 		self.messages.append(json.loads(body))
-		print self.message_actions
 		for element in self.message_actions:
 			element['functor'](element['argument'])
 
@@ -162,7 +161,6 @@ class PersistentChannel(Channel):
 		if not self.request.request.connection.stream.closed():
 			print "PersistentChannel Closed"
 			if len(self.request.board_messages) > 0:
-				print self.request.board_messages
 				self.request.write(json.dumps(self.request.board_messages));
 			try:
 				self.request.finish()

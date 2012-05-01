@@ -101,7 +101,11 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		message			= None
 		user			= self.session['user']
 		room_id			= self.get_argument('room_id')
-		room			= self.db_connection.query(Room).filter_by(id = room_id).one()
+		room			= self.db_connection.query(Room).filter_by(id = room_id).first()
+		if not room:
+			self.finish()
+			return
+
 		self.mongodb	= self.application.settings['_db']
 		msg = self.mongodb.board.find_one({"user_id":self.session["user_id"], "room_id":room.id})
 		if msg:
@@ -207,7 +211,6 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			queue_name		= str(user.username) + '_sit'
 			exchange_name   = self.session['exchange']
 
-			self.session['room_id'] = room.id
 			user.room		= room
 			user.room_id	= room.id
 			self.db_connection.addItem(user)
@@ -286,6 +289,7 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 		if len(messages["message-list"]) > 0:
 			self.write_message(json.dumps(messages["message-list"]))
 
+		self.mongoSession = messages
 		binding_keys= (self.session['public_key'], self.session['private_key'])
 		self.channel= PersistentChannel(
 				self.application.channel,
@@ -312,6 +316,7 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 		board_messages["message-list"].extend(new_messages)
 		self.mongodb.board.save(board_messages)
 		self.board_messages = board_messages["message-list"]
+		self.mongoSession = board_messages
 		self.write_message(json.dumps(new_messages))
 
 
@@ -327,7 +332,7 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 			message['user_id']		= self.session['user_id']
 			message['method']		= 'action'
 			message['private_key']	= self.session['private_key']
-			message['room_id']		= self.session['room_id']
+			message['room_id']		= self.mongoSession['room_id']
 			self.channel.publish_message("dealer", json.dumps(message));
 
 
