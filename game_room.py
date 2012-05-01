@@ -292,7 +292,11 @@ class GameRoom(object):
 		# bet in big blind and small blind by default
 		print self.seats[self.small_blind].player_stake
 		self.seats[self.small_blind].bet(self.blind/2)
+		self.seats[self.small_blind].get_user().asset -= self.blind/2
+		self.seats[self.small_blind].get_user().update()
 		self.seats[self.big_blind].bet(self.blind)
+		self.seats[self.big_blind].get_user().asset -= self.blind
+		self.seats[self.big_blind].get_user().update()
 		print "big_blind stake: ", self.seats[self.big_blind].player_stake
 
 		print self.seats[self.big_blind].get_user().username
