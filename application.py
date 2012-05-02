@@ -13,6 +13,7 @@ from config_controller import *
 from database import *
 from thread_pool import thread_pool_init
 from pika.adapters.tornado_connection import TornadoConnection
+from thread_pool import thread_pool_init
 PORT = 8888
 
 class UIIndexHandler(tornado.web.RequestHandler):
@@ -84,7 +85,6 @@ if __name__ == '__main__':
 
 
 
-	init_database()
 	# Set our pika.log options
 	pika.log.setup(color=True)
 	pika.log.info("Starting Tornado HTTPServer on port %i" % PORT)
@@ -131,6 +131,7 @@ if __name__ == '__main__':
 	#http_server.start(8)
 	http_server.start()
 	thread_pool_init()
+	init_database()
 
 	pika.log.info('PikaClient: Connecting to RabbitMQ on localhost:5672')
 	credentials = pika.PlainCredentials('guest', 'guest')
