@@ -27,6 +27,7 @@
 		$.each(buttons,function(key,value){
 			$(value).removeClass("buttonEnable");
 			$(value).addClass("buttonDisable");
+			$(value).addClass("buttonHide");
 			$(value).unbind("click");
 		});
 		raise_slider_dispose();
