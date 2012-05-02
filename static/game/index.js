@@ -120,9 +120,12 @@ function listenBoardMessageSocket(timestamp){
 	curtimestamp = timestamp;
 	var ws = 0;
 	var retry = 0 ;
+	var success = 0;
 	function onopen(evt){
 		var msg = JSON.stringify({timestamp:timestamp});
+		window.ws = ws;
 		ws.send(msg);
+		success = true;
 	}
 	function onmessage(evt) {
 		var data = JSON.parse(evt.data);
@@ -144,6 +147,10 @@ function listenBoardMessageSocket(timestamp){
 	};
 	function onclose(evt){
 		message_box.showMessage("WebSocket closed",5);
+		if(!success){
+			listenBoardMessage(timestamp,true);
+			return;
+		}
 		setTimeout(function(){
 			message_box.showMessage("Retrying",5);
 			setup_ws();
@@ -160,17 +167,18 @@ function listenBoardMessageSocket(timestamp){
 		ws.onclose = onclose;
 		ws.onmessage = onmessage;
 		ws.onopen = onopen;
-		window.ws = ws;
 	}
 	setup_ws();
 
 }
-var listenBoardMessage = function(timestamp) {
-	try{
-		listenBoardMessageSocket(timestamp);
-		return;
-	}catch(err){
-		message_box.showMessage("Seems your browser doesn't support WebSocket...");
+var listenBoardMessage = function(timestamp,nowebsocket) {
+	if(!nowebsocket){
+		try{
+			listenBoardMessageSocket(timestamp);
+			return;
+		}catch(err){
+			message_box.showMessage("Seems your browser doesn't support WebSocket...");
+		}
 	}
 	if(!timestamp) timestamp = -1;
 
@@ -189,13 +197,13 @@ var listenBoardMessage = function(timestamp) {
 				board_msg_handler.process(data[i]);
 			}
 
-			listenBoardMessage(timestamp);
+			listenBoardMessage(timestamp,nowebsocket);
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
 			console.log("listen board message replay error!!!");
 			console.log(textStatus);
 			if(index < 6) {
-				listenBoardMessage(timestamp);
+				listenBoardMessage(timestamp,nowebsocket);
 			}
 			index++;
 		},
