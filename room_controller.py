@@ -111,8 +111,11 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		if msg:
 			msg["message-list"] = []
 		else:
+
 			msg = {"user_id":self.session["user_id"], "room_id":room.id, "message-list": []}
 
+		print "Saving ",msg
+		self.mongodb.board.remove({"user_id":self.session["user_id"]}) # guarantee only one exist
 		self.mongodb.board.save(msg)
 
 		self.db_connection.addItem(user)
@@ -203,6 +206,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			self.finish()
 		else:
 			messages		= self.mongodb.board.find_one({"user_id":self.session["user_id"]})
+			print messages
 			room			= self.db_connection.query(Room).filter_by(id = messages["room_id"]).first()
 			if room is None:
 				self.finish(json.dumps({'status':'failed'}))
@@ -290,6 +294,7 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 			self.write_message(json.dumps(messages["message-list"]))
 
 		self.mongoSession = messages
+		self.messagesBuffer = messages["message-list"]
 		binding_keys= (self.session['public_key'], self.session['private_key'])
 		self.channel= PersistentChannel(
 				self.application.channel,
@@ -298,26 +303,28 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 		self.channel.connect()
 
 	def clean_matured_message(self, timestamp):
-		board_messages = self.mongodb.board.find_one({"user_id":self.session["user_id"]})
-		if board_messages is not None:
-			board_messages["message-list"] = filter(lambda x: int(x['timestamp']) > timestamp, board_messages["message-list"])
-			self.mongodb.board.update({"user_id": self.session["user_id"]}, board_messages)
+		self.messagesBuffer = filter(lambda x: int(x['timestamp']) > timestamp, self.messagesBuffer)
+		#self.mongodb.board.update({"user_id": self.session["user_id"]}, board_messages)
 
-		return board_messages
 
 
 	def on_connection_close(self):
+		user_id			= self.session['user_id']
+		mongoSession	= self.mongodb.board.find_one({"user_id": user_id})
+		mongoSession["message-list"] = self.messagesBuffer
+		self.mongodb.board.save(mongoSession)
 		self.channel.close()
 
 	def message_call_back(self, argument):
 		new_messages	= self.channel.get_messages()
-		user_id			= self.session['user_id']
-		board_messages	= self.mongodb.board.find_one({"user_id": user_id})
-		board_messages["message-list"].extend(new_messages)
-		self.mongodb.board.save(board_messages)
-		self.board_messages = board_messages["message-list"]
-		self.mongoSession = board_messages
+
+		self.messagesBuffer.extend(new_messages)
 		self.write_message(json.dumps(new_messages))
+		#board_messages	= self.mongodb.board.find_one({"user_id": user_id})
+		#board_messages["message-list"].extend(new_messages)
+		#self.mongodb.board.save(board_messages)
+		#self.board_messages = board_messages["message-list"]
+		#self.mongoSession = board_messages
 
 
 	def on_message(self, message):
@@ -325,7 +332,7 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 		msg = json.loads(message)
 		if 'timestamp' in msg:
 			timestamp	= int(msg['timestamp'])
-			board_messages = self.clean_matured_message(timestamp)
+			self.clean_matured_message(timestamp)
 		elif 'action' in msg:
 			user					= self.session['user']
 			message					= msg
