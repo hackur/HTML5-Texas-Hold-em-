@@ -113,7 +113,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		else:
 			msg = {"user_id":self.session["user_id"], "room_id":room.id, "message-list": []}
 
-		self.mongodb.board.update({"user_id":self.session["user_id"]},msg)
+		self.mongodb.board.save(msg)
 
 		self.db_connection.addItem(user)
 		self.db_connection.commit_session()

@@ -11,6 +11,7 @@ from archive_controller import *
 from chat_controller import *
 from config_controller import *
 from database import *
+from thread_pool import thread_pool_init
 from pika.adapters.tornado_connection import TornadoConnection
 PORT = 8888
 
@@ -129,6 +130,7 @@ if __name__ == '__main__':
 	http_server.bind(PORT)
 	#http_server.start(8)
 	http_server.start()
+	thread_pool_init()
 
 	pika.log.info('PikaClient: Connecting to RabbitMQ on localhost:5672')
 	credentials = pika.PlainCredentials('guest', 'guest')

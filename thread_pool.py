@@ -45,7 +45,7 @@ class ThreadPool(object):
 
         self.threads.remove(thread)
 
-thread_pool = ThreadPool()
+thread_pool = None
 
 def get_ioloop():
     "Monkeypatch me to use a custom ioloop for @in_ioloop"
@@ -54,7 +54,12 @@ def get_ioloop():
 def flag_ioloop():
     thread_locals.ioloop = True
 
-get_ioloop().add_callback(flag_ioloop)
+
+def thread_pool_init():
+    global thread_pool
+    thread_pool = ThreadPool()
+    get_ioloop().add_callback(flag_ioloop)
+
 
 def in_ioloop(fn):
 
