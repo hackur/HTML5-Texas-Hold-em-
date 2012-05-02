@@ -625,7 +625,7 @@ p.actionBox:after
 	left: 113px;
 }
 .seatPos2 p.actionBox {
-	top: -18px;
+	top: 10px;
 	left: 113px;
 }
 .seatPos3 p.actionBox {
@@ -755,7 +755,7 @@ p.actionBox:after
 	left: -5px;
 }
 .seatPos2 p.dealerBtn {
-	top: 38px;
+	top: 95px;
 	left: 123px;
 }
 .seatPos3 p.dealerBtn {
