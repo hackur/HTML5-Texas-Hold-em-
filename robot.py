@@ -1,6 +1,7 @@
 from tornado.httpclient import HTTPClient
 from tornado.httpclient import AsyncHTTPClient
-from robot_dictionary import *
+from time import gmtime, strftime
+from poker_controller import *
 import tornado.ioloop
 import urllib
 import json
@@ -16,15 +17,14 @@ class Seat:
 
 class DecisionMaker:
 	def __init__(self):
-		self.deck	= 52*[0]
+		self.ranks	= {}
+		self.poker	= Poker(2)
+		self.cards	= []
 		suit		= 0x8000;
 		index		= 0
 		for i in xrange(4):
-			for j in xrange(13):
-				self.deck[index] = primes[j] | (j << 8) | suit | (1 << (16+j));
-				index += 1
-			suit >>= 1
-		print self.deck
+			for j in xrange(2,15):
+				self.cards.append(Card(i,j))
 
 	def _rank_compare(self, left,right):
 		if left[0] != right[0] :
@@ -64,65 +64,12 @@ class DecisionMaker:
 			_suit = 2
 		elif _suit == "S":
 			_suit = 3
-		_value -= 2
-		print _suit * 13 + _value
-		return self.deck[_suit * 13 + _value]
+		return Card(_suit, _value)
 
-	def findit(self, key):
-		low	= 0
-		high= 4887
-		mid	= 0
-		while low <= high:
-			mid = (high+low) >> 1
-		#	print "product[%d]=%d",(mid,products[mid])
-			if key < products[mid]:
-				high = mid - 1
-			elif key > products[mid]:
-				low = mid + 1
-			else:
-				return mid
-		print "ERROR:  no match found; key = %d\n" % (key)
-		return -1;
-
-	def eval_5hand(self, c1, c2, c3, c4, c5):
-		q = (c1|c2|c3|c4|c5) >> 16
-		if ( c1 & c2 & c3 & c4 & c5 & 0xF000 ) > 0:
-			return  flushes[q]
-
-		s = unique5[q]
-		if s > 0:
-			return s
-		q = (c1&0xFF) * (c2&0xFF) * (c3&0xFF) * (c4&0xFF) * (c5&0xFF)
-		q = self.findit(q)
-		return values[q]
 
 	def _rank(self, cards):
-		q	= 0
-		best= 9999
-		length = len(cards)
-		sub_hand = []
-		if length == 7:
-			for i in xrange(21):
-				for j in perm7[i]:
-					sub_hand.append(cards[j])
-				q = self.eval_5hand( sub_hand[0], sub_hand[1], sub_hand[2], sub_hand[3], sub_hand[4] );
-				if q < best:
-					best = q
-
-		elif length == 6:
-			for i in xrange():
-				for j in perm6[i]:
-					sub_hand.append(cards[j])
-				q = self.eval_5hand( sub_hand[0], sub_hand[1], sub_hand[2], sub_hand[3], sub_hand[4] );
-				if q < best:
-					best = q
-
-		elif length == 5:
-			q = self.eval_5hand( cards[0], cards[1], cards[2], cards[3], cards[4] );
-			if q < best:
-				best = q
-
-		return best
+		cards.sort()
+		return self.poker.score(cards)
 
 	def filter(self,source, exclude_list):
 		result	= []
@@ -135,101 +82,147 @@ class DecisionMaker:
 			if flag == False:
 				result.append(element)
 			flag = False
-
 		return result
+	def _chen_score(self, card):
+		if card.value == 14:
+			return 10
+		elif card.value == 13:
+			return 8
+		elif card.value == 12:
+			return 7
+		elif card.value == 11:
+			return 6
+		else:
+			return card.value / 2.0
 
-	def _hand_strength(self, robot_cards, board_cards):
-		ahead	= 0
-		tied	= 0
-		behind	= 0
-		robot_all_cards = robot_cards + board_cards
-		robot_rank		= self._rank(robot_all_cards)
-		remain_cards	= filter(lambda x: x not in robot_all_cards, self.deck)
-		for i in xrange(len(remain_cards) - 1):
-			for j  in xrange(i + 1, len(remain_cards)):
-				opp_rank = self._rank([remain_cards[i], remain_cards[j]] + board_cards)
-				compare_result = opp_rank - robot_rank #self._rank_compare(robot_rank, opp_rank)
-				if compare_result > 0:
-					ahead	+= 1
-				elif compare_result == 0:
-					tied	+= 1
-				else:
-					behind	+= 1
-	#	print "ahead = %d"%(ahead)
-	#	print "tied	 = %d"%(tied)
-	#	print "behind= %d"%(behind)
-		return (ahead + tied / 2) / (ahead + tied + behind)
+	def _chen_formula(self, cards):
+		baseScore = max(self._chen_score(cards[0]), self._chen_score(cards[1]))
+		if cards[0].value == cards[1].value:
+			baseScore = max(5, baseScore * 2)
 
-	def _hand_potential(self, robot_cards, board_cards):
-		hand_potential_total = [0.0,0.0,0.0]
-		hand_potential	= [3*[0.0] for x in xrange(3)]
-		robot_all_cards = robot_cards + board_cards
-		remain_cards	= filter(lambda x: x not in robot_all_cards, self.deck) #self.filter(self.cards, robot_all_cards)
-		robot_rank		= self._rank(robot_all_cards)
-		for i in xrange(len(remain_cards) - 1):
-			for j in xrange(i + 1, len(remain_cards)):
-				opp_cards		= [remain_cards[i], remain_cards[j]]
-				opp_rank		= self._rank(opp_cards + board_cards)
-				compare_result	= opp_rank - robot_rank #self._rank_compare(robot_rank, opp_rank)
-				if compare_result > 0:
-					index	= 0
-				elif compare_result == 0:
-					index	= 1
-				else:
-					index	= 2
-				hand_potential_total[index] += 1
-				temp_cards	= filter(lambda x: x not in opp_cards, remain_cards) #self.filter(remain_cards, opp_cards)
-				if len(board_cards) == 3:
-					for k in xrange(len(temp_cards)-1):
-						for o in xrange(k + 1, len(temp_cards)):
+		if cards[0].symbol == cards[1].symbol:
+			baseScore += 2
 
-							#print "i=[%d] j=[%d] k=[%d] o=[%d]\n"%(i,j,k,o)
-							temp_board	= board_cards + [temp_cards[k],temp_cards[o]]
-							robot_best	= self._rank(temp_board+robot_cards)
-							opp_best	= self._rank(temp_board+opp_cards)
-							best_comparison= opp_best - robot_best #self._rank_compare(robot_best, opp_best)
-							if best_comparison > 0:
-								hand_potential[index][0] +=1
-							elif best_comparison == 0:
-								hand_potential[index][1] +=1
-							else:
-								hand_potential[index][2] +=1
-				elif len(board_cards) == 4:
-					for k in xrange(len(temp_cards)-1):
-						temp_board	= board_cards + [temp_cards[k]]
-						robot_best	= self._rank(temp_board+robot_cards)
-						opp_best	= self._rank(temp_board+opp_cards)
-						best_comparison= self._rank_compare(robot_best, opp_best)
+		gap = abs(cards[0].value – cards[1].value)
+
+		if gap == 0:
+			pass
+		elif gap == 1:
+			baseScore	+= 1
+		elif gap == 2:
+			baseScore	-= 1
+		elif gap == 3:
+			baseScore	-= 2
+		elif gap == 4:
+			baseScore	-= 4
+		else:
+			baseScore	-= 5
+
+		return (baseScore – gap)/20.0;
+
+
+	def _hand_potential(self, robot_cards, opp_cards_list, board_cards):
+		total_cases	= 0
+		win_counter	= 0
+		if len(board_cards) >0:
+			robot_all_cards = robot_cards + board_cards
+			remain_cards	= self.filter(self.cards, robot_all_cards)
+			for opp_cards in opp_cards_list:
+				remain_cards= self.filter(remain_cards, opp_cards)
+
+		if len(board_cards) == 0:
+			return self._chen_formula(robot_cards)
+		elif len(board_cards) == 3:
+			for k in xrange(len(remain_cards)-1):
+				for o in xrange(k + 1, len(remain_cards)):
+					counter = 0
+					for opp_cards in opp_cards_list:
+						temp_board	= board_cards + [remain_cards[k], remain_cards[o]]
+						robot_best	= self._rank(temp_board + robot_cards)
+						opp_best	= self._rank(temp_board + opp_cards)
+						best_comparison = self._rank_compare(robot_best, opp_best)
 						if best_comparison > 0:
-							hand_potential[index][0] +=1
-						elif best_comparison == 0:
-							hand_potential[index][1] +=1
-						else:
-							hand_potential[index][2] +=1
+							counter += 1
+				total_cases += 1
+				if counter == len(opp_cards_list):
+					win_counter += 1
+		elif len(board_cards) == 4:
+			for k in xrange(len(remain_cards)):
+				counter = 0
+				for opp_cards in opp_cards_list:
+					temp_board	= board_cards + [remain_cards[k]]
+					robot_best	= self._rank(temp_board + robot_cards)
+					opp_best	= self._rank(temp_board + opp_cards)
+					best_comparison = self._rank_compare(robot_best, opp_best)
+					if best_comparison > 0:
+						counter += 1
+				total_cases += 1
+				if counter == len(opp_cards_list):
+					win_counter += 1
+		elif len(board_cards) == 5:
+			remain_cards= self.filter(self.cards, robot_all_cards)
+			no_opp		= len(opp_cards_list)
+			for i in xrange(len(remain_cards) - no_ppp - 1):
+				for j in xrange(k + 1, len(remain_cards) - no_opp ):
+					counter = 0
+					for k in xrange(no_opp):
+						temp_board	= board_cards + [remain_cards[i], remain_cards[j + k]]
+						robot_best	= self._rank(temp_board + robot_cards)
+						opp_best	= self._rank(temp_board + opp_cards)
+						best_comparison = self._rank_compare(robot_best, opp_best)
+						if best_comparison > 0:
+							counter += 1
+					total_cases += 1
+				if counter == no_opp:
+					win_counter += 1
 
-				else:
-					return -1
-		ppot	= (hand_potential[2][0] + hand_potential[2][1] / 2 + hand_potential[1][0] / 2) / (hand_potential_total[2]+hand_potential_total[1]/2 +1)
-		npot	= (hand_potential[0][2] + hand_potential[1][2]/2 + hand_potential[0][1] / 2) / (hand_potential_total[0]+hand_potential_total[1]/2 +1)
-		return (ppot, npot)
+		return (win_counter*1.0)/total_cases
 
 
-	def make_decision(self, seats, robot_seat, robot_cards, board_cards):
-		robot_decks	= []
-		board_decks = []
-		print robot_cards
-		print board_cards
+	def make_decision(self, robot_cards, opp_cards_list, board_cards, current_pot, call_stake, min_raise, max_raise, rights):
+		robot_decks		= []
+		board_decks		= []
+		opp_cards_list	= []
+
 		for card in robot_cards:
 			robot_decks.append(self.convert_to_deck(card))
-		print robot_decks
+
 		for card in board_cards:
 			board_decks.append(self.convert_to_deck(card))
 
-		print board_decks
-		hs			= self._hand_strength(robot_decks, board_decks)
-		(ppot, npot)= self._hand_potential(robot_decks, board_decks)
-		p_win		= hs*(1 - npot) + (1 - hs) * ppot
-		print "win probability", p_win
+		for cards in opp_cards_list:
+			temp_list	= []
+			for card in cards:
+				temp_list.append(self.convert_to_deck(card))
+			opp_cards_list.append(temp_list)
+
+		win_odds = 1.0 / (self._hand_potential(robot_cards, opp_cards_list, board_cards))
+
+
+		if "call" in rights and "all in" in rights and "raise" not in rights:
+			if current_pot / call_stake > win_odds :
+				if current_pot / max_raise > win_odds:
+					return max_raise
+				return call_stake
+			else:
+				return -1
+
+		if "call" in rights and "raise" in rights:
+			if current_pot / call_stake > win_odds :
+				if current_pot / max_raise > win_odds:
+					return max_raise
+				elif current_pot / min_raise > win_odds:
+					return min_raise
+				return call_stake
+			else:
+				return -1
+
+		if "call" not in rights and "all in" in rights:
+			if current_pot / min_raise > win_odds:
+				return min_raise
+			else:
+				return -1
+
 
 class Robot:
 	Login_URL_Template					= "http://%s:%d/login"
@@ -444,5 +437,9 @@ if __name__=="__main__":
 	#ioloop.start()
 	decision_maker	= DecisionMaker()
 	cards	= ["2C", "2D"]
-	p_cards	= ["2H", "2S", "6C"]
-	decision_maker.make_decision([0], 1, cards, p_cards);
+	p_cards	= ["2H", "2S", "6C",]
+	print strftime("%Y-%m-%d %H:%M:%S", gmtime())
+	decision_maker.make_decision([0], 1, cards, p_cards)
+	print strftime("%Y-%m-%d %H:%M:%S", gmtime())
+	decision_maker.make_decision([0], 1, cards, p_cards)
+	print strftime("%Y-%m-%d %H:%M:%S", gmtime())

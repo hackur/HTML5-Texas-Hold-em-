@@ -41,6 +41,9 @@ class Card:
 		return text
 	def __repr__(self):
 		return self.__str__()
+	def __hash__(self):
+		return self.symbol*13 + self.value
+
 class deck:
     #Initializes the deck, and adds jokers if specified
 	def __init__(self, addJokers = False):
@@ -167,7 +170,6 @@ class Poker:
 		kicker	= []
 		pairs	= {}
 		prev	= 0
-		hand.sort()
         #Keeps track of all the pairs in a dictionary where the key is the pair's card value
         #and the value is the number occurrences. Eg. If there are 3 Kings -> {"13":3}
 		for i in range(len(hand)):
