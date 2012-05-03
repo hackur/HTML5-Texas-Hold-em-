@@ -28,7 +28,7 @@ function Seat(id,pos){
 	var portrait_border = $('<div class="portrait_border"></div>');
 	var portrait = $('<img class="portrait"/>');
 	var dealerBtn = $("<p class='dealerBtn'>D</p>");
-
+	
 	divStake.appendTo(divChip);
 	divSeatbg.appendTo(divSeat);
 	divChip.appendTo(divSeat);
@@ -351,6 +351,7 @@ function seatInit(){
 	var send_stake_btn	= $('<div id="send_stake_btn"><div id="send_stake_text">赠送好友</div></div>');
 	var info_text		= $('<div id="info_text">信   息</div>')
 	var send_val		= $('<span id="send_amount"></span>');
+	var closeBtn 		= $('<span class="closeBtn">X</span>');
 
 	portrait_box.appendTo(dialog_content);
 	info_text.appendTo(dialog_content);
@@ -366,6 +367,7 @@ function seatInit(){
 	total_games.appendTo(dialog_content);
 	// won_games.appendTo(dialog_content);
 	last_login.appendTo(dialog_content);
+	closeBtn.appendTo(dialog_content);
 	head_portrait.appendTo(portrait_box);
 
 	add_friend_btn.appendTo(dialog_bottom);

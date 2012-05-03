@@ -263,25 +263,29 @@ var take_place = function(seatID, seatObj) {
 			seatObj.player.show(seatObj.player);
 			console.log(".............");
 			console.log(window.SelectedSeat);
-			var info_hide = function(e) {
-				var infoWindow = $("#player-info-content");
-				var infoWindowPosition = infoWindow.offset();
-				var infoWindowSize = {"width": infoWindow.width(), "height": infoWindow.height()};
-				pos = get_event_position(e);
-				console.log(infoWindowSize["width"]);
-				console.log(pos[0]);
-				if(pos[0] < infoWindowPosition["left"] || pos[0] > infoWindowPosition["left"]+infoWindowSize["width"]) {
-					console.log("I'm hiding myself!");
-					seatObj.player.hide();	
-			e.stopPropagation();
-					window.removeEventListener("click", info_hide,true);
-				}
-//				$("#stand").bind("click", window.actionButton.send_action_stand());
-//				$("#backBtn").bind("click");
-			}
-			window.addEventListener("click", info_hide, true);
-//			$("#stand").unbind("click");
-//			$("#backBtn").unbind("click");
+			var closeBtn = $(".closeBtn");
+			closeBtn.click(function(e) {
+				seatObj.player.hide();	
+			});
+//			var info_hide = function(e) {
+//				var infoWindow = $(".closeBtn");
+//				var infoWindowPosition = infoWindow.offset();
+//				var infoWindowSize = {"width": infoWindow.width(), "height": infoWindow.height()};
+//				pos = get_event_position(e);
+//				console.log(infoWindowSize["width"]);
+//				console.log(pos[0]);
+//				if(pos[0] < infoWindowPosition["left"] || pos[0] > infoWindowPosition["left"]+infoWindowSize["width"]) {
+//					console.log("I'm hiding myself!");
+//					seatObj.player.hide();	
+//			e.stopPropagation();
+//					window.removeEventListener("click", info_hide,true);
+//				}
+////				$("#stand").bind("click", window.actionButton.send_action_stand());
+////				$("#backBtn").bind("click");
+//			}
+//			window.addEventListener("click", info_hide, true);
+////			$("#stand").unbind("click");
+////			$("#backBtn").unbind("click");
 		}
 	});
 };
