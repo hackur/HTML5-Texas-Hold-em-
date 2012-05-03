@@ -103,8 +103,7 @@ class DecisionMaker:
 		if cards[0].symbol == cards[1].symbol:
 			baseScore += 2
 
-		gap = abs(cards[0].value – cards[1].value)
-
+		gpa = abs(cards[0].value - cards[1].value)
 		if gap == 0:
 			pass
 		elif gap == 1:
@@ -118,7 +117,7 @@ class DecisionMaker:
 		else:
 			baseScore	-= 5
 
-		return (baseScore – gap)/20.0;
+		return (baseScore - gap)/20.0;
 
 
 	def _hand_potential(self, robot_cards, opp_cards_list, board_cards):
@@ -182,7 +181,7 @@ class DecisionMaker:
 	def make_decision(self, robot_cards, opp_cards_list, board_cards, current_pot, call_stake, min_raise, max_raise, rights):
 		robot_decks		= []
 		board_decks		= []
-		opp_cards_list	= []
+		opp_decks_list	= []
 
 		for card in robot_cards:
 			robot_decks.append(self.convert_to_deck(card))
@@ -194,10 +193,13 @@ class DecisionMaker:
 			temp_list	= []
 			for card in cards:
 				temp_list.append(self.convert_to_deck(card))
-			opp_cards_list.append(temp_list)
+			opp_decks_list.append(temp_list)
 
-		win_odds = 1.0 / (self._hand_potential(robot_cards, opp_cards_list, board_cards))
-
+		print opp_decks_list
+		win_probability = self._hand_potential(robot_decks, opp_decks_list, board_decks)
+		win_odds = 1.0 / (win_probability)
+		print win_probability
+		print win_odds
 
 		if "call" in rights and "all in" in rights and "raise" not in rights:
 			if current_pot / call_stake > win_odds :
@@ -437,9 +439,10 @@ if __name__=="__main__":
 	#ioloop.start()
 	decision_maker	= DecisionMaker()
 	cards	= ["2C", "2D"]
-	p_cards	= ["2H", "2S", "6C",]
+	p_cards	= ["5H", "4S", "6C",]
+	opp_card_list = [["3D","KD"], ["3S","4H"], ["2S","AD"]]
 	print strftime("%Y-%m-%d %H:%M:%S", gmtime())
-	decision_maker.make_decision([0], 1, cards, p_cards)
+	print decision_maker.make_decision(cards, opp_card_list, p_cards, 200, 10,20,100,["call", "raise"])
 	print strftime("%Y-%m-%d %H:%M:%S", gmtime())
-	decision_maker.make_decision([0], 1, cards, p_cards)
+	print decision_maker.make_decision(cards, opp_card_list, p_cards, 200, 40,80,100,["call", "raise"])
 	print strftime("%Y-%m-%d %H:%M:%S", gmtime())
