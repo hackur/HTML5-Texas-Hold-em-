@@ -39,6 +39,8 @@ class Card:
 		else:   #C-Clubs
 			text += "C"
 		return text
+	def __repr__(self):
+		return self.__str__()
 class deck:
     #Initializes the deck, and adds jokers if specified
 	def __init__(self, addJokers = False):
@@ -165,7 +167,7 @@ class Poker:
 		kicker	= []
 		pairs	= {}
 		prev	= 0
-
+		hand.sort()
         #Keeps track of all the pairs in a dictionary where the key is the pair's card value
         #and the value is the number occurrences. Eg. If there are 3 Kings -> {"13":3}
 		for i in range(len(hand)):
@@ -189,7 +191,12 @@ class Poker:
 
         #Here we determine the best possible combination the hand can be knowing if the
         #hand has a four of a kind, three of a kind, and multiple pairs.
-
+		#print "pairs"
+		#print pairs
+		#print "not================"
+		#print nop
+		#print "hand================"
+		#print hand
 		if 4 in nop:        #Has 4 of a kind, assigns the score and the value of the
 			score = 7
 			kicker = pairs.keys()
@@ -292,7 +299,7 @@ class Poker:
 
 #Checks to see if the hand contains an ace, and if so starts checking for the straight
 #using an ace low
-		if (hand[6].value == 14):
+		if (hand[len(hand) - 1].value == 14):
 			prev = 1
 		else:
 			prev = None
