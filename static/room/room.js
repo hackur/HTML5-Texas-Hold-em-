@@ -68,7 +68,6 @@ $(function(){
 });
 
 function create_room() {
-
 	console.log(parseInt($("#curBlind").html()));
 	//console.log($("#curBlind").val());
 	var blind = parseInt($("#curBlind").html()) * 2;
@@ -114,7 +113,7 @@ function initSetting() {
 
 	}
 	function changeBlind(val) {
-		$("#curBlind").html( Math.round(val/2) +"/" + val);
+		$("#curBlind").html( (val>>1) +"/" + val);
 	}	
 	function changePersonNum(val) {
 		$("#personNumShow").html(val);

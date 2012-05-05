@@ -40,9 +40,9 @@
 #submitButton:hover { background-image: url(./image/sure-hover.png);}
 
 .sit_slider_bar{position:absolute; top: 104px; left: 44px; width: 366px; height: 15px; background-image: url(./image/sliderbar.png);}
-#slider_bar{position:absolute; top: 104px; left: 44px; width: 366px; height: 15px; background-image: url(./image/sliderbar.png);}
+.slider_bar{position:absolute; top: 104px; left: 44px; width: 366px; height: 15px; background-image: url(./image/sliderbar.png);}
 .sit_slider_button{position:absolute; top: -11px; left: 30px; width: 62px; height: 36px; background-image: url(./image/slider.png);}
-#slider_button{position:absolute; top: -11px; left: 30px; width: 62px; height: 36px; background-image: url(./image/slider.png);}
+.slider_button{position:absolute; top: -11px; left: 30px; width: 62px; height: 36px; background-image: url(./image/slider.png);}
 #sit_slider_textMax{position:absolute; top: 126px; left: 398px; width: 60px; height: 34px;}
 #sit_slider_textMin{position:absolute; top: 126px; left: 29px; width: 60px; height: 34px;}
 

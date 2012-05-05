@@ -82,13 +82,62 @@
 	function raise_update_value(height,maxHeight){
 		var min = limits[A_RAISESTAKE][0];
 		var max = limits[A_RAISESTAKE][1];
-		var steps = (max - min) / 1;
-		var value = Math.round(height/maxHeight * steps) +  min;
+		//var steps = (max - min) / 1;
+		//console.log("height" + height + " maxHeight" + maxHeight);
+		var position = minMaxPosition(min,max);
+		console.log(min + " " + max + "minmax");
+		console.log(position[0] + " " + position[1]);
+		var SpaceNum = position[1] - position[0];
+		var SpaceLength = maxHeight / SpaceNum;
+		var whichSpace = Math.floor(height / SpaceLength);
+		var value = mem[position[0] + whichSpace];
+		if (value <= min)
+			value = min;
+		if (value >= max)
+			value = max; 
+		//var value = Math.round(height/maxHeight * steps) +  min;
+		//var value = Math.floor(height/maxHeight * steps) +  min;
 		cur_raise_value = value;
 
 		$("#raise_amount").html(value);
-
+		
 	}
+	function minMaxPosition(min,max) {
+		var i;
+		position=[];
+		for(i = 1; i < 46; i++){
+			if (mem[i]>min) {
+				position[0]=i-1;
+				break;
+			}
+			
+			
+		}
+		while( i<46){
+			if (mem[i]>max) {
+				position[1]=i;
+				break;
+				
+			}	
+			i++;	
+		}
+		return position;
+		
+	}
+	var mem = [];
+ 	var weight = [1,10,100,1000,10000,100000,1000000,10000000];
+ 	var xx = [9,1,2,3,4,5,6,7,8]
+ 	function genMem() {
+ 		var i = 1;
+ 		while(i<46){	
+ 		var degree = Math.floor((i-1)/9);
+ 		mem[i]=xx[i%9]*weight[degree];
+ 		i++;
+ 		}
+ 		//for(i = 1; i < 46; i++)
+ 		//	console.log(mem[i] + "\n");
+ 	}
+ 	genMem();
 	function raise_slider_move(e){
 		var startY = get_event_position(e)[1];
 		var minTop = 
@@ -97,7 +146,7 @@
 		var	maxTop = $("#raise_slider").offset().top 
 				+ $("#raise_slider").height()
 				- $("#raise_slider_button").height();
-
+		
 		var diffX = startY - down_pos;
 		var next_pos = down_slider_pos + diffX;
 
