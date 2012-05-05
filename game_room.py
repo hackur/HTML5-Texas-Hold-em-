@@ -6,7 +6,6 @@ from operator import attrgetter
 import sys
 from tornado import ioloop
 from database import *
-from sqlalchemy import update
 import functools
 
 class Seat(object):

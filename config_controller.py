@@ -13,12 +13,10 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 
-from sqlalchemy.orm import sessionmaker,relationship, backref
 import database
 from database import DatabaseConnection,User,Room, DealerInfo
 from authenticate import *
 from pika_channel import Channel,PersistentChannel
-from sqlalchemy.sql import functions as SQLFunc
 
 class ConfigReader(object):
 	cache = {}
