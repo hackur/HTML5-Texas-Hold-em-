@@ -23,9 +23,9 @@ from pika_channel import Channel
 class UserInfoHandler(tornado.web.RequestHandler):
 	@authenticate
 	def get(self):
-		user = self.session['user']
+		user = self.user
 		# 'n': username
 		# 's': stake
 		# 'l': level
-		msg = {'n':user.username,'s':user.asset,'l':user.level,'id':user.id}
+		msg = {'n':user.username,'s':user.asset,'l':user.level,'id':str(user._id)}
 		self.write(json.dumps(msg))

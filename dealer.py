@@ -6,7 +6,6 @@ import random
 # import PokerController
 import poker_controller
 from game_room import GameRoom
-from sqlalchemy.orm import sessionmaker,relationship, backref
 
 import database
 from database import DatabaseConnection,User,Room, DealerInfo
@@ -26,23 +25,16 @@ class Dealer(object):
 
 	def init_database(self):
 		database.init_database()
-		self.db_connection = DatabaseConnection()
-		db_connection = self.db_connection
-		db_connection.start_session()
 
-
-		info = db_connection.query(DealerInfo).filter_by(exchange = self.exchange).first()
+		info =	DealerInfo.find(exchange = self.exchange)
 
 		if not info:
-			info = DealerInfo()
+			info = DealerInfo.new(self.exchange)
 		else:
 			print "WARNING, dealer %s already in database" % self.exchange
 
 
-		info.exchange = self.exchange
 		info.rooms = 0
-		db_connection.addItem(info)
-		db_connection.commit_session()
 
 	def on_queue_bound(self, frame):
 		self.channel.basic_consume(
@@ -92,8 +84,9 @@ class Dealer(object):
 	def cmd_action(self, args):
 		#print "-------user trying to bet"
 		print "action in dealer %d" % args["action"]
-		current_room    = self.room_list[args["room_id"]]
-		current_room.user_action(args)
+		if args["room_id"] in self.room_list:
+			current_room    = self.room_list[args["room_id"]]
+			current_room.user_action(args)
 
 	def cmd_chat(self, args):
 		print args
@@ -102,11 +95,11 @@ class Dealer(object):
 
 	def cmd_sit(self, args):
 		print "sit received"
-		self.db_connection.start_session()
 		source			= args['source']
 		private_key		= args['private_key']
 		stake			= args['stake']
-		user			= self.db_connection.query(User).filter_by(id=args['user_id']).first()
+		user			= User.find(_id=args['user_id'])
+		print args['user_id']
 		current_room	= self.room_list[args["room_id"]]
 		(status, msg)	= current_room.sit(user, int(args["seat"]), source, private_key,stake)
 
@@ -117,7 +110,6 @@ class Dealer(object):
 		self.channel.basic_publish( exchange    = self.exchange,
 									routing_key = source,
 									body        = json.dumps(message))
-		self.db_connection.close()
 
 	def broadcast(self, routing_key, msg):
 		self.channel.basic_publish(	exchange	= self.exchange,
@@ -151,21 +143,17 @@ class Dealer(object):
 		routing_key = args['source']
 		roomType	= int(args["roomType"])
 
-		db_connection = self.db_connection
-		db_connection.start_session()
 
-		newRoom = Room(self.exchange,blind,max_player,
+		newRoom = Room.new(self.exchange,blind,max_player,
 				max_stake,
 				min_stake)
 		newRoom.roomType = roomType
-		db_connection.addItem(newRoom)
-		db_connection.commit_session()
 
 		self.room_list[newRoom.id] = GameRoom(
 				newRoom, args["user_id"], self,
 				max_player,blind,min_stake,max_stake)
 		print newRoom
-		message = {"room_id":newRoom.id}
+		message = {"room_id":newRoom._id}
 
 		self.channel.basic_publish( exchange    = self.exchange,
 				routing_key = routing_key,
@@ -174,7 +162,9 @@ class Dealer(object):
 
 
 	def on_message(self, channel, method, header, body):
+		print "ON_MESSAGE!"
 		obj = json.loads(body)
+		print body
 		method = getattr(self,"cmd_" + obj['method'])
 		method(obj)
 
@@ -183,13 +173,11 @@ class Dealer(object):
 
 
 	def handle_init_file(self,fname):
-		db_connection = self.db_connection
-		db_connection.start_session()
-		info = db_connection.query(Room).filter_by(exchange = self.exchange)
+		info = Room.find_all(exchange = self.exchange)
 		for room in info:
-			db_connection.delete(room)
+			room.remove()
 
-		db_connection.commit_session()
+
 	#	if os.path.isfile(fname):
 		print len(fname)
 		print os.getcwd()
@@ -199,13 +187,10 @@ class Dealer(object):
 					continue
 
 				(blind,max_stake,min_stake,max_player) = ( int(x) for x in line.strip().split(','))
-				db_connection.start_session()
 
-				newRoom = Room(self.exchange,blind,max_player,
+				newRoom = Room.new(self.exchange,blind,max_player,
 						max_stake,
 						min_stake)
-				db_connection.addItem(newRoom)
-				db_connection.commit_session()
 				self.room_list[newRoom.id] = GameRoom(
 						newRoom, 1, self,
 						max_player, blind, min_stake, max_stake)

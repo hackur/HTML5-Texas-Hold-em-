@@ -1,205 +1,242 @@
 import hashlib
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey,Text,Table,DateTime,BigInteger
-from sqlalchemy.orm import sessionmaker,relationship, backref
 from datetime import datetime
 from pprint import pprint
-Base	= declarative_base()
-class Room(Base):
-	__tablename__	= "room"
-	id			= Column(Integer,primary_key=True, autoincrement=True)
-	exchange	= Column(String(255))
-	blind		= Column(Integer)
-	player		= Column(Integer)
-	max_stake	= Column(Integer)
-	min_stake	= Column(Integer)
-	max_player	= Column(Integer)
-	roomType	= Column(Integer)
+import pymongo
+import time
+from  bson.objectid import ObjectId
 
-	def __init__(self, exchange, blind = 10, max_player = 9, max_stake = 1000, min_stake = 100):
-		self.exchange	= exchange
-		self.max_stake	= max_stake
-		self.min_stake	= min_stake
-		self.blind		= blind
-		self.max_player = max_player
-		self.player		= 0
-		self.roomType	= 0
+class MongoDocument(object):
+	def __init__(self,document=None):
+		if document:
+			self.__dict__['_entry'] = document
+			return
+		else:
+			self.__dict__['_entry'] = {}
+
+
+	def __getattr__(self, key):
+		return self._entry[key]
+
+	def __setattr__(self,key,value):
+		self._entry[key] = value
+		if not "_id" in self._entry:
+			return
+
+		db = DatabaseConnection()
+		db[self.table()].update({"_id" : self._entry['_id']},\
+				{"$set": {key:value}})
+
+	def update_attr(self,key,valueDelta):
+		db = DatabaseConnection()
+		db[self.table()].update({"_id" : self._entry['_id']},\
+				{"$inc": {key:valueDelta}})
+		self._entry[key] += valueDelta
+
+	def table(self):
+		return type(self).table_name
+
+
+
+	def insert(self):
+		collection =  DatabaseConnection()[self.table()]
+		try:
+			_id = collection.insert(self._entry,safe=True)
+		except Exception as e:
+			print e
+			return False
+
+		self._entry["_id"] = _id;
+		return True
+
+	def remove(self):
+		db = DatabaseConnection()
+		db[self.table()].remove({"_id":self._id},atomic=True)
+
+
+	@property
+	def id(self):
+		if "_id" in self._entry:
+			return str(self._entry["_id"])
+		else:
+			return None
+
+	@classmethod
+	def get_collection(Table):
+		return DatabaseConnection()[Table.table_name]
+
+	@classmethod
+	def find(Table,**kwarg):
+		print "FIND " * 10
+		if "_id" in kwarg and type(kwarg['_id']) != ObjectId:
+			kwarg['_id'] = ObjectId(kwarg['_id'])
+			print kwarg['_id'],type(kwarg['_id'])
+
+
+		db = DatabaseConnection()[Table.table_name]
+		document = db.find_one(kwarg)
+		if document:
+			obj = Table(document)
+			return obj
+		return None
+
+	@classmethod
+	def find_all(Table,**kwarg):
+		print kwarg
+		db = DatabaseConnection()[Table.table_name]
+		documents = db.find(kwarg)
+		return [ Table(document) for document in documents]
+
+class Room(MongoDocument):
+	table_name	= "room"
+
+	@staticmethod
+	def new(exchange, blind = 10, max_player = 9, max_stake = 1000, min_stake = 100):
+		room = Room()
+		room.exchange	= exchange
+		room.max_stake	= max_stake
+		room.min_stake	= min_stake
+		room.blind		= blind
+		room.max_player = max_player
+		room.player		= 0
+		room.roomType	= 0
+		if room.insert():
+			return room
+		return None
 
 	def __repr__(self):
-		return "<Room('%s','%s','%s')>" % (self.id, self.exchange,self.roomType)
-
-	def update(self):
-		self.db_connection	= DatabaseConnection()
-		self.db_connection.start_session()
-		#self.db_connection.addItem(self)
-		self.db_connection.session.merge(self)
-		self.db_connection.commit_session()
-		self.db_connection.close()
+		return "<Room('%s','%s','%s')>" % (self._id, self.exchange,self.roomType)
 
 
-class DealerInfo(Base):
-	__tablename__	= "dealer_info"
-	id			= Column(Integer,primary_key=True, autoincrement=True)
-	exchange	= Column(String(255))
-	rooms		= Column(Integer)
+
+
+class DealerInfo(MongoDocument):
+	table_name	= "dealer_info"
+
+	@staticmethod
+	def new(exchange):
+		dealer = DealerInfo()
+		dealer.exchange = exchange
+		if dealer.insert():
+			return dealer
+		return None
+
+	@staticmethod
+	def create_index(db):
+		db[User.table_name].ensure_index('rooms')
+
 
 #imtermediate table
-friendShip=Table("friendShip",Base.metadata,
-	Column("leftFriendId",Integer,ForeignKey("user.id"),primary_key=True),
-	Column("rightFriendId",Integer,ForeignKey("user.id"),primary_key=True)
-)
-class User(Base):
-	__tablename__	= "user"
 
+
+class User(MongoDocument):
+	table_name	= "user"
 	(USER_TYPE_NORMAL,USER_TYPE_SINA_WEIBO) = (0,1)
-	id		= Column(Integer, primary_key=True, autoincrement=True)
-	username	= Column(String(255))
-	password	= Column(String(255))
-	room_id		= Column(Integer, ForeignKey("room.id"))
-	room		= relationship("Room", backref=backref('users'))
-	family_id   = Column(Integer,ForeignKey('family.id'))
-	family		= relationship("Family",backref=backref('members',order_by=id))
-	#email		= Column(String(100))
-	level		= Column(Integer)
-	total_games = Column(Integer)
-	won_games	= Column(Integer)
-	max_reward	= Column(Integer)
-	last_login	= Column(DateTime)
-	signature	= Column(String(255))
-	asset		= Column(Integer) #need to be changed
-	accountType	= Column(Integer) #0 Normal, 1: Sina Weibo
-	accountID	= Column(BigInteger)
-	screen_name = Column(String(255))
-	gender		= Column(String(1))
 
-	#type in family
-	family_position_id	= Column(Integer,ForeignKey('familyPosition.id'))
-	family_position		= relationship("FamilyPosition", backref=backref('members',order_by=id))
-
-	headPortrait_path	= Column(String(255))
-	headPortrait_url	= Column(String(255))
-
-	friends		= relationship("User",
-					secondary=friendShip,
-					primaryjoin=id==friendShip.c.leftFriendId,
-					secondaryjoin=id==friendShip.c.rightFriendId
-					)
-	def update(self):
-		self.db_connection	= DatabaseConnection()
-		self.db_connection.start_session()
-		#self.db_connection.addItem(self)
-		self.db_connection.merge(self)
-		self.db_connection.commit_session()
-		self.db_connection.close()
+	@staticmethod
+	def new(username, password="",asset = 3000, accountType=0,accountID=0):
+		user = User()
+		user.username			= username
+		user.password			= password
+		user.room_id			= None
+		user.level				= 0
+		user.total_games		= 0
+		user.won_games			= 0
+		user.max_reward			= 0
+		user.last_login			= None
+		user.signature			= None
+		user.asset				= asset
+		user.accountType		= accountType
+		user.accountID			= accountID
+		user.screen_name		= username
+		user.gender				= 'M'
+		user.headPortrait_path	= None
+		user.headPortrait_url	= None
+		user.friends			= list()
+		if user.insert():
+			return user
+		return None
 
 
-	def __init__(self, username, password, total_games=0, won_games = 0, level = 0, asset = 0, max_reward = 0, **kwargs):
-		self.username		= username
-		self.screen_name	= username
-		self.password		= password
-		self.total_games	= total_games
-		self.won_games		= won_games
-		self.level			= level
-		self.asset			= asset
-		self.max_reward		= max_reward
+	@staticmethod
+	def verify_user(username,password):
+		db = DatabaseConnection()[User.table_name]
+		user_document = db.find_one({'username':username,'password':password})
+		if user_document:
+			user = User(user_document)
+			return user
+		return None
+
+	@staticmethod
+	def verify_user_openID(accountType,accountID):
+		db = DatabaseConnection()[User.table_name]
+		user_document = db.find_one({'accountType':accountType,'accountID':accountID})
+		if user_document:
+			user = User(user_document)
+			return user
+		return None
+
+	@staticmethod
+	def create_index(db):
+		db[User.table_name].ensure_index('username',unique=True)
+
 
 	def __repr__(self):
 		return "<User('%s','%s', '%s', '%s')>" % (self.id, self.username, self.password, self.friends)
 
 
+class Email(MongoDocument):
+	table_name	= "email"
 
-class Family(Base):
-	__tablename__="family"
-	id	= Column(Integer, primary_key=True, autoincrement=True)
-	name	= Column(String(100))
-	def __init__(self,name):
-		self.name=name
+	@staticmethod
+	def new(from_user_id,to_user_id,content,send_date,status,sender_name):
+		email = Email()
+		email.from_user_id	= from_user_id
+		email.to_user_id	= to_user_id
+		email.content		= content
+		email.send_date		= send_date
+		email.status		= status
+		email.sender_name = sender_name
+		if email.insert():
+			return email
+		print "Insert failed"
+		return None
 
-class FamilyPosition(Base):
-	__tablename__="familyPosition"
-	id			= Column(Integer, primary_key=True, autoincrement=True)
-	name		= Column(String(100))
-	description	= Column(Text)
-
-	def __init__(self,name):
-		self.name=name
-
-class Email(Base):
-	__tablename__	= "email"
-	id			= Column(Integer, primary_key=True, autoincrement=True)
-	from_user_id= Column(Integer, ForeignKey("user.id"))
-	from_user	= relationship("User", primaryjoin=(from_user_id==User.id), backref=backref('out_mails'))
-	to_user_id	= Column(Integer, ForeignKey("user.id"))
-	to_user		= relationship("User", primaryjoin=(to_user_id==User.id), backref=backref('in_mails'))
-	content		= Column(Text)
-	send_date	= Column(DateTime)
-	status		= Column(Integer)
-	reply_to_id	= Column(Integer, ForeignKey("email.id"))
-	reply_to	= relationship("Email", backref=backref('follow_emails', remote_side=[id], uselist=False))
 
 class DatabaseConnection(object):
 	__single	= None
 	def __new__(clz):
 		if not DatabaseConnection.__single:
-			DatabaseConnection.__single = object.__new__(clz)
-		return DatabaseConnection.__single
+			DatabaseConnection.__single = DatabaseConnection.__init__(object.__new__(clz))
+		return DatabaseConnection.__single.db
 
-	def init(self, engine_string):
-		self.engine	= create_engine(engine_string)
-		Base.metadata.create_all(self.engine)
-		self.connection	= self.engine.connect()
-		self.Session	= sessionmaker(bind=self.engine)
+	def __init__(self, host="127.0.0.1",port=27017,dbname='pokerdb'):
+		self.db	= pymongo.Connection(host=host,port=port)[dbname]
+		return self
 
-	def connect(self):
-		self.connection = self.engine.connect()
-
-	def start_session(self):
-		self.session	= self.Session()
-		self.session.expire_on_commit = False
-
-	def commit_session(self):
-		self.session.commit()
-
-	def query(self, object):
-		return self.session.query(object)
-	def execute(self, statement):
-		return self.session.execute(statement)
-	def addItem(self, item):
-		self.session.add(item)
-
-	def delete(self, item):
-		self.session.delete(item)
-
-	def rollback(self):
-		self.session.rollback()
-
-	def merge(self, object):
-		self.session.merge(object)
-
-	def close(self):
-		self.session.expunge_all()
-		self.session.close()
 
 def init_database():
 	db_connection  = DatabaseConnection()
-	db_connection.init("sqlite:///db.sqlite")
-	db_connection.connect()
 
 if __name__ == "__main__":
 	import os
 
-	if os.path.isfile("./db.sqlite"):
-		os.remove("db.sqlite")
+	db  = DatabaseConnection()
 
-	db_connection  = DatabaseConnection()
-	db_connection.init("sqlite:///db.sqlite")
-	db_connection.connect()
-	db_connection.start_session()
+	for collection in db.collection_names():
+		try:
+			db.drop_collection(collection)
+		except Exception as e:
+			print e
+			pass
+
+	User.create_index(db)
+	DealerInfo.create_index(db)
+
 	#room		= Room(exchange="dealer_exchange_1",blind=10,max_player=9)
-	ting		= User(username="ting", password=hashlib.md5("123").hexdigest())
-	mile		= User(username="mile", password=hashlib.md5("123").hexdigest())
-	mamingcao   = User(username="mamingcao", password=hashlib.md5("123").hexdigest())
-	huaqin		= User(username="huaqin", password=hashlib.md5("123").hexdigest())
+	ting		= User.new(username="ting", password=hashlib.md5("123").hexdigest())
+	mile		= User.new(username="mile", password=hashlib.md5("123").hexdigest())
+	mamingcao   = User.new(username="mamingcao", password=hashlib.md5("123").hexdigest())
+	huaqin		= User.new(username="huaqin", password=hashlib.md5("123").hexdigest())
 	ting.level	= 12
 	ting.total_games= 100
 	ting.won_games	= 40
@@ -209,39 +246,18 @@ if __name__ == "__main__":
 	ting.asset		= 12000
 	mile.asset		= 1000
 	mamingcao.asset	= 2000
-	db_connection.addItem(ting)
-	db_connection.addItem(mile)
-	db_connection.addItem(huaqin)
-	db_connection.addItem(mamingcao)
-	#db_connection.addItem(room)
+	timeStamp = time.mktime(datetime.strptime("2012-04-13 12:02:20", "%Y-%m-%d %H:%M:%S").timetuple())
+	email	= Email.new(from_user_id = ting._id,to_user_id=mile._id,\
+			send_date=timeStamp,
+			content="aassdd",status=0,sender_name = ting.screen_name)
 
-	email	= Email()
-	email.from_user = ting
-	email.to_user	= mile
-	email.content	= "aassdd"
-	email.send_date	= datetime.strptime("2012-04-13 12:02:20", "%Y-%m-%d %H:%M:%S")
-	email.reply_to_id	= None
-	db_connection.addItem(email)
-	email	= Email()
-	email.from_user = mile
-	email.to_user	= ting
-	email.content	= "hahahahahaah"
-	email.send_date	= datetime.strptime("2012-04-12 12:02:20", "%Y-%m-%d %H:%M:%S")
-	email.reply_to_id	= None
-	db_connection.addItem(email)
-	email	= Email()
-	email.from_user = mile
-	email.to_user	= ting
-	email.content	= "hahahahahaauauuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu\uyyyyyyyyyah"
-	email.send_date	= datetime.strptime("2012-04-22 12:02:20", "%Y-%m-%d %H:%M:%S")
-	email.reply_to_id	= None
-	db_connection.addItem(email)
-
-	ting.friends = [mile, mamingcao]
-	mile.friends = [ting]
-
-
-	db_connection.addItem(ting)
-	db_connection.addItem(mile)
-
-	db_connection.commit_session()
+#	db_connection.addItem(email)
+#
+	ting.friends = [mile._id, mamingcao._id]
+	mile.friends = [ting._id]
+#
+#
+#	db_connection.addItem(ting)
+#	db_connection.addItem(mile)
+#
+#	db_connection.commit_session()
