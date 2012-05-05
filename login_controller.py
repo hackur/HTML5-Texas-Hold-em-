@@ -21,7 +21,7 @@ class LoginHandler(tornado.web.RequestHandler):
 		else:
 			message		= {'status':'success'}
 			self.session['user_id'] = user._id
-		user.last_login	= datetime.now()
+			user.last_login	= datetime.now()
 		self.set_header('Access-Control-Allow-Origin', '*')
 		self.write(json.dumps(message))
 
