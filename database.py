@@ -15,7 +15,9 @@ class MongoDocument(object):
 
 
 	def __getattr__(self, key):
-		return self._entry[key]
+		if key in self._entry:
+			return self._entry[key]
+		return None
 
 	def __setattr__(self,key,value):
 		self._entry[key] = value
@@ -231,6 +233,12 @@ if __name__ == "__main__":
 
 	User.create_index(db)
 	DealerInfo.create_index(db)
+
+	bot		= User.new(username="bot1", password=hashlib.md5("123321").hexdigest())
+	bot.isBot = True
+
+	bot		= User.new(username="bot2", password=hashlib.md5("123321").hexdigest())
+	bot.isBot = True
 
 	#room		= Room(exchange="dealer_exchange_1",blind=10,max_player=9)
 	ting		= User.new(username="ting", password=hashlib.md5("123").hexdigest())

@@ -129,6 +129,13 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		broadcast_queue		= str(user.username) + '_broadcast'
 		public_key			= ('broadcast_%s_%s.testing')% (exchange, room._id)
 		private_key			= ('direct.%s.%s.%s') % (exchange, room._id, user._id)
+		binding_keys= [public_key, private_key]
+		if user.isBot:
+			bot_key			= ('direct.%s.%s.bot') % (exchange, room._id)
+			binding_keys.append(bot_key)
+			self.session['bot_key'] = bot_key
+
+
 		message				= {	'method'		: 'enter',
 								'user_id'		: str(user._id),
 								#'source'		: routing_key,
@@ -140,7 +147,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 									self.application.channel,
 									broadcast_queue,
 									exchange,
-									(private_key, public_key),
+									binding_keys,
 									declare_queue_only=True,
 									arguments = {"x-expires":int(15000)}
 									)
@@ -360,7 +367,11 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 			self.finish(json.dumps(messages["message-list"]))
 			return
 
-		binding_keys= (self.session['public_key'], self.session['private_key'])
+		binding_keys= [self.session['public_key'], self.session['private_key']]
+		if self.user.isBot:
+			binding_keys.append(self.session['bot_key'])
+
+
 		self.channel= PersistentChannel(
 				self.application.channel,
 				queue, exchange, binding_keys, self,arguments = {"x-expires":int(15000)})

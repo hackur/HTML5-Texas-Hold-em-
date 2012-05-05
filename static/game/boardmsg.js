@@ -46,8 +46,13 @@ function msg_phc(data){
 
 	//set_hand_cards(data.cards[0], data.cards[1]);
 	console.log(data.cards);
+
+	console.log("set card is ----------------------------------------------:");
+	
 	poker_lib.setCard(data.cards[0], '#cards_in_hand1');
 	poker_lib.setCard(data.cards[1], '#cards_in_hand2');
+	$("#cards_in_hand1").fadeIn();
+	$("#cards_in_hand2").fadeIn();
 	SeatList[seatId].cards	= [];
 	SeatList[seatId].cards.push(poker_lib.evaluateCard(data.cards[0]));
 	SeatList[seatId].cards.push(poker_lib.evaluateCard(data.cards[1]));
@@ -284,7 +289,12 @@ var actionName = {
 
 function _board_msg_handler(data){
 	
-	funs[data.msgType](data);
+	if(funs[data.msgType])
+		funs[data.msgType](data);
+	else{
+		console.log("NOT SUPPORTED");
+		console.log(data);
+	}
 }
 board_msg_handler.process = _board_msg_handler;
 

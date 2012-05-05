@@ -85,8 +85,8 @@ class GameRoom(object):
 	(GAME_WAIT,GAME_PLAY) = (0,1)
 	(A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND,A_STANDUP) = (1,2,3,4,5,6,7,8)
 
-	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START,MSG_POT,MSG_STAND_UP,MSG_SHOWDOWN,MSG_EMOTICON, MSG_CHAT) \
-				= ('sit','bhc','phc','winner','next','action','public','start','pot','standup','showdown','emoticon', 'chat')
+	(MSG_SIT,MSG_BHC,MSG_PHC,MSG_WINNER,MSG_NEXT,MSG_ACTION,MSG_PUBLIC_CARD,MSG_START,MSG_POT,MSG_STAND_UP,MSG_SHOWDOWN,MSG_EMOTICON, MSG_CHAT,MSG_BOTCARD) \
+				= ('sit','bhc','phc','winner','next','action','public','start','pot','standup','showdown','emoticon', 'chat','bot_card')
 	def __init__(self, room, owner, dealer,
 			num_of_seats = 9, blind = 10,
 			min_stake=100,max_stake=2000):
@@ -95,6 +95,7 @@ class GameRoom(object):
 		self.status     = GameRoom.GAME_WAIT
 		self.dealer     = dealer
 		self.broadcast_key  = "broadcast_%s_%s.testing" % (self.dealer.exchange, self.room._id)
+		self.bot_key		=	('direct.%s.%s.bot') % (self.dealer.exchange, room._id)
 		self.occupied_seat  = 0
 		self.suit		= ["DIAMOND", "HEART", "SPADE", "CLUB"]
 		self.face		= ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
@@ -158,6 +159,7 @@ class GameRoom(object):
 		msg['timestamp']= self.msg_count
 		msg['msgType']	= msgType
 		self.dealer.broadcast(destination, msg)
+
 
 	def user_action(self,args):
 		action          = args["action"]
@@ -286,6 +288,9 @@ class GameRoom(object):
 								"Cards in hand": card_list
 							}
 				self.direct_message(msg_sent,seat.get_private_key(),GameRoom.MSG_PHC)
+				msg_sent["user_id"] = seat.get_user().id
+				msg_sent["seat_id"] = seat.seat_id
+				self.direct_message(msg_sent,self.bot_key,GameRoom.MSG_BOTCARD)
 
 		self.broadcast({"seat_list":seat_list},GameRoom.MSG_BHC) # HC for Have Card
 
