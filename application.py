@@ -115,6 +115,7 @@ if __name__ == '__main__':
 		(r"/userinfo", UserInfoHandler),
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),
+		(r"/logout", LogoutHandler),
         (r"/weibologin",SinaWeiboLogin),
 		(r"/test", IndexTestHandler),
         (r"/weibologinCallback/?",SinaWeiboLoginBack),

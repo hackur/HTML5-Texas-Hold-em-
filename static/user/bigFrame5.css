@@ -44,8 +44,8 @@
 	position: absolute;
 }
 #fdelete{
-	top: 260px;
-	left: -1px;
+	top: 200px;
+	left: 140px;
 	width: 145px;
 	height: 53px;
 	position: absolute;
@@ -54,7 +54,7 @@
 }
 #fsend{
 	top: 200px;
-	left: 140px;
+	left: -1px;
 	width: 145px;
 	height: 53px;
 	position: absolute;

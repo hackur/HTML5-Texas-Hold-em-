@@ -26,7 +26,6 @@ class LoginHandler(tornado.web.RequestHandler):
 		self.write(json.dumps(message))
 
 class GuestLoginHandler(tornado.web.RequestHandler):
-	@tornado.web.asynchronous
 	def post(self):
 		if self.get_argument('username', default=None) is None:
 			#TODO Check whether username is exist
@@ -49,7 +48,12 @@ class GuestLoginHandler(tornado.web.RequestHandler):
 
 		self.set_header('Access-Control-Allow-Origin', '*')
 		self.write(json.dumps(message))
-		self.finish()
+
+class LogoutHandler(tornado.web.RequestHandler):
+	def post(self):
+		if 'user_id' in self.session:
+			del self.session['user_id']
+			self.redirect("/static/index/index.html")
 
 from weibo import APIClient
 
