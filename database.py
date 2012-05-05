@@ -234,10 +234,10 @@ if __name__ == "__main__":
 	User.create_index(db)
 	DealerInfo.create_index(db)
 
-	bot		= User.new(username="bot1", password=hashlib.md5("123321").hexdigest())
+	bot		= User.new(username="human1", password=hashlib.md5("123321").hexdigest())
 	bot.isBot = True
 
-	bot		= User.new(username="bot2", password=hashlib.md5("123321").hexdigest())
+	bot		= User.new(username="human2", password=hashlib.md5("123321").hexdigest())
 	bot.isBot = True
 
 	#room		= Room(exchange="dealer_exchange_1",blind=10,max_player=9)
