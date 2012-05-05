@@ -87,7 +87,7 @@
 		var position = minMaxPosition(min,max);
 		console.log(min + " " + max + "minmax");
 		console.log(position[0] + " " + position[1]);
-		var SpaceNum = position[1] - position[0];
+		var SpaceNum = position[1] - position[0] + 1;
 		var SpaceLength = maxHeight / SpaceNum;
 		var whichSpace = Math.floor(height / SpaceLength);
 		var value = mem[position[0] + whichSpace];
