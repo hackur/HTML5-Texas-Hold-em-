@@ -231,6 +231,10 @@ class GameRoom(object):
 		print "direct_key	=>", direct_key
 		print "seat request =>%d\n" % (seat_no)
 
+		if self.get_seat(player.id):
+			return (False, "User seat sat down already")
+
+
 		hand_stake = int(stake)
 		if seat_no > len(self.seats):
 			return (False, "Seat number is too large: %s we have %s" % (seat_no,len(self.seats)))
@@ -933,6 +937,7 @@ class GameRoom(object):
 			for seat in go_away_list:
 				msg[seat._user.id] = {"seat_no":seat.seat_id}
 				print "user id:%s, seat id:%d" %(seat._user.id, seat.seat_id)
+				del self.user_seat[seat._user.id]
 				seat.status = Seat.SEAT_EMPTY
 				seat.set_user(None)
 				seat.kicked_out = False

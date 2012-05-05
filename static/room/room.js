@@ -11,7 +11,6 @@ function fetchRoom(roomClass) {
 	} else if(roomClass == 4) {
 		roomcontent = "#familybattleroomcontent";
 	}
-	$(roomcontent).html("");
 	$.ajax({
 		type : 'get',
 		url : "/list_room",
@@ -19,7 +18,7 @@ function fetchRoom(roomClass) {
 			type : roomClass
 		},
 		success : function(data) {
-			console.log(data);
+			$(roomcontent).html("");
 			$.each(data.rooms, function(index, room) {
 				var id = room[0];
 				var blind = parseInt(room[1]);
@@ -28,7 +27,8 @@ function fetchRoom(roomClass) {
 				var min_stake = room[4];
 				var max_stake = room[5];
 				var item = $('<li class="roomitem"></li>');
-				item.append($('<span class="roomid"></span>').html(id));
+				
+				item.append($('<span class="roomid"></span>').html(id.substring(id.length - 5)));
 				item.append($('<span class="info1"></span>').html(blind / 2 + "/" + blind));
 				item.append($('<span class="info2"></span>').html(min_stake + "/" + max_stake));
 				item.append($('<span class="numplaying"></span>').html(player + "/" + max_player));

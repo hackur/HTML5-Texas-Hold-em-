@@ -153,7 +153,7 @@ class Dealer(object):
 				newRoom, args["user_id"], self,
 				max_player,blind,min_stake,max_stake)
 		print newRoom
-		message = {"room_id":newRoom._id}
+		message = {"room_id":newRoom.id}
 
 		self.channel.basic_publish( exchange    = self.exchange,
 				routing_key = routing_key,

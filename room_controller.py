@@ -66,7 +66,7 @@ class CreateRoomHandler(tornado.web.RequestHandler):
 		dealer = self.find_dealer()
 		self.channel	= Channel(
 				self.application.channel,
-				str(dealer.exchange))
+				str(dealer['exchange']))
 
 		arguments = self.session["user_id"]
 		self.channel.add_ready_action(self.connected_call_back, arguments);
@@ -87,7 +87,7 @@ class CreateRoomHandler(tornado.web.RequestHandler):
 		max_player	= self.get_argument("max_player")
 
 		msg = {"method":"create_room","blind":blind,"max_stake":max_stake,"min_stake":min_stake,
-				"max_player":max_player,"user_id":userid,"roomType":roomType,
+				"max_player":max_player,"user_id":str(userid),"roomType":roomType,
 				"source":self.channel.routing_key}
 
 		self.channel.publish_message("dealer",json.dumps(msg))
