@@ -3,6 +3,8 @@ var user_link = "../user/user.html";
 
 function login_check() {
 	console.log("LOGIN CHECK!!");
+	console.log( localStorage['username']);
+	console.log( localStorage['password']);
 	$('#llogin').click(function() {
 
 		$.ajax({

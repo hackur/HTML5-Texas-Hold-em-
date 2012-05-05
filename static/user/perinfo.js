@@ -50,7 +50,7 @@ var info_init = function() {
 	getUserImage();
 	listEmail(1);
 	buddyInfo();
-	viewEmail();
+	/* viewEmail(); */
 	bindSendFriendEmail();
 	window.bigframe = [	{header:"#info",	content:"#info_frame", background:"url(./image/left.png)"},
 						{header:"#email",	content:"#mail_list_frame", background:"url(./image/middle.png)"},
@@ -242,7 +242,8 @@ var buddyInfo = function() {
 
 var view_friend = function(friend, i) {
 	$("#name" + i).click(function() {
-		$("#fID").html("ID名称：");
+
+		$("#fID").html("昵称：");
 		$("#ffamily").html("家族：");
 		$("#fpos").html("职位：");
 		$("#frank").html("等级：");

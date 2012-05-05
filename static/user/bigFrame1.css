@@ -107,6 +107,7 @@
 	left: 150px;
 	position: absolute;
 }
+/*
 #family {
 	top: 70px;
 	left: 150px;
@@ -117,14 +118,25 @@
 	left: 350px;
 	position: absolute;
 }
+#property {
+	top: 110px;
+	left: 350px;
+	position: absolute;
+}
 #pos {
 	top: 110px;
 	left: 150px;
 	position: absolute;
 }
+*/
+#rank {
+	top: 70px;
+	left: 150px;
+	position: absolute;
+}
 #property {
 	top: 110px;
-	left: 350px;
+	left: 150px;
 	position: absolute;
 }
 #winRate {

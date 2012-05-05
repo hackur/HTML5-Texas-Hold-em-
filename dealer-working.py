@@ -125,7 +125,7 @@ class Dealer(object):
 		source          = args['source']
 		private_key     = args['private_key']
 		stake			= args['stake']
-		user            = self.db_connection.query(User).filter_by(id=args['user_id']).first()
+		user            = User.find(_id=args['user_id'])
 		current_room    = self.room_list[args["room_id"]]
 		(status, msg)   = current_room.sit(user, int(args["seat"]), source, private_key,stake)
 

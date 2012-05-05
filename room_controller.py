@@ -13,21 +13,21 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 
-from sqlalchemy.orm import sessionmaker,relationship, backref
 import database
 from database import DatabaseConnection,User,Room, DealerInfo
 from authenticate import *
 from pika_channel import Channel,PersistentChannel
-from sqlalchemy.sql import functions as SQLFunc
 from config_controller import ConfigReader
+from  bson.objectid import ObjectId
 
 class ListRoomHandler(tornado.web.RequestHandler):
 	@authenticate
 	def get(self):
-		roomType = self.get_argument('type',0)
-		print roomType
-		rooms = self.db_connection.query(Room).filter_by(roomType=roomType)
-		rooms = [(r.id,r.blind,r.player,r.max_player,r.min_stake,r.max_stake) for r in rooms]
+		roomType = int(self.get_argument('type',0))
+		print "ROOOM TYPE:",roomType
+		print [ x for x in  DatabaseConnection()['room'].find()]
+		rooms = Room.find_all(roomType=roomType)
+		rooms = [(str(r._id),r.blind,r.player,r.max_player,r.min_stake,r.max_stake) for r in rooms]
 		self.write(json.dumps({"rooms":rooms}))
 
 
@@ -35,15 +35,15 @@ class FastEnterRoomHandler(tornado.web.RequestHandler):
 	@authenticate
 	def get(self):
 		roomType = self.get_argument('type',0)
-		rooms = self.db_connection.query(Room). \
-				filter_by(roomType=roomType).filter(Room.player < Room.max_player).first()
-		self.write(str(rooms.id))
+		room = DatabaseConnection()[Room.table_name].find_one( \
+				{"$where":'this.max_player > this.player','roomType':roomType})
+		self.write(str(room['_id']))
 
 
 class CreateRoomHandler(tornado.web.RequestHandler):
 	def find_dealer(self):
-		dealer = self.db_connection.query(SQLFunc.min(DealerInfo.rooms)).one()
-		dealer = self.db_connection.query(DealerInfo).filter_by(rooms=dealer[0]).one()
+		collection = DealerInfo.get_collection()
+		dealer = collection.find(sort=[("rooms",1)],limit=1)[0]
 		return dealer
 
 	@tornado.web.asynchronous
@@ -68,7 +68,7 @@ class CreateRoomHandler(tornado.web.RequestHandler):
 				self.application.channel,
 				str(dealer.exchange))
 
-		arguments = self.session["user"].id
+		arguments = self.session["user_id"]
 		self.channel.add_ready_action(self.connected_call_back, arguments);
 		self.channel.add_message_action(self.message_call_back, None)
 		self.channel.connect()
@@ -99,27 +99,26 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
 		message			= None
-		user			= self.session['user']
+		user			= self.user
 		room_id			= self.get_argument('room_id')
-		room			= self.db_connection.query(Room).filter_by(id = room_id).first()
+		room			= Room.find(_id = ObjectId(room_id))
 		if not room:
+			print Room.find_all()
+			print "not a valid room",room_id
 			self.finish()
 			return
 
 		self.mongodb	= self.application.settings['_db']
-		msg = self.mongodb.board.find_one({"user_id":self.session["user_id"], "room_id":room.id})
+		msg = self.mongodb.board.find_one({"user_id":self.session["user_id"], "room_id":room._id})
 		if msg:
 			msg["message-list"] = []
 		else:
-
-			msg = {"user_id":self.session["user_id"], "room_id":room.id, "message-list": []}
+			msg = {"user_id":self.session["user_id"], "room_id":room._id, "message-list": []}
 
 		print "Saving ",msg
 		self.mongodb.board.remove({"user_id":self.session["user_id"]}) # guarantee only one exist
 		self.mongodb.board.save(msg)
 
-		self.db_connection.addItem(user)
-		self.db_connection.commit_session()
 		queue				= str(user.username) + '_init'
 		exchange			= str(room.exchange)
 
@@ -128,12 +127,12 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		routing_key			= exchange + '_' + queue
 
 		broadcast_queue		= str(user.username) + '_broadcast'
-		public_key			= ('broadcast_%s_%d.testing')% (exchange, room.id)
-		private_key			= ('direct.%s.%d.%d') % (exchange, room.id, user.id)
+		public_key			= ('broadcast_%s_%s.testing')% (exchange, room._id)
+		private_key			= ('direct.%s.%s.%s') % (exchange, room._id, user._id)
 		message				= {	'method'		: 'enter',
-								'user_id'		: user.id,
+								'user_id'		: str(user._id),
 								#'source'		: routing_key,
-								'room_id'		: room.id,
+								'room_id'		: str(room._id),
 								'private_key'	: private_key}
 
 		arguments			= {'routing_key': 'dealer', 'message': message}
@@ -157,7 +156,6 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		self.channel.connect()
 		self.session['public_key']	= public_key
 		self.session['private_key']	= private_key
-		self.session['user']		= user
 		#self.session['messages']	= list()
 		print "ENTER!"
 
@@ -195,7 +193,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
 		self.mongodb = self.application.settings['_db']
-		user		= self.session['user']
+		user		= self.user
 		seat		= self.get_argument('seat')
 		stake		= self.get_argument('stake')
 
@@ -207,7 +205,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 		else:
 			messages		= self.mongodb.board.find_one({"user_id":self.session["user_id"]})
 			print messages
-			room			= self.db_connection.query(Room).filter_by(id = messages["room_id"]).first()
+			room			= Room.find(_id=messages["room_id"])
 			if room is None:
 				self.finish(json.dumps({'status':'failed'}))
 				return
@@ -215,10 +213,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			queue_name		= str(user.username) + '_sit'
 			exchange_name   = self.session['exchange']
 
-			user.room		= room
-			user.room_id	= room.id
-			self.db_connection.addItem(user)
-			self.db_connection.commit_session()
+			user.room_id	= room._id
 			#exchange_name	= str(user.room.exchange)
 			#source_key		= "%s_%s" % (exchange_name, queue_name)
 
@@ -227,7 +222,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 									'user_id':user.id,
 									'seat':seat,
 									#'source':source_key,
-									'room_id':user.room.id,
+									'room_id':str(user.room_id),
 									'private_key':self.session['private_key'] ,
 									'stake':stake
 								}
@@ -266,14 +261,14 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 class BoardActionMessageHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
-		user					= self.session['user']
+		user					= self.user
 		message					= json.loads(self.get_argument('message'))
 		queue					= '%s_action_queue' % (str(user.username))
-		exchange				= str(user.room.exchange)
-		message['user_id']		= user.id
+		exchange				= self.session['exchange']
+		message['user_id']		= user._id
 		message['method']		= 'action'
 		message['private_key']	= self.session['private_key']
-		message['room_id']		= user.room.id
+		message['room_id']		= user.room_id
 		self.channel			= Channel(self.application.channel,exchange)
 		self.channel.publish_message("dealer", json.dumps(message));
 
@@ -286,7 +281,7 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 	def open(self):
 		print "WebSocket opened","x" * 20
 		self.mongodb = self.application.settings['_db']
-		user		= self.session['user']
+		user		= self.user
 		queue		= str(user.username)  + '_broadcast'
 		exchange	= self.session['exchange']
 		messages = self.mongodb.board.find_one({"user_id":self.session["user_id"]})
@@ -334,12 +329,11 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 			timestamp	= int(msg['timestamp'])
 			self.clean_matured_message(timestamp)
 		elif 'action' in msg:
-			user					= self.session['user']
 			message					= msg
-			message['user_id']		= self.session['user_id']
+			message['user_id']		= str(self.session['user_id'])
 			message['method']		= 'action'
 			message['private_key']	= self.session['private_key']
-			message['room_id']		= self.mongoSession['room_id']
+			message['room_id']		= str(self.mongoSession['room_id'])
 			self.channel.publish_message("dealer", json.dumps(message));
 
 
@@ -356,7 +350,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
 		self.mongodb = self.application.settings['_db']
-		user		= self.session['user']
+		user		= self.user
 		timestamp	= int(self.get_argument('timestamp'))
 		queue		= str(user.username)  + '_broadcast'
 		exchange	= self.session['exchange']

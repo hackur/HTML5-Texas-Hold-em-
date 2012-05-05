@@ -7,8 +7,9 @@ import tornado.httpserver
 import tornado.web
 from authenticate import *
 from datetime import datetime
-from database import DatabaseConnection,User,Family,FamilyPosition,Email
+from database import DatabaseConnection,User,Email
 import hashlib
+from  bson.objectid import ObjectId
 
 class PersonalArchiveHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
@@ -21,14 +22,11 @@ class PersonalArchiveHandler(tornado.web.RequestHandler):
 		percentage	= 0
 		if user.headPortrait_url is not None:
 			portrait = user.headPortrait_url
-		if user.family is not None:
-			family	= user.family.name
-			position= user.family_position.name
 		if user.total_games > 0:
 			percentage = (user.won_games * 1.0) / user.total_games
 		message	= {
 					"status": "success",
-					"name": user.username,
+					"name": user.screen_name,
 					"head_portrait": portrait,
 					"family": family,
 					"position": position,
@@ -49,21 +47,21 @@ class PlayerArchiveHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
 		player_id	= self.get_argument("id", -1);
-		player		= self.db_connection.query(User).filter_by(id = player_id).first();
+		player		= User.find(_id = player_id)
 		portrait	= None
 		family		= "-1"
 		position	= "-1"
 		percentage	= 0
 		if player.headPortrait_url is not None:
 			portrait = player.headPortrait_url
-		if player.family is not None:
-			family	= player.family.name
-			position= player.family_position.name
+		#if player.family is not None:
+		#	family	= player.family.name
+		#	position= player.family_position.name
 		if player.total_games > 0:
 			percentage = (player.won_games * 1.0) / player.total_games
 		message	= {
 					"status": "success",
-					"name": player.username,
+					"name": player.screen_name,
 					"head_portrait": portrait,
 					"family": family,
 					"position": position,
@@ -84,7 +82,7 @@ class HeadPortraitHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	@authenticate
 	def post(self):
-		user			= self.session['user']
+		user			= self.user
 		directory		= "uploads/" + user.username
 		head_portrait	= self.request.files['head_portrait'][0]
 
@@ -115,9 +113,10 @@ class EmailListHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
 		page		= int(self.get_argument('page', 1))
-		user		= self.session['user']
-		all_emails	= self.db_connection.query(Email).filter_by(to_user = user).order_by(Email.send_date)
-		total_emails= all_emails.count()
+		user_id		= self.session['user_id']
+		all_emails	= [ email for email in Email.find_all(to_user_id=str(user_id)) ]
+			#sort=[('send_date',1)]) ]
+		total_emails=  len(all_emails)
 		pages		= math.ceil((1.0 *total_emails) / self.PAGE_SIZE)
 		if page > pages:
 			current = pages
@@ -127,16 +126,18 @@ class EmailListHandler(tornado.web.RequestHandler):
 			else:
 				current = page
 		start		= (current - 1) * self.PAGE_SIZE
+		if start < 0:
+			start = 0
 		end			= start + self.PAGE_OFFSET
 		print "[%d,%d, %d, %d] " % (page,pages, start, end)
-		emails		= all_emails.slice(start, end)
+		emails		= all_emails[start:end]
 		email_list	= list()
 		for email in emails:
 			email_list.append({
 								"id": email.id,
-								"date": email.send_date.strftime("%Y-%m-%d %H:%M:%S"),
-								"sender_name": email.from_user.username,
-								"sender_id":email.from_user.id,
+								"date": datetime.fromtimestamp(email.send_date).strftime("%Y-%m-%d %H:%M:%S"),
+								"sender_name": email.sender_name,
+								"sender_id":str(email.from_user_id),
 								"message": email.content
 							})
 
@@ -146,7 +147,8 @@ class EmailListHandler(tornado.web.RequestHandler):
 						"pages":	int(pages),
 						"current":	int(current),
 						"emails":	email_list
-					}
+		}
+
 		self.finish(json.dumps(message))
 
 class EmailViewHandler(tornado.web.RequestHandler):
@@ -154,9 +156,17 @@ class EmailViewHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
 		email_id= self.get_argument('email')
-		user	= self.session['user']
-		email	= self.db_connection.query(Email).filter_by(to_user = user).filter_by(id = email_id).first()
-		message	= {"status":"success", "email":str(email)}
+		print 'mail id',email_id
+		if not email_id:
+			self.finish()
+
+		user_id	= self.session['user_id']
+		email	= Email.find(to_user_id = str(user_id), _id = email_id)
+		if email == None:
+			self.finish()
+			return
+
+		message	= {"status":"success", "email":str(email.content)}
 		self.finish(json.dumps(message))
 
 class EmailSendHandler(tornado.web.RequestHandler):
@@ -166,16 +176,11 @@ class EmailSendHandler(tornado.web.RequestHandler):
 		user_id				= self.session['user_id']
 		destination			= self.get_argument('destination')
 		content				= self.get_argument('content')
-		reply_to			= self.get_argument('reply_to', None)
-		email				= Email()
-		email.from_user_id	= user_id
-		email.to_user_id	= destination
-		email.content		= content
-		email.send_date		= datetime.now()
-		email.status		= 0
-		email.reply_to_id	= reply_to
-		self.db_connection.addItem(email)
-		self.db_connection.commit_session()
+		timeStamp = time.mktime(datetime.now().timetuple())
+
+		email				= Email.new(str(user_id),destination,content,timeStamp,
+							0,self.user.screen_name)
+
 		message	= {"status":"success"}
 		self.finish(json.dumps(message))
 
@@ -185,32 +190,30 @@ class EmailDeleteHandler(tornado.web.RequestHandler):
 	def post(self):
 		user_id = self.session['user_id']
 		email_id= self.get_argument('email_id')
-		self.db_connection.query(Email).filter(Email.id==email_id).filter(Email.to_user_id == user_id).delete()
-		self.db_connection.commit_session()
+		Email.find(_id = email_id, to_user_id = str(user_id)).remove()
 		message = {"status":"success"}
 		self.finish(json.dumps(message))
 
 
 class BuddyInfoHandler(tornado.web.RequestHandler):
 	def addBuddy(self):
-		user = self.session["user"]
-		friend_id = int(self.get_argument("user_id"))
+		user = self.user
+		friend_id = self.get_argument("user_id")
 		print "new friend ",friend_id
 		friend_list = user.friends
 		for friend in friend_list:
-			print "old friend: ",friend.id
-			if friend_id == friend.id:
+			print "old friend: ",friend
+			if friend_id == friend:
 				message = {"status": "friend already in the list"}
 				self.finish(json.dumps(message))
 				return
-		friend = self.db_connection.query(User).filter(User.id == friend_id).first()
+		friend = User.find(_id = friend_id)
 		if friend == None:
 			message = {"status": "friend doesn't exist"}
 			self.finish(json.dumps(message))
 			return
-		friend_list.append(friend)
-		self.db_connection.addItem(user)
-		self.db_connection.commit_session()
+		friend_list.append(friend.id)
+		user.friends = friend_list # Just for saving the result
 		message = {"status": "friend added"}
 		print user.friends
 		self.finish(json.dumps(message))
@@ -223,17 +226,17 @@ class BuddyInfoHandler(tornado.web.RequestHandler):
 			self.addBuddy()
 			return
 
-		user = self.session['user']
+		user = self.user
 		message = {
-			"userId": user.id,
+			"userId": str(user._id),
 			"friends": list()
 		}
-		for friend in user.friends:
+		for friend_id in user.friends:
+			friend = User.find(_id=friend_id)
 			message["friends"].append({
-						"id": friend.id,
+						"id": str(friend._id),
 						"head_portrait": None,
-						"family": friend.family,
-						"name": friend.username,
+						"name": friend.screen_name,
 						"position": "-1",
 						"level": friend.level,
 						"asset": friend.asset,

@@ -29,10 +29,7 @@ class LoginPageHandler(tornado.web.RequestHandler):
 	def get(self):
 		if 'user_id' in self.session:
 			user_id =  self.session['user_id']
-			db = DatabaseConnection()
-			db.start_session()
-			user = DatabaseConnection().query(User).filter_by(id =user_id).first()
-			db.commit_session()
+			user = User.find(_id =user_id)
 			if not user:
 				del self.session['user_id']
 			else:
