@@ -14,7 +14,6 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 
-from sqlalchemy.orm import sessionmaker,relationship, backref
 import database
 from database import DatabaseConnection,User,Room
 from authenticate import *

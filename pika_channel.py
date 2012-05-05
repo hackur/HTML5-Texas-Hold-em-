@@ -149,6 +149,8 @@ class PersistentChannel(Channel):
 		self.queue_bound = 0
 		for key in self.binding_keys:
 			print "PersistentChannel binding ",key
+			print "PersistentChannel binding ",type(key)
+			key = str(key)
 			self.channel.queue_bind(exchange	= self.exchange,
 								queue			= self.queue_name,
 								#Just use queue name as KEY!
