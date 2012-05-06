@@ -937,7 +937,8 @@ class GameRoom(object):
 			for seat in go_away_list:
 				msg[seat._user.id] = {"seat_no":seat.seat_id}
 				print "user id:%s, seat id:%d" %(seat._user.id, seat.seat_id)
-				del self.user_seat[seat._user.id]
+				if seat._user.id in self.user_seat: #
+					del self.user_seat[seat._user.id]
 				seat.status = Seat.SEAT_EMPTY
 				seat.set_user(None)
 				seat.kicked_out = False

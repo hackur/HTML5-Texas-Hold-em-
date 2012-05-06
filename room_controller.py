@@ -18,7 +18,6 @@ from database import DatabaseConnection,User,Room, DealerInfo
 from authenticate import *
 from pika_channel import Channel,PersistentChannel
 from config_controller import ConfigReader
-from  bson.objectid import ObjectId
 
 class ListRoomHandler(tornado.web.RequestHandler):
 	@authenticate
@@ -101,7 +100,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		message			= None
 		user			= self.user
 		room_id			= self.get_argument('room_id')
-		room			= Room.find(_id = ObjectId(room_id))
+		room			= Room.find(_id = room_id)
 		if not room:
 			print Room.find_all()
 			print "not a valid room",room_id
@@ -113,7 +112,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		if msg:
 			msg["message-list"] = []
 		else:
-			msg = {"user_id":self.session["user_id"], "room_id":room._id, "message-list": []}
+			msg = {"user_id":self.session["user_id"], "room_id":room.id, "message-list": []}
 
 		print "Saving ",msg
 		self.mongodb.board.remove({"user_id":self.session["user_id"]}) # guarantee only one exist
@@ -137,9 +136,9 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 
 
 		message				= {	'method'		: 'enter',
-								'user_id'		: user.id),
+								'user_id'		: user.id,
 								#'source'		: routing_key,
-								'room_id'		: room.id),
+								'room_id'		: room.id,
 								'private_key'	: private_key}
 
 		arguments			= {'routing_key': 'dealer', 'message': message}
@@ -272,7 +271,7 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 		message					= json.loads(self.get_argument('message'))
 		queue					= '%s_action_queue' % (str(user.username))
 		exchange				= self.session['exchange']
-		message['user_id']		= user._id
+		message['user_id']		= user.id
 		message['method']		= 'action'
 		message['private_key']	= self.session['private_key']
 		message['room_id']		= user.room_id

@@ -68,10 +68,8 @@ class MongoDocument(object):
 
 	@classmethod
 	def find(Table,**kwarg):
-		print "FIND " * 10
 		if "_id" in kwarg and type(kwarg['_id']) != ObjectId:
 			kwarg['_id'] = ObjectId(kwarg['_id'])
-			print kwarg['_id'],type(kwarg['_id'])
 
 
 		db = DatabaseConnection()[Table.table_name]
@@ -83,7 +81,9 @@ class MongoDocument(object):
 
 	@classmethod
 	def find_all(Table,**kwarg):
-		print kwarg
+		if "_id" in kwarg and type(kwarg['_id']) != ObjectId:
+			kwarg['_id'] = ObjectId(kwarg['_id'])
+
 		db = DatabaseConnection()[Table.table_name]
 		documents = db.find(kwarg)
 		return [ Table(document) for document in documents]

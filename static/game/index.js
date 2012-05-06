@@ -61,7 +61,7 @@ var enter = function(){
 			console.log(data);
 			if( data.status == "success" ) {
 				console.log("enter success!");
-				listenBoardMessage(data.room.timestamp); // TODO Add timestamp
+				listenBoardMessage(data.room.timestamp); 
 				console.log([data.room.seats, "++++++___________++++++++"]);
 				for(var i = 0; i < data.room.seats.length; i++ ) {
 					if(i < SeatList.length){
@@ -178,6 +178,7 @@ var listenBoardMessage = function(timestamp,nowebsocket) {
 			return;
 		}catch(err){
 			message_box.showMessage("Seems your browser doesn't support WebSocket...");
+			nowebsocket = true;
 		}
 	}
 	if(!timestamp) timestamp = -1;
