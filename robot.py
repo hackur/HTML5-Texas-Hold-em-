@@ -329,6 +329,7 @@ class Robot:
 			self.cookies= response.headers['Set-Cookie'];
 			self.get_user_info()
 		else:
+			print "Failed",content
 			pass
 		print "Robot login handle [end]"
 
@@ -588,8 +589,22 @@ class Robot:
 		print "handle stand up [end]"
 
 
+import argparse
 if __name__=="__main__":
-	robot	= Robot(ip='127.0.0.1',port=8888,username='bot1',password='123321')
+	parser = argparse.ArgumentParser(description='Bot...')
+	parser.add_argument('--port','-P',default=8888,type=int)
+	parser.add_argument('--username','-U',default="human1")
+	parser.add_argument('--password','-E',default="123321")
+	parser.add_argument('--server','-S',default="127.0.0.1")
+
+	args = parser.parse_args()
+
+	host = args.server
+	port = args.port
+	username = args.username
+	password = args.password
+
+	robot	= Robot(ip=host,port=port,username=username,password=password)
 	robot.start()
 	ioloop	= tornado.ioloop.IOLoop.instance()
 	ioloop.start()

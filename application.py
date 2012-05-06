@@ -67,9 +67,26 @@ def on_connected(connection):
 	connection.channel(on_channel_open)
 
 
+import argparse
 if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description='Server...')
+	parser.add_argument('--debug-mode','-D',default=1,type=int)
+	parser.add_argument('--processes','-N',default=1,type=int)
+	parser.add_argument('--port','-P',default=8888,type=int)
+	args = parser.parse_args()
+	PORT = args.port
+
+	num_of_process =args.processes
+	print args
+	if args.debug_mode == 1:
+		debug = True
+		num_of_process = 1
+	else:
+		debug = False
+	print debug,num_of_process
+
 	settings = {
-		"debug": True,
+		"debug": debug,
 		'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
 		"static_path2": os.path.join(os.path.dirname(__file__), "static"),
 		"uploaded_image_path": os.path.join(os.path.dirname(__file__), "uploads"),
@@ -83,7 +100,7 @@ if __name__ == '__main__':
 
 
 	# Set our pika.log options
-	pika.log.setup(color=True)
+	pika.log.setup(color=False)
 	pika.log.info("Starting Tornado HTTPServer on port %i" % PORT)
 	application = tornado.web.Application([
 		(r"/?$", IndexPageHandler),
@@ -127,7 +144,7 @@ if __name__ == '__main__':
 	http_server = tornado.httpserver.HTTPServer(application)
 	http_server.bind(PORT)
 	#http_server.start(8)
-	http_server.start()
+	http_server.start(num_of_process)
 	thread_pool_init()
 	init_database()
 
