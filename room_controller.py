@@ -27,7 +27,7 @@ class ListRoomHandler(tornado.web.RequestHandler):
 		print "ROOOM TYPE:",roomType
 		print [ x for x in  DatabaseConnection()['room'].find()]
 		rooms = Room.find_all(roomType=roomType)
-		rooms = [(str(r._id),r.blind,r.player,r.max_player,r.min_stake,r.max_stake) for r in rooms]
+		rooms = [(r.id,r.blind,r.player,r.max_player,r.min_stake,r.max_stake) for r in rooms]
 		self.write(json.dumps({"rooms":rooms}))
 
 
@@ -137,9 +137,9 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 
 
 		message				= {	'method'		: 'enter',
-								'user_id'		: str(user._id),
+								'user_id'		: user.id),
 								#'source'		: routing_key,
-								'room_id'		: str(room._id),
+								'room_id'		: room.id),
 								'private_key'	: private_key}
 
 		arguments			= {'routing_key': 'dealer', 'message': message}
@@ -220,7 +220,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			queue_name		= str(user.username) + '_sit'
 			exchange_name   = self.session['exchange']
 
-			user.room_id	= room._id
+			user.room_id	= room.id
 			#exchange_name	= str(user.room.exchange)
 			#source_key		= "%s_%s" % (exchange_name, queue_name)
 
