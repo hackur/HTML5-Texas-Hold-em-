@@ -29,6 +29,16 @@ class ListRoomHandler(tornado.web.RequestHandler):
 		rooms = [(r.id,r.blind,r.player,r.max_player,r.min_stake,r.max_stake) for r in rooms]
 		self.write(json.dumps({"rooms":rooms}))
 
+	@authenticate
+	def post(self):
+		roomType = int(self.get_argument('type',0))
+		print "ROOOM TYPE:",roomType
+		print [ x for x in  DatabaseConnection()['room'].find()]
+		rooms = Room.find_all(roomType=roomType)
+		rooms = [(r.id,r.blind,r.player,r.max_player,r.min_stake,r.max_stake) for r in rooms]
+		self.write(json.dumps({"rooms":rooms}))
+
+
 
 class FastEnterRoomHandler(tornado.web.RequestHandler):
 	@authenticate

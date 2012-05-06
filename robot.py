@@ -8,6 +8,7 @@ import json
 import pprint
 import array
 
+(A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND,A_STANDUP) = (1,2,3,4,5,6,7,8)
 class Seat:
 	def __init__(self, seat_id = -1, stake = 0, table = 0):
 		self.id			= seat_id
@@ -44,6 +45,7 @@ class DecisionMaker:
 		elif len(card) == 3:
 			_value= "10"
 			_suit = card[2]
+
 		if _value.isdigit():
 			_value = int(_value)
 		else:
@@ -103,7 +105,7 @@ class DecisionMaker:
 		if cards[0].symbol == cards[1].symbol:
 			baseScore += 2
 
-		gpa = abs(cards[0].value - cards[1].value)
+		gap = abs(cards[0].value - cards[1].value)
 		if gap == 0:
 			pass
 		elif gap == 1:
@@ -161,8 +163,8 @@ class DecisionMaker:
 		elif len(board_cards) == 5:
 			remain_cards= self.filter(self.cards, robot_all_cards)
 			no_opp		= len(opp_cards_list)
-			for i in xrange(len(remain_cards) - no_ppp - 1):
-				for j in xrange(k + 1, len(remain_cards) - no_opp ):
+			for i in xrange(len(remain_cards) - no_opp - 1):
+				for j in xrange(i + 1, len(remain_cards) - no_opp ):
 					counter = 0
 					for k in xrange(no_opp):
 						temp_board	= board_cards + [remain_cards[i], remain_cards[j + k]]
@@ -182,53 +184,97 @@ class DecisionMaker:
 		robot_decks		= []
 		board_decks		= []
 		opp_decks_list	= []
-
+		print "======================[start]==========================="
+		print robot_cards
+		print board_cards
+		print opp_cards_list
+		print "======================[end]==========================="
 		for card in robot_cards:
 			robot_decks.append(self.convert_to_deck(card))
-
+		print "=======1====="
 		for card in board_cards:
 			board_decks.append(self.convert_to_deck(card))
 
+		print "=======2====="
 		for cards in opp_cards_list:
 			temp_list	= []
 			for card in cards:
 				temp_list.append(self.convert_to_deck(card))
 			opp_decks_list.append(temp_list)
+		print "=======3====="
 
 		print opp_decks_list
 		win_probability = self._hand_potential(robot_decks, opp_decks_list, board_decks)
+		win_probability += 0.005
+		if win_probability > 1.0:
+			win_probability = 1.0
 		win_odds = 1.0 / (win_probability)
 		print win_probability
 		print win_odds
 
-		if "call" in rights and "all in" in rights and "raise" not in rights:
-			if current_pot / call_stake > win_odds :
-				if current_pot / max_raise > win_odds:
-					return max_raise
-				return call_stake
-			else:
-				return -1
+		amount = -1
+		action = -1
 
-		if "call" in rights and "raise" in rights:
+		if A_CALLSTAKE in rights and A_ALLIN in rights and A_RAISESTAKE not in rights:
 			if current_pot / call_stake > win_odds :
 				if current_pot / max_raise > win_odds:
-					return max_raise
+					print "max raise all in"
+					amount = max_raise
+					action = A_ALLIN
+				else:
+					print "call stake"
+					amount = call_stake
+					action = A_CALLSTAKE
+			else:
+				print "fold"
+				amount = -1
+				action = A_DISCARDGAME
+
+		elif A_CALLSTAKE in rights and A_RAISESTAKE in rights:
+			if current_pot / call_stake > win_odds :
+				if current_pot / max_raise > win_odds:
+					print "max raise all in"
+					amount = max_raise
+					action = A_RAISESTAKE
 				elif current_pot / min_raise > win_odds:
-					return min_raise
-				return call_stake
+					print "min raise"
+					amount = min_raise
+					action = A_RAISESTAKE
+				else:
+					print "call stake"
+					amount = call_stake
+					action = A_CALLSTAKE
 			else:
-				return -1
+				print "fold"
+				amount = -1
+				action = A_DISCARDGAME
 
-		if "call" not in rights and "all in" in rights:
+		elif A_CALLSTAKE not in rights and A_ALLIN in rights:
 			if current_pot / min_raise > win_odds:
-				return min_raise
+				print "min raise"
+				amount = min_raise
+				action = A_RAISESTAKE
 			else:
-				return -1
+				print "fold"
+				amount = -1
+				action = A_DISCARDGAME
+
+		if amount == -1 and A_CHECK in rights:
+			amount = -1
+			action = A_CHECK
+
+		if action == A_ALLIN and len(board_decks) <3:
+			action = A_CALLSTAKE
+			amount = call_stake
+		print "amount = ",amount
+		return (action, amount)
 
 
 class Robot:
 	Login_URL_Template					= "http://%s:%d/login"
+	List_Room_URL_Template				= "http://%s:%d/list_room"
 	Enter_Room_URL_Template				= "http://%s:%d/enter"
+	User_Info_URL_Template				= "http://%s:%d/userinfo"
 	Sit_Down_URL_Template				= "http://%s:%d/sit-down"
 	Post_Board_Message_URL_Template		= "http://%s:%d/post-board-message"
 	Listen_Board_Message_URL_Template	= "http://%s:%d/listen-board-message"
@@ -243,14 +289,24 @@ class Robot:
 		self.port		= port
 		self.username	= username
 		self.password	= password
-		self.room		= room
-		self.timestamp	= -1
+		self.room			= None
+		self.timestamp		= -1
 		self.public_cards	= [0, 0, 0, 0, 0]
 		self.seats			= [0, 0, 0, 0, 0, 0, 0, 0, 0]
+		self.seat			= -1
+		self.pot_amount		= 0
+		self.min_raise		= 0
+		self.max_raise		= 0
+		self.call_amount	= 0
+		self.hand_cards		= None
+		self.rights			= None
+		self.opp_cards		= None
 		self.http_client	= AsyncHTTPClient()
 		self.decision_maker = DecisionMaker()
 		self.login_url		= Robot.Login_URL_Template % (ip, port)
 		self.enter_url		= Robot.Enter_Room_URL_Template % (ip, port)
+		self.user_info_url	= Robot.User_Info_URL_Template % (ip, port)
+		self.list_room_url	= Robot.List_Room_URL_Template % (ip, port)
 		self.sit_down_url				= Robot.Sit_Down_URL_Template % (ip, port)
 		self.post_board_message_url		= Robot.Post_Board_Message_URL_Template % (ip ,port)
 		self.listen_board_message_url	= Robot.Listen_Board_Message_URL_Template % (ip, port)
@@ -271,11 +327,49 @@ class Robot:
 		content		= json.loads(response.body)
 		if content["status"] == "success":
 			self.cookies= response.headers['Set-Cookie'];
-			self.asset	= content['s']
-			self.enter()
+			self.get_user_info()
 		else:
 			pass
 		print "Robot login handle [end]"
+
+	def get_user_info(self):
+		headers	= {"Cookie":self.cookies}
+		self.http_client.fetch(	self.user_info_url,
+								self.user_info_handle,
+								method='GET',
+								headers=headers)
+
+	def user_info_handle(self,response):
+		content		= json.loads(response.body)
+		self.asset	= content['s']
+		self.list_room()
+
+	def list_room(self):
+		headers	= {"Cookie":self.cookies}
+		body	= urllib.urlencode({"type":0})
+		self.http_client.fetch(	self.list_room_url,
+								self.list_room_handle,
+								method='POST',
+								headers=headers,
+								body=body)
+
+	def list_room_handle(self, response):
+		def sorter(left, right):
+			return left[2] - right[2]
+
+		print "List Room Handle[start]"
+		print response.body
+		content = json.loads(response.body)
+		available_list = filter(lambda x: x[2] > 0 and x[2] < x[3] ,content["rooms"])
+		print available_list
+		if len(available_list) > 0:
+			available_list.sort(sorter)
+			self.room = available_list[0][0]
+		else:
+			self.room = content["rooms"][0][0]
+
+		self.enter()
+		print "List Room Hanlde[end]"
 
 	def enter(self):
 		print "Robot enter [start]"
@@ -291,6 +385,7 @@ class Robot:
 
 	def enter_handle(self, response):
 		print "Robot enter handle [start]"
+		print response.body
 		content		= json.loads(response.body)
 		if content["status"] == "success":
 			self.cookies= response.headers['Set-Cookie'];
@@ -340,6 +435,9 @@ class Robot:
 		post_data	= {"timestamp": self.timestamp}
 		body		= urllib.urlencode(post_data)
 		headers		= {"Cookie":self.cookies}
+
+		print "post content"
+		print post_data
 		self.http_client.fetch(	self.listen_board_message_url,
 								self.listen_board_message_handle,
 								method	= "POST",
@@ -350,19 +448,57 @@ class Robot:
 
 	def listen_board_message_handle(self, response):
 		print "Robot listen board message handle [start]"
-		content	= json.loads(response.body)
-		print content
-		for message in content:
-			if message["status"] == "success":
-				self.cookies= response.headers['Set-Cookie'];
-				for i in xrange(len(content)):
-					message			= content[i]
-					self.timestamp	= message["timestamp"]
-					method = getattr(self,"handle_" + message['msgType'])
-					method(message)
+		print response.body
+		try:
+			content	= json.loads(response.body)
+			content.sort(self._sorter)
+			self.cookies= response.headers['Set-Cookie'];
+			for i in xrange(len(content)):
+				message			= content[i]
+				print message
+				self.timestamp	= message["timestamp"]
+				method = getattr(self,"handle_" + message['msgType'])
+				method(message)
+		except:
+			print "Unexpected error:", sys.exc_info()[0]
+			print "content is :"
+			print response.body
+
+		self.listen_board_message()
 		print "Robot listen board message handle [end]"
+
+	def _sorter(self, left, right):
+		return left["timestamp"] - right["timestamp"]
+
 	def send_post_message(self):
-		self.decision_maker.make_decision(self.seats, self.seat, self.hand_card, self.public_card)
+		print "send post message [start]"
+		(action, amount)  = self.decision_maker.make_decision(
+											self.hand_cards,
+											self.opp_cards,
+											self.public_cards,
+											self.pot_amount,
+											self.call_amount,
+											self.min_raise,
+											self.max_raise,
+											self.rights)
+
+		post_data	= {"message":json.dumps({"action": action, "amount":amount})}
+		body		= urllib.urlencode(post_data)
+		headers		= {"Cookie":self.cookies}
+		self.http_client.fetch(	self.post_board_message_url,
+								self.handle_post_board,
+								method	= "POST",
+								headers	= headers,
+								body	= body)
+
+	#print decision_maker.make_decision(cards, opp_card_list, p_cards, 200, 10,20,100,["call", "raise"])
+		print "send post message [end]"
+
+
+	def handle_post_board(self, data):
+		print "handle post message [start]"
+		print data.body
+		print "handle post message [end]"
 
 	def handle_sit(self,data):
 		print "handle sit [start]"
@@ -372,20 +508,32 @@ class Robot:
 		self.seats[data["seat_no"]].table = 0
 		print "handle sit [end]"
 
+	def handle_bot_card(self, data):
+		print "handle bot card [start]"
+		print data
+		if data['cards'] not in self.opp_cards:
+			self.opp_cards.append(data['cards'])
+		print "handle bot card [end]"
+
 	def handle_bhc(self,data):
 		print "handle bhc [start]"
+		print data
 		pass
 		print "handle bhc [end]"
 
 	def handle_phc(self,data):
 		print "handle phc [start]"
-		self.seats[self.seat].hand_cards.extend(data["cards"])
+		print data
+		self.hand_cards = data["cards"]
 		pass
 		print "handle phc [end]"
 
 	def handle_winner(self,data):
 		print "handle winner [start]"
-		pass
+		print data
+		if data[self.room]["seat_no"] ==self.seat_no:
+			self.asset	+= data[self.room]['stake'] - self.stake
+			self.stake	= data[self.room]['stake']
 		print "handle winner [end]"
 
 	def handle_next(self,data):
@@ -393,34 +541,42 @@ class Robot:
 		print "seat no =%d"%(data["seat_no"])
 		print "self seat=%d"%(self.seat)
 		if data["seat_no"] == self.seat:
+			if 2 in data["rights"]:
+				self.call_amount= data["amount_limits"]['2']
+			if 3 in data["rights"]:
+				self.min_raise	= data["amount_limits"]['3'][0]
+				self.max_raise	= data["amount_limits"]['3'][1]
+			self.rights = data["rights"]
 			self.send_post_message()
-		pass
 		print "handle next [end]"
 
 	def handle_action(self, data):
 		print "handle action [start]"
-		self.seats[data["seat_no"]].stake = data["stake"]
-		self.seats[data["seat_no"]].table = data["table"]
-		pass
+		if data["seat_no"] == self.seat:
+			self.stake = data["stake"]
 		print "handle action [end]"
 
-	def handle_public_card(self,data):
+	def handle_public(self,data):
 		print "handle public [start]"
 		self.public_cards = []
 		for i in xrange(len(data["cards"])):
-			self.public_cards.push(data["cards"][i]);
-		pass
+			self.public_cards.append(data["cards"][i]);
 		print "handle public [end]"
 
-	def handle_start_game(self,data):
+	def handle_start(self,data):
 		print "handle start game [start]"
-		self.public_cards = []
-		pass
+		self.public_cards	= []
+		self.opp_cards		= []
+		self.hand_cards		= []
+		self.pot_amount		= 0
+		print "stake =>",self.stake
 		print "handle start game [end]"
 
 	def handle_pot(self, data):
 		print "handle pot [start]"
-		pass
+		self.pot_amount = 0
+		for pot in data["pot"]:
+			self.pot_amount += pot[1]["amount"]
 		print "handle pot [end]"
 
 
@@ -433,10 +589,11 @@ class Robot:
 
 
 if __name__=="__main__":
-	#robot	= Robot(ip='127.0.0.1',port=8888,username='mile',password='123',room=1)
-	#robot.start()
-	#ioloop	= tornado.ioloop.IOLoop.instance()
-	#ioloop.start()
+	robot	= Robot(ip='127.0.0.1',port=8888,username='bot1',password='123321')
+	robot.start()
+	ioloop	= tornado.ioloop.IOLoop.instance()
+	ioloop.start()
+	'''
 	decision_maker	= DecisionMaker()
 	cards	= ["2C", "2D"]
 	p_cards	= ["5H", "4S", "6C",]
@@ -446,3 +603,4 @@ if __name__=="__main__":
 	print strftime("%Y-%m-%d %H:%M:%S", gmtime())
 	print decision_maker.make_decision(cards, opp_card_list, p_cards, 200, 40,80,100,["call", "raise"])
 	print strftime("%Y-%m-%d %H:%M:%S", gmtime())
+	'''
