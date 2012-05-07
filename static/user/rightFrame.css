@@ -37,9 +37,11 @@
 		0px -1px 0px rgba(000,000,000,0.7),
 		0px 1px 0px rgba(255,255,255,0.3);
 
+	line-height:35px;
 	width: 260px;
 	position: absolute;
 	cursor: pointer;
+	height:40px;
 /*	font-weight: bolder;*/
 }
 .GeneralBtn:active{
@@ -49,7 +51,7 @@
 	-webkit-box-shadow:
 		5px 6px 3px rgba(000,000,000,0.0),
 		inset 0px 0px 0px rgba(255,255,255,0.6);
-	margin-top: 10px;
+	margin-top: 5px;
 	margin-left: 5px;
 }
 #logout {
@@ -57,11 +59,11 @@
 	left: 0px;
 }
 #lobby {
-	top: 173px;
+	top: 183px;
 	left: 0px;
 }
 #quick_acc {
-	top: 237px;
+	top: 257px;
 	left: 0px;
 }
 #help {

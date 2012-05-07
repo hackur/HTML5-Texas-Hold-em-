@@ -13,40 +13,8 @@ window.get_event_position = function(e){
 	}
 	return [e.clientX,e.clientY]
 }
-function decide_event(){
-	window.event_up = "touchend";
-	window.event_down = "touchstart"; 
-	window.event_move = "touchmove";
-	if(navigator.userAgent.match(/iPhone/i) ||
-	 		navigator.userAgent.match(/Android/i) ||
-			navigator.userAgent.match(/iPad/i) ||
-			navigator.userAgent.match(/iPod/i) ||
-			navigator.userAgent.match(/webOS/i) ||
-			navigator.userAgent.match(/BlackBerry/)
-	){
-		event_up = "touchend";
-		event_down = "touchstart"; 
-		event_move = "touchmove";
-		window.touch_enable = true;
-	}
-	else{
-		event_up = "mouseup"; 
-		event_down = "mousedown"; 
-		event_move = "mousemove";
-		window.touch_enable = false;
-	}
-
-	if( $.browser.webkit ) {
-			eventTransitionEnd = "webkitTransitionEnd";
-	} else if( $.browser.mozilla ) {
-			eventTransitionEnd = "transitionend";
-	} else if ($.browser.opera) {
-			eventTransitionEnd = "oTransitionEnd";
-	}
-}
 
 var info_init = function() {
-	decide_event();
 	getUserImage();
 	listEmail(1);
 	buddyInfo();
@@ -103,10 +71,10 @@ var info_init = function() {
 		frameControl(bigframe[i], i);
 	}
 	recharge.drag();
-	$("#lobby").click(function(){
+	$("#lobby").bind("vclick",function(){
 		window.location = "/static/room/room.html";
 	});
-	$("#quick_acc").click(function(){
+	$("#quick_acc").bind("vclick",function(){
 		$.ajax({
 			type:"get",
 			url:"/fast_enter",
@@ -115,6 +83,13 @@ var info_init = function() {
 				window.location = "/static/game/game.html";
 			}
 		});
+	});
+
+	$("#logout").bind("vclick",function(){
+		$.post("/logout",function(){
+			window.location="/";
+		});
+
 	});
 };
 
@@ -287,4 +262,4 @@ var bindSendFriendEmail = function(){
 		console.log("fsend end");
 	});
 }
-window.SelectedFriend = null;
+
