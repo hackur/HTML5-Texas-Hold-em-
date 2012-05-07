@@ -721,16 +721,9 @@ class GameRoom(object):
 	def distribute_ante(self):
 		ante_dict = {}
 		rank_list = self.poker_controller.rank_users()
-		#temp_list = list(rank_list)
 		for i in xrange(len(rank_list)):
 			print "rank list"
-			#for j in xrange(len(temp_list[i])):
-			#	print temp_list[i][j].status
-			#	if temp_list[i][j].status == Seat.SEAT_EMPTY:
-			#		rank_list[i].remove(rank_list[i][j])
 			rank_list[i] = filter(lambda seat : seat.status != Seat.SEAT_EMPTY, rank_list[i])
-			#temp = [rank_list[i][j].get_user().id for j in xrange(len(rank_list[i]))]
-			#print temp
 
 			for owner, ante in self.pot.iteritems():
 				ante = ante["amount"]
