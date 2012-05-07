@@ -35,6 +35,7 @@ class Dealer(object):
 
 
 		info.rooms = 0
+		self.info = info
 
 	def on_queue_bound(self, frame):
 		self.channel.basic_consume(
@@ -158,6 +159,8 @@ class Dealer(object):
 				routing_key = routing_key,
 				body        = json.dumps(message))
 
+		self.info.rooms += 1
+
 
 
 	def on_message(self, channel, method, header, body):
@@ -193,6 +196,7 @@ class Dealer(object):
 				self.room_list[newRoom.id] = GameRoom(
 						newRoom, 1, self,
 						max_player, blind, min_stake, max_stake)
+				self.info.rooms += 1
 				print newRoom
 
 
