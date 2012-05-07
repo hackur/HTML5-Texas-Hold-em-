@@ -158,7 +158,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 									exchange,
 									binding_keys,
 									declare_queue_only=True,
-									arguments = {"x-expires":int(15000)}
+									arguments = {"x-expires":int(1800000)}
 									)
 
 		self.callBackCount = 0
@@ -309,7 +309,7 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 		binding_keys= (self.session['public_key'], self.session['private_key'])
 		self.channel= PersistentChannel(
 				self.application.channel,
-				queue, exchange, binding_keys, self,arguments = {"x-expires":int(15000)})
+				queue, exchange, binding_keys, self,arguments = {"x-expires":int(1800000)})
 		self.channel.add_message_action(self.message_call_back, None)
 		self.channel.connect()
 
@@ -383,7 +383,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 
 		self.channel= PersistentChannel(
 				self.application.channel,
-				queue, exchange, binding_keys, self,arguments = {"x-expires":int(15000)})
+				queue, exchange, binding_keys, self,arguments = {"x-expires":int(1800000)})
 		self.channel.add_message_action(self.message_call_back, None)
 		self.channel.connect()
 

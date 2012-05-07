@@ -60,7 +60,7 @@ def on_channel_open(channel):
 def on_close_callback(msg1,msg2):
 	print "CHANNEL CLOSED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 	print msg1,msg2
-	exit(0)
+	exit(-1)
 
 def on_connected(connection):
 	print "pika connected"
@@ -76,14 +76,12 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 	PORT = args.port
 
-	num_of_process =args.processes
-	print args
+	num_of_process = args.processes
 	if args.debug_mode == 1:
 		debug = True
 		num_of_process = 1
 	else:
 		debug = False
-	print debug,num_of_process
 
 	settings = {
 		"debug": debug,
@@ -100,7 +98,7 @@ if __name__ == '__main__':
 
 
 	# Set our pika.log options
-	pika.log.setup(color=False)
+	pika.log.setup(color=debug)
 	pika.log.info("Starting Tornado HTTPServer on port %i" % PORT)
 	application = tornado.web.Application([
 		(r"/?$", IndexPageHandler),
@@ -138,7 +136,6 @@ if __name__ == '__main__':
         (r"/weibologinCallback/?",SinaWeiboLoginBack),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path2'])),
 		(r"/uploads/(.*)", tornado.web.StaticFileHandler, dict(path=settings['uploaded_image_path'])),
-	#	(r"/(.*.html)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
 		(r"/PokerUITest/(.*)", tornado.web.StaticFileHandler, dict(path=settings['PokerUITest'])),
 		], **settings)
 	http_server = tornado.httpserver.HTTPServer(application)

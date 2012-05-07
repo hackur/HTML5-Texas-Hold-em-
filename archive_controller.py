@@ -102,8 +102,6 @@ class HeadPortraitHandler(tornado.web.RequestHandler):
 
 		user.headPortrait_url		= "/" + directory + '/' + filename
 		user.headPortrait_path		= "./" + directory + '/' + filename
-		self.db_connection.addItem(user)
-		self.db_connection.commit_session()
 		message = {"status":"success","url":user.headPortrait_url}
 		self.finish(json.dumps(message))
 
