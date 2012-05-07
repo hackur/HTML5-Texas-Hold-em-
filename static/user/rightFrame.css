@@ -10,63 +10,67 @@
 	color: white;
 	font-weight: bolder;
 }
-#range {
-	top: 35px;
-	left: 0px;
-	width: 273px;
-	height: 83px;
+.GeneralBtn {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 19px;
+	color: #ffffff;
+	padding: 10px 0px;
+	background: -moz-linear-gradient(
+		top,
+		#42aaff 0%,
+		#003366);
+	background: -webkit-gradient(
+		linear, left top, left bottom, 
+		from(#42aaff),
+		to(#003366));
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border: 1px solid #003366;
+	-moz-box-shadow:
+		5px 6px 3px rgba(000,000,000,0.6),
+		inset 0px 0px 0px rgba(255,255,255,0.6);
+	-webkit-box-shadow:
+		5px 6px 3px rgba(000,000,000,0.6),
+		inset 0px 0px 0px rgba(255,255,255,0.6);
+	text-shadow:
+		0px -1px 0px rgba(000,000,000,0.7),
+		0px 1px 0px rgba(255,255,255,0.3);
+
+	width: 260px;
 	position: absolute;
-	background-image: url(./image/yellowBT.png);
-	color: white;
-	font-weight: bolder;
-	line-height: 75px;
 	cursor: pointer;
+/*	font-weight: bolder;*/
+}
+.GeneralBtn:active{
+	-moz-box-shadow:
+		5px 6px 3px rgba(000,000,000,0.0),
+		inset 0px 0px 0px rgba(255,255,255,0.6);
+	-webkit-box-shadow:
+		5px 6px 3px rgba(000,000,000,0.0),
+		inset 0px 0px 0px rgba(255,255,255,0.6);
+	margin-top: 10px;
+	margin-left: 5px;
+}
+#logout {
+	top: 107px;
+	left: 0px;
 }
 #lobby {
-	top: 120px;
+	top: 173px;
 	left: 0px;
-	width: 273px;
-	height: 83px;
-	position: absolute;
-	background-image: url(./image/yellowBT.png);
-	color: white;
-	font-weight: bolder;
-	line-height: 75px;
-	cursor: pointer;
 }
 #quick_acc {
-	top: 205px;
+	top: 237px;
 	left: 0px;
-	width: 273px;
-	height: 83px;
-	position: absolute;
-	background-image: url(./image/blueBT.png);
-	color: white;
-	font-weight: bolder;
-	line-height: 75px;
-	cursor: pointer;
 }
 #help {
 	top: 300px;
 	left: 0px;
-	width: 133px;
-	height: 62px;
-	position: absolute;
-	background-image: url(./image/buttonTwo.png);
-	color: white;
-	font-weight: bolder;
-	line-height: 58px;
-	cursor: pointer;
+	width: 123px;
 }
 #setting {
 	top: 300px;
 	left: 140px;
-	width: 133px;
-	height: 62px;
-	position: absolute;
-	background-image: url(./image/buttonTwo.png);
-	color: white;
-	font-weight: bolder;
-	line-height: 58px;
-	cursor: pointer;
+	width: 123px;
 }
