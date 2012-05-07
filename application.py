@@ -46,10 +46,6 @@ class UserPageHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.render("static/user/user.html")
 
-class IndexTestHandler(tornado.web.RequestHandler):
-	def get(self):
-		self.render("room-test-ajax.html",username=self.get_argument('username'),sitno=self.get_argument('sitno'))
-
 
 application = None
 def on_channel_open(channel):
@@ -88,7 +84,6 @@ if __name__ == '__main__':
 		'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
 		"static_path2": os.path.join(os.path.dirname(__file__), "static"),
 		"uploaded_image_path": os.path.join(os.path.dirname(__file__), "uploads"),
-		"PokerUITest": os.path.join(os.path.dirname(__file__), "PokerUITest"),
 		#'session_storage':"dir"
 		"session_storage":"mongodb:///db",
 		"session_age":None,
@@ -107,6 +102,7 @@ if __name__ == '__main__':
 		(r"/static/game/game.html", UIIndexTestHandler),
 		(r"/static/index/index.html", LoginPageHandler),
 		(r"/static/user/user.html", UserPageHandler),
+		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path2'])),
 		(r"/sk",BoardListenMessageSocketHandler ),
 
 		(r"/uitest.html", UIIndexHandler),
@@ -115,28 +111,28 @@ if __name__ == '__main__':
 		(r"/personal-archive",PersonalArchiveHandler),
 		(r"/player-archive", PlayerArchiveHandler),
 		(r"/head-portrait-upload",HeadPortraitHandler),
+
 		(r"/list-email",EmailListHandler),
 		(r"/send-email",EmailSendHandler),
+		(r"/view-email",EmailViewHandler),
+		(r"/delete-email",EmailDeleteHandler),
+
 		(r"/send-chat",SentChatMessageHandler),
 		(r"/create_room",CreateRoomHandler),
 		(r"/list_room",ListRoomHandler),
 		(r"/fast_enter",FastEnterRoomHandler),
 		(r"/buddy-info/(\w*)",BuddyInfoHandler),
-		(r"/view-email",EmailViewHandler),
 		(r"/config/(\w+)",ConfigHandler),
 
 
-		(r"/delete-email",EmailDeleteHandler),
 		(r"/userinfo", UserInfoHandler),
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),
 		(r"/logout", LogoutHandler),
         (r"/weibologin",SinaWeiboLogin),
-		(r"/test", IndexTestHandler),
         (r"/weibologinCallback/?",SinaWeiboLoginBack),
-		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path2'])),
+        (r"/refill",BotRefillHandler),
 		(r"/uploads/(.*)", tornado.web.StaticFileHandler, dict(path=settings['uploaded_image_path'])),
-		(r"/PokerUITest/(.*)", tornado.web.StaticFileHandler, dict(path=settings['PokerUITest'])),
 		], **settings)
 	http_server = tornado.httpserver.HTTPServer(application)
 	http_server.bind(PORT)

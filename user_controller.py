@@ -28,3 +28,14 @@ class UserInfoHandler(tornado.web.RequestHandler):
 		# 'l': level
 		msg = {'n':user.username,'s':user.asset,'l':user.level,'id':user.id}
 		self.write(json.dumps(msg))
+
+class BotRefillHandler(tornado.web.RequestHandler):
+	@authenticate
+	def get(self):
+		if self.user.isBot:
+			self.user.update_attr('asset',3000)
+			self.write(str(self.user.asset))
+			return
+
+		self.send_error(404)
+
