@@ -8,7 +8,7 @@ import json
 import pprint
 import argparse
 import sys
-
+import random
 
 (A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND,A_STANDUP) = (1,2,3,4,5,6,7,8)
 class Seat:
@@ -17,6 +17,41 @@ class Seat:
 		self.stake		= stake
 		self.table		= table
 		self.hand_cards	= []
+
+class FoolDecisionMaker:
+	Fold	= 100
+	Call	= 7500
+	Raise	= 9500
+	All_In	= 10000
+	def __init__(self):
+		pass
+
+	def make_decision(self, robot_cards, opp_cards_list, board_cards, current_pot, call_stake, min_raise, max_raise, rights):
+		action	= -1
+		amount	= -1
+		value = random.randint(1, 10000)
+		if value < FoolDecisionMaker.Fold:
+			action	= -1
+			amount	= -1
+		elif value < FoolDecisionMaker.Call:
+			if A_CALLSTAKE not in rights and A_ALLIN in rights:
+				action	= A_ALLIN
+				amount	= min_raise
+			else:
+				action	= A_CALLSTAKE
+				amount	= call_stake
+		elif value < FoolDecisionMaker.Raise:
+			if A_CALLSTAKE in rights and A_ALLIN in rights and A_RAISESTAKE not in rights:
+				action	= A_CALLSTAKE
+				amount	= call_stake
+			else:
+				action	= A_RAISESTAKE
+				amount	= min_raise
+		elif value < All_In:
+			action	= A_ALLIN
+			amount	= max_raise
+
+		return (action, amount)
 
 class DecisionMaker:
 	def __init__(self):
@@ -131,8 +166,7 @@ class DecisionMaker:
 		remain_cards	= self.filter(self.cards, robot_all_cards)
 		for opp_cards in opp_cards_list:
 			remain_cards= self.filter(remain_cards, opp_cards)
-		print "===========================board_cards============================="
-		print len(board_cards)
+
 		if len(board_cards) == 3:
 			for k in xrange(len(remain_cards)-1):
 				for o in xrange(k + 1, len(remain_cards)):
@@ -279,18 +313,16 @@ class DecisionMaker:
 				temp_list.append(self.convert_to_deck(card))
 			opp_decks_list.append(temp_list)
 
-		print opp_decks_list
 
 		if len(board_cards) == 0:
 			return self._chen_strategy(robot_decks, call_stake, min_raise, max_raise, rights)
 		else:
 			win_probability = self._hand_potential(robot_decks, opp_decks_list, board_decks)
 			win_probability += 0.005
-			print "win probability 1=>%d"%(win_probability)
 			if win_probability > 1.0:
 				win_probability = 1.0
 			win_odds = 1.0 / (win_probability)
-			print "win probability 2=>%d"%(win_probability)
+			print "win probability =>%d"%(win_probability)
 			return self._normal_strategy(win_odds, current_pot, call_stake, min_raise, max_raise, rights)
 
 
@@ -308,25 +340,30 @@ class Robot:
 	Action_Check_Stake	= 4
 	Action_Discard_Game	= 5
 	Action_Stand_Up		= 8
-	def __init__(self, ip='127.0.0.1', port = 80, username=None, password=None, room=None):
+	def __init__(self, ip='127.0.0.1', port = 80, username=None, password=None, room=None, iq="low"):
 		self.ip			= ip
 		self.port		= port
 		self.username	= username
 		self.password	= password
 		self.room			= None
 		self.timestamp		= -1
-		self.public_cards	= [0, 0, 0, 0, 0]
+		self.public_cards	= []
 		self.seats			= [0, 0, 0, 0, 0, 0, 0, 0, 0]
 		self.seat			= -1
 		self.pot_amount		= 0
 		self.min_raise		= 0
 		self.max_raise		= 0
 		self.call_amount	= 0
-		self.hand_cards		= None
-		self.rights			= None
-		self.opp_cards		= None
+		self.hand_cards		= []
+		self.rights			= []
+		self.opp_cards		= []
 		self.http_client	= AsyncHTTPClient()
-		self.decision_maker = DecisionMaker()
+
+		if iq == "low":
+			self.decision_make	= FoolDecisionMaker()
+		else:
+			self.decision_maker = DecisionMaker()
+
 		self.login_url		= Robot.Login_URL_Template % (ip, port)
 		self.enter_url		= Robot.Enter_Room_URL_Template % (ip, port)
 		self.user_info_url	= Robot.User_Info_URL_Template % (ip, port)
@@ -475,28 +512,31 @@ class Robot:
 		print "Robot listen board message [end]"
 
 	def listen_board_message_handle(self, response):
+		def _sorter(left, right):
+			return left["timestamp"] - right["timestamp"]
+
 		print "Robot listen board message handle [start]"
-		print response.body
 		try:
 			content	= json.loads(response.body)
-			content.sort(self._sorter)
-			self.cookies= response.headers['Set-Cookie'];
-			for i in xrange(len(content)):
-				message			= content[i]
-				print message
-				self.timestamp	= message["timestamp"]
-				method = getattr(self,"handle_" + message['msgType'])
-				method(message)
 		except:
 			print "Unexpected error:", sys.exc_info()[0]
+			print sys.exc_info()
 			print "content is :"
 			print response.body
+			self.listen_board_message()
+			return
+		content.sort(_sorter)
+		self.cookies= response.headers['Set-Cookie'];
+		for i in xrange(len(content)):
+			message			= content[i]
+			print message
+			self.timestamp	= message["timestamp"]
+			method = getattr(self,"handle_" + message['msgType'])
+			method(message)
 
 		self.listen_board_message()
 		print "Robot listen board message handle [end]"
 
-	def _sorter(self, left, right):
-		return left["timestamp"] - right["timestamp"]
 
 	def send_post_message(self):
 		print "send post message [start]"
@@ -519,13 +559,11 @@ class Robot:
 								headers	= headers,
 								body	= body)
 
-	#print decision_maker.make_decision(cards, opp_card_list, p_cards, 200, 10,20,100,["call", "raise"])
 		print "send post message [end]"
 
 
 	def handle_post_board(self, data):
 		print "handle post message [start]"
-		print data.body
 		print "handle post message [end]"
 
 	def handle_sit(self,data):
@@ -539,8 +577,9 @@ class Robot:
 	def handle_bot_card(self, data):
 		print "handle bot card [start]"
 		print data
-		if data['cards'] not in self.opp_cards and data['cards'] != self.hand_cards:
-			self.opp_cards.append(data['cards'])
+		if data['cards'] not in self.opp_cards:
+			if data['cards'] != self.hand_cards:
+				self.opp_cards.append(data['cards'])
 
 		print "handle bot card [end]"
 
@@ -567,8 +606,6 @@ class Robot:
 
 	def handle_next(self,data):
 		print "handle next [start]"
-		print "seat no =%d"%(data["seat_no"])
-		print "self seat=%d"%(self.seat)
 		if data["seat_no"] == self.seat:
 			if 2 in data["rights"]:
 				self.call_amount= data["amount_limits"]['2']
@@ -623,15 +660,16 @@ if __name__=="__main__":
 	parser.add_argument('--username','-U',default="human1")
 	parser.add_argument('--password','-E',default="123321")
 	parser.add_argument('--server','-S',default="127.0.0.1")
+	parser.add_argument('--iq','-I',default="low")
 
 	args = parser.parse_args()
 
-	host = args.server
-	port = args.port
-	username = args.username
-	password = args.password
-
-	robot	= Robot(ip=host,port=port,username=username,password=password)
+	host	= args.server
+	port	= args.port
+	username= args.username
+	password= args.password
+	iq		= args.iq
+	robot	= Robot(ip=host,port=port,username=username,password=password,iq)
 	robot.start()
 	ioloop	= tornado.ioloop.IOLoop.instance()
 	ioloop.start()
