@@ -20,7 +20,7 @@ class LoginHandler(tornado.web.RequestHandler):
 			message		= {'status':'failed', 'content':'invalid username or password'}
 		else:
 			message		= {'status':'success'}
-			self.session['user_id'] = user._id
+			self.session['user_id'] = user.id
 			user.last_login	= datetime.now()
 		self.set_header('Access-Control-Allow-Origin', '*')
 		self.write(json.dumps(message))
@@ -43,7 +43,7 @@ class GuestLoginHandler(tornado.web.RequestHandler):
 			message		= {'status':'failed', 'content':'invalid username or password'}
 		else:
 			message		= {'status':'success', 'username':user.username, 'password':password}
-			self.session['user_id'] = user._id
+			self.session['user_id'] = user.id
 			user.last_login	= datetime.now()
 
 		self.set_header('Access-Control-Allow-Origin', '*')
@@ -95,7 +95,7 @@ class SinaWeiboLoginBack(tornado.web.RequestHandler):
 		user.headPortrait_url = user_info.profile_image_url #avatar_large?
 
 		user.last_login	= datetime.now()
-		self.session['user_id'] = user._id
+		self.session['user_id'] = user.id
 		self.redirect("/static/user/user.html")
 
 	@tornado.web.asynchronous

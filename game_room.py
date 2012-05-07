@@ -474,7 +474,7 @@ class GameRoom(object):
 
 		if self.status != GameRoom.GAME_WAIT:
 			next_seat = self.seats[self.current_seat]
-			print "next seat no =>%d" %d (next_seat.seat_id)
+			print "next seat no =>%d" % (next_seat.seat_id)
 			self.broadcast(
 				{
 					"seat_no":next_seat.seat_id,

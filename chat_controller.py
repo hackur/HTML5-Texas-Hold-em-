@@ -15,16 +15,16 @@ class SentChatMessageHandler(tornado.web.RequestHandler):
 		board_messages	= self.mongodb.board.find_one({"user_id": self.session['user_id']})
 		if 'is_sit_down' in board_messages and board_messages['is_sit_down'] == True:
 			message				= {}
-			user				= self.session['user']
-			exchange			= str(user.room.exchange)
+			user				= self.user
+			exchange			= self.session['exchange']
 			message["method"]	= "chat"
 			message["seat"]		= int(self.get_argument("seat"))
 			message["user"]		= user.id
 			message["content"]	= self.get_argument("message")
-			message["room"]		= user.room.id
+			message["room"]		= user.room_id
 			self.channel		= Channel(self.application.channel, exchange)
 			self.channel.publish_message("dealer", json.dumps(message))
 			result	= "{\"status\":\"success\"}"
 		else:
-			result	= "{\"status\":\"failed\"}"
+			result	= board_messages
 		self.finish(result)
