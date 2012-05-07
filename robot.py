@@ -6,7 +6,9 @@ import tornado.ioloop
 import urllib
 import json
 import pprint
-import array
+import argparse
+import sys
+
 
 (A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND,A_STANDUP) = (1,2,3,4,5,6,7,8)
 class Seat:
@@ -119,21 +121,19 @@ class DecisionMaker:
 		else:
 			baseScore	-= 5
 
-		return (baseScore - gap)/20.0;
+		return baseScore;
 
 
 	def _hand_potential(self, robot_cards, opp_cards_list, board_cards):
 		total_cases	= 0
 		win_counter	= 0
-		if len(board_cards) >0:
-			robot_all_cards = robot_cards + board_cards
-			remain_cards	= self.filter(self.cards, robot_all_cards)
-			for opp_cards in opp_cards_list:
-				remain_cards= self.filter(remain_cards, opp_cards)
-
-		if len(board_cards) == 0:
-			return self._chen_formula(robot_cards)
-		elif len(board_cards) == 3:
+		robot_all_cards = robot_cards + board_cards
+		remain_cards	= self.filter(self.cards, robot_all_cards)
+		for opp_cards in opp_cards_list:
+			remain_cards= self.filter(remain_cards, opp_cards)
+		print "===========================board_cards============================="
+		print len(board_cards)
+		if len(board_cards) == 3:
 			for k in xrange(len(remain_cards)-1):
 				for o in xrange(k + 1, len(remain_cards)):
 					counter = 0
@@ -142,11 +142,12 @@ class DecisionMaker:
 						robot_best	= self._rank(temp_board + robot_cards)
 						opp_best	= self._rank(temp_board + opp_cards)
 						best_comparison = self._rank_compare(robot_best, opp_best)
-						if best_comparison > 0:
+						if best_comparison >= 0:
 							counter += 1
-				total_cases += 1
+				total_cases += 1.0
 				if counter == len(opp_cards_list):
-					win_counter += 1
+					win_counter += 1.0
+
 		elif len(board_cards) == 4:
 			for k in xrange(len(remain_cards)):
 				counter = 0
@@ -155,66 +156,56 @@ class DecisionMaker:
 					robot_best	= self._rank(temp_board + robot_cards)
 					opp_best	= self._rank(temp_board + opp_cards)
 					best_comparison = self._rank_compare(robot_best, opp_best)
-					if best_comparison > 0:
+					if best_comparison >= 0:
 						counter += 1
-				total_cases += 1
+				total_cases += 1.0
 				if counter == len(opp_cards_list):
-					win_counter += 1
+					win_counter += 1.0
 		elif len(board_cards) == 5:
 			remain_cards= self.filter(self.cards, robot_all_cards)
 			no_opp		= len(opp_cards_list)
+			robot_best	= self._rank(robot_all_cards)
 			for i in xrange(len(remain_cards) - no_opp - 1):
 				for j in xrange(i + 1, len(remain_cards) - no_opp ):
 					counter = 0
 					for k in xrange(no_opp):
-						temp_board	= board_cards + [remain_cards[i], remain_cards[j + k]]
-						robot_best	= self._rank(temp_board + robot_cards)
-						opp_best	= self._rank(temp_board + opp_cards)
+						opp_cards	= board_cards + [remain_cards[i], remain_cards[j + k]]
+						opp_best	= self._rank(opp_cards)
 						best_comparison = self._rank_compare(robot_best, opp_best)
-						if best_comparison > 0:
+						if best_comparison >= 0:
 							counter += 1
-					total_cases += 1
+					total_cases += 1.0
 				if counter == no_opp:
-					win_counter += 1
-
+					win_counter += 1.0
+			board_rank = self._rank(board_cards)
+			win_counter += (total_cases/10)*(robot_best[0] - board_rank[0] + 1)
+		print (win_counter*1.0)/total_cases
 		return (win_counter*1.0)/total_cases
 
+	def _chen_strategy(self, robot_decks, call_stake, min_raise, max_raise, rights):
+		chen_value = self._chen_formula(robot_decks)
 
-	def make_decision(self, robot_cards, opp_cards_list, board_cards, current_pot, call_stake, min_raise, max_raise, rights):
-		robot_decks		= []
-		board_decks		= []
-		opp_decks_list	= []
-		print "======================[start]==========================="
-		print robot_cards
-		print board_cards
-		print opp_cards_list
-		print "======================[end]==========================="
-		for card in robot_cards:
-			robot_decks.append(self.convert_to_deck(card))
-		print "=======1====="
-		for card in board_cards:
-			board_decks.append(self.convert_to_deck(card))
+		if chen_value >= 8:
+			if A_RAISESTAKE in rights:
+				action = A_RAISESTAKE
+				amount = min_raise
+			else:
+				amount = call_stake
+				action = A_CALLSTAKE
+		else:
+			action = A_DISCARDGAME
+			amount = -1
 
-		print "=======2====="
-		for cards in opp_cards_list:
-			temp_list	= []
-			for card in cards:
-				temp_list.append(self.convert_to_deck(card))
-			opp_decks_list.append(temp_list)
-		print "=======3====="
+		if amount == -1 and A_CHECK in rights:
+			amount = -1
+			action = A_CHECK
+		print "(%d, %d)" %(action, amount)
+		return (action, amount)
 
-		print opp_decks_list
-		win_probability = self._hand_potential(robot_decks, opp_decks_list, board_decks)
-		win_probability += 0.005
-		if win_probability > 1.0:
-			win_probability = 1.0
-		win_odds = 1.0 / (win_probability)
-		print win_probability
-		print win_odds
-
+	def _normal_strategy(self, win_odds, current_pot, call_stake, min_raise, max_raise, rights):
 		amount = -1
 		action = -1
-
+		print win_odds
 		if A_CALLSTAKE in rights and A_ALLIN in rights and A_RAISESTAKE not in rights:
 			if current_pot / call_stake > win_odds :
 				if current_pot / max_raise > win_odds:
@@ -263,11 +254,44 @@ class DecisionMaker:
 			amount = -1
 			action = A_CHECK
 
-		if action == A_ALLIN and len(board_decks) <3:
-			action = A_CALLSTAKE
-			amount = call_stake
 		print "amount = ",amount
 		return (action, amount)
+
+
+	def make_decision(self, robot_cards, opp_cards_list, board_cards, current_pot, call_stake, min_raise, max_raise, rights):
+		robot_decks		= []
+		board_decks		= []
+		opp_decks_list	= []
+		print "======================[start]==========================="
+		print robot_cards
+		print board_cards
+		print opp_cards_list
+		print "======================[end]==========================="
+		for card in robot_cards:
+			robot_decks.append(self.convert_to_deck(card))
+
+		for card in board_cards:
+			board_decks.append(self.convert_to_deck(card))
+
+		for cards in opp_cards_list:
+			temp_list	= []
+			for card in cards:
+				temp_list.append(self.convert_to_deck(card))
+			opp_decks_list.append(temp_list)
+
+		print opp_decks_list
+
+		if len(board_cards) == 0:
+			return self._chen_strategy(robot_decks, call_stake, min_raise, max_raise, rights)
+		else:
+			win_probability = self._hand_potential(robot_decks, opp_decks_list, board_decks)
+			win_probability += 0.005
+			print "win probability 1=>%d"%(win_probability)
+			if win_probability > 1.0:
+				win_probability = 1.0
+			win_odds = 1.0 / (win_probability)
+			print "win probability 2=>%d"%(win_probability)
+			return self._normal_strategy(win_odds, current_pot, call_stake, min_raise, max_raise, rights)
 
 
 class Robot:
@@ -325,6 +349,7 @@ class Robot:
 	def login_handle(self,response):
 		print "Robot login handle [start]"
 		content		= json.loads(response.body)
+		print content
 		if content["status"] == "success":
 			self.cookies= response.headers['Set-Cookie'];
 			self.get_user_info()
@@ -342,6 +367,7 @@ class Robot:
 	def user_info_handle(self,response):
 		content		= json.loads(response.body)
 		self.asset	= content['s']
+		self.user_id= content['id']
 		self.list_room()
 
 	def list_room(self):
@@ -373,6 +399,7 @@ class Robot:
 
 	def enter(self):
 		print "Robot enter [start]"
+		print "enter "+self.room
 		post_data	= {"room_id":self.room}
 		body		= urllib.urlencode(post_data)
 		headers		= {"Cookie":self.cookies}
@@ -511,8 +538,9 @@ class Robot:
 	def handle_bot_card(self, data):
 		print "handle bot card [start]"
 		print data
-		if data['cards'] not in self.opp_cards:
+		if data['cards'] not in self.opp_cards and data['cards'] != self.hand_cards:
 			self.opp_cards.append(data['cards'])
+
 		print "handle bot card [end]"
 
 	def handle_bhc(self,data):
@@ -531,9 +559,9 @@ class Robot:
 	def handle_winner(self,data):
 		print "handle winner [start]"
 		print data
-		if data[self.room]["seat_no"] ==self.seat_no:
-			self.asset	+= data[self.room]['stake'] - self.stake
-			self.stake	= data[self.room]['stake']
+		if self.user_id in data:
+			self.asset	+= data[self.user_id]['stake'] - self.stake
+			self.stake	= data[self.user_id]['stake']
 		print "handle winner [end]"
 
 	def handle_next(self,data):
@@ -587,12 +615,19 @@ class Robot:
 			self.seat[player["seat_no"]] = None
 		print "handle stand up [end]"
 
-
 if __name__=="__main__":
-	robot	= Robot(ip='127.0.0.1',port=8888,username='bot1',password='123321')
+	parser = argparse.ArgumentParser(description='Start a Poker Robot player')
+	parser.add_argument('--username', dest='username', action='store')
+	parser.add_argument('--password', dest='password', action='store')
+	args	= parser.parse_args(sys.argv[1:])
+
+
+	robot	= Robot(ip='127.0.0.1',port=8888,username=args.username,password=args.password)
 	robot.start()
 	ioloop	= tornado.ioloop.IOLoop.instance()
 	ioloop.start()
+
+
 	'''
 	decision_maker	= DecisionMaker()
 	cards	= ["2C", "2D"]
