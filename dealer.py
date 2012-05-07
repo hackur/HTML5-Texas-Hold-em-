@@ -35,6 +35,7 @@ class Dealer(object):
 
 
 		info.rooms = 0
+		self.info = info
 
 	def on_queue_bound(self, frame):
 		self.channel.basic_consume(
@@ -146,8 +147,7 @@ class Dealer(object):
 
 		newRoom = Room.new(self.exchange,blind,max_player,
 				max_stake,
-				min_stake)
-		newRoom.roomType = roomType
+				min_stake,roomType)
 
 		self.room_list[newRoom.id] = GameRoom(
 				newRoom, args["user_id"], self,
@@ -158,6 +158,8 @@ class Dealer(object):
 		self.channel.basic_publish( exchange    = self.exchange,
 				routing_key = routing_key,
 				body        = json.dumps(message))
+
+		self.info.rooms += 1
 
 
 
@@ -172,7 +174,7 @@ class Dealer(object):
 		self.connection.close()
 
 
-	def handle_init_file(self,fname):
+	def handle_init_file(self,fname,isDebug):
 		info = Room.find_all(exchange = self.exchange)
 		for room in info:
 			room.remove()
@@ -186,14 +188,15 @@ class Dealer(object):
 				if line[0] == '#':
 					continue
 
-				(blind,max_stake,min_stake,max_player) = ( int(x) for x in line.strip().split(','))
+				(roomType,blind,max_stake,min_stake,max_player) = ( int(x) for x in line.strip().split(','))
 
 				newRoom = Room.new(self.exchange,blind,max_player,
 						max_stake,
-						min_stake)
+						min_stake,roomType)
 				self.room_list[newRoom.id] = GameRoom(
 						newRoom, 1, self,
 						max_player, blind, min_stake, max_stake)
+				self.info.rooms += 1
 				print newRoom
 
 
@@ -204,6 +207,7 @@ if __name__ == "__main__":
 	parser.add_argument('--rabbitmq-host','-H',default='localhost')
 	parser.add_argument('--rabbitmq-port','-P',default='5672',type=int)
 	parser.add_argument('--init-file','-F',default='init_rooms.txt')
+	parser.add_argument('--debug-mode','-D',default=True)
 	args = parser.parse_args()
 
 
@@ -220,7 +224,7 @@ if __name__ == "__main__":
 
 
 	dealer.start()
-	dealer.handle_init_file(args.init_file)
+	dealer.handle_init_file(args.init_file,args.debug_mode)
 	ioloop = tornado.ioloop.IOLoop.instance()
 
 	ioloop.start()

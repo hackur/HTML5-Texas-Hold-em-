@@ -14,8 +14,8 @@ function Seat(id,pos){
 	var divSeat = $('<div class="seat"></div>');
 	var divSeatbg = $('<div class="seatbg"></div>');
 	var divSeatdownbg = $('<div class="countdown win seat_dowm_bg"></div>');
-	var divName = $('<div class="name">name</div>');
-	var divMoney = $('<div class="money">money</div>');
+	var divName = $('<div class="name"></div>');
+	var divMoney = $('<div class="money"></div>');
 	var divCountdown = $('<div class="countdown"></div>');
 	var divCount = $('<div class="countdown down"></div>');
 	var divWinbg = $('<div class="winbg"></div>')
@@ -192,8 +192,8 @@ function Seat(id,pos){
 		seatObj.username 	= "";
 		seatObj.stake 		= "";
 		seatObj.userid		= "";
-		divName.html("name");
-		divMoney.html("money");
+		divName.html("");
+		divMoney.html("");
 		portrait.remove()
 		portrait = $('<img class="portrait" />');
 		portrait.appendTo(divSeat);

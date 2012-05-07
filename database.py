@@ -92,7 +92,7 @@ class Room(MongoDocument):
 	table_name	= "room"
 
 	@staticmethod
-	def new(exchange, blind = 10, max_player = 9, max_stake = 1000, min_stake = 100):
+	def new(exchange, blind = 10, max_player = 9, max_stake = 1000, min_stake = 100,roomType=0):
 		room = Room()
 		room.exchange	= exchange
 		room.max_stake	= max_stake
@@ -100,7 +100,7 @@ class Room(MongoDocument):
 		room.blind		= blind
 		room.max_player = max_player
 		room.player		= 0
-		room.roomType	= 0
+		room.roomType	= roomType
 		if room.insert():
 			return room
 		return None

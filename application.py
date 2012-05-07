@@ -60,16 +60,31 @@ def on_channel_open(channel):
 def on_close_callback(msg1,msg2):
 	print "CHANNEL CLOSED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 	print msg1,msg2
-	exit(0)
+	exit(-1)
 
 def on_connected(connection):
 	print "pika connected"
 	connection.channel(on_channel_open)
 
 
+import argparse
 if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description='Server...')
+	parser.add_argument('--debug-mode','-D',default=1,type=int)
+	parser.add_argument('--processes','-N',default=1,type=int)
+	parser.add_argument('--port','-P',default=8888,type=int)
+	args = parser.parse_args()
+	PORT = args.port
+
+	num_of_process = args.processes
+	if args.debug_mode == 1:
+		debug = True
+		num_of_process = 1
+	else:
+		debug = False
+
 	settings = {
-		"debug": True,
+		"debug": debug,
 		'cookie_secret':"COOKIESECRET=ajbdfjbaodbfjhbadjhfbkajhwsbdofuqbeoufb",
 		"static_path2": os.path.join(os.path.dirname(__file__), "static"),
 		"uploaded_image_path": os.path.join(os.path.dirname(__file__), "uploads"),
@@ -83,7 +98,7 @@ if __name__ == '__main__':
 
 
 	# Set our pika.log options
-	pika.log.setup(color=True)
+	pika.log.setup(color=debug)
 	pika.log.info("Starting Tornado HTTPServer on port %i" % PORT)
 	application = tornado.web.Application([
 		(r"/?$", IndexPageHandler),
@@ -121,13 +136,12 @@ if __name__ == '__main__':
         (r"/weibologinCallback/?",SinaWeiboLoginBack),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path2'])),
 		(r"/uploads/(.*)", tornado.web.StaticFileHandler, dict(path=settings['uploaded_image_path'])),
-	#	(r"/(.*.html)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
 		(r"/PokerUITest/(.*)", tornado.web.StaticFileHandler, dict(path=settings['PokerUITest'])),
 		], **settings)
 	http_server = tornado.httpserver.HTTPServer(application)
 	http_server.bind(PORT)
 	#http_server.start(8)
-	http_server.start()
+	http_server.start(num_of_process)
 	thread_pool_init()
 	init_database()
 

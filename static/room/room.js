@@ -19,6 +19,7 @@ function fetchRoom(roomClass) {
 		},
 		success : function(data) {
 			$(roomcontent).html("");
+			var roomID = 1;
 			$.each(data.rooms, function(index, room) {
 				var id = room[0];
 				var blind = parseInt(room[1]);
@@ -28,7 +29,7 @@ function fetchRoom(roomClass) {
 				var max_stake = room[5];
 				var item = $('<li class="roomitem"></li>');
 				
-				item.append($('<span class="roomid"></span>').html(id.substring(id.length - 5)));
+				item.append($('<span class="roomid"></span>').html(roomID++));
 				item.append($('<span class="info1"></span>').html(blind / 2 + "/" + blind));
 				item.append($('<span class="info2"></span>').html(min_stake + "/" + max_stake));
 				item.append($('<span class="numplaying"></span>').html(player + "/" + max_player));
