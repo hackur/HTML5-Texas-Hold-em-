@@ -22,7 +22,7 @@ class LoginHandler(tornado.web.RequestHandler):
 		else:
 			message		= {'status':'success'}
 			self.session['user_id'] = user.id
-			user.last_login	= datetime.now()
+			user.last_login	= int(time.time())
 		self.set_header('Access-Control-Allow-Origin', '*')
 		self.write(json.dumps(message))
 
@@ -44,7 +44,7 @@ class GuestLoginHandler(tornado.web.RequestHandler):
 		else:
 			message		= {'status':'success', 'username':user.username, 'password':password}
 			self.session['user_id'] = user.id
-			user.last_login	= datetime.now()
+			user.last_login	= int(time.time())
 
 		self.set_header('Access-Control-Allow-Origin', '*')
 		self.write(json.dumps(message))
@@ -83,7 +83,7 @@ class SinaWeiboLoginBack(tornado.web.RequestHandler):
 							accountID=uid)
 		if not user:
 			user_info = client.get.users__show(uid=uid)
-			user = User.new(username="%s_%s" % (User.USER_TYPE_SINA_WEIBO,accountID),\
+			user = User.new(username="%s_%s" % (User.USER_TYPE_SINA_WEIBO,uid),\
 						accountType=User.USER_TYPE_SINA_WEIBO,accountID=uid)
 			user.screen_name = user_info.screen_name
 			user.gender	= user_info.gender
