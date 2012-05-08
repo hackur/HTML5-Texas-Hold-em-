@@ -678,7 +678,6 @@ class Robot:
 		if self.user_id in data:
 			if data[self.user_id]["seat_no"]==self.seat:
 				self.stake = 0
-				self.asset -= self.stake
 				if self.asset <= 200:
 					ioloop	= tornado.ioloop.IOLoop.instance()
 					ioloop.add_timeout(time.time() + 10, self.refill)
