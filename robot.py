@@ -31,26 +31,44 @@ class FoolDecisionMaker:
 		amount	= -1
 		value = random.randint(1, 10000)
 		if value < FoolDecisionMaker.Fold:
-			action	= -1
-			amount	= -1
+			action	= A_DISCARDGAME
+			amount	= 0
 		elif value < FoolDecisionMaker.Call:
-			if A_CALLSTAKE not in rights and A_ALLIN in rights:
+			if A_CALLSTAKE in rights:
+				action	= A_CALLSTAKE
+				amount	= call_stake
+			elif A_ALLIN in rights:
 				action	= A_ALLIN
 				amount	= min_raise
 			else:
-				action	= A_CALLSTAKE
-				amount	= call_stake
+				action	= A_DISCARDGAME
+				amount	= 0
 		elif value < FoolDecisionMaker.Raise:
-			if A_CALLSTAKE in rights and A_ALLIN in rights and A_RAISESTAKE not in rights:
+			if A_CALLSTAKE in rights:
 				action	= A_CALLSTAKE
 				amount	= call_stake
-			else:
+			elif A_RAISESTAKE in rights:
 				action	= A_RAISESTAKE
 				amount	= min_raise
-		elif value < All_In:
-			action	= A_ALLIN
-			amount	= max_raise
-
+			elif A_ALLIN in rights:
+				action	= A_ALLIN
+				amount	= min_raise
+			else:
+				action	= A_DISCARDGAME
+				amount	= 0
+		elif value < FoolDecisionMaker.All_In:
+			if A_ALLIN in rights:
+				action	= A_ALLIN
+				amount	= max_raise
+			elif A_RAISESTAKE in rights:
+				action  = A_RAISESTAKE
+				amount  = min_raise
+			elif A_CALLSTAKE in rights:
+				action  = A_CALLSTAKE
+				amount  = call_stake
+			else:
+				action  = A_DISCARDGAME
+				amount  = 0
 		return (action, amount)
 
 class DecisionMaker:
@@ -360,7 +378,7 @@ class Robot:
 		self.http_client	= AsyncHTTPClient()
 
 		if iq == "low":
-			self.decision_make	= FoolDecisionMaker()
+			self.decision_maker	= FoolDecisionMaker()
 		else:
 			self.decision_maker = DecisionMaker()
 
@@ -669,7 +687,7 @@ if __name__=="__main__":
 	username= args.username
 	password= args.password
 	iq		= args.iq
-	robot	= Robot(ip=host,port=port,username=username,password=password,iq)
+	robot	= Robot(ip=host,port=port,username=username,password=password,iq=iq)
 	robot.start()
 	ioloop	= tornado.ioloop.IOLoop.instance()
 	ioloop.start()
