@@ -157,7 +157,7 @@ class FoolDecisionMaker:
 				board_decks.append(self.convert_to_deck(card))
 
 			if len(board_cards) >= 3:
-				robot_randk	= self._rank(robot_decks+board_decks)
+				robot_rank	= self._rank(robot_decks+board_decks)
 				if robot_rank[0] <= 4:
 					if A_CHECK in rights:
 						action = A_CHECK
