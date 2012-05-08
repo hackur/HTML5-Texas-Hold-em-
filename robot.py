@@ -60,10 +60,52 @@ class FoolDecisionMaker:
 			_suit = 3
 		return Card(_suit, _value)
 
+	def _rank(self, cards):
+		cards.sort()
+		return self.poker.score(cards)
+
+	def _chen_score(self, card):
+		if card.value == 14:
+			return 10
+		elif card.value == 13:
+			return 8
+		elif card.value == 12:
+			return 7
+		elif card.value == 11:
+			return 6
+		else:
+			return card.value / 2.0
+
+	def _chen_formula(self, cards):
+		baseScore = max(self._chen_score(cards[0]), self._chen_score(cards[1]))
+		if cards[0].value == cards[1].value:
+			baseScore = max(5, baseScore * 2)
+
+		if cards[0].symbol == cards[1].symbol:
+			baseScore += 2
+
+		gap = abs(cards[0].value - cards[1].value)
+		if gap == 0:
+			pass
+		elif gap == 1:
+			baseScore	+= 1
+		elif gap == 2:
+			baseScore	-= 1
+		elif gap == 3:
+			baseScore	-= 2
+		elif gap == 4:
+			baseScore	-= 4
+		else:
+			baseScore	-= 5
+
+		return baseScore;
+
+
 	def make_decision(self, robot_cards, opp_cards_list, board_cards, current_pot, call_stake, min_raise, max_raise, rights):
 		action	= -1
 		amount	= -1
 		value = random.randint(1, 10000)
+		print "call %f, min raise %f, max raise %f" %(call_stake, min_raise, max_raise)
 		if value < FoolDecisionMaker.Fold:
 			action	= A_DISCARDGAME
 			amount	= 0
@@ -104,15 +146,28 @@ class FoolDecisionMaker:
 				action  = A_DISCARDGAME
 				amount  = 0
 
-		if action == A_ALLIN or action = A_RAISESTAKE and amount = max_raise:
-			robot_decks = self.convert_to_deck(robot_cards)
-			board_decks = self.convert_to_deck(board_cards)
-			robot_randk	= self.poker.score(robot_decks+board_decks)
-			if robot_rank[0] <= 4:
-				if A_CHECK in rights:
-					action = A_CHECK
-					amount = 0
-				else:
+		print "action =%d, amount =%d"%(action, amount)
+		print "ALL in =%d, max raise =%d"%(A_ALLIN, max_raise)
+		if action == A_ALLIN or amount == max(max_raise,min_raise, call_stake):
+			robot_decks = []
+			board_decks	= []
+			for card in robot_cards:
+				robot_decks.append(self.convert_to_deck(card))
+			for card in board_cards:
+				board_decks.append(self.convert_to_deck(card))
+
+			if len(board_cards) >= 3:
+				robot_randk	= self._rank(robot_decks+board_decks)
+				if robot_rank[0] <= 4:
+					if A_CHECK in rights:
+						action = A_CHECK
+						amount = 0
+					else:
+						action = A_DISCARDGAME
+						amount = 0
+			else:
+				chen_score	= self._chen_formula(robot_decks)
+				if chen_score < 9:
 					action = A_DISCARDGAME
 					amount = 0
 
@@ -365,11 +420,6 @@ class DecisionMaker:
 		robot_decks		= []
 		board_decks		= []
 		opp_decks_list	= []
-		print "======================[start]==========================="
-		print robot_cards
-		print board_cards
-		print opp_cards_list
-		print "======================[end]==========================="
 		for card in robot_cards:
 			robot_decks.append(self.convert_to_deck(card))
 
@@ -475,10 +525,16 @@ class Robot:
 								headers=headers)
 
 	def user_info_handle(self,response):
+		print "user info [start]"
 		content		= json.loads(response.body)
+		print content
 		self.asset	= content['s']
 		self.user_id= content['id']
-		self.list_room()
+		if self.asset < 3000:
+			self.refill()
+		else:
+			self.list_room()
+		print "user info [end]"
 
 	def list_room(self):
 		headers	= {"Cookie":self.cookies}
@@ -494,9 +550,8 @@ class Robot:
 			return left[2] - right[2]
 
 		print "List Room Handle[start]"
-		print response.body
 		content = json.loads(response.body)
-		available_list = filter(lambda x: x[2] > 0 and x[2] < x[3] ,content["rooms"])
+		available_list = filter(lambda x: x[2] > 0 and x[2] < x[3],content["rooms"])
 		print available_list
 		if len(available_list) > 0:
 			available_list.sort(sorter)
@@ -537,11 +592,12 @@ class Robot:
 			else:
 				self.stake	= self.min_stake
 
-			self.asset	-= self.stake
-			self.timestamp = content["room"]["timestamp"]
+			self.asset		-= self.stake
+			self.timestamp	= content["room"]["timestamp"]
+			print "current time stamp ", self.timestamp
 			self.sit_down()
 		else:
-			pass
+			self.list_room()
 		print "Robot enter handle [end]"
 
 
@@ -560,12 +616,13 @@ class Robot:
 	def sit_down_handle(self,response):
 		print "Robot sit_down handle [start]"
 		content		= json.loads(response.body)
+		print content
 		if content["status"] == "success":
 			self.cookies= response.headers['Set-Cookie'];
 			self.listen_board_message()
 			self.is_sit_down = True
 		else:
-			self.list_room()
+			self.refill()
 		print "Robot sit_down handle [end]"
 
 	def listen_board_message(self):
@@ -602,10 +659,11 @@ class Robot:
 		self.cookies= response.headers['Set-Cookie'];
 		for i in xrange(len(content)):
 			message			= content[i]
-			print message
-			self.timestamp	= message["timestamp"]
-			method = getattr(self,"handle_" + message['msgType'])
-			method(message)
+			if message["timestamp"] > self.timestamp:
+				print message
+				self.timestamp	= message["timestamp"]
+				method = getattr(self,"handle_" + message['msgType'])
+				method(message)
 
 		if self.is_sit_down == True:
 			self.listen_board_message()
@@ -683,9 +741,9 @@ class Robot:
 	def handle_next(self,data):
 		print "handle next [start]"
 		if data["seat_no"] == self.seat:
-			if 2 in data["rights"]:
+			if A_CALLSTAKE in data["rights"]:
 				self.call_amount= data["amount_limits"]['2']
-			if 3 in data["rights"]:
+			if A_RAISESTAKE in data["rights"]:
 				self.min_raise	= data["amount_limits"]['3'][0]
 				self.max_raise	= data["amount_limits"]['3'][1]
 			self.rights = data["rights"]
