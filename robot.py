@@ -9,6 +9,7 @@ import pprint
 import argparse
 import sys
 import random
+import time
 
 (A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND,A_STANDUP) = (1,2,3,4,5,6,7,8)
 class Seat:
@@ -352,6 +353,7 @@ class Robot:
 	Sit_Down_URL_Template				= "http://%s:%d/sit-down"
 	Post_Board_Message_URL_Template		= "http://%s:%d/post-board-message"
 	Listen_Board_Message_URL_Template	= "http://%s:%d/listen-board-message"
+	Refill_URL_Template					= "http://%s:%d/refill"
 	Action_ALL			= 1
 	Action_Call_Stake	= 2
 	Action_Raise_Stake	= 3
@@ -376,6 +378,7 @@ class Robot:
 		self.rights			= []
 		self.opp_cards		= []
 		self.http_client	= AsyncHTTPClient()
+		self.is_sit_down	= False
 
 		if iq == "low":
 			self.decision_maker	= FoolDecisionMaker()
@@ -385,6 +388,7 @@ class Robot:
 		self.login_url		= Robot.Login_URL_Template % (ip, port)
 		self.enter_url		= Robot.Enter_Room_URL_Template % (ip, port)
 		self.user_info_url	= Robot.User_Info_URL_Template % (ip, port)
+		self.refill_url		= Robot.Refill_URL_Template % (ip, port)
 		self.list_room_url	= Robot.List_Room_URL_Template % (ip, port)
 		self.sit_down_url				= Robot.Sit_Down_URL_Template % (ip, port)
 		self.post_board_message_url		= Robot.Post_Board_Message_URL_Template % (ip ,port)
@@ -509,6 +513,7 @@ class Robot:
 		if content["status"] == "success":
 			self.cookies= response.headers['Set-Cookie'];
 			self.listen_board_message()
+			self.is_sit_down = True
 		else:
 			pass
 		print "Robot sit_down handle [end]"
@@ -537,11 +542,11 @@ class Robot:
 		try:
 			content	= json.loads(response.body)
 		except:
-			print "Unexpected error:", sys.exc_info()[0]
 			print sys.exc_info()
 			print "content is :"
 			print response.body
-			self.listen_board_message()
+			if self.is_sit_down == True:
+				self.listen_board_message()
 			return
 		content.sort(_sorter)
 		self.cookies= response.headers['Set-Cookie'];
@@ -552,7 +557,8 @@ class Robot:
 			method = getattr(self,"handle_" + message['msgType'])
 			method(message)
 
-		self.listen_board_message()
+		if self.is_sit_down == True:
+			self.listen_board_message()
 		print "Robot listen board message handle [end]"
 
 
@@ -594,7 +600,6 @@ class Robot:
 
 	def handle_bot_card(self, data):
 		print "handle bot card [start]"
-		print data
 		if data['cards'] not in self.opp_cards:
 			if data['cards'] != self.hand_cards:
 				self.opp_cards.append(data['cards'])
@@ -666,10 +671,36 @@ class Robot:
 
 	def handle_standup(self, data):
 		print "handle stand up [start]"
-		stand_up_player = filter(lambda x: "seat_no" in x,data)
-		for player in stand_up_player:
-			self.seat[player["seat_no"]] = None
+
+		if self.user_id in data:
+			if data[self.user_id]["seat_no"]==self.seat:
+				self.stake = 0
+				self.asset -= self.stake
+				if self.asset <= 200:
+					ioloop	= tornado.ioloop.IOLoop.instance()
+					ioloop.add_timeout(time.time() + 10, self.refill)
+				else:
+					ioloop	= tornado.ioloop.IOLoop.instance()
+					ioloop.add_timeout(time.time() + 10, self.list_room)
+
+				self.is_sit_down = False
 		print "handle stand up [end]"
+
+	def refill(self):
+		print "refill [start]"
+		headers	= {"Cookie":self.cookies}
+		self.http_client.fetch(	self.refill_url,
+								self.refill_handle,
+								method='GET',
+								headers=headers)
+		print "refill [end]"
+
+	def refill_handle(self, response):
+		print "refill handle [start]"
+		self.asset = float(response.body)
+		self.list_room()
+		print "refill handle [end]"
+
 
 import argparse
 if __name__=="__main__":
