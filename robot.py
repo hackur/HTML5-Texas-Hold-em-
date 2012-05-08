@@ -25,7 +25,40 @@ class FoolDecisionMaker:
 	Raise	= 9500
 	All_In	= 10000
 	def __init__(self):
+		self.poker	= Poker(2)
 		pass
+
+	def convert_to_deck(self, card):
+		_suit = 0
+		_value= 0
+		if len(card) == 2:
+			_value= card[0]
+			_suit = card[1]
+		elif len(card) == 3:
+			_value= "10"
+			_suit = card[2]
+
+		if _value.isdigit():
+			_value = int(_value)
+		else:
+			if _value == "J":
+				_value = 11
+			elif _value == "Q":
+				_value = 12
+			elif _value == "K":
+				_value = 13
+			elif _value == "A":
+				_value = 14
+
+		if _suit == "C":
+			_suit = 0
+		elif _suit == "D":
+			_suit = 1
+		elif _suit == "H":
+			_suit = 2
+		elif _suit == "S":
+			_suit = 3
+		return Card(_suit, _value)
 
 	def make_decision(self, robot_cards, opp_cards_list, board_cards, current_pot, call_stake, min_raise, max_raise, rights):
 		action	= -1
@@ -70,9 +103,23 @@ class FoolDecisionMaker:
 			else:
 				action  = A_DISCARDGAME
 				amount  = 0
+
+		if action == A_ALLIN or action = A_RAISESTAKE and amount = max_raise:
+			robot_decks = self.convert_to_deck(robot_cards)
+			board_decks = self.convert_to_deck(board_cards)
+			robot_randk	= self.poker.score(robot_decks+board_decks)
+			if robot_rank[0] <= 4:
+				if A_CHECK in rights:
+					action = A_CHECK
+					amount = 0
+				else:
+					action = A_DISCARDGAME
+					amount = 0
+
 		if action == A_DISCARDGAME and A_CHECK in rights:
 			action = A_CHECK
 			amount = 0
+
 		return (action, amount)
 
 class DecisionMaker:
@@ -508,7 +555,6 @@ class Robot:
 								method	= "POST",
 								headers	= headers,
 								body	= body)
-
 		print "Robot sit_down [end]"
 
 	def sit_down_handle(self,response):
@@ -519,7 +565,7 @@ class Robot:
 			self.listen_board_message()
 			self.is_sit_down = True
 		else:
-			pass
+			self.list_room()
 		print "Robot sit_down handle [end]"
 
 	def listen_board_message(self):
