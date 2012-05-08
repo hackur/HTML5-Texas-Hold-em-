@@ -491,6 +491,7 @@ class Robot:
 				self.stake	= self.min_stake
 
 			self.asset	-= self.stake
+			self.timestamp = content["room"]["timestamp"]
 			self.sit_down()
 		else:
 			pass
@@ -592,6 +593,9 @@ class Robot:
 	def handle_post_board(self, data):
 		print "handle post message [start]"
 		print "handle post message [end]"
+
+	def handle_chat(self,data):
+		pass
 
 	def handle_sit(self,data):
 		print "handle sit [start]"
