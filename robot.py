@@ -70,6 +70,9 @@ class FoolDecisionMaker:
 			else:
 				action  = A_DISCARDGAME
 				amount  = 0
+		if action == A_DISCARDGAME and A_CHECK in rights:
+			action = A_CHECK
+			amount = 0
 		return (action, amount)
 
 class DecisionMaker:
