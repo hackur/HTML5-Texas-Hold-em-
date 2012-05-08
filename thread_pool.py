@@ -65,13 +65,10 @@ def in_ioloop(fn):
 
     @wraps(fn)
     def res(*args, **kwargs):
-        try:
-            if thread_locals.ioloop:
-                fn(*args, **kwargs)
-                return
-        except AttributeError:
-            print "ERROR in ioloop"
-            pass
+		if hasattr(thread_locals,"ioloop"):
+			if thread_locals.ioloop:
+				fn(*args, **kwargs)
+				return
 
         get_ioloop().add_callback(partial(fn, *args, **kwargs))
 
