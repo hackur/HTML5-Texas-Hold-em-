@@ -10,6 +10,7 @@ from database import DatabaseConnection,User,Room
 
 from random import random
 from thread_pool import in_thread_pool, in_ioloop, blocking
+import time
 
 class LoginHandler(tornado.web.RequestHandler):
 	def post(self):
@@ -35,7 +36,6 @@ class GuestLoginHandler(tornado.web.RequestHandler):
 			user.screen_name = username.replace("GUEST_",u'游客')[0:6]
 		else:
 			username		= self.get_argument('username')
-			print self.get_argument('password'),username
 			password		= hashlib.md5(self.get_argument('password')).hexdigest()
 			user			= User.verify_user(username,password)
 
@@ -59,7 +59,7 @@ from weibo import APIClient
 
 APP_KEY = '3994352852' # app key
 APP_SECRET = 'c75a6d36c510a4dae255e75a5e8cb956' # app secret
-CALLBACK_URL = 'http://gigiduck.com:8888/weibologinCallback/' # callback url
+CALLBACK_URL = 'http://gigiduck.com:8001/weibologinCallback/' # callback url
 class SinaWeiboLogin(tornado.web.RequestHandler):
 	def get(self):
 		client = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
@@ -75,26 +75,30 @@ class SinaWeiboLoginBack(tornado.web.RequestHandler):
 		r = client.request_access_token(code)
 		access_token = r.access_token
 		expires_in = r.expires_in
+		print r.access_token,r.expires_in
 		client.set_access_token(access_token, expires_in)
 		uid = client.get.account__get_uid().uid
 		print uid
-		user_info = client.get.users__show(uid=uid)
-		self.got_user_info(uid,user_info)
-
-	@in_ioloop
-	def got_user_info(self,uid,user_info):
-
 		user  = User.verify_user_openID(accountType=User.USER_TYPE_SINA_WEIBO,\
 							accountID=uid)
-		if user == None:
+		if not user:
+			user_info = client.get.users__show(uid=uid)
 			user = User.new(username="%s_%s" % (User.USER_TYPE_SINA_WEIBO,accountID),\
 						accountType=User.USER_TYPE_SINA_WEIBO,accountID=uid)
+			user.screen_name = user_info.screen_name
+			user.gender	= user_info.gender
+			user.headPortrait_url = user_info.profile_image_url #avatar_large?
+			print user_info
+			user.openIDinfo = user_info
+		else:
+			print "old user"
 
-		user.screen_name = user_info.screen_name
-		user.gender	= user_info.gender
-		user.headPortrait_url = user_info.profile_image_url #avatar_large?
+		user.last_login	= int(time.time())
 
-		user.last_login	= datetime.now()
+		self.got_user_info(uid,user)
+
+	@in_ioloop
+	def got_user_info(self,uid,user):
 		self.session['user_id'] = user.id
 		self.redirect("/static/user/user.html")
 

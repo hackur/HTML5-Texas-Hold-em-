@@ -16,9 +16,6 @@ from pika.adapters.tornado_connection import TornadoConnection
 from thread_pool import thread_pool_init
 PORT = 8888
 
-class UIIndexHandler(tornado.web.RequestHandler):
-	def get(self):
-		self.render("uitest.html")
 
 class UIIndexTestHandler(tornado.web.RequestHandler):
 	@authenticate
@@ -105,7 +102,6 @@ if __name__ == '__main__':
 		(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path2'])),
 		(r"/sk",BoardListenMessageSocketHandler ),
 
-		(r"/uitest.html", UIIndexHandler),
 		(r"/sit-down", SitDownBoardHandler),
 		(r"/enter", EnterRoomHandler),
 		(r"/personal-archive",PersonalArchiveHandler),
