@@ -102,7 +102,7 @@ function initSetting() {
 	blindSliderBar.create($("#blindBar"),2,100,2);
 	personSliderBar.setPosition(70,119);
 	personSliderBar.setVar(changePersonNum);
-	personSliderBar.create($("#personNumBar"),2, 9, 1);
+	personSliderBar.create($("#personNumBar"),2, 9, 1 , 360);
 	console.log($("#confirmBtn"));
 	$("#confirmBtn").click(submitRomeSetting);
 	function submitRomeSetting() {
