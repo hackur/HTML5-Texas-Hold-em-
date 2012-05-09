@@ -55,9 +55,14 @@ def on_close_callback(msg1,msg2):
 	print msg1,msg2
 	exit(-1)
 
+def on_pressure(**kwargs):
+	print "PRESSURE!!",kwargs
+	exit(0)
+
 def on_connected(connection):
 	print "pika connected"
 	connection.channel(on_channel_open)
+	connection.add_backpressure_callback(on_pressure)
 
 
 import argparse
@@ -148,7 +153,7 @@ if __name__ == '__main__':
 
 	#If we publishing message's speed is much faster than msg processed.
 	# "TCP back pressure" will happen, set a huge multiplier to avoid that
-	application.connection.set_backpressure_multiplier(100000)
+	application.connection.set_backpressure_multiplier(10000000)
 
 	ioloop = tornado.ioloop.IOLoop.instance()
 

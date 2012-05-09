@@ -124,6 +124,10 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		else:
 			msg = {"user_id":self.session["user_id"], "room_id":room.id}
 
+		BoardMessage.get_collection().remove({
+						"user_id":self.session["user_id"],
+						},safe=True)
+
 		# guarantee only one exist
 		self.mongodb.board.update({"user_id":self.session["user_id"]},msg,upsert=True)
 
@@ -384,10 +388,12 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 					)]
 
 		if len(messages) > 0:
-			print "IN DB-------------------------",timestamp
+			print "IN DB-------------------------",timestamp,self.user.username
 			print messages
 			self.finish(json.dumps(messages))
 			return
+		else:
+			print "Nothing in DB",timestamp,self.user.username
 
 		binding_keys = [self.session['public_key'], self.session['private_key']]
 		if self.user.isBot:
@@ -399,36 +405,45 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 				queue, exchange, binding_keys, self,arguments = {"x-expires":int(1800000)})
 		self.channel.add_message_action(self.message_call_back, None)
 		self.channel.connect()
+		self.closed = False
 
 	def clean_matured_message(self, timestamp):
 		BoardMessage.get_collection().remove({
 						"user_id":self.session["user_id"],
 						'timestamp':{'$lte':timestamp}
 						})
-#		board_messages = self.mongodb.board.find_one({"user_id":self.session["user_id"]})
-#		print "========================[start]========================="
-#		print board_messages
-#		print "========================[ end ]========================="
-#		if board_messages is not None:
-#			board_messages["message-list"] = filter(lambda x: int(x['timestamp']) > timestamp, board_messages["message-list"])
-#			self.mongodb.board.update({"user_id": self.session["user_id"]}, board_messages)
-
 
 	def on_connection_close(self):
 		self.channel.close()
 
+	def cancel_ok(self):
+		if self.request.connection.stream.closed():
+			return
+
+		if hasattr(self,"BoardMessage"):
+			self.write(json.dumps(self.BoardMessage))
+			pika.log.info( "Cancel OK %s",self.user.username)
+		else:
+			pika.log.info( "Cancel..... %s",self.user.username)
+			self.write(json.dumps({}))
+		self.finish()
+
 	def message_call_back(self, argument):
 		new_messages	= self.channel.get_messages()
-		print "------message receive start------"
-		print new_messages
-		print "------message receive end------"
-		user_id			= self.session['user_id']
+		pika.log.info( "------message receive start------ %s",self.user.username)
+		pika.log.info( [ x['timestamp'] for x in new_messages ])
+		pika.log.info( "------message receive end------")
+		user_id			= self.user.id
 		for content in new_messages:
 			BoardMessage.new(user_id,int(content['timestamp']),content)
 
-		if hasattr(self,"board_messages"):
-			self.board_messages.extend(new_messages)
+		if hasattr(self,"BoardMessage"):
+			self.BoardMessage.extend(new_messages)
 		else:
-			self.board_messages = new_messages
+			self.BoardMessage = new_messages
+		#if not self.closed:
+		#	self.write(json.dumps(new_messages))
+		#	self.finish();
+		#	self.closed = True
 
 		self.channel.close();
