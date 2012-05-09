@@ -86,4 +86,144 @@
 	position: absolute;
 	top: 26px;
 }
-
+/*awardDialog CSS stylesheet*/
+.awardDialog {
+position:absolute;
+background: url(./image/awardBg.png);
+width:355px;
+height:241px;
+left:171px;
+top:142px;
+display:none;
+}
+.awardLight {
+position:relative;
+background: url(./image/awardLight.png);
+width:358px;
+height:321px;
+left:-4px;
+top:-40px;
+}
+.awardMoney{
+position:relative;
+background: url(./image/awardMoney.png);
+width:222px;
+height:207px;
+left:56px;
+top:65px;
+}
+/*Setting Nick Dialog CSS*/
+.settingNickDialog {
+color:#fff;
+position:absolute;
+width: 644px;
+height: 388px;
+left:0px;
+top:30px;
+background: url(./image/settingNickNameBg.png);
+display:none;
+}
+.dialogTitle {
+color:#fff;
+font-size:28px;
+position:absolute;
+left:256px;
+top:60px;
+}
+.nameArea {
+position:absolute;
+font-size:26px;
+left:133px;
+top:155px;
+width:400px;
+height:33px;
+}
+.nick {
+	position : absolute;
+	left:11px;
+	top: 2px;
+}
+.name {
+	position: absolute;
+	left:96px;
+	top:1px;
+	width: 200px;
+	height: 26px;
+    background: #fff; 
+	font-size:25px;
+	border: 1px solid #fff;
+    padding: 5px;
+    border-radius: 5px;
+    vertical-align:middle;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+.genderArea {
+position:absolute;
+left:133px;
+top:223px;
+width:400px;
+height:35px;
+font-size: 26px;
+}
+.gender {
+	position : absolute;
+	left:11px;
+	top: -2px;
+}
+.male {
+position:absolute;
+left:103px;
+top:-5px;
+width:34px;
+height:38px;
+background:url(./image/male.png);
+}
+.female {
+position:absolute;
+left:198px;
+top:-5px;
+width:34px;
+height:38px;
+background:url(./image/female.png);
+}
+.maleCheck{
+position:absolute;
+left:153px;
+top:3px;
+width:27px;
+height:27px;
+background:url(./image/check.png);
+}
+.femaleCheck{
+position:absolute;
+left:252px;
+top:3px;
+width:27px;
+height:27px;
+background:url(./image/nocheck.png);
+}
+.buttonArea {
+position:absolute;
+left:88px;
+top:282px;
+font-size:25px;
+}
+.confirmBtn{
+position:absolute;
+left:2px;
+width:117px;
+height:49px;
+text-align:center;
+line-height:42px;
+background: url(./image/button.png);
+}
+.cancelBtn{
+position:absolute;
+left:345px;
+width:117px;
+height:49px;
+text-align:center;
+line-height:42px;
+background: url(./image/button.png);
+}

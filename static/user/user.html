@@ -19,6 +19,7 @@
 		<script src="perinfo.js"></script>
 		<script src="recharge.js"></script>
 		<script src="email.js"></script>
+		<script src="awardDialogAndNickSettingDialog.js"></script>
 		<script type="text/javascript">
 			$(info_init);
 		</script>
@@ -26,11 +27,21 @@
 	<body>
 		<div id="background">
 			<div id="btFrame">
-				<div id="info" class="frame-header">个人信息</div>
-				<div id="email" class="frame-header">邮 箱</div>
-				<div id="market" class="frame-header">商 城</div>
-				<div id="recharge" class="frame-header">充 值</div>
-				<div id="friend" class="frame-header">好 友</div>
+				<div id="info" class="frame-header">
+					个人信息
+				</div>
+				<div id="email" class="frame-header">
+					邮 箱
+				</div>
+				<div id="market" class="frame-header">
+					商 城
+				</div>
+				<div id="recharge" class="frame-header">
+					充 值
+				</div>
+				<div id="friend" class="frame-header">
+					好 友
+				</div>
 			</div>
 
 			<div id="info_frame" class="bigFrame" style="display:none;">
@@ -46,16 +57,20 @@
 					<div id="female"></div>
 					<span id="row3">年龄：</span>
 					<span id="row4">现居地：</span>
-					<div id="isetting">设 置</div>
-					<div id="icancel">取 消</div>
+					<div id="isetting">
+						设 置
+					</div>
+					<div id="icancel">
+						取 消
+					</div>
 
 					<div id="divtest" style="top:215px;left:100px;position:absolute">
 						<form action="../../head-portrait-upload" method="post" enctype="multipart/form-data">
-						<label id="label1">头像：</label>
-						<!-- <input id="input1" name="head-portrait" type="input"/> -->
-						<input type="file" name="head_portrait">
-						</br>
-						<input type="submit" value="上传" >
+							<label id="label1">头像：</label>
+							<!-- <input id="input1" name="head-portrait" type="input"/> -->
+							<input type="file" name="head_portrait">
+							</br>
+							<input type="submit" value="上传" >
 						</form>
 					</div>
 					<div id="status" style="top:215px;left:360px;position:absolute"></div>
@@ -72,143 +87,215 @@
 				<span id="latestOnline">最近上线时间：</span>
 				<span id="idiograph">个性签名：</span>
 			</div>
-
-			<div id="bigFrame2" class="bigFrame" style="display:none;">
-				<span id="sender">发件人：</span>
-				<span id="time">时间：</span>
-				<div id="inputFrame">
-					<span id="content">内容：</span>
+			<div class="awardDialog">
+				<div class="awardLight">
+					<div class="awardMoney"></div>
 				</div>
-				<div id="reply">回 复</div>
-				<div id="delete">删 除</div>
 			</div>
-			<div id="replyFrame">
-				<span id="receiver">收件人ID：</span>
-				<textarea id="text1" rows="10" cols="50"></textarea>
-				<div id="sureButton">确 定</div>
-				<div id="replay-cancel-btn">取消</div>
-			</div>
-			<div id="mail_list_frame" class="bigFrame" style="display:none;">
-				<div id="mail_list_container">
-					<div id= "mail_list" ></div>		
+			<div class = "settingNickDialog">
+				<div class = "dialogTitle">
+					昵称设置
 				</div>
-				<div id="mail_list_navigator">
-					<div id="mail_page_last">上一页</div>
-					<div id="mail_page_next">下一页</div>
-					<div id="mail_page">
-						<input id="mail_page_input" value="1" type="text"/>
+				<div class = "nameArea">
+					<label class="nick"> 姓名</label>
+					<input class="name"/>
+				</div>
+				<div class = "genderArea">
+					<div class="gender">
+						性别
 					</div>
-					<div id="mail_page_btn">Go</div>
+					<div class="male"></div>
+					<div class="maleCheck"></div>
+					<div class="female"></div>
+					<div class="femaleCheck"></div>
 				</div>
-			</div>
-
-			<div id="market_frame" class="bigFrame" style="display:none;">
-				<div id="light1" class="light"></div>
-				<div id="member">
-					<div id="sale1" class="sale"></div>
-				</div>
-				<span id="content1">一个月。价格20RMB，获得白</br>银VIP小标志，商城道具9折</br>优惠，奖励金币100000</span>
-				<div id="line1" class="line"></div>
-				<div id="purchase1" class="purchase">购 买</div>
-
-				<div id="light2" class="light"></div>
-				<div id="yellowDia">
-					<div id="sale2" class="sale"></div>
-				</div>
-				<span id="content2">一个月。价格50RMB，获得黄</br>金VIP小标志，商城道具8折</br>优惠，奖励金币300000</span>
-				<div id="line2" class="line"></div>
-				<div id="purchase2" class="purchase">购 买</div>
-
-				<div id="light3" class="light"></div>
-				<div id="redDia">
-					<div id="sale3" class="sale"></div>
-				</div>
-				<span id="content3">一个月。价格100RMB，获钻</br>石VIP小标志，商城道具7折</br>优惠，奖励金币750000</span>
-				<div id="purchase3" class="purchase">购 买</div>	
-			</div>
-
-			<div id="recharge_frame" class="bigFrame" style="display:none;">
-				<div id="convert1">1RMB=1钻石</div>
-				<div id="rpurchase1" class="rpurchase">购 买</div>
-				<div id="convert2">5RMB=5钻石</div>
-				<div id="rpurchase2" class="rpurchase">购 买</div>
-				<div id="convert3">20RMB=20钻石</div>
-				<div id="rpurchase3" class="rpurchase">购 买</div>
-				<div id="convert4">其他金额购买</div>
-				<div id="rpurchase4" class="rpurchase">购 买</div>
-
-				<div id="rrunway"></div>
-				<div id="rrunner"></div>
-				<span id="min">0</span>
-				<span id="max">10,000</span>
-				<span id="current">0</span>
-				<span id="notation">您当前有X钻石   （1钻石=10000金豆）</span>
-				<div id="exchange">兑 换</div>
-				<div id="line3" class="line"></div>
-				<div id="line4" class="line"></div>
-				<div id="line5" class="line"></div>
-				<div id="line6" class="line"></div>
-			</div>
-
-			<div id="friend_frame" class="bigFrame" style="display:none;">
-				<div id="rightInfo">
-					<div id="por_box">
-						<img id="image3" src="">
+				<div class = "buttonArea">
+					<div class = "confirmBtn">
+						确定
 					</div>
-					<!--
-					<div id="fspace">好友空间</div>
-					-->
-					<div id="fsend">发送邮件</div>
-					<div id="fdelete">删除好友</div>
-					<span id="fID">昵称：</span>
-					<!--
-					<span id="ffamily">家族：</span>
-					<span id="fpos">职位：</span>
-					-->
-					<span id="frank">等级：</span>
-					<span id="fpro">资产：</span>
+					<div class = "cancelBtn">
+						取消
+					</div>
 				</div>
-				<div id="name0" class="name"></div>
-				<div id="name1" class="name"></div>
-				<div id="name2" class="name"></div>
-				<div id="name3" class="name"></div>
-				<div id="name4" class="name"></div>
-				<div id="name5" class="name"></div>
-				<div id="name6" class="name"></div>
+			</div>
+		</div>
+		<div id="bigFrame2" class="bigFrame" style="display:none;">
+			<span id="sender">发件人：</span>
+			<span id="time">时间：</span>
+			<div id="inputFrame">
+				<span id="content">内容：</span>
+			</div>
+			<div id="reply">
+				回 复
+			</div>
+			<div id="delete">
+				删 除
+			</div>
+		</div>
+		<div id="replyFrame">
+			<span id="receiver">收件人ID：</span>
+			<textarea id="text1" rows="10" cols="50"></textarea>
+			<div id="sureButton">
+				确 定
+			</div>
+			<div id="replay-cancel-btn">
+				取消
+			</div>
+		</div>
+		<div id="mail_list_frame" class="bigFrame" style="display:none;">
+			<div id="mail_list_container">
+				<div id= "mail_list" ></div>
+			</div>
+			<div id="mail_list_navigator">
+				<div id="mail_page_last">
+					上一页
+				</div>
+				<div id="mail_page_next">
+					下一页
+				</div>
+				<div id="mail_page">
+					<input id="mail_page_input" value="1" type="text"/>
+				</div>
+				<div id="mail_page_btn">
+					Go
+				</div>
+			</div>
+		</div>
 
-				<div id="line7" class="line"></div>
-				<div id="line8" class="line"></div>
-				<div id="line9" class="line"></div>
-				<div id="line10" class="line"></div>
-				<div id="line11" class="line"></div>
-				<div id="line12" class="line"></div>
+		<div id="market_frame" class="bigFrame" style="display:none;">
+			<div id="light1" class="light"></div>
+			<div id="member">
+				<div id="sale1" class="sale"></div>
+			</div>
+			<span id="content1">一个月。价格20RMB，获得白</br>银VIP小标志，商城道具9折</br>优惠，奖励金币100000</span>
+			<div id="line1" class="line"></div>
+			<div id="purchase1" class="purchase">
+				购 买
 			</div>
 
-			<div id="smallFrame">
+			<div id="light2" class="light"></div>
+			<div id="yellowDia">
+				<div id="sale2" class="sale"></div>
+			</div>
+			<span id="content2">一个月。价格50RMB，获得黄</br>金VIP小标志，商城道具8折</br>优惠，奖励金币300000</span>
+			<div id="line2" class="line"></div>
+			<div id="purchase2" class="purchase">
+				购 买
 			</div>
 
-			<div id="rightFrame">
+			<div id="light3" class="light"></div>
+			<div id="redDia">
+				<div id="sale3" class="sale"></div>
+			</div>
+			<span id="content3">一个月。价格100RMB，获钻</br>石VIP小标志，商城道具7折</br>优惠，奖励金币750000</span>
+			<div id="purchase3" class="purchase">
+				购 买
+			</div>
+		</div>
+
+		<div id="recharge_frame" class="bigFrame" style="display:none;">
+			<div id="convert1">
+				1RMB=1钻石
+			</div>
+			<div id="rpurchase1" class="rpurchase">
+				购 买
+			</div>
+			<div id="convert2">
+				5RMB=5钻石
+			</div>
+			<div id="rpurchase2" class="rpurchase">
+				购 买
+			</div>
+			<div id="convert3">
+				20RMB=20钻石
+			</div>
+			<div id="rpurchase3" class="rpurchase">
+				购 买
+			</div>
+			<div id="convert4">
+				其他金额购买
+			</div>
+			<div id="rpurchase4" class="rpurchase">
+				购 买
+			</div>
+
+			<div id="rrunway"></div>
+			<div id="rrunner"></div>
+			<span id="min">0</span>
+			<span id="max">10,000</span>
+			<span id="current">0</span>
+			<span id="notation">您当前有X钻石   （1钻石=10000金豆）</span>
+			<div id="exchange">
+				兑 换
+			</div>
+			<div id="line3" class="line"></div>
+			<div id="line4" class="line"></div>
+			<div id="line5" class="line"></div>
+			<div id="line6" class="line"></div>
+		</div>
+
+		<div id="friend_frame" class="bigFrame" style="display:none;">
+			<div id="rightInfo">
+				<div id="por_box">
+					<img id="image3" src="">
+				</div>
 				<!--
-				<span id="span1">当 前 在 玩 人 数 ：100,000</span>
+				<div id="fspace">好友空间</div>
 				-->
-				<div id="logout" class="GeneralBtn">
-					<span>登 出</span>
+				<div id="fsend">
+					发送邮件
 				</div>
-				<div id="lobby" class="GeneralBtn">
-					<span>游 戏 大 厅</span>
+				<div id="fdelete">
+					删除好友
 				</div>
-				<div id="quick_acc" class="GeneralBtn">
-					<span>快 速 进 入</span>
-				</div>
+				<span id="fID">昵称：</span>
 				<!--
-				<div id="help" class="GeneralBtn">
-					<span>帮 助</span>
-				</div>
-				<div id="setting" class="GeneralBtn">
-					<span>设 置</span>
-				</div>
+				<span id="ffamily">家族：</span>
+				<span id="fpos">职位：</span>
 				-->
+				<span id="frank">等级：</span>
+				<span id="fpro">资产：</span>
 			</div>
+			<div id="name0" class="name"></div>
+			<div id="name1" class="name"></div>
+			<div id="name2" class="name"></div>
+			<div id="name3" class="name"></div>
+			<div id="name4" class="name"></div>
+			<div id="name5" class="name"></div>
+			<div id="name6" class="name"></div>
+
+			<div id="line7" class="line"></div>
+			<div id="line8" class="line"></div>
+			<div id="line9" class="line"></div>
+			<div id="line10" class="line"></div>
+			<div id="line11" class="line"></div>
+			<div id="line12" class="line"></div>
+		</div>
+
+		<div id="smallFrame"></div>
+
+		<div id="rightFrame">
+			<!--
+			<span id="span1">当 前 在 玩 人 数 ：100,000</span>
+			-->
+			<div id="logout" class="GeneralBtn">
+				<span>登 出</span>
+			</div>
+			<div id="lobby" class="GeneralBtn">
+				<span>游 戏 大 厅</span>
+			</div>
+			<div id="quick_acc" class="GeneralBtn">
+				<span>快 速 进 入</span>
+			</div>
+			<!--
+			<div id="help" class="GeneralBtn">
+			<span>帮 助</span>
+			</div>
+			<div id="setting" class="GeneralBtn">
+			<span>设 置</span>
+			</div>
+			-->
+		</div>
 		</div>
 	</body>
 </html>
