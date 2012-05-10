@@ -48,13 +48,15 @@ class Channel(object):
 		self.consumer_tag = self.channel.basic_consume(
 				consumer_callback=self.on_room_message,
 						queue=self.queue_name,
-						no_ack=True,consumer_tag=self.consumer_tag)
+						no_ack=False,consumer_tag=self.consumer_tag)
 
 
 	def on_room_message(self, channel, method, header, body):
 		self.messages.append(json.loads(body))
 		for element in self.message_actions:
 			element['functor'](element['argument'])
+
+		self.channel.basic_ack(method.delivery_tag)
 
 
 
@@ -99,6 +101,7 @@ class PersistentChannel(Channel):
 		self.request = request
 		self.declare_queue_only = declare_queue_only
 		self.arguments = arguments
+		self.closed = False
 
 	def connect(self):
 		pika.log.info('Declaring %s Queue' % self.queue_name)
@@ -133,6 +136,12 @@ class PersistentChannel(Channel):
 		super(PersistentChannel,self).on_queue_bound(frame)
 
 
+	def on_room_message(self, channel, method, header, body):
+		if not self.closed:
+			super(PersistentChannel,self).on_room_message(channel,method,header,body)
+		else:
+			self.channel.basic_reject(method.delivery_tag)
+
 
 	def on_queue_declared(self, frame):
 
@@ -149,3 +158,4 @@ class PersistentChannel(Channel):
 	def on_basic_cancel(self, frame):
 		pika.log.info( "PersistentChannel Closed %s %s",self.request.user.username,self.consumer_tag)
 		self.request.cancel_ok()
+		self.closed = True
