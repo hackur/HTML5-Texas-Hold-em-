@@ -814,8 +814,8 @@ class Robot:
 
 import argparse
 if __name__=="__main__":
-	import time
-	time.sleep(10)
+	#import time
+	#time.sleep(10)
 	parser = argparse.ArgumentParser(description='Bot...')
 	parser.add_argument('--port','-P',default=8888,type=int)
 	parser.add_argument('--username','-U',default="human1")
