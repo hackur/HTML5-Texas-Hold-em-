@@ -153,7 +153,7 @@ if __name__ == '__main__':
 
 	#If we publishing message's speed is much faster than msg processed.
 	# "TCP back pressure" will happen, set a huge multiplier to avoid that
-	application.connection.set_backpressure_multiplier(10000000)
+	application.connection.set_backpressure_multiplier(100000)
 
 	ioloop = tornado.ioloop.IOLoop.instance()
 

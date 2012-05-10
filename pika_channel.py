@@ -137,7 +137,7 @@ class PersistentChannel(Channel):
 
 
 	def on_room_message(self, channel, method, header, body):
-		if not self.closed:
+		if not self.closed and not self.request.isClosed():
 			super(PersistentChannel,self).on_room_message(channel,method,header,body)
 		else:
 			self.channel.basic_reject(method.delivery_tag)

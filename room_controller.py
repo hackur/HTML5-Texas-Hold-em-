@@ -316,14 +316,18 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 		self.channel.add_message_action(self.message_call_back, None)
 		self.channel.connect()
 		self.lastestTimestamp = 0
+		self._isClosed = False
 
 	def clean_matured_message(self, timestamp):
 		self.lastestTimestamp = timestamp
 		self.messagesBuffer = filter(lambda x: int(x['timestamp']) > timestamp, self.messagesBuffer)
 
 
+	def isClosed(self):
+		return self._isClosed
 
 	def on_connection_close(self):
+		self.isClosed = True
 		DatabaseConnection()[BoardMessage.table_name].remove({
 						"user_id":self.user.id,
 						'timestamp':{'$lte':self.lastestTimestamp}
@@ -360,6 +364,8 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 			message['room_id']		= str(self.mongoSession['room_id'])
 			self.channel.publish_message("dealer", json.dumps(message));
 
+	def cancel_ok(self):
+		pass
 
 	def on_close(self):
 		self.channel.close();
@@ -415,6 +421,9 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 
 	def on_connection_close(self):
 		self.channel.close()
+
+	def isClosed(self):
+		return self.request.connection.stream.closed()
 
 	def cancel_ok(self):
 		if self.request.connection.stream.closed():
