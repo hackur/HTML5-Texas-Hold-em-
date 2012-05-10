@@ -212,7 +212,7 @@ class GameRoom(object):
 
 				if self.status != GameRoom.GAME_WAIT:
 					next_seat = self.seats[self.current_seat]
-					print "NEXT!"
+					print "NEXT!",next_seat.seat_id,next_seat.get_user().username
 					self.broadcast({"seat_no":next_seat.seat_id,
 									'rights':next_seat.rights,
 									'to':self.action_timeout,

@@ -16,7 +16,6 @@ class Channel(object):
 	def connect(self):
 		self.channel.queue_declare(
 							auto_delete	= True,
-							exclusive	= True,
 							callback	= self.on_queue_declared)
 
 
