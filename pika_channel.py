@@ -107,7 +107,7 @@ class PersistentChannel(Channel):
 		self.channel.queue_declare(
 							queue		= self.queue_name,
 							auto_delete	= False,
-							exclusive	= True,
+							#exclusive	= True,
 							callback	= self.on_queue_declared,
 							arguments   = self.arguments)
 
