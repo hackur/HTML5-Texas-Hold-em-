@@ -71,7 +71,7 @@ class PlayerArchiveHandler(tornado.web.RequestHandler):
 					"total_games": player.total_games,
 					"won_games": player.won_games,
 					"max_reward": player.max_reward,
-					"last_login": player.last_login.strftime("%Y-%m-%d %H:%M:%S"),
+					"last_login": datetime.fromtimestamp(player.last_login).strftime("%Y-%m-%d %H:%M:%S"),
 					"signature": player.signature or "This guy is too lazy to leave a signature",
 					"friends": str(player.friends),
 				}

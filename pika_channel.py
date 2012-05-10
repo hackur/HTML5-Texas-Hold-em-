@@ -14,22 +14,18 @@ class Channel(object):
 		self.consumer_tag   = None
 
 	def connect(self):
-		pika.log.info('Declaring anonymous Queue')
 		self.channel.queue_declare(
 							auto_delete	= True,
 							exclusive	= True,
 							callback	= self.on_queue_declared)
 
-		pika.log.info('PikaClient: Exchange Declared, Declaring Queue Finish')
 
 	def on_queue_declared(self, frame):
-		pika.log.info('PikaClient: Queue Declared, Binding Queue')
 		#if not self.queue_name:
 		self.queue_name = frame.method.queue
 		#Just use queue name as KEY!
 		self.routing_key = self.queue_name
 
-		print self.queue_name
 			#TODO May be we shouldn't bind queue everytime
 			#for durable queue
 		self.channel.queue_bind(exchange	= self.exchange,
@@ -38,38 +34,34 @@ class Channel(object):
 								callback	= self.on_queue_bound)
 
 	def on_queue_bound(self, frame):
-		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume')
-		print self.queue_name
 		self.consume()
 
-		pika.log.info('PikaClient: Queue Bound, Issuing Basic Consume Finish')
 
 		for element in self.ready_actions:
 			element['functor'](element['argument'])
 
 	def consume(self):
-		print "CONSUME!!!!",self.queue_name
 		self.consumer_tag	= "mtag%i" % Channel.tag ## Seems pika's tag name is not that reliable
 		Channel.tag += 1
+		pika.log.info("Start consume %s %s",self.consumer_tag,self.queue_name)
 
 		self.consumer_tag = self.channel.basic_consume(
 				consumer_callback=self.on_room_message,
 						queue=self.queue_name,
-						no_ack=True,consumer_tag=self.consumer_tag)
-		print "END!!!!"
+						no_ack=False,consumer_tag=self.consumer_tag)
 
 
 	def on_room_message(self, channel, method, header, body):
-		pika.log.info('PikaCient: Message receive, delivery tag #%i' % method.delivery_tag)
 		self.messages.append(json.loads(body))
 		for element in self.message_actions:
 			element['functor'](element['argument'])
 
+		self.channel.basic_ack(method.delivery_tag)
+
 
 
 	def on_basic_cancel(self, frame):
-		pika.log.info('PikaClient: Basic Cancel Ok')
-		print "connection close---"
+		pass
 
 	def close(self):
 		if not self.closing:
@@ -109,31 +101,33 @@ class PersistentChannel(Channel):
 		self.request = request
 		self.declare_queue_only = declare_queue_only
 		self.arguments = arguments
+		self.closed = False
 
 	def connect(self):
 		pika.log.info('Declaring %s Queue' % self.queue_name)
 		self.channel.queue_declare(
 							queue		= self.queue_name,
 							auto_delete	= False,
-							exclusive	= False,
+							exclusive	= True,
 							callback	= self.on_queue_declared,
 							arguments   = self.arguments)
 
 
 	def close(self):
+		pika.log.info( "Trying PersistentChannel Closing %s %s",self.queue_name,self.consumer_tag)
 		if not self.closing:
-			print "PersistentChannel Closing"
-			#self.channel.close()
+			pika.log.info( "PersistentChannel Closing %s",self.queue_name)
 			self.closing = True
 			self.channel.basic_cancel(self.consumer_tag,nowait=False, callback=self.on_basic_cancel)
+		else:
+			pika.log.info("Closing already!")
+
 
 	def on_queue_bound(self, frame):
 		self.queue_bound += 1
 		if self.queue_bound < len(self.binding_keys):
-			print "QUEUE BOUND :",self.queue_bound
 			return
 
-		print "@@QUEUE BOUND :",self.queue_bound
 		if self.declare_queue_only:
 			for element in self.ready_actions:
 				element['functor'](element['argument'])
@@ -142,14 +136,17 @@ class PersistentChannel(Channel):
 		super(PersistentChannel,self).on_queue_bound(frame)
 
 
+	def on_room_message(self, channel, method, header, body):
+		if not self.closed and not self.request.isClosed():
+			super(PersistentChannel,self).on_room_message(channel,method,header,body)
+		else:
+			self.channel.basic_reject(method.delivery_tag)
+
 
 	def on_queue_declared(self, frame):
 
-		pika.log.info('PikaClient: Queue Declared, Binding Queue')
 		self.queue_bound = 0
 		for key in self.binding_keys:
-			print "PersistentChannel binding ",key
-			print "PersistentChannel binding ",type(key)
 			key = str(key)
 			self.channel.queue_bind(exchange	= self.exchange,
 								queue			= self.queue_name,
@@ -159,12 +156,6 @@ class PersistentChannel(Channel):
 
 
 	def on_basic_cancel(self, frame):
-		print "PersistentChannel Closed"
-		if not self.request.request.connection.stream.closed():
-			print "PersistentChannel Closed"
-			if len(self.request.board_messages) > 0:
-				self.request.write(json.dumps(self.request.board_messages));
-			try:
-				self.request.finish()
-			except:
-				print "Client connection closed"
+		pika.log.info( "PersistentChannel Closed %s %s",self.request.user.username,self.consumer_tag)
+		self.request.cancel_ok()
+		self.closed = True

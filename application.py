@@ -55,9 +55,14 @@ def on_close_callback(msg1,msg2):
 	print msg1,msg2
 	exit(-1)
 
+def on_pressure(**kwargs):
+	print "PRESSURE!!",kwargs
+	exit(0)
+
 def on_connected(connection):
 	print "pika connected"
 	connection.channel(on_channel_open)
+	connection.add_backpressure_callback(on_pressure)
 
 
 import argparse

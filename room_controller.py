@@ -120,13 +120,16 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		self.mongodb	= self.application.settings['_db']
 		msg = self.mongodb.board.find_one({"user_id":self.session["user_id"], "room_id":room._id})
 		if msg:
-			msg["message-list"] = []
+			pass
 		else:
-			msg = {"user_id":self.session["user_id"], "room_id":room.id, "message-list": []}
+			msg = {"user_id":self.session["user_id"], "room_id":room.id}
 
-		print "Saving ",msg
-		self.mongodb.board.remove({"user_id":self.session["user_id"]}) # guarantee only one exist
-		self.mongodb.board.save(msg)
+		BoardMessage.get_collection().remove({
+						"user_id":self.session["user_id"],
+						},safe=True)
+
+		# guarantee only one exist
+		self.mongodb.board.update({"user_id":self.session["user_id"]},msg,upsert=True)
 
 		queue				= str(user.username) + '_init'
 		exchange			= str(room.exchange)
@@ -220,7 +223,6 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			self.finish()
 		else:
 			messages		= self.mongodb.board.find_one({"user_id":self.session["user_id"]})
-			print messages
 			room			= Room.find(_id=messages["room_id"])
 			if room is None:
 				self.finish(json.dumps({'status':'failed'}))
@@ -263,9 +265,8 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			self.channel.close()
 			return
 		if messages['status'] == 'success':
-			board_message = self.mongodb.board.find_one({"user_id":self.session['user_id']});
-			board_message['is_sit_down'] = True
-			self.mongodb.board.save(board_message)
+			self.mongodb.board.update({"user_id":self.session['user_id']},\
+					{"$set" :{'is_sit_down':True}});
 
 		self.write(json.dumps(messages))
 		self.channel.close();
@@ -300,30 +301,41 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 		user		= self.user
 		queue		= str(user.username)  + '_broadcast'
 		exchange	= self.session['exchange']
-		messages = self.mongodb.board.find_one({"user_id":self.session["user_id"]})
-		if len(messages["message-list"]) > 0:
+
+		messages = [ msg.content for msg in BoardMessage.find_all(user_id=self.session["user_id"])]
+		if len(messages) > 0:
 			self.write_message(json.dumps(messages["message-list"]))
 
-		self.mongoSession = messages
-		self.messagesBuffer = messages["message-list"]
+		session = self.mongodb.board.find_one({"user_id":self.session["user_id"]})
+		self.mongoSession = session
+		self.messagesBuffer = messages
 		binding_keys= (self.session['public_key'], self.session['private_key'])
 		self.channel= PersistentChannel(
 				self.application.channel,
 				queue, exchange, binding_keys, self,arguments = {"x-expires":int(1800000)})
 		self.channel.add_message_action(self.message_call_back, None)
 		self.channel.connect()
+		self.lastestTimestamp = 0
+		self._isClosed = False
 
 	def clean_matured_message(self, timestamp):
+		self.lastestTimestamp = timestamp
 		self.messagesBuffer = filter(lambda x: int(x['timestamp']) > timestamp, self.messagesBuffer)
-		#self.mongodb.board.update({"user_id": self.session["user_id"]}, board_messages)
 
 
+	def isClosed(self):
+		return self._isClosed
 
 	def on_connection_close(self):
+		self.isClosed = True
+		DatabaseConnection()[BoardMessage.table_name].remove({
+						"user_id":self.user.id,
+						'timestamp':{'$lte':self.lastestTimestamp}
+						})
+
 		user_id			= self.session['user_id']
-		mongoSession	= self.mongodb.board.find_one({"user_id": user_id})
-		mongoSession["message-list"] = self.messagesBuffer
-		self.mongodb.board.save(mongoSession)
+		for content in self.messagesBuffer:
+			BoardMessage.new(user_id,int(content['timestamp']),content)
 		self.channel.close()
 
 	def message_call_back(self, argument):
@@ -352,6 +364,8 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 			message['room_id']		= str(self.mongoSession['room_id'])
 			self.channel.publish_message("dealer", json.dumps(message));
 
+	def cancel_ok(self):
+		pass
 
 	def on_close(self):
 		self.channel.close();
@@ -371,12 +385,23 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		queue		= str(user.username)  + '_broadcast'
 		exchange	= self.session['exchange']
 		self.clean_matured_message(timestamp)
-		messages = self.mongodb.board.find_one({"user_id":self.session["user_id"]})
-		if len(messages["message-list"]) > 0:
-			self.finish(json.dumps(messages["message-list"]))
-			return
+		messages = [ msg['content'] for msg in BoardMessage.get_collection().find(\
+					{
+					"user_id":self.session["user_id"],
+					"timestamp":{"$gt":timestamp}
+					},
+				sort=[("timestamp",1)]
+					)]
 
-		binding_keys= [self.session['public_key'], self.session['private_key']]
+		if len(messages) > 0:
+			print "IN DB-------------------------",timestamp,self.user.username
+			print messages
+			self.finish(json.dumps(messages))
+			return
+		else:
+			print "Nothing in DB",timestamp,self.user.username
+
+		binding_keys = [self.session['public_key'], self.session['private_key']]
 		if self.user.isBot:
 			binding_keys.append(self.session['bot_key'])
 
@@ -386,28 +411,48 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 				queue, exchange, binding_keys, self,arguments = {"x-expires":int(1800000)})
 		self.channel.add_message_action(self.message_call_back, None)
 		self.channel.connect()
+		self.closed = False
 
 	def clean_matured_message(self, timestamp):
-		board_messages = self.mongodb.board.find_one({"user_id":self.session["user_id"]})
-		print "========================[start]========================="
-		print board_messages
-		print "========================[ end ]========================="
-		if board_messages is not None:
-			board_messages["message-list"] = filter(lambda x: int(x['timestamp']) > timestamp, board_messages["message-list"])
-			self.mongodb.board.update({"user_id": self.session["user_id"]}, board_messages)
-
+		BoardMessage.get_collection().remove({
+						"user_id":self.session["user_id"],
+						'timestamp':{'$lte':timestamp}
+						})
 
 	def on_connection_close(self):
 		self.channel.close()
 
+	def isClosed(self):
+		return self.request.connection.stream.closed()
+
+	def cancel_ok(self):
+		if self.request.connection.stream.closed():
+			return
+
+		if hasattr(self,"BoardMessage"):
+			self.write(json.dumps(self.BoardMessage))
+			pika.log.info( "Cancel OK %s",self.user.username)
+		else:
+			pika.log.info( "Cancel..... %s",self.user.username)
+			self.write(json.dumps({}))
+		self.finish()
+
 	def message_call_back(self, argument):
 		new_messages	= self.channel.get_messages()
-		print "------message receive start------"
-		print new_messages
-		print "------message receive end------"
-		user_id			= self.session['user_id']
-		board_messages	= self.mongodb.board.find_one({"user_id": user_id})
-		board_messages["message-list"].extend(new_messages)
-		self.mongodb.board.save(board_messages)
-		self.board_messages = board_messages["message-list"]
+		pika.log.info( "------message receive start------ %s",self.user.username)
+		pika.log.info( [ x['timestamp'] for x in new_messages ])
+		pika.log.info( "------message receive end------")
+		user_id			= self.user.id
+		for content in new_messages:
+			BoardMessage.new(user_id,int(content['timestamp']),content)
+
+		if hasattr(self,"BoardMessage"):
+			self.BoardMessage.extend(new_messages)
+		else:
+			self.BoardMessage = new_messages
+		#if not self.closed:
+		#	self.write(json.dumps(new_messages))
+		#	self.finish();
+		#	self.closed = True
+
 		self.channel.close();

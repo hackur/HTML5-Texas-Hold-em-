@@ -204,6 +204,19 @@ class Email(MongoDocument):
 		return None
 
 
+class BoardMessage(MongoDocument):
+	table_name = "board_message"
+
+	@staticmethod
+	def new(user_id,timestamp,content):
+		msg = BoardMessage()
+		msg.user_id = user_id
+		msg.timestamp = timestamp
+		msg.content = content
+		if msg.insert():
+			return msg
+		return None
+
 class DatabaseConnection(object):
 	__single	= None
 	def __new__(clz):
