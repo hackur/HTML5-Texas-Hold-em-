@@ -16,7 +16,6 @@ class Channel(object):
 	def connect(self):
 		self.channel.queue_declare(
 							auto_delete	= True,
-							exclusive	= True,
 							callback	= self.on_queue_declared)
 
 
@@ -108,7 +107,7 @@ class PersistentChannel(Channel):
 		self.channel.queue_declare(
 							queue		= self.queue_name,
 							auto_delete	= False,
-							exclusive	= True,
+							#exclusive	= True,
 							callback	= self.on_queue_declared,
 							arguments   = self.arguments)
 
