@@ -7,7 +7,7 @@ import sys
 from tornado import ioloop
 from database import *
 import functools
-
+import pika
 class Seat(object):
 	(SEAT_EMPTY,SEAT_WAITING,SEAT_PLAYING,SEAT_ALL_IN) = (0,1,2,3)
 
@@ -322,7 +322,8 @@ class GameRoom(object):
 		if self.seats[self.big_blind].player_stake == 0:
 			self.seats[self.big_blind].status = Seat.SEAT_ALL_IN
 			if self.seats[self.big_blind].table_amount <= self.seats[self.small_blind].table_amount:
-				self.round_finish()
+				if len(seat_list) == 2:
+					self.round_finish()
 			elif self.seats[self.big_blind].table_amount <= self.blind:
 				self.min_amount = self.seats[self.big_blind].table_amount
 				if self.same_amount_on_table():
@@ -469,6 +470,8 @@ class GameRoom(object):
 							'table': seat.table_amount
 						}
 		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
+		pika.log.info("current seat =%s time out\n", seat.get_user().username)
+		pika.log.info("current seat =%d time out\n", self.current_seat)
 		seat.kicked_out = True
 		self.discard_game(user_id)
 
@@ -709,6 +712,8 @@ class GameRoom(object):
 
 			self.num_of_checks = 0
 			go_away_list = filter(lambda seat: seat.kicked_out == True, self.seats)
+			pika.log.info("go away list:")
+			print go_away_list
 			self.kick_out(go_away_list)
 
 		print "Round Finish[End]"
@@ -926,6 +931,8 @@ class GameRoom(object):
 
 	def kick_out(self, go_away_list):
 		print "kick out [Start]"
+		print "go away list"
+		print go_away_list
 		if len(go_away_list) > 0:
 			msg = {}
 			for seat in go_away_list:
@@ -933,10 +940,13 @@ class GameRoom(object):
 				print "user id:%s, seat id:%d" %(seat._user.id, seat.seat_id)
 				if seat._user.id in self.user_seat: #
 					del self.user_seat[seat._user.id]
+
+				pika.log.info("seat id = %d \n", seat.seat_id)
+				pika.log.info("user name =%s \n", seat.get_user().username)
+
 				seat.status = Seat.SEAT_EMPTY
 				seat.set_user(None)
 				seat.kicked_out = False
-
 			self.room.update_attr('player',-len(go_away_list))
 			self.broadcast(msg, GameRoom.MSG_STAND_UP)
 		print "kick out [End]"

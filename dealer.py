@@ -14,7 +14,7 @@ from pika.adapters.tornado_connection import TornadoConnection
 
 import json
 import os
-
+import pika
 class Dealer(object):
 	def __init__(self,exchange,host,port):
 		self.exchange   = exchange
@@ -218,6 +218,7 @@ if __name__ == "__main__":
 
 	print exchange_id,rabbitmqServer,port
 
+	pika.log.setup(color=True)
 
 	dealer = Dealer(exchange = exchange_id,host=rabbitmqServer,port=port)
 	dealer.init_database()
@@ -226,5 +227,4 @@ if __name__ == "__main__":
 	dealer.start()
 	dealer.handle_init_file(args.init_file,args.debug_mode)
 	ioloop = tornado.ioloop.IOLoop.instance()
-
 	ioloop.start()

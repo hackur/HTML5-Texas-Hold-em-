@@ -10,6 +10,7 @@ import argparse
 import sys
 import random
 import time
+import pika
 
 (A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND,A_STANDUP) = (1,2,3,4,5,6,7,8)
 class Seat:
@@ -146,8 +147,6 @@ class FoolDecisionMaker:
 				action  = A_DISCARDGAME
 				amount  = 0
 
-		print "action =%d, amount =%d"%(action, amount)
-		print "ALL in =%d, max raise =%d"%(A_ALLIN, max_raise)
 		if action == A_ALLIN or amount == max(max_raise,min_raise, call_stake):
 			robot_decks = []
 			board_decks	= []
@@ -347,9 +346,16 @@ class DecisionMaker:
 			if A_RAISESTAKE in rights:
 				action = A_RAISESTAKE
 				amount = min_raise
-			else:
+			elif A_CALLSTAKE in rights:
 				amount = call_stake
 				action = A_CALLSTAKE
+			elif A_ALLIN in rights:
+				action = A_ALLIN
+				amount = min_raise
+			else:
+				action = A_DISCARDGAME
+				amount = -1
+
 		else:
 			action = A_DISCARDGAME
 			amount = -1
@@ -402,7 +408,7 @@ class DecisionMaker:
 			if current_pot / min_raise > win_odds:
 				print "min raise"
 				amount = min_raise
-				action = A_RAISESTAKE
+				action = A_ALLIN
 			else:
 				print "fold"
 				amount = -1
@@ -626,12 +632,12 @@ class Robot:
 		print "Robot sit_down handle [end]"
 
 	def listen_board_message(self):
-		print "Robot listen board message [start]"
+		pika.log.info( "Robot Listen Board Message [Start]")
+
 		post_data	= {"timestamp": self.timestamp}
 		body		= urllib.urlencode(post_data)
 		headers		= {"Cookie":self.cookies}
 
-		print "post content"
 		print post_data
 		self.http_client.fetch(	self.listen_board_message_url,
 								self.listen_board_message_handle,
@@ -639,13 +645,14 @@ class Robot:
 								headers	= headers,
 								body	= body)
 
-		print "Robot listen board message [end]"
+		pika.log.info( "Robot Listen Board Message [End]")
 
 	def listen_board_message_handle(self, response):
 		def _sorter(left, right):
 			return left["timestamp"] - right["timestamp"]
 
-		print "Robot listen board message handle [start]"
+		pika.log.info( "Robot Handle Listen Board Message [Start]")
+
 		try:
 			content	= json.loads(response.body)
 		except:
@@ -667,11 +674,12 @@ class Robot:
 
 		if self.is_sit_down == True:
 			self.listen_board_message()
-		print "Robot listen board message handle [end]"
+
+		pika.log.info( "Robot Handle Listen Board Message [End]")
 
 
 	def send_post_message(self):
-		print "send post message [start]"
+		pika.log.info( "Send Post Message [Start]")
 		(action, amount)  = self.decision_maker.make_decision(
 											self.hand_cards,
 											self.opp_cards,
@@ -691,55 +699,55 @@ class Robot:
 								headers	= headers,
 								body	= body)
 
-		print "send post message [end]"
+		pika.log.info( "Send Post Message [End]")
 
 
 	def handle_post_board(self, data):
-		print "handle post message [start]"
-		print "handle post message [end]"
+		pika.log.info( "Handle Post Message [Start]")
+		pika.log.info( "Handle Post Message [End]")
 
 	def handle_chat(self,data):
 		pass
 
 	def handle_sit(self,data):
-		print "handle sit [start]"
+		pika.log.info( "Handle Sit [Start]")
 		self.seats[data["seat_no"]] = Seat()
 		self.seats[data["seat_no"]].seat_id = data["seat_no"]
 		self.seats[data["seat_no"]].stake = data["info"]["player_stake"]
 		self.seats[data["seat_no"]].table = 0
-		print "handle sit [end]"
+		pika.log.info( "Handle Sit [End]")
 
 	def handle_bot_card(self, data):
-		print "handle bot card [start]"
+		pika.log.info( "Handle Bot Card [Start]")
 		if data['cards'] not in self.opp_cards:
 			if data['cards'] != self.hand_cards:
 				self.opp_cards.append(data['cards'])
 
-		print "handle bot card [end]"
+		pika.log.info( "Handle Bot Card [End]")
 
 	def handle_bhc(self,data):
-		print "handle bhc [start]"
-		print data
-		pass
-		print "handle bhc [end]"
+		pika.log.info( "Handle bhc [Start]")
+		pika.log.info("\t\t %s", data)
+		pika.log.info( "Handle bhc [End]")
 
 	def handle_phc(self,data):
-		print "handle phc [start]"
-		print data
+		pika.log.info( "Handle phc [Start]")
+		pika.log.info( "\t\t %s", data)
 		self.hand_cards = data["cards"]
-		pass
-		print "handle phc [end]"
+		pika.log.info( "Handle phc [End]")
 
 	def handle_winner(self,data):
-		print "handle winner [start]"
-		print data
+		pika.log.info( "Handle winner [Start]")
+		pika.log.info( "\t\t %s", data)
 		if self.user_id in data:
 			self.asset	+= data[self.user_id]['stake'] - self.stake
 			self.stake	= data[self.user_id]['stake']
-		print "handle winner [end]"
+		pika.log.info( "Handle winner [End]")
 
 	def handle_next(self,data):
-		print "handle next [start]"
+		pika.log.info( "Handle next [Start]")
+		pika.log.info( "\t\t %s", data)
+
 		if data["seat_no"] == self.seat:
 			if A_CALLSTAKE in data["rights"]:
 				self.call_amount= data["amount_limits"]['2']
@@ -748,40 +756,54 @@ class Robot:
 				self.max_raise	= data["amount_limits"]['3'][1]
 			self.rights = data["rights"]
 			self.send_post_message()
-		print "handle next [end]"
+
+		pika.log.info( "Handle next [End]")
 
 	def handle_action(self, data):
-		print "handle action [start]"
+		pika.log.info( "Handle action [Start]")
+		pika.log.info( "\t\t %s", data)
+
 		if data["seat_no"] == self.seat:
 			self.stake = data["stake"]
-		print "handle action [end]"
+
+		pika.log.info( "Handle action [End]")
 
 	def handle_public(self,data):
-		print "handle public [start]"
+		pika.log.info( "Handle public [Start]")
+		pika.log.info( "\t\t %s", data)
+
 		self.public_cards = []
 		for i in xrange(len(data["cards"])):
 			self.public_cards.append(data["cards"][i]);
-		print "handle public [end]"
+
+		pika.log.info( "Handle public [End]")
 
 	def handle_start(self,data):
-		print "handle start game [start]"
+		pika.log.info( "Handle start game [Start]")
+		pika.log.info( "\t\t %s", data)
+
 		self.public_cards	= []
 		self.opp_cards		= []
 		self.hand_cards		= []
 		self.pot_amount		= 0
+
 		print "stake =>",self.stake
-		print "handle start game [end]"
+		pika.log.info( "Handle start game [End]")
 
 	def handle_pot(self, data):
-		print "handle pot [start]"
+		pika.log.info( "Handle pot [Start]")
+		pika.log.info( "\t\t %s", data)
+
 		self.pot_amount = 0
 		for pot in data["pot"]:
 			self.pot_amount += pot[1]["amount"]
-		print "handle pot [end]"
+
+		pika.log.info( "Handle pot [End]")
 
 
 	def handle_standup(self, data):
-		print "handle stand up [start]"
+		pika.log.info( "Handle stand up [Start]")
+		pika.log.info( "\t\t %s", data)
 
 		if self.user_id in data:
 			if data[self.user_id]["seat_no"]==self.seat:
@@ -794,22 +816,29 @@ class Robot:
 					ioloop.add_timeout(time.time() + 10, self.list_room)
 
 				self.is_sit_down = False
-		print "handle stand up [end]"
+
+
+		pika.log.info( "Handle stand up [End]")
 
 	def refill(self):
-		print "refill [start]"
+		pika.log.info( "Re-fill [Start]")
+
 		headers	= {"Cookie":self.cookies}
 		self.http_client.fetch(	self.refill_url,
 								self.refill_handle,
 								method='GET',
 								headers=headers)
-		print "refill [end]"
+
+		pika.log.info( "Re-fill [End]")
 
 	def refill_handle(self, response):
-		print "refill handle [start]"
+		pika.log.info( "Handle Re-fill [Start]")
+		pika.log.info( "\t\t %s", response.body)
+
 		self.asset = float(response.body)
 		self.list_room()
-		print "refill handle [end]"
+
+		pika.log.info( "Handl Re-fill [End]")
 
 
 import argparse
@@ -823,6 +852,8 @@ if __name__=="__main__":
 
 	args = parser.parse_args()
 
+	debug = True
+	pika.log.setup(color=debug)
 	host	= args.server
 	port	= args.port
 	username= args.username
