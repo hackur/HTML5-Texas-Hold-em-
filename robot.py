@@ -103,7 +103,7 @@ class FoolDecisionMaker:
 
 
 	def make_decision(self, robot_cards, opp_cards_list, board_cards, current_pot, call_stake, min_raise, max_raise, rights):
-		action	= -1
+		action	= A_DISCARDGAME
 		amount	= -1
 		value = random.randint(1, 10000)
 		print "call %f, min raise %f, max raise %f" %(call_stake, min_raise, max_raise)
@@ -368,7 +368,7 @@ class DecisionMaker:
 
 	def _normal_strategy(self, win_odds, current_pot, call_stake, min_raise, max_raise, rights):
 		amount = -1
-		action = -1
+		action = A_DISCARDGAME
 		print win_odds
 		if A_CALLSTAKE in rights and A_ALLIN in rights and A_RAISESTAKE not in rights:
 			if current_pot / call_stake > win_odds :

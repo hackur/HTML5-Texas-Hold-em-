@@ -517,7 +517,7 @@ class GameRoom(object):
 		#	return
 		else:
 			print "I'm here!!!!!"
-			self.current_seat = self.info_next(self.current_seat, [1,2,3,4,5,8])#self.seats[self.current_seat].rights)
+			self.current_seat = self.info_next(self.current_seat, self.previou_base_rights)#self.seats[self.current_seat].rights)
 		print "discard game [End]"
 
 	def stand_up(self, user_id):
@@ -574,6 +574,7 @@ class GameRoom(object):
 				self.current_seat = self.info_next(seat_no, [1,2,3,5,8])
 
 	def info_next(self, current_position, rights):
+		self.previou_base_rights = rights
 		next_seat = self.check_next(current_position)
 		self.seats[next_seat].rights = rights
 		callback = functools.partial(self.discard_game_timeout,self.seats[next_seat].get_user().id)
@@ -804,6 +805,8 @@ class GameRoom(object):
 
 		total_amount_list.sort(reverse = True)
 		print "length of total amount list: ", len(total_amount_list)
+
+
 		if len(total_amount_list) > 1:
 			max_amount = min(self.seats[seat_no].player_stake, total_amount_list[1] - self.seats[seat_no].table_amount)
 		else:
@@ -811,12 +814,16 @@ class GameRoom(object):
 
 		min_amount = self.min_amount - self.seats[seat_no].table_amount
 		if GameRoom.A_CALLSTAKE in self.seats[seat_no].rights:
-			if self.seats[seat_no].player_stake < min_amount:
+			if self.seats[seat_no].player_stake < min_amount or min_amount == 0:
 				self.seats[seat_no].rights.remove(GameRoom.A_CALLSTAKE)
 			else:
 				self.amount_limits[GameRoom.A_CALLSTAKE] = min_amount
 		elif GameRoom.A_CALLSTAKE in self.amount_limits:
 			del self.amount_limits[GameRoom.A_CALLSTAKE]
+
+		if GameRoom.A_CHECK in self.seats[seat_no].rights:
+			if min_amount != 0 and self.seats[seat_no].table_amount != min_amount:
+				self.seats[seat_no].rights.remove(GameRoom.A_CHECK)
 
 		print "-------------player's rights: ", self.seats[seat_no].rights
 		min_amount = 2 * self.raise_amount
