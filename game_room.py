@@ -517,7 +517,7 @@ class GameRoom(object):
 		#	return
 		else:
 			print "I'm here!!!!!"
-			self.current_seat = self.info_next(self.current_seat, self.seats[self.current_seat].rights)
+			self.current_seat = self.info_next(self.current_seat, [1,2,3,4,5,8])#self.seats[self.current_seat].rights)
 		print "discard game [End]"
 
 	def stand_up(self, user_id):
@@ -552,6 +552,8 @@ class GameRoom(object):
 		self.seats[seat_no].bet(amount)
 		if self.min_amount < self.seats[seat_no].table_amount:
 			self.min_amount = self.seats[seat_no].table_amount
+
+		self.raise_amount = max(amount, self.raise_amount)
 
 		if self.flop_flag == False:
 			if self.same_amount_on_table(True):
