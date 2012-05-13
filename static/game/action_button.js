@@ -8,7 +8,7 @@
 	var A_DISCARDGAME	= 5;
 	var A_STAND       = 8;
 	var limits;
-
+	
 	var buttons = { 
 			1:'#btAllin', 4:'#btCheck',
 			3:'#btRaise',2:'#btCall',
@@ -21,6 +21,10 @@
 		4:action_check,
 		5:action_discard
 	};
+	
+	var flagCheck = 0;
+	var flagCheckOrFold = false;
+	var flagCallAny = false;
 
 	function disable_all(){
 		console.log("disable_all");
@@ -55,6 +59,7 @@
 			}
 		);
 		disable_all();
+		
 
 	}
 	function send_action_stand(){
@@ -113,7 +118,7 @@
 			
 			
 		}
-		while( i<46){
+		while( i<64){
 			if (mem[i]>max) {
 				position[1]=i;
 				break;
@@ -129,7 +134,7 @@
  	var xx = [9,1,2,3,4,5,6,7,8]
  	function genMem() {
  		var i = 1;
- 		while(i<46){	
+ 		while(i<64){	
  		var degree = Math.floor((i-1)/9);
  		mem[i]=xx[i%9]*weight[degree];
  		i++;
@@ -208,6 +213,9 @@
 	}
 
 	function enable_buttons(rights,_limits){
+		if(checkAutoButtons(rights))
+			return;
+		
 		console.log(["enable_buttons",rights,_limits]);
 		var allRight = [A_ALLIN,A_CHECK,A_RAISESTAKE,A_CALLSTAKE,A_DISCARDGAME];
 		limits = _limits;
@@ -215,6 +223,7 @@
 			if(buttons[value] == undefined){
 				return;
 			}
+			console.log("index " + index + "value " + value);
 			var bid = buttons[value];
 			$(bid).addClass("buttonEnable");
 			$(bid).removeClass("buttonHide");
@@ -234,11 +243,114 @@
 			$(bid).addClass("buttonDisable");
 		});
 	}
-
+	function checkAutoButtons(rights) {
+		var hasCheckRight = 0, hasAllInRight = 0,hasCallStakeRight = 0;
+		var i = 0;
+		while(i < rights.length) {
+			if(A_CHECK == rights[i]){
+				hasCheckRight = 1;
+			}
+			if(A_ALLIN == rights[i]){
+				hasAllInRight = 1;
+			}
+			if(A_CALLSTAKE == rights[i]) {
+				hasCallStakeRight = 1;
+			}
+			i++;
+		}
+		if (flagCallAny){
+			chooseCallAny();
+			if(hasCallStakeRight){
+				action_call();
+				return true;
+			}
+			if(hasAllInRight){
+				action_allin();
+				return true;
+			}	
+		}
+		if (flagCheckOrFold){
+			chooseCheckOrFold();
+			if(hasCheckRight){
+				action_check();
+				return true;
+			}
+			action_discard();
+			return true;
+			
+		}
+		if (flagCheck){
+			chooseCheck();
+			var i = 0,flag = 0;
+			if(hasCheckRight){
+				action_check();
+				return true;
+			}
+		}
+		
+		
+		return false;
+	}
+	function enable_AutoButtons(){
+		$("#btAutoCheck").removeClass("autoButtonHide");
+		$("#cbAutoCheck").unbind("click",chooseCheck);
+		$("#cbAutoCheck").bind("click",chooseCheck);
+		$("#btAutoCheckOrFold").removeClass("autoButtonHide");
+		$("#cbAutoCheckOrFold").unbind("click",chooseCheckOrFold);
+		$("#cbAutoCheckOrFold").bind("click",chooseCheckOrFold);
+		$("#btAutoCallAny").removeClass("autoButtonHide");
+		$("#cbAutoCallAny").unbind("click",chooseCallAny);
+		$("#cbAutoCallAny").bind("click",chooseCallAny);
+	
+	}
+	function disable_AutoButtons(){
+		$("#btAutoCheck").addClass("autoButtonHide");
+		$("#cbAutoCheck").unbind("click",chooseCheck);
+		$("#btAutoCheckOrFold").addClass("autoButtonHide");
+		$("#cbAutoCheckOrFold").unbind("click",chooseCheckOrFold);
+		$("#btAutoCallAny").addClass("autoButtonHide");
+		$("#cbAutoCallAny").unbind("click",chooseCallAny);
+	}
+	function chooseCheck(){
+		if(!flagCheck){
+			$("#cbAutoCheck").removeClass("noCheck");
+			$("#cbAutoCheck").addClass("check");
+			flagCheck = 1;
+		} else {
+			$("#cbAutoCheck").removeClass("check");
+			$("#cbAutoCheck").addClass("noCheck");
+			flagCheck = 0;
+		}
+	}
+	function chooseCheckOrFold(){
+		if(!flagCheckOrFold){
+			$("#cbAutoCheckOrFold").removeClass("noCheck");
+			$("#cbAutoCheckOrFold").addClass("check");
+			flagCheckOrFold = 1;
+		} else {
+			$("#cbAutoCheckOrFold").removeClass("check");
+			$("#cbAutoCheckOrFold").addClass("noCheck");
+			flagCheckOrFold = 0;
+		}
+	}
+	function chooseCallAny(){
+		if(!flagCallAny){
+			$("#cbAutoCallAny").removeClass("noCheck");
+			$("#cbAutoCallAny").addClass("check");
+			flagCallAny = 1;
+		} else {
+			$("#cbAutoCallAny").removeClass("check");
+			$("#cbAutoCallAny").addClass("noCheck");
+			flagCallAny = 0;
+		}
+	}
+	
+	
 	actionButton.enable_buttons = enable_buttons;
 	actionButton.disable_all = disable_all;
 	actionButton.send_action_stand = send_action_stand;
-
+	actionButton.enable_AutoButtons = enable_AutoButtons;
+	actionButton.disable_AutoButtons = disable_AutoButtons;
 	function unit_test(){
 		enable_buttons([2,3,4]);
 	}

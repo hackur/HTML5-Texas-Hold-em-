@@ -16,6 +16,7 @@
 $(function(){
 $(".awardDialog").click(function(){
 	$(".awardDialog").hide();
+	//$(".awardDialog").fadeOut()
 	});
 });
 

@@ -59,6 +59,7 @@
 	position:absolute;
 	left:17px;
 }
+
 /*
 #btFold {
 	top:560px;
@@ -82,3 +83,72 @@
 	left:950px;
 }
 */
+.checkButton {
+	position:absolute;
+	width:185px;
+	height:67px;
+	font-weight:bold;
+	left:47px;
+	top:16px;
+	background:url(./image/button.png);	
+}
+.autoButtonHide{
+	display:none;
+}
+
+.noCheck{
+	background:url(./image/nocheck.png);
+}
+.check{
+	background:url(./image/check.png);
+}
+#btAutoCheckOrFold{
+	left:240px;
+}
+#btAutoCallAny{
+	left:432px;
+}
+#cbAutoCheck{
+	position:absolute;
+	width:27px;
+	height:27px;
+	left:17px;
+	top:17px;
+}
+#lbAutoCheck{
+	position:absolute;
+	color:#fff;
+	left:65px;
+	top:16px;
+	font-size:25px;
+}
+#cbAutoCheckOrFold{
+	position:absolute;
+	width:27px;
+	height:27px;
+	left:17px;
+	top:17px;
+}
+#lbAutoCheckOrFold{
+	position:absolute;
+	color:#fff;
+	left:55px;
+	top:16px;
+	font-size:25px;
+}
+#cbAutoCallAny{
+	position:absolute;
+	width:27px;
+	height:27px;
+	left:17px;
+	top:17px;
+}
+#lbAutoCallAny{
+	position:absolute;
+	color:#fff;
+	left:65px;
+	top:16px;
+	font-size:25px;
+}
+
+

@@ -69,7 +69,8 @@ function msg_winner(data){
 	message_box.showMessage("We have a winner! ",3);
 	console.log(data);
 	actionButton.disable_all();
-
+	if(window.user_info.IsSat)
+		actionButton.disable_AutoButtons();
     function distribute(){
         /* We have to wait for while here 
          * Because we may still collecting coins
@@ -177,10 +178,14 @@ function msg_next(data){
 	console.log(SeatList[data.seat_no].username);
 	if( SeatList[data.seat_no].userid == window.user_info.id )
 	{ 
+		if(window.user_info.userIsSat)
+			actionButton.disable_AutoButtons();
 		actionButton.enable_buttons(data.rights,data.amount_limits);
 	}
 	else{
 		actionButton.disable_all();
+		if(window.user_info.userIsSat)
+			actionButton.enable_AutoButtons();
 	}
 	//collect_chips();
 }
@@ -257,6 +262,8 @@ function msg_standup(data){
 				window.user_info.userIsSat = false;
 				window.user_info.sit_no = undefined;
 				actionButton.disable_all();
+				if(window.user_info.userIsSat == false)
+					actionButton.disable_AutoButtons();
 			}
 		}
 	});

@@ -590,7 +590,7 @@ p.actionBox
 	-webkit-border-radius: 30px;
 	-moz-border-radius: 30px;
 	border-radius: 30px;
-	-moz-box-shadow: 2px 2px 4px #888;*/
+	-moz-box-shadow: 2px 2px 4px #888;
 	font-size: 15px;
 }
 p.actionBox:before  
