@@ -131,6 +131,7 @@ class Dealer(object):
 		self.channel.basic_publish( exchange    = self.exchange,
 				routing_key = routing_key,
 				body        = json.dumps(message))
+		current_room.resend_last_next_message()
 
 
 	def cmd_create_room(self, args):

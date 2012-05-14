@@ -120,6 +120,8 @@ class GameRoom(object):
 		self.non_fold_move	= False
 		self.countdown		= None
 		self.action_timeout = 30
+		self.last_next_message	= None
+		self.next_timeout_time	= -1
 		self.seats = [ Seat(x) for x in xrange(num_of_seats) ]
 
 		self.poker_controller = PokerController(self.seats)
@@ -146,11 +148,21 @@ class GameRoom(object):
 		result['timestamp'] = self.msg_count
 		return result
 
+	def resend_last_next_message(self):
+		if self.last_next_message is not None:
+			print "publish last next message ================================="
+			print self.last_next_message
+			self.last_next_message["resend"]	= 1
+			self.last_next_message["to"] = self.next_timeout_time - time.time()
+			self.dealer.broadcast(self.broadcast_key, self.last_next_message)
+
 	def broadcast(self,msg,msgType):
 		self.msg_count += 1
 		msg['timestamp']= self.msg_count
 		msg['msgType']	= msgType
 		print "Broadcasting ",self.broadcast_key
+		if msgType == GameRoom.MSG_NEXT:
+			self.last_next_message = msg
 		self.dealer.broadcast(self.broadcast_key, msg)
 
 	def direct_message(self, msg, destination,msgType):
@@ -270,6 +282,7 @@ class GameRoom(object):
 
 	def start_game(self):
 		self.t		= None
+		self.last_next_message = None
 		if len(filter(lambda seat: not seat.is_empty() and seat.player_stake != 0, self.seats)) < 2 and not self.t:
 			return
 		self.status	= GameRoom.GAME_PLAY
@@ -585,7 +598,8 @@ class GameRoom(object):
 		self.seats[next_seat].rights = rights
 		callback = functools.partial(self.discard_game_timeout,self.seats[next_seat].get_user().id)
 		#self.countdown = Timer(20, self.discard_game, args=[self.seats[next_seat].get_private_key()])
-		self.countdown = self.ioloop.add_timeout(time.time() + self.action_timeout, callback)
+		self.next_timeout_time = time.time() + self.action_timeout
+		self.countdown = self.ioloop.add_timeout(self.next_timeout_time, callback)
 
 		print "seat no. for next player: ", self.seats[next_seat].get_user().username
 		self.calculate_proper_amount(next_seat, rights)

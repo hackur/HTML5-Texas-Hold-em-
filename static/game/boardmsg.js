@@ -295,7 +295,8 @@ var actionName = {
 };
 
 function _board_msg_handler(data){
-	
+	console.log("===================board message==================")
+	console.log(data);	
 	if(funs[data.msgType])
 		funs[data.msgType](data);
 	else{

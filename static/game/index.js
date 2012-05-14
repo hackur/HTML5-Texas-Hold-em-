@@ -131,13 +131,17 @@ function listenBoardMessageSocket(timestamp){
 		var data = JSON.parse(evt.data);
 		var timestamp = 0;
 		retry = 0;
+		console.log("=============================data==========================")
+		console.log(data);
+		console.log("===========================================================")
+		console.log("current time stamp =>"+curtimestamp)
+		console.log("time stamp =>"+data[0].timestamp)
 		for(var i = 0; i < data.length; i++) {
 			timestamp = data[i].timestamp;
-			if(timestamp <= curtimestamp){
+			if(timestamp <= curtimestamp && data[i].resend != 1){
 				continue;
 			}
 			curtimestamp = timestamp;
-			//console.log(data[i]);
 			console.log(timestamp);
 			board_msg_handler.process(data[i]);
 		}

@@ -432,6 +432,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		if hasattr(self,"BoardMessage"):
 			self.write(json.dumps(self.BoardMessage))
 			pika.log.info( "Cancel OK %s",self.user.username)
+			print json.dumps(self.BoardMessage)
 		else:
 			pika.log.info( "Cancel..... %s",self.user.username)
 			self.write(json.dumps({}))
@@ -440,7 +441,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 	def message_call_back(self, argument):
 		new_messages	= self.channel.get_messages()
 		pika.log.info( "------message receive start------ %s",self.user.username)
-		pika.log.info( [ x['timestamp'] for x in new_messages ])
+		pika.log.info( [ x for x in new_messages ])
 		pika.log.info( "------message receive end------")
 		user_id			= self.user.id
 		for content in new_messages:
@@ -454,5 +455,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		#	self.write(json.dumps(new_messages))
 		#	self.finish();
 		#	self.closed = True
-
+		print "+++++++++++++++++++++++++++++"
+		print self.BoardMessage
+		print "+++++++++++++++++++++++++++++"
 		self.channel.close();
