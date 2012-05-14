@@ -517,7 +517,6 @@ class GameRoom(object):
 		#	return
 		else:
 			print "I'm here!!!!!"
-	#		self.current_seat = self.info_next(self.current_seat, self.seats[self.current_seat].rights)
 			if self.flop_flag == False:
 				if self.same_amount_on_table():
 					self.current_seat = self.info_next(self.current_seat, [1,3,4,5,8])
@@ -825,12 +824,18 @@ class GameRoom(object):
 				self.seats[seat_no].rights.remove(GameRoom.A_CALLSTAKE)
 			else:
 				self.amount_limits[GameRoom.A_CALLSTAKE] = min_amount
+
+			if min_amount == 0:
+				self.seats[seat_no].rights.remove(GameRoom.A_CALLSTAKE)
+				self.seats[seat_no].rights.append(GameRoom.A_CHECK)
+				del self.amount_limits[GameRoom.A_CALLSTAKE]
+
 		elif GameRoom.A_CALLSTAKE in self.amount_limits:
 			del self.amount_limits[GameRoom.A_CALLSTAKE]
 
-		#if GameRoom.A_CHECK in self.seats[seat_no].rights:
-		#	if min_amount != 0 and self.seats[seat_no].table_amount != min_amount:
-		#		self.seats[seat_no].rights.remove(GameRoom.A_CHECK)
+		if GameRoom.A_CHECK in self.seats[seat_no].rights:
+			if min_amount != 0 and self.seats[seat_no].table_amount != min_amount:
+				self.seats[seat_no].rights.remove(GameRoom.A_CHECK)
 
 		print "-------------player's rights: ", self.seats[seat_no].rights
 		min_amount = 2 * self.raise_amount
