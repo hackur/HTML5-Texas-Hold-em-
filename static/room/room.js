@@ -113,6 +113,7 @@ function initSetting() {
 		$("#settingDialog").hide();
 
 	}
+	$("#closeButton").click(cancelSetting);
 	function changeBlind(val) {
 		$("#curBlind").html( (val>>1) +"/" + val);
 	}	

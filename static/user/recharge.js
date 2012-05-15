@@ -41,7 +41,7 @@
 			curX = runwayLeft;
 		}
 		curX -= runwayLeft;
-		$(runner_button).offset({left:  curX });
+		$(runner_button).offset({left:  curX + 40 });
 		e.preventDefault();
 	};
 

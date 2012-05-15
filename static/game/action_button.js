@@ -292,23 +292,29 @@
 		return false;
 	}
 	function enable_AutoButtons(){
-		$("#btAutoCheck").removeClass("autoButtonHide");
+		//$("#btAutoCheck").removeClass("autoButtonHide");
+		$("#btAutoCheck").fadeIn("fast");
 		$("#cbAutoCheck").unbind("click",chooseCheck);
 		$("#cbAutoCheck").bind("click",chooseCheck);
-		$("#btAutoCheckOrFold").removeClass("autoButtonHide");
+		//$("#btAutoCheckOrFold").removeClass("autoButtonHide");
+		$("#btAutoCheckOrFold").fadeIn("fast");
 		$("#cbAutoCheckOrFold").unbind("click",chooseCheckOrFold);
 		$("#cbAutoCheckOrFold").bind("click",chooseCheckOrFold);
-		$("#btAutoCallAny").removeClass("autoButtonHide");
+		//$("#btAutoCallAny").removeClass("autoButtonHide");
+		$("#btAutoCallAny").fadeIn("fast");
 		$("#cbAutoCallAny").unbind("click",chooseCallAny);
 		$("#cbAutoCallAny").bind("click",chooseCallAny);
 	
 	}
 	function disable_AutoButtons(){
-		$("#btAutoCheck").addClass("autoButtonHide");
+		//$("#btAutoCheck").addClass("autoButtonHide");
+		$("#btAutoCheck").fadeOut("fast");
 		$("#cbAutoCheck").unbind("click",chooseCheck);
-		$("#btAutoCheckOrFold").addClass("autoButtonHide");
+		//$("#btAutoCheckOrFold").addClass("autoButtonHide");
+		$("#btAutoCheckOrFold").fadeOut("fast");
 		$("#cbAutoCheckOrFold").unbind("click",chooseCheckOrFold);
-		$("#btAutoCallAny").addClass("autoButtonHide");
+		//$("#btAutoCallAny").addClass("autoButtonHide");
+		$("#btAutoCallAny").fadeOut("fast");
 		$("#cbAutoCallAny").unbind("click",chooseCallAny);
 	}
 	function chooseCheck(){
