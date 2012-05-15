@@ -49,6 +49,7 @@ def on_channel_open(channel):
 	pika.log.info('PikaClient: Channel Open')
 	application.channel = channel
 	channel.add_on_close_callback(on_close_callback)
+	channel.basic_qos(prefetch_count=1)
 
 def on_close_callback(msg1,msg2):
 	print "CHANNEL CLOSED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
