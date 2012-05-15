@@ -118,30 +118,22 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 			return
 
 		self.mongodb	= self.application.settings['_db']
-		msg = self.mongodb.board.find_one({"user_id":self.session["user_id"], "room_id":room._id})
-		if msg:
-			pass
-		else:
-			msg = {"user_id":self.session["user_id"], "room_id":room.id}
+		msg = {"id":self.session.session_id, "room_id":room.id}
 
 		BoardMessage.get_collection().remove({
-						"user_id":self.session["user_id"],
+						"id":self.session.session_id,
 						},safe=True)
 
 		# guarantee only one exist
-		self.mongodb.board.update({"user_id":self.session["user_id"]},msg,upsert=True)
+		self.mongodb.board.update({"id":self.session.session_id},msg,upsert=True)
 
-		queue				= str(user.username) + '_init'
 		exchange			= str(room.exchange)
 
 		self.session['exchange'] = exchange
 
-		routing_key			= exchange + '_' + queue
-
-		broadcast_queue		= str(user.username) + '_broadcast'
 		public_key			= ('broadcast_%s_%s.testing')% (exchange, room._id)
 		private_key			= ('direct.%s.%s.%s') % (exchange, room._id, user._id)
-		binding_keys= [public_key, private_key]
+		binding_keys		= [public_key, private_key]
 		if user.isBot:
 			bot_key			= ('direct.%s.%s.bot') % (exchange, room._id)
 			binding_keys.append(bot_key)
@@ -150,18 +142,17 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 
 		message				= {	'method'		: 'enter',
 								'user_id'		: user.id,
-								#'source'		: routing_key,
 								'room_id'		: room.id,
 								'private_key'	: private_key}
 
 		arguments			= {'routing_key': 'dealer', 'message': message}
-		broadcast_channel	= PersistentChannel(
+		self.broadcast_channel = broadcast_channel	= PersistentChannel(
 									self.application.channel,
-									broadcast_queue,
+									str(self.session.session_id),
 									exchange,
 									binding_keys,
 									declare_queue_only=True,
-									arguments = {"x-expires":int(1800000)}
+									arguments = {"x-expires":int(600000)}
 									)
 
 		self.callBackCount = 0
@@ -188,10 +179,13 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
+
 		self.channel.add_message_action(self.message_call_back, None)
 
+		self.mongodb.board.update({"id":self.session.session_id},
+				{"$set": {'queue':self.broadcast_channel.queue_name}})
+
 		argument['message']['source'] = self.channel.routing_key
-		print "PUBLISHED"
 		self.channel.publish_message(argument['routing_key'], json.dumps(argument['message']))
 
 	def message_call_back(self, argument):
@@ -222,7 +216,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			self.write(json.dumps({'status':'success'}))
 			self.finish()
 		else:
-			messages		= self.mongodb.board.find_one({"user_id":self.session["user_id"]})
+			messages		= self.mongodb.board.find_one({"id":self.session.session_id})
 			room			= Room.find(_id=messages["room_id"])
 			if room is None:
 				self.finish(json.dumps({'status':'failed'}))
@@ -265,7 +259,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 			self.channel.close()
 			return
 		if messages['status'] == 'success':
-			self.mongodb.board.update({"user_id":self.session['user_id']},\
+			self.mongodb.board.update({"id":self.session.session_id},\
 					{"$set" :{'is_sit_down':True}});
 
 		self.write(json.dumps(messages))
@@ -280,7 +274,6 @@ class BoardActionMessageHandler(tornado.web.RequestHandler):
 	def post(self):
 		user					= self.user
 		message					= json.loads(self.get_argument('message'))
-		queue					= '%s_action_queue' % (str(user.username))
 		exchange				= self.session['exchange']
 		message['user_id']		= user.id
 		message['method']		= 'action'
@@ -299,20 +292,21 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 		print "WebSocket opened","x" * 20
 		self.mongodb = self.application.settings['_db']
 		user		= self.user
-		queue		= str(user.username)  + '_broadcast'
 		exchange	= self.session['exchange']
 
 		messages = [ msg.content for msg in BoardMessage.find_all(user_id=self.session["user_id"])]
 		if len(messages) > 0:
 			self.write_message(json.dumps(messages["message-list"]))
 
-		session = self.mongodb.board.find_one({"user_id":self.session["user_id"]})
+		session = self.mongodb.board.find_one({"id":self.session.session_id})
+
 		self.mongoSession = session
 		self.messagesBuffer = messages
 		binding_keys= (self.session['public_key'], self.session['private_key'])
+		print "QUEUE NAME",session['queue']
 		self.channel= PersistentChannel(
 				self.application.channel,
-				queue, exchange, binding_keys, self,arguments = {"x-expires":int(1800000)})
+				str(session['queue']), exchange, binding_keys, self,arguments = {"x-expires":int(600000)})
 		self.channel.add_message_action(self.message_call_back, None)
 		self.channel.connect()
 		self.lastestTimestamp = 0
@@ -382,7 +376,6 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		self.mongodb = self.application.settings['_db']
 		user		= self.user
 		timestamp	= int(self.get_argument('timestamp'))
-		queue		= str(user.username)  + '_broadcast'
 		exchange	= self.session['exchange']
 		self.clean_matured_message(timestamp)
 		messages = [ msg['content'] for msg in BoardMessage.get_collection().find(\
@@ -393,13 +386,14 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 				sort=[("timestamp",1)]
 					)]
 
+		session = self.mongodb.board.find_one({"id":self.session.session_id})
+
 		if len(messages) > 0:
-			print "IN DB-------------------------",timestamp,self.user.username
-			print messages
 			self.finish(json.dumps(messages))
 			return
 		else:
 			print "Nothing in DB",timestamp,self.user.username
+
 
 		binding_keys = [self.session['public_key'], self.session['private_key']]
 		if self.user.isBot:
@@ -408,7 +402,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 
 		self.channel= PersistentChannel(
 				self.application.channel,
-				queue, exchange, binding_keys, self,arguments = {"x-expires":int(1800000)})
+				str(session['queue']), exchange, binding_keys, self,arguments = {"x-expires":int(600000)})
 		self.channel.add_message_action(self.message_call_back, None)
 		self.channel.connect()
 		self.closed = False
@@ -440,9 +434,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 
 	def message_call_back(self, argument):
 		new_messages	= self.channel.get_messages()
-		pika.log.info( "------message receive start------ %s",self.user.username)
-		pika.log.info( [ x for x in new_messages ])
-		pika.log.info( "------message receive end------")
+		pika.log.info( "MR: %s %s",self.user.username,[ x for x in new_messages ])
 		user_id			= self.user.id
 		for content in new_messages:
 			BoardMessage.new(user_id,int(content['timestamp']),content)

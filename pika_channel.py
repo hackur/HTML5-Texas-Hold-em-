@@ -1,5 +1,7 @@
 import json
 import pika
+from tornado import ioloop
+import time
 
 class Channel(object):
 	tag = 0
@@ -105,21 +107,25 @@ class PersistentChannel(Channel):
 	def connect(self):
 		pika.log.info('Declaring %s Queue' % self.queue_name)
 		self.channel.queue_declare(
-							queue		= self.queue_name,
+							queue		= self.queue_name if self.queue_name else '',
 							auto_delete	= False,
 							#exclusive	= True,
 							callback	= self.on_queue_declared,
 							arguments   = self.arguments)
 
 
-	def close(self):
-		pika.log.info( "Trying PersistentChannel Closing %s %s",self.queue_name,self.consumer_tag)
+	def _close(self):
+		pika.log.info("Trying PersistentChannel Closing %s %s",self.queue_name,self.consumer_tag)
 		if not self.closing:
 			pika.log.info( "PersistentChannel Closing %s",self.queue_name)
 			self.closing = True
 			self.channel.basic_cancel(self.consumer_tag,nowait=False, callback=self.on_basic_cancel)
 		else:
 			pika.log.info("Closing already!")
+
+
+	def close(self):
+		ioloop.IOLoop.instance().add_timeout(time.time() + 0.5, self._close)
 
 
 	def on_queue_bound(self, frame):
@@ -143,13 +149,12 @@ class PersistentChannel(Channel):
 
 
 	def on_queue_declared(self, frame):
-
+		self.queue_name = str(frame.method.queue)
 		self.queue_bound = 0
 		for key in self.binding_keys:
 			key = str(key)
 			self.channel.queue_bind(exchange	= self.exchange,
 								queue			= self.queue_name,
-								#Just use queue name as KEY!
 								routing_key	= key,
 								callback	= self.on_queue_bound)
 
