@@ -208,9 +208,9 @@ class BoardMessage(MongoDocument):
 	table_name = "board_message"
 
 	@staticmethod
-	def new(user_id,timestamp,content):
+	def new(id,timestamp,content):
 		msg = BoardMessage()
-		msg.user_id = user_id
+		msg.id = id
 		msg.timestamp = timestamp
 		msg.content = content
 		if msg.insert():

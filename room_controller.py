@@ -184,6 +184,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 
 		self.mongodb.board.update({"id":self.session.session_id},
 				{"$set": {'queue':self.broadcast_channel.queue_name}})
+		self.application.channel.queue_purge(queue=self.broadcast_channel.queue_name)
 
 		argument['message']['source'] = self.channel.routing_key
 		self.channel.publish_message(argument['routing_key'], json.dumps(argument['message']))
@@ -294,7 +295,7 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 		user		= self.user
 		exchange	= self.session['exchange']
 
-		messages = [ msg.content for msg in BoardMessage.find_all(user_id=self.session["user_id"])]
+		messages = [ msg.content for msg in BoardMessage.find_all(id=self.session.session_id)]
 		if len(messages) > 0:
 			self.write_message(json.dumps(messages["message-list"]))
 
@@ -321,15 +322,15 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 		return self._isClosed
 
 	def on_connection_close(self):
-		self.isClosed = True
+		self._isClosed = True
 		DatabaseConnection()[BoardMessage.table_name].remove({
-						"user_id":self.user.id,
+						"id":self.session.session_id,
 						'timestamp':{'$lte':self.lastestTimestamp}
 						})
 
-		user_id			= self.session['user_id']
+		id			= self.session.session_id
 		for content in self.messagesBuffer:
-			BoardMessage.new(user_id,int(content['timestamp']),content)
+			BoardMessage.new(id,int(content['timestamp']),content)
 		self.channel.close()
 
 	def message_call_back(self, argument):
@@ -380,7 +381,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		self.clean_matured_message(timestamp)
 		messages = [ msg['content'] for msg in BoardMessage.get_collection().find(\
 					{
-					"user_id":self.session["user_id"],
+					"id":self.session.session_id,
 					"timestamp":{"$gt":timestamp}
 					},
 				sort=[("timestamp",1)]
@@ -409,7 +410,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 
 	def clean_matured_message(self, timestamp):
 		BoardMessage.get_collection().remove({
-						"user_id":self.session["user_id"],
+						"id":self.session.session_id,
 						'timestamp':{'$lte':timestamp}
 						})
 
@@ -437,7 +438,7 @@ class BoardListenMessageHandler(tornado.web.RequestHandler):
 		pika.log.info( "MR: %s %s",self.user.username,[ x for x in new_messages ])
 		user_id			= self.user.id
 		for content in new_messages:
-			BoardMessage.new(user_id,int(content['timestamp']),content)
+			BoardMessage.new(self.session.session_id,int(content['timestamp']),content)
 
 		if hasattr(self,"BoardMessage"):
 			self.BoardMessage.extend(new_messages)
