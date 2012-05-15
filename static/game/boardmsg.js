@@ -171,6 +171,8 @@ function msg_next(data){
 	 * */
 	console.log("msg_next=========================================");
 	console.log(data);
+	console.log("rights");
+	console.log(data.rights)
 	//time_bar(data.seat_no);
 	SeatList[data.seat_no].setCountdown(data.to);
 

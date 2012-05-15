@@ -847,9 +847,9 @@ class GameRoom(object):
 		elif GameRoom.A_CALLSTAKE in self.amount_limits:
 			del self.amount_limits[GameRoom.A_CALLSTAKE]
 
-		if GameRoom.A_CHECK in self.seats[seat_no].rights:
-			if min_amount != 0 and self.seats[seat_no].table_amount != min_amount:
-				self.seats[seat_no].rights.remove(GameRoom.A_CHECK)
+		#if GameRoom.A_CHECK in self.seats[seat_no].rights:
+		#	if min_amount != 0 and self.seats[seat_no].table_amount != min_amount:
+		#		self.seats[seat_no].rights.remove(GameRoom.A_CHECK)
 
 		print "-------------player's rights: ", self.seats[seat_no].rights
 		min_amount = 2 * self.raise_amount
