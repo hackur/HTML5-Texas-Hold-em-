@@ -669,8 +669,11 @@ class Robot:
 			if message["timestamp"] > self.timestamp:
 				print message
 				self.timestamp	= message["timestamp"]
-				method = getattr(self,"handle_" + message['msgType'])
-				method(message)
+				if hasattr(self,"handle_" + message['msgType']):
+					method = getattr(self,"handle_" + message['msgType'])
+					method(message)
+				else:
+					print message['msgType'],"is not supported"
 
 		if self.is_sit_down == True:
 			self.listen_board_message()

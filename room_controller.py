@@ -148,7 +148,7 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		arguments			= {'routing_key': 'dealer', 'message': message}
 		self.broadcast_channel = broadcast_channel	= PersistentChannel(
 									self.application.channel,
-									str(self.session.session_id),
+									"%s%s" % (str(self.session.session_id),room.id[-6:]),
 									exchange,
 									binding_keys,
 									declare_queue_only=True,

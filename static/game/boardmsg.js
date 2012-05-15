@@ -33,21 +33,14 @@ function msg_bhc(data){
 	 * The "some one" may be you. Message should
 	 * be ignored in that case
 	 * */
-	console.log("msg_bhc =================================");
-	console.log(data);
 	dealCard.deal(data.seat_list);
+	SeatList[parseInt(data.dealer)].showDealerBtn();
 }
 function msg_phc(data){ 
 	//Private message: you got hand card
-	console.log("msg_phc is ----------------------------------------------:");
-	console.log(data);
 	var seatId = window.user_info.sit_no;
-	SeatList[parseInt(data.dealer)].showDealerBtn();
 
 	//set_hand_cards(data.cards[0], data.cards[1]);
-	console.log(data.cards);
-
-	console.log("set card is ----------------------------------------------:");
 	
 	poker_lib.setCard(data.cards[0], '#cards_in_hand1');
 	poker_lib.setCard(data.cards[1], '#cards_in_hand2');
@@ -67,7 +60,6 @@ function msg_phc(data){
 function msg_winner(data){
 	//We have a winner in this game
 	message_box.showMessage("We have a winner! ",3);
-	console.log(data);
 	actionButton.disable_all();
 	if(window.user_info.IsSat)
 		actionButton.disable_AutoButtons();
@@ -76,7 +68,6 @@ function msg_winner(data){
          * Because we may still collecting coins
          * */
         $.each(data,function(userid,info){
-            console.log(info);
             if(info.isWin == undefined){
                     return;
             }
@@ -90,8 +81,6 @@ function msg_winner(data){
         });
         $.each(SeatList,function(index,seat){
             $.each(seat.getChips(),function(index,chip){
-                console.log("removing");
-                console.log(chip);
                 chip.remove();
             });
             seat.cleanChips();
@@ -103,7 +92,6 @@ function msg_winner(data){
     setTimeout(distribute,1000);
 
 	$.each(data,function(userid,info){
-		console.log(info);
 		if(info.isWin == undefined){
 			return;
 		}
@@ -169,15 +157,9 @@ function msg_next(data){
 	 * Rights ( whether user can  call, check,...) will included
 	 * Also amount limits is included ( How much user can put in action)
 	 * */
-	console.log("msg_next=========================================");
-	console.log(data);
-	console.log("rights");
-	console.log(data.rights)
 	//time_bar(data.seat_no);
 	SeatList[data.seat_no].setCountdown(data.to);
 
-	console.log(window.user_info.username);
-	console.log(SeatList[data.seat_no].username);
 	if( SeatList[data.seat_no].userid == window.user_info.id )
 	{ 
 		if(window.user_info.userIsSat)
@@ -196,8 +178,6 @@ function msg_action(data){
 	 * Some one did an action,
 	 * Also, this one can be current user
 	 * */
-	console.log("msg_action=====================================");
-	console.log(data);
 	//*document.getElementById("money" + data.seat_no).innerHTML = data.stake;*/
 	SeatList[data.seat_no].setStake(data.stake,data.table);
 	SeatList[data.seat_no].showAction(actionName[(data.action).toString()])
@@ -209,7 +189,6 @@ function msg_public_card(data){
 	/***
 	* Public cards is updated
 	* */
-	console.log("msg_public_card ==================================");
 	public_card = data.cards;
 	dealCard.send_public_card(data.cards);
 	if(window.user_info.userIsSat){
@@ -222,8 +201,6 @@ function msg_public_card(data){
 	}
 }
 function msg_start_game(data){
-	console.log("msg_start_game================================");
-	console.log(data);
 	var seconds = parseInt(data.to);
 	var contentDIV = window.message_box.showMessage("",seconds);
 	var countDown = function(){
@@ -242,12 +219,8 @@ function msg_pot(data){
 	pot_manager.update(data.pot);
 }
 function msg_standup(data){
-	console.log("Stand up");
-	console.log(data);
 	$.each(data,function(userid, info) {
-		console.log([userid, info.seat_no], "+++++");
 		if (info.seat_no != undefined) {
-			console.log([userid, info.seat_no], "Stand!");
 
 			SeatList[info.seat_no].seatStand();
 			SeatList[info.seat_no].removeCountdown();
@@ -297,8 +270,6 @@ var actionName = {
 };
 
 function _board_msg_handler(data){
-	console.log("===================board message==================")
-	console.log(data);	
 	if(funs[data.msgType])
 		funs[data.msgType](data);
 	else{

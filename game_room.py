@@ -297,7 +297,7 @@ class GameRoom(object):
 				card_list   = [ str(card) for card in seat.handcards ]
 				seat_list.append(seat.seat_id)
 
-				msg_sent = {	"dealer": self.current_dealer,
+				msg_sent = {
 								"small_blind": self.small_blind,
 								"big_blind": self.big_blind,
 								"cards": card_list,
@@ -308,7 +308,7 @@ class GameRoom(object):
 				msg_sent["seat_id"] = seat.seat_id
 				self.direct_message(msg_sent,self.bot_key,GameRoom.MSG_BOTCARD)
 
-		self.broadcast({"seat_list":seat_list},GameRoom.MSG_BHC) # HC for Have Card
+		self.broadcast({"seat_list":seat_list,'dealer':self.current_dealer},GameRoom.MSG_BHC) # HC for Have Card
 
 		# bet in big blind and small blind by default
 		print self.seats[self.small_blind].player_stake
