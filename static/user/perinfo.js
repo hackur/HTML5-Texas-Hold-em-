@@ -15,6 +15,7 @@ window.get_event_position = function(e){
 }
 
 var info_init = function() {
+	dailyBonus();
 	getUserImage();
 	listEmail(1);
 	buddyInfo();
@@ -214,7 +215,26 @@ var buddyInfo = function() {
 		dataType: "json"
 	});
 };
-
+var dailyBonus = function() {
+	$.ajax({
+		type: "get",
+		url:  "/dailybonus",
+		data: {},
+		success: function(data) {
+			console.log("daily bonus====");
+			console.log(data);
+			if(data.status == 'success'){
+				console.log("success");
+				window.awardDialog.show();
+			}else{
+				console.log("failed");
+			
+			}
+		},
+		dataType: "json"
+	});
+	
+};
 var view_friend = function(friend, i) {
 	$("#name" + i).click(function() {
 

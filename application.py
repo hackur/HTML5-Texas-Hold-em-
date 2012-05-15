@@ -128,6 +128,7 @@ if __name__ == '__main__':
 
 
 		(r"/userinfo", UserInfoHandler),
+		(r"/dailybonus", DailyBonusHandler),
 		(r"/guest-login", GuestLoginHandler),
 		(r"/login", LoginHandler),
 		(r"/logout", LogoutHandler),

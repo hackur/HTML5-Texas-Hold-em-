@@ -1,9 +1,8 @@
-
 import json
 import os
 import sys
 import time
-
+from datetime import datetime
 # Detect if we're running in a git repo
 from os.path import exists, normpath
 if exists(normpath('../pika')):
@@ -28,6 +27,19 @@ class UserInfoHandler(tornado.web.RequestHandler):
 		# 'l': level
 		msg = {'n':user.username,'s':user.asset,'l':user.level,'id':user.id}
 		self.write(json.dumps(msg))
+
+class DailyBonusHandler(tornado.web.RequestHandler):
+	@authenticate
+	def get(self):
+		user = self.user
+		last_login_date = datetime.fromtimestamp(user.last_login)
+		if last_login_date.date() < datetime.today().date():
+			self.user.update_attr('asset', 1000)
+			self.user.last_login = time.time()
+			self.write(json.dumps({'status':'success'}))
+		else:
+			self.write(json.dumps({'status':'failed'}))
+
 
 class BotRefillHandler(tornado.web.RequestHandler):
 	@authenticate
