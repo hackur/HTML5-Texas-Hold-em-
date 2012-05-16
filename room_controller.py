@@ -12,7 +12,7 @@ import pika
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-
+import functools
 import database
 from database import DatabaseConnection,User,Room, DealerInfo
 from authenticate import *
@@ -169,6 +169,18 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		#self.session['messages']	= list()
 		print "ENTER!"
 
+
+	def purge_call_back(self,data):
+		argument = self.argument
+		self.channel.add_message_action(self.message_call_back, None)
+		self.mongodb.board.update(
+			{"id":self.session.session_id},
+			{"$set": {'queue':self.broadcast_channel.queue_name}}
+		)
+		argument['message']['source'] = self.channel.routing_key
+		self.channel.publish_message(	argument['routing_key'],
+										json.dumps(argument['message']))
+
 	def initial_call_back(self, argument):
 		print "ENTER CALL BACK",argument
 		self.callBackCount += 1
@@ -179,15 +191,13 @@ class EnterRoomHandler(tornado.web.RequestHandler):
 		if self.request.connection.stream.closed():
 			self.channel.close();
 			return
+		self.argument = argument
+		self.application.channel.queue_purge(
+			callback= self.purge_call_back,
+			queue	= self.broadcast_channel.queue_name
+		)
 
-		self.channel.add_message_action(self.message_call_back, None)
 
-		self.mongodb.board.update({"id":self.session.session_id},
-				{"$set": {'queue':self.broadcast_channel.queue_name}})
-		self.application.channel.queue_purge(queue=self.broadcast_channel.queue_name)
-
-		argument['message']['source'] = self.channel.routing_key
-		self.channel.publish_message(argument['routing_key'], json.dumps(argument['message']))
 
 	def message_call_back(self, argument):
 		messages= self.channel.get_messages()[0]
@@ -335,6 +345,10 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 
 	def message_call_back(self, argument):
 		new_messages	= self.channel.get_messages()
+		print "=======================Mr.%s's Message============================" % (self.user.username)
+		print "+++++++++++++++++++++++++++++++++++"
+		print new_messages
+		print "+++++++++++++++++++++++++++++++++++"
 
 		self.messagesBuffer.extend(new_messages)
 		self.write_message(json.dumps(new_messages))
@@ -346,7 +360,6 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 
 
 	def on_message(self, message):
-		print message
 		msg = json.loads(message)
 		if 'timestamp' in msg:
 			timestamp	= int(msg['timestamp'])
