@@ -22,7 +22,15 @@ class LoginHandler(tornado.web.RequestHandler):
 		else:
 			message		= {'status':'success'}
 			self.session['user_id'] = user.id
-		#	user.last_login	= int(time.time())
+			if user.last_login == None:
+				user.bonus_notification = 1
+			else:
+				print user.last_login
+				last_login_date = datetime.fromtimestamp(user.last_login)
+				if last_login_date.date() < datetime.today().date():
+					user.bonus_notification = 1
+			user.last_login	= int(time.time())
+
 		self.set_header('Access-Control-Allow-Origin', '*')
 		self.write(json.dumps(message))
 
@@ -44,7 +52,14 @@ class GuestLoginHandler(tornado.web.RequestHandler):
 		else:
 			message		= {'status':'success', 'username':user.username, 'password':password}
 			self.session['user_id'] = user.id
-		#	user.last_login	= int(time.time())
+			if user.last_login == None:
+				user.bonus_notification = 1
+			else:
+				last_login_date = datetime.fromtimestamp(user.last_login)
+				if last_login_date.date() < datetime.today().date():
+					user.bonus_notification = 1
+
+			user.last_login	= int(time.time())
 
 		self.set_header('Access-Control-Allow-Origin', '*')
 		self.write(json.dumps(message))
@@ -93,7 +108,13 @@ class SinaWeiboLoginBack(tornado.web.RequestHandler):
 		else:
 			print "old user"
 
-		#user.last_login	= int(time.time())
+		if user.last_login == None:
+			user.bonus_notification = 1
+		else:
+			last_login_date = datetime.fromtimestamp(user.last_login)
+			if last_login_date.date() < datetime.today().date():
+				user.bonus_notification = 1
+		user.last_login	= int(time.time())
 
 		self.got_user_info(uid,user)
 
