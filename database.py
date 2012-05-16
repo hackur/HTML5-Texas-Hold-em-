@@ -150,10 +150,11 @@ class User(MongoDocument):
 		user.accountType		= accountType
 		user.accountID			= accountID
 		user.screen_name		= username
-		user.gender				= 'M'
+		user.gender				= 'N/A'
 		user.headPortrait_path	= None
 		user.headPortrait_url	= None
 		user.friends			= list()
+		user.bonus_notification	= 0
 		if user.insert():
 			return user
 		return None

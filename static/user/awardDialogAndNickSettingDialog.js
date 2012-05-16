@@ -38,6 +38,7 @@ $(function() {
 	$(".cancelBtn").click(cancelBtnClicked);
 	function confirmBtnClicked() {
 		$(".settingNickDialog").hide();
+		update_user_info();
 		//alert($(".name").val() + "\n" + gender);
 	
 	}
@@ -45,4 +46,29 @@ $(function() {
 		$(".settingNickDialog").hide();
 		history.go(-1);
 	}
+	var update_user_info = function() {
+		var genderText	= -1;
+		var nickname	= '-1';
+		if (gender==0){
+			genderText = 'F';
+		}else{
+			genderText = 'M';
+		}
+		nickname = $('#nickname-input').val();
+		$.ajax({
+			type: "post",
+			url:  "/userinfo",
+			data: {nickname:nickname, gender:genderText},
+			success: function(data) {
+				console.log(data);
+				if(data.status == 'success'){
+					console.log("success");
+					info_init();
+				}else{
+					console.log("failed");		
+				}
+			},
+			dataType: "json"
+		});
+	};
 });

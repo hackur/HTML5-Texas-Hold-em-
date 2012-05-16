@@ -15,6 +15,7 @@ window.get_event_position = function(e){
 }
 
 var info_init = function() {
+	dailyBonus();
 	getUserImage();
 	listEmail(1);
 	buddyInfo();
@@ -118,7 +119,15 @@ var uploadImage = function() {
 		}
 	});
 };
-
+var textDict = {'id': 'ID名称：',
+				'rank': '等级：',
+				'property': '资产：',
+				'winRate': '胜率：',
+				'winBiggestStake': '赢得最大赌注：',
+				'totalInnings': '总局数：',
+				'victoryInnings': '胜利局数：',
+				'latestOnline': '最近上线时间：',
+				'idiograph': '个性签名：'};
 var getUserImage = function() {
 	$.ajax({
 		type: "post",
@@ -128,17 +137,20 @@ var getUserImage = function() {
 			console.log(data);
 			var url = data.head_portrait;
 			$("#image1").attr("src", url);
-			$("#property").html($("#property").html() + data.asset);
-			$("#family").html($("#family").html() + data.family);
-			$("#rank").html($("#rank").html() + data.level);
-			$("#ID").html($("#ID").html() + data.name);
-			$("#winRate").html($("#winRate").html() + data.percentage);
-			$("#winBiggestStake").html($("#winBiggestStake").html() + data.max_reward);
-			$("#pos").html($("#pos").html() + data.position);
-			$("#idiograph").html($("#idiograph").html() + data.signature);
-			$("#totalInnings").html($("#totalInnings").html() + data.total_games);
-			$("#victoryInnings").html($("#victoryInnings").html() + data.won_games);
-			$("#latestOnline").html($("#latestOnline").html() + data.last_login);
+			$("#ID").html(textDict["id"] + data.name);
+			$("#rank").html(textDict["rank"] + data.level);
+			$("#property").html(textDict["property"] + data.asset);
+		//	$("#family").html(textDict["family"] + data.family);
+			$("#winRate").html(textDict["winRate"] + data.percentage);
+			$("#winBiggestStake").html(textDict["winBiggestStake"] + data.max_reward);
+		//	$("#pos").html(textDict["pos"] + data.position);
+			$("#idiograph").html(textDict["idiograph"] + data.signature);
+			$("#totalInnings").html(textDict["totalInnings"] + data.total_games);
+			$("#victoryInnings").html(textDict["victoryInnings"] + data.won_games);
+			$("#latestOnline").html(textDict["latestOnline"] + data.last_login);
+			if(data.gender == 'N/A'){
+				window.settingNickDialog.show();
+			}
 		},
 		dataType: "json"
 	});
@@ -214,7 +226,26 @@ var buddyInfo = function() {
 		dataType: "json"
 	});
 };
-
+var dailyBonus = function() {
+	$.ajax({
+		type: "get",
+		url:  "/dailybonus",
+		data: {},
+		success: function(data) {
+			console.log("daily bonus====");
+			console.log(data);
+			if(data.status == 'success'){
+				console.log("success");
+				window.awardDialog.show();
+			}else{
+				console.log("failed");
+			
+			}
+		},
+		dataType: "json"
+	});
+	
+};
 var view_friend = function(friend, i) {
 	$("#name" + i).click(function() {
 

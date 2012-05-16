@@ -37,7 +37,8 @@ class PersonalArchiveHandler(tornado.web.RequestHandler):
 					"won_games": user.won_games,
 					"max_reward": user.max_reward,
 					"last_login": datetime.fromtimestamp(user.last_login).strftime("%Y-%m-%d %H:%M:%S"),
-					"signature": user.signature or "This guy is too lazy to leave a signature"
+					"signature": user.signature or "This guy is too lazy to leave a signature",
+					"gender": user.gender
 				}
 		self.write(json.dumps(message))
 		self.finish()
@@ -74,6 +75,7 @@ class PlayerArchiveHandler(tornado.web.RequestHandler):
 					"last_login": datetime.fromtimestamp(player.last_login).strftime("%Y-%m-%d %H:%M:%S"),
 					"signature": player.signature or "This guy is too lazy to leave a signature",
 					"friends": str(player.friends),
+					"gender": player.gender
 				}
 		self.write(json.dumps(message))
 		self.finish()
