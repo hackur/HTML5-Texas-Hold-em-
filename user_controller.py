@@ -29,7 +29,7 @@ class UserInfoHandler(tornado.web.RequestHandler):
 		self.write(json.dumps(msg))
 
 class DailyBonusHandler(tornado.web.RequestHandler):
-	@authenticate
+	@authentpcate
 	def get(self):
 		user = self.user
 		last_login_date = datetime.fromtimestamp(user.last_login)
