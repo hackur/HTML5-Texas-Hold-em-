@@ -2,7 +2,7 @@
 
 (function(recharge,$){
 	
-	var runner_button;
+	/*var runner_button;
 	var runner_button_down = false;
 	var runwayLeft = 0;
 	var runwayRight = 0;
@@ -49,7 +49,16 @@
 		window.removeEventListener(event_down, runner_down);
 		window.removeEventListener(event_up, runner_up);
 	};
-
+	*/
+	var rechargeSliderBar = slider_bar();
+	function drag(){
+		rechargeSliderBar.setPosition(39,259);
+		rechargeSliderBar.setVar(changeChargeNum);
+		function changeChargeNum(val) {
+			$("#current").html(val);
+		}
+		rechargeSliderBar.create($("#rechargeSliderbar"),0,10000,100);
+	}
 	recharge.drag = drag;
-
+	
 })(window.recharge = window.recharge || {}, jQuery);
