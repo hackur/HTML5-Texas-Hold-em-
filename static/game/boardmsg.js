@@ -56,10 +56,27 @@ function msg_phc(data){
 	dealCard.deal(window.user_info.sit_no,
 				["#cards_in_hand1","#cards_in_hand2"]);
 	*/
+	console.log("checking ================");
+	console.log(window.user_info)
+	for (var i = 0; i < SeatList.length; i++) {
+		console.log("i = "+i);
+		console.log("is sit"+SeatList[i].getIsSat())
+		if(window.user_info.userIsSat == true && window.user_info.sit_no == i){
+			SeatList[i].hideBackCard();
+		}
+		else{
+			if(SeatList[i].getIsSat() == true){
+				SeatList[i].showBackCard();
+			}
+		}
+	}
 }
 function msg_winner(data){
 	//We have a winner in this game
 	message_box.showMessage("We have a winner! ",3);
+	for (var i = 0; i < SeatList.length; i++) {
+		SeatList[i].hideBackCard();
+	}
 	actionButton.disable_all();
 	if(window.user_info.IsSat)
 		actionButton.disable_AutoButtons();
@@ -90,8 +107,10 @@ function msg_winner(data){
 		pot_manager.reset();
     }
     setTimeout(distribute,1000);
-
+	console.log("game finished===========+++++++++++++++++++++");
+	console.log(data);
 	$.each(data,function(userid,info){
+		console.log(info)
 		if(info.isWin == undefined){
 			return;
 		}
@@ -112,6 +131,7 @@ function msg_winner(data){
 		}else{
 			seat.showWinCardName(cards);
 		}
+		console.log("check point");
         for (var i = 0, k = 0;  i <= info.handcards.length - 1 && k <= 1; i++) {
             for (var j = 0; j <= public_card.length - 1; j++) {
                 if (info.handcards[i] == public_card[j]) {
