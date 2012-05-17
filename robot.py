@@ -532,8 +532,13 @@ class Robot:
 
 	def user_info_handle(self,response):
 		print "user info [start]"
-		content		= json.loads(response.body)
-		print content
+		try:
+			content		= json.loads(response.body)
+			print content
+		except e as Exception:
+			print response.body
+			raise e
+
 		self.asset	= content['s']
 		self.user_id= content['id']
 		if self.asset < 3000:
@@ -621,6 +626,7 @@ class Robot:
 
 	def sit_down_handle(self,response):
 		print "Robot sit_down handle [start]"
+		print response
 		content		= json.loads(response.body)
 		print content
 		if content["status"] == "success":

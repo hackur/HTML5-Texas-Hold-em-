@@ -336,8 +336,12 @@ class BoardListenMessageSocketHandler(tornado.websocket.WebSocketHandler):
 	def message_call_back(self, argument):
 		new_messages	= self.channel.get_messages()
 
-		self.messagesBuffer.extend(new_messages)
-		self.write_message(json.dumps(new_messages))
+		if self.isClosed():
+			for msg in new_messages:
+				BoardMessage.new(id,int(content['timestamp']),msg)
+		else:
+			self.messagesBuffer.extend(new_messages)
+			self.write_message(json.dumps(new_messages))
 		#board_messages	= self.mongodb.board.find_one({"user_id": user_id})
 		#board_messages["message-list"].extend(new_messages)
 		#self.mongodb.board.save(board_messages)
