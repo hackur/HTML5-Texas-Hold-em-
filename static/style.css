@@ -21,7 +21,7 @@ body{
 	-o-user-select: none; 
     height:640px;
     width:960px;
-    margin:0px;
+    margin:0px auto;
 	left:0px;
 	overflow:hidden;
 }

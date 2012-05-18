@@ -1,7 +1,13 @@
 
 body {
-	
-	margin: 0px;
+	width:960px;
+	margin: 0px auto !important;
+}
+body .ui-page.ui-body-c.ui-page-active{
+	position: relative;
+	width: 960px;
+	left: inherit;
+	top: inherit;
 }
 div{
 	-moz-user-select: none; 
