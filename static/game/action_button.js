@@ -294,28 +294,28 @@
 	function enable_AutoButtons(){
 		$("#btAutoCheck").removeClass("autoButtonHide");
 		//$("#btAutoCheck").fadeIn("fast");
-		$("#cbAutoCheck").unbind("click",chooseCheck);
-		$("#cbAutoCheck").bind("click",chooseCheck);
+		$("#btAutoCheck").unbind("click",chooseCheck);
+		$("#btAutoCheck").bind("click",chooseCheck);
 		$("#btAutoCheckOrFold").removeClass("autoButtonHide");
 		//$("#btAutoCheckOrFold").fadeIn("fast");
-		$("#cbAutoCheckOrFold").unbind("click",chooseCheckOrFold);
-		$("#cbAutoCheckOrFold").bind("click",chooseCheckOrFold);
+		$("#btAutoCheckOrFold").unbind("click",chooseCheckOrFold);
+		$("#btAutoCheckOrFold").bind("click",chooseCheckOrFold);
 		$("#btAutoCallAny").removeClass("autoButtonHide");
 		//$("#btAutoCallAny").fadeIn("fast");
-		$("#cbAutoCallAny").unbind("click",chooseCallAny);
-		$("#cbAutoCallAny").bind("click",chooseCallAny);
+		$("#btAutoCallAny").unbind("click",chooseCallAny);
+		$("#btAutoCallAny").bind("click",chooseCallAny);
 	
 	}
 	function disable_AutoButtons(){
 		$("#btAutoCheck").addClass("autoButtonHide");
 		//$("#btAutoCheck").fadeOut("fast");
-		$("#cbAutoCheck").unbind("click",chooseCheck);
+		$("#btAutoCheck").unbind("click",chooseCheck);
 		$("#btAutoCheckOrFold").addClass("autoButtonHide");
 		//$("#btAutoCheckOrFold").fadeOut("fast");
-		$("#cbAutoCheckOrFold").unbind("click",chooseCheckOrFold);
+		$("#btAutoCheckOrFold").unbind("click",chooseCheckOrFold);
 		$("#btAutoCallAny").addClass("autoButtonHide");
 		//$("#btAutoCallAny").fadeOut("fast");
-		$("#cbAutoCallAny").unbind("click",chooseCallAny);
+		$("#btAutoCallAny").unbind("click",chooseCallAny);
 	}
 	function chooseCheck(){
 		if(!flagCheck){
