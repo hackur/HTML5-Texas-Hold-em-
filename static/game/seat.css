@@ -1,4 +1,5 @@
 /* seat */
+
 .seat {
 	height: 149px;
 	width: 135px;
@@ -353,7 +354,18 @@
 }
 
 
-.backcard{ position: absolute; width:57px; height:78px;visibility:hidden;}
+.backcard{ 
+	position: absolute; left:480px; top:100px; 
+	height:40px; 
+	width:30px;
+	-moz-transition: all 1s; 
+	-webkit-transition: all 1s;  
+	-ms-transition: all 1s;  
+	-o-transition: all 1s;  
+	transition-timing-function: ease-out;
+	transition: all 1s;  
+
+}
 .seatPos0 .bcard01{ top: -75px; left: 33px; }
 .seatPos0 .bcard02{ top: -75px; left: 47px; }
 

@@ -32,8 +32,8 @@ function Seat(id,pos){
 	var dealerBtn = $("<p class='dealerBtn'>D</p>");
 	
 	divStake.appendTo(divChip);
-	div_back_card01.appendTo(divSeat);
-	div_back_card02.appendTo(divSeat);
+	//div_back_card01.appendTo(divSeat);
+	//div_back_card02.appendTo(divSeat);
 	divSeatbg.appendTo(divSeat);
 	divChip.appendTo(divSeat);
 	divName.appendTo(divSeat);
