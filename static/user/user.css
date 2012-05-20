@@ -98,6 +98,7 @@ width:355px;
 height:241px;
 left:171px;
 top:142px;
+z-index:10;
 display:none;
 }
 .awardLight {

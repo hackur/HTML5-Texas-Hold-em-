@@ -7,6 +7,7 @@ var table_init = function() {
 	seatInit();
 
 	actionButton.disable_all();
+	actionButton.disable_AutoButtons();
 
 
 	$.each(SeatList,function(index,seat){
@@ -61,6 +62,7 @@ var enter = function(){
 			console.log(data);
 			if( data.status == "success" ) {
 				console.log("enter success!");
+				window.user_info.userIsPlay = false;
 				listenBoardMessage(data.room.timestamp); 
 				console.log([data.room.seats, "++++++___________++++++++"]);
 				for(var i = 0; i < data.room.seats.length; i++ ) {
