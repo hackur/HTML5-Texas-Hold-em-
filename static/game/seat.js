@@ -20,8 +20,10 @@ function Seat(id,pos){
 	var divCount = $('<div class="countdown down"></div>');
 	var divWinbg = $('<div class="winbg"></div>')
 	var divWin = $('<div class="countdown win"></div>');
-	var divWin_last_card01 = $('<img class="countdown win card01" src="./pokers/club/A.png">');
-	var divWin_last_card02 = $('<img class="countdown win card02" src="./pokers/club/A.png">');
+	var div_back_card01		= $('<img class="backcard bcard01" src = "./pokers/back.png">')
+	var div_back_card02		= $('<img class="backcard bcard02" src = "./pokers/back.png">')
+	var divWin_last_card01	= $('<img class="countdown win card01" src="./pokers/club/A.png">');
+	var divWin_last_card02	= $('<img class="countdown win card02" src="./pokers/club/A.png">');
 	var divChip = $('<div class="chip"> </div>');
 	var divStake = $('<div class="tstake"></div>');
 	var cur_pos = "seatPos" + pos;
@@ -30,6 +32,8 @@ function Seat(id,pos){
 	var dealerBtn = $("<p class='dealerBtn'>D</p>");
 	
 	divStake.appendTo(divChip);
+	//div_back_card01.appendTo(divSeat);
+	//div_back_card02.appendTo(divSeat);
 	divSeatbg.appendTo(divSeat);
 	divChip.appendTo(divSeat);
 	divName.appendTo(divSeat);
@@ -120,7 +124,14 @@ function Seat(id,pos){
 			}, 5000);
 		}
 	};
-
+	seatObj.showBackCard = function(){
+		div_back_card01.css("visibility","visible");
+		div_back_card02.css("visibility","visible");
+	};
+	seatObj.hideBackCard = function(){
+		div_back_card01.css("visibility", "hidden");
+		div_back_card02.css("visibility", "hidden");
+	};
 	seatObj.showDealerBtn = function() {
 		dealerBtn.fadeIn(500);
 	};

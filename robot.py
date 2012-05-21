@@ -853,15 +853,16 @@ class Robot:
 import argparse
 if __name__=="__main__":
 	import time
-	time.sleep(10)
 	parser = argparse.ArgumentParser(description='Bot...')
 	parser.add_argument('--port','-P',default=8888,type=int)
 	parser.add_argument('--username','-U',default="human1")
 	parser.add_argument('--password','-E',default="123321")
 	parser.add_argument('--server','-S',default="127.0.0.1")
+	parser.add_argument('--wait','-W',default=0,type=int)
 	parser.add_argument('--iq','-I',default="low")
 
 	args = parser.parse_args()
+	time.sleep(args.wait)
 
 	debug = True
 	pika.log.setup(color=debug)

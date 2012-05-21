@@ -132,7 +132,7 @@ class DealerInfo(MongoDocument):
 
 class User(MongoDocument):
 	table_name	= "user"
-	(USER_TYPE_NORMAL,USER_TYPE_SINA_WEIBO) = (0,1)
+	(USER_TYPE_NORMAL,USER_TYPE_SINA_WEIBO, USER_TYPE_FACEBOOK) = (0,1,2)
 
 	@staticmethod
 	def new(username, password="",asset = 3000, accountType=0,accountID=0):

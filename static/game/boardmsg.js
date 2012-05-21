@@ -39,9 +39,8 @@ function msg_bhc(data){
 function msg_phc(data){ 
 	//Private message: you got hand card
 	var seatId = window.user_info.sit_no;
-
 	//set_hand_cards(data.cards[0], data.cards[1]);
-	
+	window.user_info.userIsPlay = true;
 	poker_lib.setCard(data.cards[0], '#cards_in_hand1');
 	poker_lib.setCard(data.cards[1], '#cards_in_hand2');
 	$("#cards_in_hand1").fadeIn();
@@ -49,20 +48,37 @@ function msg_phc(data){
 	SeatList[seatId].cards	= [];
 	SeatList[seatId].cards.push(poker_lib.evaluateCard(data.cards[0]));
 	SeatList[seatId].cards.push(poker_lib.evaluateCard(data.cards[1]));
-
+	
 	dealCard.set_hc(['#cards_in_hand1','#cards_in_hand2']);
-
+	
 /*
 	dealCard.deal(window.user_info.sit_no,
 				["#cards_in_hand1","#cards_in_hand2"]);
 	*/
+	console.log("checking ================");
+	console.log(window.user_info)
+	for (var i = 0; i < SeatList.length; i++) {
+		console.log("i = "+i);
+		console.log("is sit"+SeatList[i].getIsSat())
+		if(window.user_info.userIsSat == true && window.user_info.sit_no == i){
+			SeatList[i].hideBackCard();
+		}
+		else{
+			if(SeatList[i].getIsSat() == true){
+				SeatList[i].showBackCard();
+			}
+		}
+	}
 }
 function msg_winner(data){
 	//We have a winner in this game
 	message_box.showMessage("We have a winner! ",3);
+	for (var i = 0; i < SeatList.length; i++) {
+		SeatList[i].hideBackCard();
+	}
 	actionButton.disable_all();
-	if(window.user_info.IsSat)
-		actionButton.disable_AutoButtons();
+	actionButton.disable_AutoButtons();
+	window.user_info.userIsPlay = false;
     function distribute(){
         /* We have to wait for while here 
          * Because we may still collecting coins
@@ -90,8 +106,11 @@ function msg_winner(data){
 		pot_manager.reset();
     }
     setTimeout(distribute,1000);
-
+	console.log("game finished===========+++++++++++++++++++++");
+	console.log(data);
+	
 	$.each(data,function(userid,info){
+		console.log(info)
 		if(info.isWin == undefined){
 			return;
 		}
@@ -99,7 +118,7 @@ function msg_winner(data){
 		seat.cards	= [];
 		seat.setStake(info.stake,0);
 		SeatList[info.seat_no].removeCountdown();
-
+		
 		if(info.handcards == undefined){
 			return;
 		}
@@ -112,6 +131,7 @@ function msg_winner(data){
 		}else{
 			seat.showWinCardName(cards);
 		}
+		console.log("check point");
         for (var i = 0, k = 0;  i <= info.handcards.length - 1 && k <= 1; i++) {
             for (var j = 0; j <= public_card.length - 1; j++) {
                 if (info.handcards[i] == public_card[j]) {
@@ -162,13 +182,13 @@ function msg_next(data){
 
 	if( SeatList[data.seat_no].userid == window.user_info.id )
 	{ 
-		if(window.user_info.userIsSat)
+		if(window.user_info.userIsPlay)
 			actionButton.disable_AutoButtons();
 		actionButton.enable_buttons(data.rights,data.amount_limits);
 	}
 	else{
 		actionButton.disable_all();
-		if(window.user_info.userIsSat)
+		if(window.user_info.userIsPlay)
 			actionButton.enable_AutoButtons();
 	}
 	//collect_chips();
@@ -213,7 +233,10 @@ function msg_start_game(data){
 	};
 	countDown();
 	actionButton.disable_all();
-	
+	window.user_info.userIsPlay = true;
+	for (var i = 0; i < SeatList.length; i++) {
+		SeatList[i].hideBackCard();
+	}
 }
 function msg_pot(data){
 	pot_manager.update(data.pot);
@@ -226,19 +249,20 @@ function msg_standup(data){
 			SeatList[info.seat_no].removeCountdown();
 			if (!window.user_info.userIsSat) {
 				SeatList[info.seat_no].showSeatdownbg();
-			} 
+			}
 			else if(parseInt(window.user_info.sit_no) == parseInt(info.seat_no)) {
 				SeatList[info.seat_no].removeStand();
+				
 				for (var i = 0; i < 9; i++) {
 					if (!SeatList[i].getIsSat()) {
 						SeatList[i].showSeatdownbg();
 					} 
 				}
+				window.user_info.userIsPlay = false;
 				window.user_info.userIsSat = false;
 				window.user_info.sit_no = undefined;
 				actionButton.disable_all();
-				if(window.user_info.userIsSat == false)
-					actionButton.disable_AutoButtons();
+				actionButton.disable_AutoButtons();
 			}
 		}
 	});

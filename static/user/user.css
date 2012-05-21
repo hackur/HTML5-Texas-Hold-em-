@@ -1,3 +1,7 @@
+body { margin: 0 auto; }
+body .ui-page.ui-body-c.ui-page-active{
+	position:relative;
+}
 #mail_list_frame{
 	position: absolute;
 	top: 82px;
@@ -94,6 +98,7 @@ width:355px;
 height:241px;
 left:171px;
 top:142px;
+z-index:10;
 display:none;
 }
 .awardLight {

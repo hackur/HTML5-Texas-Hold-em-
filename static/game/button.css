@@ -84,13 +84,54 @@
 }
 */
 .checkButton {
-	position:absolute;
+	/*position:absolute;
 	width:185px;
 	height:67px;
 	font-weight:bold;
 	left:47px;
 	top:16px;
-	background:url(./image/button.png);	
+	background:url(./image/button.png);	*/
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 25px;
+	color: #ffffff;
+	padding: 10px 0px;
+	text-align:center;
+	line-height:29px;
+	background: -webkit-gradient(
+		linear, left top, left bottom, 
+		from(#42aaff),
+		to(#003366));
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border: 1px solid #003366;
+	-moz-box-shadow:
+		5px 6px 3px rgba(000,000,000,0.6),
+		inset 0px 0px 0px rgba(255,255,255,0.6);
+	-webkit-box-shadow:
+		5px 6px 3px rgba(000,000,000,0.6),
+		inset 0px 0px 0px rgba(255,255,255,0.6);
+	text-shadow:
+		0px -1px 0px rgba(000,000,000,0.7),
+		0px 1px 0px rgba(255,255,255,0.3);
+	position: absolute;
+	cursor: pointer;
+	width: 168px;
+	height:40px;
+	top:10px;
+/*	font-weight: bolder;*/
+}
+.checkButton:active {
+		-moz-box-shadow:
+		5px 6px 3px rgba(000,000,000,0.0),
+		inset 0px 0px 0px rgba(255,255,255,0.6);
+	-webkit-box-shadow:
+		5px 6px 3px rgba(000,000,000,0.0),
+		inset 0px 0px 0px rgba(255,255,255,0.6);
+		/*
+	margin-top: 5px;
+	margin-left: 5px;
+	*/
 }
 .autoButtonHide{
 	display:none;
@@ -101,6 +142,9 @@
 }
 .check{
 	background:url(./image/check.png);
+}
+#btAutoCheck{
+	left:48px;
 }
 #btAutoCheckOrFold{
 	left:240px;

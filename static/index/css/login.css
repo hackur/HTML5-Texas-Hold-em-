@@ -1,4 +1,13 @@
-
+body{
+	margin: 0 auto !important;
+	width: 960px;
+	overflow: hidden;
+}
+body .ui-page.ui-body-c.ui-page-active{
+	width: 960px;
+	position: relative;
+	left: inherit;
+}
 #lbg {
 	background-image:url('../img/login/loginbg.jpg');
 }

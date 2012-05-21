@@ -1,6 +1,9 @@
 body{
-    margin:0;
+    margin:0 auto;
     padding:0;    
+}
+body .ui-page.ui-body-c.ui-page-active{
+	position:relative;
 }
 #container{
     height:640px;
@@ -383,4 +386,9 @@ html {
 	text-decoration:none;
 	text-shadow:1px 1px 0px #000000;
 }
-
+#closeButton:hover {
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #0d82bd), color-stop(1, #49bffa));
+	background:-moz-linear-gradient(center top, #0d82bd 5%, #49bffa 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#0d82bd', endColorstr='#49bffa');
+	background-color:#0d82bd;
+}

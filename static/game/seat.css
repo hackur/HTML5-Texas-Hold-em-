@@ -1,4 +1,5 @@
 /* seat */
+
 .seat {
 	height: 149px;
 	width: 135px;
@@ -351,6 +352,46 @@
 	top: -43px;
 	left: 76px;
 }
+
+
+.backcard{ 
+	position: absolute; left:480px; top:100px; 
+	height:40px; 
+	width:30px;
+	-moz-transition: all 1s; 
+	-webkit-transition: all 1s;  
+	-ms-transition: all 1s;  
+	-o-transition: all 1s;  
+	transition-timing-function: ease-out;
+	transition: all 1s;  
+
+}
+.seatPos0 .bcard01{ top: -75px; left: 33px; }
+.seatPos0 .bcard02{ top: -75px; left: 47px; }
+
+.seatPos8 .bcard01{ top: -75px; left: 5px; }
+.seatPos8 .bcard02{ top: -75px; left: 19px; }
+
+.seatPos7 .bcard01{ top: -20px; left: -57px; }
+.seatPos7 .bcard02{ top: -20px; left: -43px; }
+
+.seatPos6 .bcard01{ top: 74px; left: -57px; }
+.seatPos6 .bcard02{ top: 74px; left: -43px; }
+
+.seatPos5 .bcard01{ top: 90px; left: -70px; }
+.seatPos5 .bcard02{ top: 90px; left: -56px; }
+
+.seatPos4 .bcard01{ top: 90px; left: 136px; }
+.seatPos4 .bcard02{ top: 90px; left: 150px; }
+
+.seatPos3 .bcard01{ top: 74px; left: 120px; }
+.seatPos3 .bcard02{ top: 74px; left: 134px; }
+
+.seatPos2 .bcard01{ top: -20px; left: 120px; }
+.seatPos2 .bcard02{ top: -20px; left: 134px; }
+
+.seatPos1 .bcard01{ top: -75px; left: 56px; }
+.seatPos1 .bcard02{ top: -75px; left: 70px; }
 
 .tstake {
 	font-size: 20px;
