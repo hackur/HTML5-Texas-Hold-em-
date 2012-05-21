@@ -98,7 +98,7 @@ width:355px;
 height:241px;
 left:171px;
 top:142px;
-z-index:10;
+z-index:9;
 display:none;
 }
 .awardLight {
@@ -127,6 +127,7 @@ left:0px;
 top:30px;
 background: url(./image/settingNickNameBg.png);
 display:none;
+z-index:10;
 }
 .dialogTitle {
 color:#fff;
