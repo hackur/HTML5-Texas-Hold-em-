@@ -148,7 +148,7 @@ class FaceBookLogin(tornado.web.RequestHandler):
 			self.finish("<script>top.location.href='" + auth_url + "'</script>")
 		else:
 			user  = User.verify_user_openID(accountType = User.USER_TYPE_FACEBOOK,
-											accountID	= user_info["user_id"]
+											accountID	= user_info["user_id"])
 			if not user:
 				self.finish("<script>top.location.href='" + auth_url + "'</script>")
 			else:
@@ -178,7 +178,12 @@ class FaceBookLogin(tornado.web.RequestHandler):
 		user	= User.new(	username	= "%s_%s" % (User.USER_TYPE_FACEBOOK, uid),
 							accountType	= User.USER_TYPE_FACEBOOK,
 							accountID	= uid)
-		user.gender				= content["gender"] == "mail"? "M":"F"
+		if content["gender"] == "mail":
+			user.gender = "M"
+		elif content["gender"] == "femail":
+			user.gender	= "F"
+		else:
+			user.gender	= "N/A"
 		user.screen_name		= content["name"]
 		user.headPortrait_url	= content["picture"]
 		self._login_user(user)
