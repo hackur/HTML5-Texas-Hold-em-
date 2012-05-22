@@ -146,14 +146,15 @@ class GameRoom(object):
 		result['max_stake'] = self.max_stake
 		result['blind']     = self.blind
 		result['timestamp'] = self.msg_count
-		seat = self.get_seat(user_id)
-		if seat:
-			card_list = [ str(card) for card in seat.handcards ]
-			result['hc'] =  card_list
+		if self.status == GameRoom.GAME_PLAY:
+			seat = self.get_seat(user_id)
+			if seat:
+				card_list = [ str(card) for card in seat.handcards ]
+				result['hc'] =  card_list
 
-		if self.last_next_message:
-			self.last_next_message["to"] = self.next_timeout_time - time.time()
-			result['next'] = self.last_next_message
+			if self.last_next_message:
+				self.last_next_message["to"] = self.next_timeout_time - time.time()
+				result['next'] = self.last_next_message
 
 
 		return result
