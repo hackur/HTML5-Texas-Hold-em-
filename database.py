@@ -262,7 +262,7 @@ if __name__ == "__main__":
 	ting.total_games= 100
 	ting.won_games	= 40
 	ting.max_reward	= 998
-	ting.last_login	= datetime.strptime("2012-04-13 12:02:20", "%Y-%m-%d %H:%M:%S")
+	ting.last_login	= 0
 	ting.signature	= "software engineer"
 	ting.asset		= 12000
 	mile.asset		= 1000
