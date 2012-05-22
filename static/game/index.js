@@ -58,7 +58,6 @@ var enter = function(){
 		"/enter",
 		{room_id:room},
 		function(data){
-			console.log("Below is enter data:");
 			console.log(data);
 			if( data.status == "success" ) {
 				console.log("enter success!");
@@ -99,15 +98,8 @@ var enter = function(){
 				if(data.room.publicCard){
 					dealCard.send_public_card(data.room.publicCard);
 				}
-				//console.log(SeatList);
-
 
 				window.room_info = data.room;
-				//max_stake;
-				//min_stake;
-				//blind;
-				//timestamp;
-
 			}
 						
 		},

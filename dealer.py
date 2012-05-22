@@ -83,7 +83,6 @@ class Dealer(object):
 		self.connection.set_backpressure_multiplier(100000)
 
 	def cmd_action(self, args):
-		#print "-------user trying to bet"
 		print "action in dealer %d" % args["action"]
 		if args["room_id"] in self.room_list:
 			current_room    = self.room_list[args["room_id"]]

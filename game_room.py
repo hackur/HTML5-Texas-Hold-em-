@@ -239,17 +239,14 @@ class GameRoom(object):
 			self.countdown = None
 
 	def sit(self, player, seat_no, direct_key, private_key,stake):
-		print "user sit [Start]"
-		print "direct_key	=>", direct_key
-		print "seat request =>%d\n" % (seat_no)
 
 		if self.get_seat(player.id):
-			return (False, "User seat sat down already")
+			return (False, "")
 
 
 		hand_stake = int(stake)
 		if seat_no > len(self.seats):
-			return (False, "Seat number is too large: %s we have %s" % (seat_no,len(self.seats)))
+			return (False, "" % (seat_no,len(self.seats)))
 
 		if not self.seats[seat_no].is_empty():
 			return (False, "Seat Occupied")
@@ -277,7 +274,6 @@ class GameRoom(object):
 			self.t	= self.ioloop.add_timeout(time.time() + timeout, self.start_game)
 			self.broadcast(msg,GameRoom.MSG_START)
 		self.room.update_attr('player',1);
-		print "user sit [End]"
 		return ( True, "" )
 
 	def start_game(self):

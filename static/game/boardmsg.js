@@ -43,8 +43,8 @@ function msg_phc(data){
 	window.user_info.userIsPlay = true;
 	poker_lib.setCard(data.cards[0], '#cards_in_hand1');
 	poker_lib.setCard(data.cards[1], '#cards_in_hand2');
-	$("#cards_in_hand1").fadeIn();
-	$("#cards_in_hand2").fadeIn();
+	//$("#cards_in_hand1").fadeIn();
+	//$("#cards_in_hand2").fadeIn();
 	SeatList[seatId].cards	= [];
 	SeatList[seatId].cards.push(poker_lib.evaluateCard(data.cards[0]));
 	SeatList[seatId].cards.push(poker_lib.evaluateCard(data.cards[1]));
@@ -161,6 +161,7 @@ function msg_winner(data){
 		$("#cards_in_hand2").fadeOut("fast");
 		$(".card-name").remove();
 		$(".card-name-win").remove();
+		dealCard.clear();
 		$.each(data,function(userid,info){
 			if (info.seat_no != undefined) {
 				SeatList[info.seat_no].removeCard();

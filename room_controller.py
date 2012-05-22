@@ -23,8 +23,6 @@ class ListRoomHandler(tornado.web.RequestHandler):
 	@authenticate
 	def get(self):
 		roomType = int(self.get_argument('type',0))
-		print "ROOOM TYPE:",roomType
-		print [ x for x in  DatabaseConnection()['room'].find()]
 		rooms = Room.find_all(roomType=roomType)
 		rooms = [(r.id,r.blind,r.player,r.max_player,r.min_stake,r.max_stake) for r in rooms]
 		self.write(json.dumps({"rooms":rooms}))
@@ -32,8 +30,6 @@ class ListRoomHandler(tornado.web.RequestHandler):
 	@authenticate
 	def post(self):
 		roomType = int(self.get_argument('type',0))
-		print "ROOOM TYPE:",roomType
-		print [ x for x in  DatabaseConnection()['room'].find()]
 		rooms = Room.find_all(roomType=roomType)
 		rooms = [(r.id,r.blind,r.player,r.max_player,r.min_stake,r.max_stake) for r in rooms]
 		self.write(json.dumps({"rooms":rooms}))
@@ -84,7 +80,6 @@ class CreateRoomHandler(tornado.web.RequestHandler):
 
 	def message_call_back(self,argument):
 		message = self.channel.get_messages()[0]
-		print "ROOM ID ", message["room_id"]
 		self.write(json.dumps(message))
 		self.finish()
 
@@ -221,7 +216,7 @@ class SitDownBoardHandler(tornado.web.RequestHandler):
 		seat		= self.get_argument('seat')
 		stake		= self.get_argument('stake')
 
-		if 'is_sit_down' in self.session and \
+		if False and 'is_sit_down' in self.session and \
 			self.session['is_sit_down'] == True and \
 			self.session['seat'] == seat:
 			self.write(json.dumps({'status':'success'}))
