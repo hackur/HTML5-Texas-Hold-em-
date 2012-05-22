@@ -55,6 +55,8 @@ $(function() {
 			genderText = 'M';
 		}
 		nickname = $('#nickname-input').val();
+		if(nickname == "");
+			nickname = "ziguang";
 		$.ajax({
 			type: "post",
 			url:  "/userinfo",

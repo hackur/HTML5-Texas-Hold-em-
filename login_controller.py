@@ -138,7 +138,7 @@ facebook_app_id		= "231740453606973"
 facebook_app_secret	= "17a7bf50f0cdbfc143cb3eb63b33a874"
 facebook_graph		= "https://graph.facebook.com/%s?fields=id,name,picture,gender,username"
 canvas_page			= "http://gigiduck.com:8888/facebook/"
-auth_url			= "https://www.facebook.com/dialog/oauth?client_id="+facebook_app_id+"&redirect_uri="+urllib.pathname2url(canvas_page)
+#auth_url			= "https://www.facebook.com/dialog/oauth?client_id="+facebook_app_id+"&redirect_uri="+urllib.pathname2url(canvas_page)
 class FaceBookLogin(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	def get(self):
