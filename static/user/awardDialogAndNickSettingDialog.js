@@ -37,7 +37,6 @@ $(function() {
 	$(".confirmBtn").click(confirmBtnClicked);
 	$(".cancelBtn").click(cancelBtnClicked);
 	function confirmBtnClicked() {
-		$(".settingNickDialog").hide();
 		update_user_info();
 		//alert($(".name").val() + "\n" + gender);
 	
@@ -55,8 +54,9 @@ $(function() {
 			genderText = 'M';
 		}
 		nickname = $('#nickname-input').val();
-		if(nickname == "");
-			nickname = "ziguang";
+		if(nickname == "")
+			return;
+		$(".settingNickDialog").hide();
 		$.ajax({
 			type: "post",
 			url:  "/userinfo",
