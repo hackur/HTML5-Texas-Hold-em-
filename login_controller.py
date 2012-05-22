@@ -4,6 +4,7 @@ import json
 import hashlib
 import urllib
 import base64
+import hmac
 import tornado.ioloop
 import tornado.httpserver
 import tornado.web
@@ -136,32 +137,47 @@ class SinaWeiboLoginBack(tornado.web.RequestHandler):
 facebook_app_id		= "231740453606973"
 facebook_app_secret	= "17a7bf50f0cdbfc143cb3eb63b33a874"
 facebook_graph		= "https://graph.facebook.com/%s?fields=id,name,picture,gender,username"
-canvas_page			= "http://gigiduck.com:8001/static/user/"
+canvas_page			= "http://gigiduck.com:8888/facebook/"
 auth_url			= "https://www.facebook.com/dialog/oauth?client_id="+facebook_app_id+"&redirect_uri="+urllib.pathname2url(canvas_page)
 class FaceBookLogin(tornado.web.RequestHandler):
+	@tornado.web.asynchronous
 	def get(self):
-		signed_request	= self.get_argument('signed_request')
-		sig, payload	= signed_request.split(u'.', 1)
-		user_info		= json.loads(base64.b64decode(payload))
+		#args['code']			= self.get_argument('code')
+		#args['client_secret']	= facebook_app_secret
+		self.finish("<script>top.location.href='" + auth_url + "'</script>")
 
-		if "user_id" not in user_info:
-			self.finish("<script>top.location.href='" + auth_url + "'</script>")
-		else:
-			user  = User.verify_user_openID(accountType = User.USER_TYPE_FACEBOOK,
-											accountID	= user_info["user_id"])
-			if not user:
-				self.finish("<script>top.location.href='" + auth_url + "'</script>")
-			else:
-				self._login_user(user)
-
+	@tornado.web.asynchronous
 	def post(self):
 		signed_request	= self.get_argument('signed_request')
-		sig, payload	= signed_request.split(u'.', 1)
-		data			= json.loads(base64.b64decode(payload))
-		if "user_id" not in user_info:
-			self.finish("<script>top.location.href='" + auth_url + "'</script>")
+		encoded_sig, payload	= signed_request.split(u'.', 1)
+
+		sig = self._base64_url_decode(encoded_sig)
+		data= json.loads(self._base64_url_decode(payload))
+		if data.get('algorithm').upper() != 'HMAC-SHA256':
+			self.finish('Unknown algorithm')
+			return None
 		else:
-			self.get_user_info(data)
+			expected_sig = hmac.new(facebook_app_secret, msg=payload, digestmod=hashlib.sha256).digest()
+
+		if sig != expected_sig:
+			self.finish('Bad request')
+			return None
+		else:
+			if "user_id" not in data:
+				self.finish("<script>top.location.href='" + auth_url + "'</script>")
+			else:
+				user  = User.verify_user_openID(accountType = User.USER_TYPE_FACEBOOK,
+												accountID	= data["user_id"])
+				if not user:
+					self.get_user_info(data)
+				else:
+					self._login_user(user)
+
+
+	def _base64_url_decode(self, inp):
+		padding_factor = (4 - len(inp) % 4) % 4
+		inp += "="*padding_factor
+		return base64.b64decode(unicode(inp).translate(dict(zip(map(ord, u'-_'), u'+/'))))
 
 	def get_user_info(self, data):
 		graph_url	= facebook_graph % (data["user_id"])
@@ -197,4 +213,4 @@ class FaceBookLogin(tornado.web.RequestHandler):
 				user.bonus_notification = 1
 		user.last_login	= int(time.time())
 		self.session['user_id'] = user.id
-
+		self.redirect("/static/user/user.html")
