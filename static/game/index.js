@@ -63,7 +63,6 @@ var enter = function(){
 				console.log("enter success!");
 				window.user_info.userIsPlay = false;
 				listenBoardMessage(data.room.timestamp); 
-				console.log([data.room.seats, "++++++___________++++++++"]);
 				for(var i = 0; i < data.room.seats.length; i++ ) {
 					if(i < SeatList.length){
 						if(data.room.seats[i] == null ) {						
@@ -79,7 +78,6 @@ var enter = function(){
 							if( SeatList[i].userid == window.user_info.id) {
 								sit_transit.transit(i);
 								SeatList[i].showStand();
-								console.log("-----------------------" + i);
 								window.user_info.userIsSat = true;
 								window.user_info.sit_no = i;
 							}
@@ -98,10 +96,18 @@ var enter = function(){
 				if(data.room.publicCard){
 					dealCard.send_public_card(data.room.publicCard);
 				}
+				if(data.room.hc){
+					poker_lib.setCard(data.room.hc[0], '#cards_in_hand1');
+					poker_lib.setCard(data.room.hc[1], '#cards_in_hand2');
+					$("#cards_in_hand1").fadeIn();
+					$("#cards_in_hand2").fadeIn();
+				}
+				if(data.room.next){
+					board_msg_handler.process(data.room.next);
+				}
 
 				window.room_info = data.room;
 			}
-						
 		},
 		'json'
 	);

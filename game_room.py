@@ -133,7 +133,7 @@ class GameRoom(object):
 						GameRoom.A_STANDUP		:self.stand_up
 						}
 
-	def to_listener(self):
+	def to_listener(self,user_id):
 		result = {}
 		result['status'] = self.status
 		if self.status == GameRoom.GAME_PLAY:
@@ -146,16 +146,26 @@ class GameRoom(object):
 		result['max_stake'] = self.max_stake
 		result['blind']     = self.blind
 		result['timestamp'] = self.msg_count
+		seat = self.get_seat(user_id)
+		if seat:
+			card_list = [ str(card) for card in seat.handcards ]
+			result['hc'] =  card_list
+
+		if self.last_next_message:
+			self.last_next_message["to"] = self.next_timeout_time - time.time()
+			result['next'] = self.last_next_message
+
+
 		return result
 
-	def resend_last_next_message(self):
-		if self.last_next_message is not None:
-			print "publish last next message ================================="
-			print self.last_next_message
-			self.last_next_message["resend"]	= 1
-			self.last_next_message["to"] = self.next_timeout_time - time.time()
-			self.dealer.broadcast(self.broadcast_key, self.last_next_message)
-
+#	def resend_last_next_message(self):
+#		if self.last_next_message is not None:
+#			print "publish last next message ================================="
+#			print self.last_next_message
+#			self.last_next_message["resend"]	= 1
+#			self.last_next_message["to"] = self.next_timeout_time - time.time()
+#			self.dealer.broadcast(self.broadcast_key, self.last_next_message)
+#
 	def broadcast(self,msg,msgType):
 		self.msg_count += 1
 		msg['timestamp']= self.msg_count
@@ -297,7 +307,6 @@ class GameRoom(object):
 								"small_blind": self.small_blind,
 								"big_blind": self.big_blind,
 								"cards": card_list,
-								"Cards in hand": card_list
 							}
 				self.direct_message(msg_sent,seat.get_private_key(),GameRoom.MSG_PHC)
 				msg_sent["user_id"] = seat.get_user().id
@@ -357,8 +366,6 @@ class GameRoom(object):
 		if user_id in self.user_seat:
 			return self.seats[self.user_seat[user_id]]
 		else:
-
-			print "User ",user_id," has no seat"
 			return None
 
 	def is_valid_seat(self, user_id, current_seat):
@@ -942,6 +949,7 @@ class GameRoom(object):
 		self.big_blind_move = False
 		self.current_seat = None
 		self.raise_amount = self.blind
+		self.last_next_message = None
 
 		player_list		= filter(lambda seat: not seat.is_empty() and seat.player_stake != 0 and seat.kicked_out == False, self.seats)
 		go_away_list	= filter(lambda seat: (not seat.is_empty() and seat.player_stake == 0) or seat.kicked_out == True, self.seats)
