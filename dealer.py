@@ -83,7 +83,6 @@ class Dealer(object):
 		self.connection.set_backpressure_multiplier(100000)
 
 	def cmd_action(self, args):
-		#print "-------user trying to bet"
 		print "action in dealer %d" % args["action"]
 		if args["room_id"] in self.room_list:
 			current_room    = self.room_list[args["room_id"]]
@@ -119,19 +118,19 @@ class Dealer(object):
 
 	def cmd_enter(self,args):
 		routing_key = args['source']
+		user_id = args['user_id']
 		if args['room_id'] not in self.room_list:
 			#self.cmd_create_room(args)
 			message     = {'status':'failed'}
 		else:
-			print "Entered Room"
 			current_room = self.room_list[args["room_id"]]
 
-			message     = {'status':'success', "room":current_room.to_listener()}
+			message     = {'status':'success', "room":current_room.to_listener(user_id)}
 
 		self.channel.basic_publish( exchange    = self.exchange,
 				routing_key = routing_key,
 				body        = json.dumps(message))
-		current_room.resend_last_next_message()
+		#current_room.resend_last_next_message()
 
 
 	def cmd_create_room(self, args):
