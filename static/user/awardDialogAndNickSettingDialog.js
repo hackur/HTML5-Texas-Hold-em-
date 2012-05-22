@@ -34,8 +34,11 @@ $(function() {
 		$(".maleCheck").css("background","url(./image/check.png)");
 		$(".femaleCheck").css("background","url(./image/nocheck.png)");
 	}
-	$(".confirmBtn").click(confirmBtnClicked);
-	$(".cancelBtn").click(cancelBtnClicked);
+	$("#confirmBtn").click(confirmBtnClicked);
+	$("#cancelBtn").click(cancelBtnClicked);
+	$("#closeButton").click(function(){
+		$(".settingNickDialog").hide();
+		history.go(-1);});
 	function confirmBtnClicked() {
 		update_user_info();
 		//alert($(".name").val() + "\n" + gender);
