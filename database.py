@@ -108,8 +108,21 @@ class Room(MongoDocument):
 	def __repr__(self):
 		return "<Room('%s','%s','%s')>" % (self._id, self.exchange,self.roomType)
 
-
-
+class Commodity(MongoDocument):
+	table_name	= "commodity"
+	@staticmethod
+	def new(commodity_id, title, description, price, image_url):
+		commodity = Commodity()
+		commodity.commodity_id	= commodity_id
+		commodity.title			= title
+		commodity.description	= description
+		commodity.price			= price
+		commodity.image_url		= image_url
+		if commodity.insert():
+			return commodity
+		return None
+	def __repr__(self):
+		return "<Commodity('%s', '%s', '%s', %d, '%s')>" % (self._id, self.title, self.description, self.price, self.image_url)
 
 class DealerInfo(MongoDocument):
 	table_name	= "dealer_info"
@@ -254,6 +267,7 @@ if __name__ == "__main__":
 
 
 	#room		= Room(exchange="dealer_exchange_1",blind=10,max_player=9)
+	item		= Commodity.new(1, "1000 Credits", "1000 Credits/USD", 1, "NONE")
 	ting		= User.new(username="ting", password=hashlib.md5("123").hexdigest())
 	mile		= User.new(username="mile", password=hashlib.md5("123").hexdigest())
 	mamingcao   = User.new(username="mamingcao", password=hashlib.md5("123").hexdigest())
