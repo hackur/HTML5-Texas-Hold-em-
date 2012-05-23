@@ -2,18 +2,12 @@
 #bigFrame4 {
 	display: none;
 }
-#line3 {
-	top: 50px;
-}
-#line4 {
-	top: 100px;
-}
-#line5 {
-	top: 150px;
-}
-#line6 {
-	top: 200px;
-}
+#line1 { top: 50px; }
+#line2 { top: 100px; }
+#line3 { top: 150px; }
+#line4 { top: 200px; }
+#line5 { top: 250px; }
+#line6 { top: 300px; }
 
 #convert1 {
 	top: 10px;
@@ -49,7 +43,7 @@
 	background-image: url(./image/pitch1.png);
 }
 #convert4 {
-	top: 161px;
+	top: 163px;
 	left: 13px;
 	position: absolute;
 	width: 350px;
@@ -57,6 +51,28 @@
 	line-height: 33px;
 }
 #convert4:hover {
+	background-image: url(./image/pitch1.png);
+}
+#convert5 {
+	top: 213px;
+	left: 13px;
+	position: absolute;
+	width: 350px;
+	height: 38px;
+	line-height: 33px;
+}
+#convert5:hover {
+	background-image: url(./image/pitch1.png);
+}
+#convert6 {
+	top: 263px;
+	left: 13px;
+	position: absolute;
+	width: 350px;
+	height: 38px;
+	line-height: 33px;
+}
+#convert6:hover {
 	background-image: url(./image/pitch1.png);
 }
 .rpurchase {
@@ -81,6 +97,14 @@
 }
 #rpurchase4 {
 	top: 158px;
+	left: 440px;
+}
+#rpurchase5 {
+	top: 209px;
+	left: 440px;
+}
+#rpurchase6 {
+	top: 260px;
 	left: 440px;
 }
 #rrunway {

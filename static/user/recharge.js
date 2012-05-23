@@ -4,7 +4,9 @@
 		{index:1, description:"1000 chips", order_info: 201201},
 		{index:2, description:"2000 chips", order_info: 201202},
 		{index:3, description:"5000 chips", order_info: 201203},
-		{index:4, description:"10000 chips", order_info:201204}
+		{index:4, description:"10000 chips", order_info:201204},
+		{index:5, description:"20000 chips", order_info:201205},
+		{index:6, description:"50000 chips", order_info:201206},
 	];
 	var commodities = [];
 
