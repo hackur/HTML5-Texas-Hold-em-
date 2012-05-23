@@ -1,10 +1,10 @@
 (function(recharge,$){
-	FB.init({appId: 231740453606973, status: true, cookie: true});
+	//FB.init({appId: 231740453606973, status: true, cookie: true});
 	var items =[
-		{index:1, description:"10000 Credits", order_info:"recharge_1"},
-		{index:2, description:"20000 Credits", order_info:"recharge_2"},
-		{index:3, description:"50000 Credits", order_info:"recharge_3"},
-		{index:4, description:"100000 Credits", order_info:"recharge_4"}
+		{index:1, description:"1000 chips", order_info: 201201},
+		{index:2, description:"2000 chips", order_info: 201202},
+		{index:3, description:"5000 chips", order_info: 201203},
+		{index:4, description:"10000 chips", order_info:201204}
 	];
 	var commodities = [];
 
@@ -23,11 +23,9 @@
 			_button.attr('id', "rpurchase"+entity.info.index);
 			_button.html("Purchase");
 			_button.bind("vclick", entity.invokeOrder);
-			console.log(_itemDes);
-			console.log(_button);
-			console.log($("#recharge_frame"));
-			console.log($("#recharge_frame").append(_itemDes));
-			console.log($("#recharge_frame").append(_button));
+			console.log($(document));
+			_itemDes.appendTo($("#recharge_frame"));
+			_button.appendTo($("#recharge_frame"));
 		};
 
 		entity.invokeOrder = function(){
@@ -37,7 +35,8 @@
 				action:"buy_item", 
 				dev_purchase_params: {'oscif': true}
 			};
-			FB.UI(obj, entity.orderCallback);
+			console.log(obj);
+			FB.ui(obj, entity.orderCallback);
 		};
 	
 		entity.orderCallback = function(data){
@@ -54,8 +53,14 @@
 		entity.construct();
 		return entity;
 	}
-	for(var i=0; i < items.length; i++){
-		commodities.push(Commodity(items[i]));
+
+	var initCommodity = function(){
+		for(var i=0; i < items.length; i++){
+			commodities.push(Commodity(items[i]));
+		}
+		window.commodities = commodities;
 	}
-	window.commodities = commodities;
-})(window.recharge = window.recharge || {}, jQuery);
+	console.log("==================commodities=======================");
+	console.log(commodities);
+	window.initCommodity = initCommodity;
+})({}, jQuery);

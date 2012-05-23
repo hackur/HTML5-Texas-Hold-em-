@@ -14,6 +14,7 @@ from database import DatabaseConnection,User,Room
 from random import random
 from thread_pool import in_thread_pool, in_ioloop, blocking
 import time
+from database import *
 
 facebook_app_id		= "231740453606973"
 facebook_app_secret	= "17a7bf50f0cdbfc143cb3eb63b33a874"
@@ -26,6 +27,13 @@ def _base64_url_decode(inp):
 	inp += "="*padding_factor
 	return base64.b64decode(unicode(inp).translate(dict(zip(map(ord, u'-_'), u'+/'))))
 
+class FaceBookChannelHandler(tornado.web.RequestHandler):
+	@tornado.web.asynchronous
+	def get(self):
+		self.render("./channel.html")
+
+	def post(self):
+		self.render("./channel.html")
 
 class FaceBookLogin(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
@@ -97,7 +105,8 @@ class FaceBookLogin(tornado.web.RequestHandler):
 				user.bonus_notification = 1
 		user.last_login	= int(time.time())
 		self.session['user_id'] = user.id
-		self.redirect("/static/user/user.html")
+		self.render("static/user/user.html")
+#		self.redirect("/static/user/user.html")
 
 class FaceBookPurchaseHandler(tornado.web.RequestHandler):
 	def post(self):
@@ -106,6 +115,7 @@ class FaceBookPurchaseHandler(tornado.web.RequestHandler):
 
 		sig = _base64_url_decode(encoded_sig)
 		data= json.loads(_base64_url_decode(payload))
+		method = self.get_argument('method')
 		if data.get('algorithm').upper() != 'HMAC-SHA256':
 			self.finish('Unknown algorithm')
 			return None
@@ -116,18 +126,26 @@ class FaceBookPurchaseHandler(tornado.web.RequestHandler):
 			self.finish('Bad request')
 			return None
 		else:
-			self._process_data(data)
+			self._process_data(data,method)
 
-	def _process_data(self, data):
-		request_type = data["method"]
+	def _process_data(self, data,method):
+		request_type = method
 		if request_type == 'payments_get_items':
-			order_info	= json.loads(data['credits']['order_info'])
-			item_id		= order_info['item_id']
-			item		= Commodity.find(commodity_id = item_id)
-			response	= {"content":[item], "method":request_type}
+			item_id		= data["credits"]['order_info']
+			item		= Commodity.find(commodity_id = int(item_id))
+			itemInfo	= {}
+			itemInfo['item_id']		= item_id
+			itemInfo['title']	= item.title
+			itemInfo['price']	= item.price
+			itemInfo['description']	= item.description
+			itemInfo['image_url']	= item.image_url
+			response	= {"content":[itemInfo], "method":request_type}
 		elif request_type == "payments_status_update":
 			order_details	= json.loads(data['credits']['order_details'])
-			item_data		= json.loads(order_details['items'][0]['data'])
+			print "-------------------------------"
+			print order_details
+			print "--------------------------------"
+			item_data		= order_details['items'][0]['data']
 			if "modified" in item_data:
 				earned_currency_order = item_data['modified']
 			else:
@@ -141,6 +159,14 @@ class FaceBookPurchaseHandler(tornado.web.RequestHandler):
 					product_amount	= earned_currency_order['product_amount']
 					credits_amount	= earned_currency_order['credits_amount']
 
+				client_id	= data['user_id']
+				items		= order_details['items']
+				client		= User.verify_user_openID(	accountType = User.USER_TYPE_FACEBOOK,
+														accountID	= client_id)
+				for item in items:
+					commodity = Commodity.find(commodity_id = int(item["item_id"]))
+					client.update_attr('asset', commodity.money)
+
 				next_order_status	= "settled"
 				response = {
 					"content" : {
@@ -150,11 +176,15 @@ class FaceBookPurchaseHandler(tornado.web.RequestHandler):
 					"method" : request_type
 				}
 			elif current_order_status == "disputed":
+				raise Exception("disputed")
 				pass
 			elif current_order_status == "refunded":
-				pass
+				raise Exception("refunded")
+			elif current_order_status == "settled":
+				response = {}
 			else:
-				pass
+				raise Exception(request_type)
 
+		print json.dumps(response)
 		self.finish(json.dumps(response))
 

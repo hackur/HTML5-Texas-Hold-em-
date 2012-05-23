@@ -71,7 +71,7 @@ class MongoDocument(object):
 		if "_id" in kwarg and type(kwarg['_id']) != ObjectId:
 			kwarg['_id'] = ObjectId(kwarg['_id'])
 
-
+		print kwarg
 		db = DatabaseConnection()[Table.table_name]
 		document = db.find_one(kwarg)
 		if document:
@@ -111,13 +111,14 @@ class Room(MongoDocument):
 class Commodity(MongoDocument):
 	table_name	= "commodity"
 	@staticmethod
-	def new(commodity_id, title, description, price, image_url):
+	def new(commodity_id, title, description, price, image_url, money):
 		commodity = Commodity()
 		commodity.commodity_id	= commodity_id
 		commodity.title			= title
 		commodity.description	= description
 		commodity.price			= price
 		commodity.image_url		= image_url
+		commodity.money			= money
 		if commodity.insert():
 			return commodity
 		return None
@@ -267,7 +268,10 @@ if __name__ == "__main__":
 
 
 	#room		= Room(exchange="dealer_exchange_1",blind=10,max_player=9)
-	item		= Commodity.new(1, "1000 Credits", "1000 Credits/USD", 1, "NONE")
+	item		= Commodity.new( 201201, "1000 chips", "1000 chips", 1, "NONE", 1000)
+	item		= Commodity.new( 201202, "2000 chips", "2000 chips", 2, "NONE", 2000)
+	item		= Commodity.new( 201203, "5000 chips", "5000 chips", 5, "NONE", 5000)
+	item		= Commodity.new( 201204, "10000 chips", "10000 chips", 10, "NONE", 10000)
 	ting		= User.new(username="ting", password=hashlib.md5("123").hexdigest())
 	mile		= User.new(username="mile", password=hashlib.md5("123").hexdigest())
 	mamingcao   = User.new(username="mamingcao", password=hashlib.md5("123").hexdigest())

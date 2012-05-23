@@ -136,6 +136,7 @@ if __name__ == '__main__':
         (r"/weibologin",SinaWeiboLogin),
         (r"/weibologinCallback/?",SinaWeiboLoginBack),
 		(r"/facebook/",FaceBookLogin),
+		(r"/facebook/channel.html", FaceBookChannelHandler),
         (r"/facebook/purchase/",FaceBookPurchaseHandler),
 		(r"/refill",BotRefillHandler),
 		(r"/uploads/(.*)", tornado.web.StaticFileHandler, dict(path=settings['uploaded_image_path'])),

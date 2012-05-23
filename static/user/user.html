@@ -24,10 +24,30 @@
 		<script src="/static/user/email.js"></script>
 		<script src="/static/user/awardDialogAndNickSettingDialog.js"></script>
 		<script type="text/javascript">
-			$(document).ready(info_init);
+		$(info_init);
 		</script>
 	</head>
 	<body>
+		<div id="fb-root"></div>
+		<script>
+			window.fbAsyncInit = function() {
+				FB.init({
+					appId      : '231740453606973',
+					channelUrl : "//gigiduck.com:8888/facebook/channel.html",
+					status     : true,
+					cookie     : true,
+					xfbml      : true
+				});
+			};
+			$(document).ready(function(){
+				var d	= document;
+				var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+				if (d.getElementById(id)) {return;}
+				js = d.createElement('script'); js.id = id; js.async = true;
+				js.src = "//connect.facebook.net/en_US/all.js";
+				ref.parentNode.insertBefore(js, ref);
+			});
+		</script>
 		<div id="background">
 			<div id="btFrame">
 				<div id="info" class="frame-header">

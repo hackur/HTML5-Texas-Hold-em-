@@ -19,6 +19,7 @@ var info_init = function() {
 	getUserImage();
 	listEmail(1);
 	buddyInfo();
+	initCommodity();
 	/* viewEmail(); */
 	bindSendFriendEmail();
 	window.bigframe = [	{header:"#info",	content:"#info_frame", background:"url(./image/left.png)"},
@@ -87,9 +88,12 @@ var info_init = function() {
 	});
 
 	$("#logout").bind("vclick",function(){
+		window.location="/static/facebook.html";
+		/*
 		$.post("/logout",function(){
 			window.location="/";
 		});
+		*/
 
 	});
 };
