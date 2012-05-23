@@ -40,7 +40,8 @@ class FaceBookLogin(tornado.web.RequestHandler):
 	def get(self):
 		#args['code']			= self.get_argument('code')
 		#args['client_secret']	= facebook_app_secret
-		self.finish("<script>top.location.href='" + auth_url + "'</script>")
+		if "user_id" in self.session:
+			self.render("static/user/user.html")
 
 	@tornado.web.asynchronous
 	def post(self):

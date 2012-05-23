@@ -43,7 +43,9 @@ $(function(){
 		if(window.user_info.userIsSat){
 			actionButton.send_action_stand();
 			setTimeout(function(){
-				history.go(-1);
+				//history.go(-1);
+				window.location = "http://" + document.domain + ":" + window.location.port + "/static/room/room.html"
+
 			},500);
 		}
 		else{
