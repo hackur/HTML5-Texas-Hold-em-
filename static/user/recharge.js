@@ -37,7 +37,7 @@
 				action:"buy_item", 
 				dev_purchase_params: {'oscif': true}
 			};
-			FB.ui(obj, orderCallback);
+			FB.UI(obj, entity.orderCallback);
 		};
 	
 		entity.orderCallback = function(data){
