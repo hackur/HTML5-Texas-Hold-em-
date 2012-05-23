@@ -142,9 +142,6 @@ class FaceBookPurchaseHandler(tornado.web.RequestHandler):
 			response	= {"content":[itemInfo], "method":request_type}
 		elif request_type == "payments_status_update":
 			order_details	= json.loads(data['credits']['order_details'])
-			print "-------------------------------"
-			print order_details
-			print "--------------------------------"
 			item_data		= order_details['items'][0]['data']
 			if "modified" in item_data:
 				earned_currency_order = item_data['modified']
@@ -154,10 +151,10 @@ class FaceBookPurchaseHandler(tornado.web.RequestHandler):
 			if current_order_status == "placed":
 				if earned_currency_order != None:
 					print earned_currency_order
-					product			= earned_currency_order['product']
-					product_title	= earned_currency_order['product_title']
-					product_amount	= earned_currency_order['product_amount']
-					credits_amount	= earned_currency_order['credits_amount']
+			#		product			= earned_currency_order['product']
+			#		product_title	= earned_currency_order['product_title']
+			#		product_amount	= earned_currency_order['product_amount']
+			#		credits_amount	= earned_currency_order['credits_amount']
 
 				client_id	= data['user_id']
 				items		= order_details['items']
@@ -167,6 +164,7 @@ class FaceBookPurchaseHandler(tornado.web.RequestHandler):
 					commodity = Commodity.find(commodity_id = int(item["item_id"]))
 					client.update_attr('asset', commodity.money)
 
+				self.save_order(client_id, order_details)
 				next_order_status	= "settled"
 				response = {
 					"content" : {
@@ -188,3 +186,24 @@ class FaceBookPurchaseHandler(tornado.web.RequestHandler):
 		print json.dumps(response)
 		self.finish(json.dumps(response))
 
+	def save_order(self, user_id, order):
+		print "========================save order[start]=================================="
+		items = []
+		for item in order["items"]:
+			items.append(item["item_id"])
+		PurchaseOrder.new(	order["status"],
+							user_id,
+							order["update_time"],
+							order["ref_order_id"],
+							order["order_id"],
+							items,
+							order["app"],
+							order["time_placed"],
+							order["currency"],
+							order["amount"],
+							order["receiver"],
+							order["buyer"],
+							order["data"],
+							order["properties"])
+
+		print "========================save order[end]=================================="

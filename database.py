@@ -125,6 +125,33 @@ class Commodity(MongoDocument):
 	def __repr__(self):
 		return "<Commodity('%s', '%s', '%s', %d, '%s')>" % (self._id, self.title, self.description, self.price, self.image_url)
 
+
+class PurchaseOrder(MongoDocument):
+	table_name	= "purchase_order"
+	@staticmethod
+	def new(status, user_id, update_time, ref_order_id, order_id, items, app, time_placed, currency, amount, receiver, buyer, data, properties):
+		order				= PurchaseOrder()
+		order.status		= status
+		order.user_id		= user_id
+		order.update_time	= update_time
+		order.ref_order_id	= ref_order_id
+		order.order_id		= order_id
+		order.items			= items
+		order.app			= app
+		order.time_placed	= time_placed
+		order.currency		= currency
+		order.amount		= amount
+		order.receiver		= receiver
+		order.buyer			= buyer
+		order.data			= data
+		order.properties	= properties
+		if order.insert():
+			return order
+		return None
+
+	def __repr__(self):
+		return "<PurchaseOrder('%s', %d, %d, %d, %d)>" % (self._id, self.order_id, self.user_id, self.update_time, self.time_placed)
+
 class DealerInfo(MongoDocument):
 	table_name	= "dealer_info"
 
