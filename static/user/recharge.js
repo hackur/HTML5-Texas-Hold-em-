@@ -1,64 +1,61 @@
-
-
 (function(recharge,$){
+	FB.init({appId: 231740453606973, status: true, cookie: true});
+	var items =[
+		{index:1, description:"10000 Credits", order_info:"recharge_1"},
+		{index:2, description:"20000 Credits", order_info:"recharge_2"},
+		{index:3, description:"50000 Credits", order_info:"recharge_3"},
+		{index:4, description:"100000 Credits", order_info:"recharge_4"}
+	];
+	var commodities = [];
+
+	function Commodity(info){
+		var entity = {};
+		entity.info= info;
+		entity.construct = function(){
+			console.log("------------construction--------------");
+			console.log(entity.info);
+			var _itemDes = $('<div></div>');
+			var _button  = $('<div class="rpurchase"></div>');
+
+			_itemDes.attr('id','convert'+entity.info.index);
+			_itemDes.html(entity.info.description);
+			
+			_button.attr('id', "rpurchase"+entity.info.index);
+			_button.html("Purchase");
+			_button.bind("vclick", entity.invokeOrder);
+			console.log(_itemDes);
+			console.log(_button);
+			console.log($("#recharge_frame"));
+			console.log($("#recharge_frame").append(_itemDes));
+			console.log($("#recharge_frame").append(_button));
+		};
+
+		entity.invokeOrder = function(){
+			var obj = {
+				method:"pay",
+				order_info: entity.info.order_info,
+				action:"buy_item", 
+				dev_purchase_params: {'oscif': true}
+			};
+			FB.UI(obj, entity.orderCallback);
+		};
 	
-	/*var runner_button;
-	var runner_button_down = false;
-	var runwayLeft = 0;
-	var runwayRight = 0;
+		entity.orderCallback = function(data){
+			console.log("order callback [start]");
+			console.log(entity.info);
+			if (data['order_id']){
+				console.log("order done.");
+			}else{
+				console.log("order cancel.");
+			}
+			console.log("order callback [end]");
+		};
 
-	var drag = function() {
-
-		window.addEventListener(event_down, runner_down);
-		window.addEventListener(event_up, runner_up);
-		runner_button = document.getElementById('rrunner');
-	};
-
-	var runner_down = function(e) {
-		if(e.target == runner_button) {
-			runner_button_down = true;
-			window.addEventListener(event_move, runner_move);
-		}
-	};
-
-	var runner_up = function(e) {
-		window.removeEventListener(event_move, runner_move);
-	};
-
-	var runner_move = function(e) {
-		runwayLeft = $("#rrunway").offset().left;
-		runwayRight = $("#rrunway").css('width');
-		runwayRight = parseInt(runwayRight.slice(0, runwayRight.length - 2)) 
-						+ runwayLeft;
-		console.log(runwayRight + " " + runwayLeft);
-
-		var curX = get_event_position(e)[0];
-		console.log(get_event_position(e)[0]);
-		if(curX > runwayRight){
-			curX = runwayRight;
-		}
-		if(curX < runwayLeft){
-			curX = runwayLeft;
-		}
-		curX -= runwayLeft;
-		$(runner_button).offset({left:  curX + 40 });
-		e.preventDefault();
-	};
-
-	var dispose = function() {
-		window.removeEventListener(event_down, runner_down);
-		window.removeEventListener(event_up, runner_up);
-	};
-	*/
-	var rechargeSliderBar = slider_bar();
-	function drag(){
-		rechargeSliderBar.setPosition(39,259);
-		rechargeSliderBar.setVar(changeChargeNum);
-		function changeChargeNum(val) {
-			$("#current").html(val);
-		}
-		rechargeSliderBar.create($("#rechargeSliderbar"),0,10000,100);
+		entity.construct();
+		return entity;
 	}
-	recharge.drag = drag;
-	
+	for(var i=0; i < items.length; i++){
+		commodities.push(Commodity(items[i]));
+	}
+	window.commodities = commodities;
 })(window.recharge = window.recharge || {}, jQuery);
