@@ -1,5 +1,5 @@
 (function(recharge,$){
-	FB.init({appId: <your_app_id>, status: true, cookie: true});
+	FB.init({appId: 231740453606973, status: true, cookie: true});
 	var items =[
 		{index:1, description:"10000 Credits", order_info:"recharge_1"},
 		{index:2, description:"20000 Credits", order_info:"recharge_2"},
@@ -20,12 +20,14 @@
 			_itemDes.attr('id','convert'+entity.info.index);
 			_itemDes.html(entity.info.description);
 			
-			_button.attr('id', "rpurchase"+entiry.info.index);
+			_button.attr('id', "rpurchase"+entity.info.index);
 			_button.html("Purchase");
 			_button.bind("vclick", entity.invokeOrder);
-			
-			$("#recharge_frame").append(_itemDes);
-			$("#recharge_frame").append(_button);
+			console.log(_itemDes);
+			console.log(_button);
+			console.log($("#recharge_frame"));
+			console.log($("#recharge_frame").append(_itemDes));
+			console.log($("#recharge_frame").append(_button));
 		};
 
 		entity.invokeOrder = function(){

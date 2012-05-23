@@ -71,7 +71,7 @@ var info_init = function() {
 	for(var i = 0; i < bigframe.length; i++) {
 		frameControl(bigframe[i], i);
 	}
-	recharge.drag();
+	//recharge.drag();
 	$("#lobby").bind("vclick",function(){
 		window.location = "/static/room/room.html";
 	});
