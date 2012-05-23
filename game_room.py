@@ -157,6 +157,12 @@ class GameRoom(object):
 				result['next'] = self.last_next_message
 
 
+		#TODO
+			#Which user have card
+			#Table amount
+			#Pot info
+			#second left until start game
+
 		return result
 
 #	def resend_last_next_message(self):
@@ -314,7 +320,8 @@ class GameRoom(object):
 				msg_sent["seat_id"] = seat.seat_id
 				self.direct_message(msg_sent,self.bot_key,GameRoom.MSG_BOTCARD)
 
-		self.broadcast({"seat_list":seat_list,'dealer':self.current_dealer},GameRoom.MSG_BHC) # HC for Have Card
+		self.broadcast({"seat_list":seat_list,'dealer':self.current_dealer},\
+				GameRoom.MSG_BHC) # HC for Have Card
 
 		# bet in big blind and small blind by default
 		print self.seats[self.small_blind].player_stake
@@ -327,7 +334,9 @@ class GameRoom(object):
 		print self.seats[self.current_dealer].get_user().username
 
 		seat = self.seats[self.small_blind]
-		broadcast_msg = {'action':GameRoom.A_SMALLBLIND, 'seat_no':seat.seat_id,'stake':seat.player_stake,'table':seat.table_amount}
+		broadcast_msg = {'action':GameRoom.A_SMALLBLIND, 'seat_no':seat.seat_id,\
+				'stake':seat.player_stake,'table':seat.table_amount}
+
 		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
 
 		seat = self.seats[self.big_blind]
