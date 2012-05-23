@@ -79,6 +79,7 @@
 	}
 
 	function collect_coin(pot,users){
+		var gotSomething = false;
 		$.each(users,function(index,userid){
 			$.each(SeatList,function(index,seat){
 				if(seat.userid == userid){
@@ -89,10 +90,12 @@
 						var img = chip.css("background-image");
 						make_coin_animation(startOffset,destOffset,img,pot.coinElement,chip);
 						seat.clearStake();
+						gotSomething = true;
 					});
 				}
 			});
 		});
+		return gotSomething;
 	}
 	function update(pot_info){
 		$.each(pot_info,function(index,pot){
@@ -112,7 +115,9 @@
 				return;
 			}
 			pots[pid].setAmount(pot[1].amount);
-			collect_coin(pots[pid],pot[0]);
+			if(!collect_coin(pots[pid],pot[0])){
+				pots[pid].coinElement.addClass('chip100');
+			}
 		});
 		$.each(SeatList,function(index,seat){
 			$.each(seat.getChips(),function(index,chip){

@@ -62,24 +62,43 @@ var enter = function(){
 			if( data.status == "success" ) {
 				console.log("enter success!");
 				window.user_info.userIsPlay = false;
+				window.room_info = data.room;
+				if(data.room.pot){
+					board_msg_handler.process(data.room.pot);
+				}
+				if(data.room.start){
+					board_msg_handler.process(data.room.start);
+				}
 				listenBoardMessage(data.room.timestamp); 
 				for(var i = 0; i < data.room.seats.length; i++ ) {
-					if(i < SeatList.length){
-						if(data.room.seats[i] == null ) {						
-							SeatList[i].setIsSat(false);
-						}
-						else {
-
-							SeatList[i].sit(data.room.seats[i].user,
-									data.room.seats[i].player_stake,
-									data.room.seats[i].uid
+					var seatData = data.room.seats[i] ;
+					var seatObj = SeatList[i];
+					if(data.room.seats[i] == null ) {						
+						SeatList[i].setIsSat(false);
+					}
+					else {
+						SeatList[i].sit(data.room.seats[i].user,
+							data.room.seats[i].player_stake,
+							data.room.seats[i].uid
 							);
+						console.log("SET STAKE!!!");
+						console.log(seatData.status);
+						if(seatData.status > 1){
+						/*(SEAT_EMPTY,SEAT_WAITING,SEAT_PLAYING,SEAT_ALL_IN) = (0,1,2,3) */
+							seatObj.setStake(seatData.player_stake,
+									seatData.table_amount);
 							
-							if( SeatList[i].userid == window.user_info.id) {
-								sit_transit.transit(i);
-								SeatList[i].showStand();
-								window.user_info.userIsSat = true;
-								window.user_info.sit_no = i;
+						}
+
+						if( SeatList[i].userid == window.user_info.id) {
+							sit_transit.transit(i);
+							SeatList[i].showStand();
+							window.user_info.userIsSat = true;
+							window.user_info.sit_no = i;
+						}
+						else{
+							if(seatData.status > 1){
+								dealCard.show_back_card(i);
 							}
 						}
 					}
@@ -94,6 +113,7 @@ var enter = function(){
 				}
 
 				if(data.room.publicCard){
+					window.public_card = data.room.publicCard;
 					dealCard.send_public_card(data.room.publicCard);
 				}
 				if(data.room.hc){
@@ -106,7 +126,6 @@ var enter = function(){
 					board_msg_handler.process(data.room.next);
 				}
 
-				window.room_info = data.room;
 			}
 		},
 		'json'

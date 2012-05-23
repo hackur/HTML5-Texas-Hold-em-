@@ -149,6 +149,8 @@ function Seat(id,pos){
 		divCount.removeClass("countdown down");
 		divCount.addClass("countdown down");
 		divCount.show();
+		var perCent = timeout / window.room_info.action_time;
+		divCount.css('top',divCount.height() * (1-perCent));
 		divCount.animate(
 			{ top : divCount.height() }, 
 			parseInt(timeout)*1000, function() {

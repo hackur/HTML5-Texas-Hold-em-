@@ -354,6 +354,12 @@
 }
 
 
+.backcard-noanima{ 
+	position: absolute; left:480px; top:100px; 
+	height:40px; 
+	width:30px;
+
+}
 .backcard{ 
 	position: absolute; left:480px; top:100px; 
 	height:40px; 

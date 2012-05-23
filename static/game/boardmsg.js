@@ -15,7 +15,6 @@ function msg_sit(data){
 	var username = data.info.user;
 	var stake = data.info.player_stake;
 	var userid = data.info.uid;
-	var public_card = [];
 	SeatList[seatID].sit(username,stake,userid);
 	if( userid == window.user_info.id){
 		window.user_info.sit_no = seatID;
@@ -55,6 +54,7 @@ function msg_phc(data){
 	dealCard.deal(window.user_info.sit_no,
 				["#cards_in_hand1","#cards_in_hand2"]);
 	*/
+	/*
 	console.log("checking ================");
 	console.log(window.user_info)
 	for (var i = 0; i < SeatList.length; i++) {
@@ -69,6 +69,7 @@ function msg_phc(data){
 			}
 		}
 	}
+	*/
 }
 function msg_winner(data){
 	//We have a winner in this game
@@ -183,14 +184,16 @@ function msg_next(data){
 
 	if( SeatList[data.seat_no].userid == window.user_info.id )
 	{ 
-		if(window.user_info.userIsPlay)
+		if(window.user_info.userIsPlay){
 			actionButton.disable_AutoButtons();
+		}
 		actionButton.enable_buttons(data.rights,data.amount_limits);
 	}
 	else{
 		actionButton.disable_all();
-		if(window.user_info.userIsPlay)
+		if(window.user_info.userIsPlay){
 			actionButton.enable_AutoButtons();
+		}
 	}
 	//collect_chips();
 }
@@ -210,7 +213,7 @@ function msg_public_card(data){
 	/***
 	* Public cards is updated
 	* */
-	public_card = data.cards;
+	window.public_card = data.cards;
 	dealCard.send_public_card(data.cards);
 	if(window.user_info.userIsSat){
 		var seatId	= window.user_info.sit_no;

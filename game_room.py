@@ -146,6 +146,7 @@ class GameRoom(object):
 		result['max_stake'] = self.max_stake
 		result['blind']     = self.blind
 		result['timestamp'] = self.msg_count
+		result['action_time'] = self.action_timeout
 		if self.status == GameRoom.GAME_PLAY:
 			seat = self.get_seat(user_id)
 			if seat:
@@ -156,12 +157,17 @@ class GameRoom(object):
 				self.last_next_message["to"] = self.next_timeout_time - time.time()
 				result['next'] = self.last_next_message
 
+			pot_info = [ (users,info) for users,info in self.pot.iteritems() ]
+			result['pot'] = {'msgType':GameRoom.MSG_POT,'pot':pot_info}
+
+		if self.t:
+			second =  self.t.deadline - time.time()
+			msg		= {'msgType':GameRoom.MSG_START, 'to':second }
+			result['start'] = msg
+
 
 		#TODO
-			#Which user have card
-			#Table amount
-			#Pot info
-			#second left until start game
+		#second left until start game
 
 		return result
 
@@ -269,8 +275,6 @@ class GameRoom(object):
 			return (False, "Seat Occupied")
 
 		if hand_stake > player.asset or hand_stake < self.min_stake:
-			print "stake ", hand_stake
-			print "player asset", player.asset
 			return (False, "invalid stake amount.")
 
 		self.user_seat[player.id] = seat_no
