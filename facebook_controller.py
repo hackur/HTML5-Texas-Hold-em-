@@ -187,7 +187,6 @@ class FaceBookPurchaseHandler(tornado.web.RequestHandler):
 		self.finish(json.dumps(response))
 
 	def save_order(self, user_id, order):
-		print "========================save order[start]=================================="
 		items = []
 		for item in order["items"]:
 			items.append(item["item_id"])
@@ -206,4 +205,3 @@ class FaceBookPurchaseHandler(tornado.web.RequestHandler):
 							order["data"],
 							order["properties"])
 
-		print "========================save order[end]=================================="
