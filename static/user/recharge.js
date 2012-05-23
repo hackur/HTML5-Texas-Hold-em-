@@ -12,6 +12,8 @@
 		var entity = {};
 		entity.info= info;
 		entity.construct = function(){
+			console.log("------------construction--------------");
+			console.log(entity.info);
 			var _itemDes = $('<div></div>');
 			var _button  = $('<div class="rpurchase"></div>');
 
