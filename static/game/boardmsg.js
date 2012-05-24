@@ -40,7 +40,6 @@ function msg_phc(data){
 	//Private message: you got hand card
 	var seatId = window.user_info.sit_no;
 	//set_hand_cards(data.cards[0], data.cards[1]);
-	window.user_info.userIsPlay = true;
 	poker_lib.setCard(data.cards[0], '#cards_in_hand1');
 	poker_lib.setCard(data.cards[1], '#cards_in_hand2');
 	//$("#cards_in_hand1").fadeIn();
@@ -78,6 +77,7 @@ function msg_winner(data){
 	}
 	actionButton.disable_all();
 	actionButton.disable_AutoButtons();
+	actionButton.resetAutoButtons();
 	window.user_info.userIsPlay = false;
     function distribute(){
         /* We have to wait for while here 
@@ -233,8 +233,9 @@ function msg_start_game(data){
 		seconds--;
 	};
 	countDown();
+	if (window.user_info.userIsSat)
+		window.user_info.userIsPlay = true;
 	actionButton.disable_all();
-	window.user_info.userIsPlay = true;
 	for (var i = 0; i < SeatList.length; i++) {
 		SeatList[i].hideBackCard();
 	}
@@ -243,6 +244,7 @@ function msg_pot(data){
 	pot_manager.update(data.pot);
 }
 function msg_standup(data){
+	console.log("standup Message");
 	$.each(data,function(userid, info) {
 		if (info.seat_no != undefined) {
 

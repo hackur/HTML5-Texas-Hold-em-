@@ -64,6 +64,7 @@
 	}
 	function send_action_stand(){
 		send_action(A_STAND);
+		disable_AutoButtons();
 	}
 	function action_allin(){
 		send_action(A_ALLIN);
@@ -79,6 +80,7 @@
 		send_action(A_CHECK);
 	}
 	function action_discard(){
+		window.user_info.userIsPlay = false;
 		send_action(A_DISCARDGAME);
 	}
 	var down_pos;
@@ -259,63 +261,69 @@
 			i++;
 		}
 		if (flagCallAny){
-			chooseCallAny();
 			if(hasCallStakeRight){
 				action_call();
+				resetAutoButtons();
 				return true;
 			}
 			if(hasAllInRight){
 				action_allin();
+				resetAutoButtons();
 				return true;
 			}	
 		}
 		if (flagCheckOrFold){
-			chooseCheckOrFold();
 			if(hasCheckRight){
 				action_check();
+				resetAutoButtons();
 				return true;
 			}
 			action_discard();
+			resetAutoButtons();
 			return true;
 			
 		}
 		if (flagCheck){
-			chooseCheck();
 			var i = 0,flag = 0;
 			if(hasCheckRight){
 				action_check();
+				resetAutoButtons();
 				return true;
 			}
 		}
 		
-		
+		resetAutoButtons();
 		return false;
 	}
 	function enable_AutoButtons(){
+		//resetAutoButtons();
 		$("#btAutoCheck").removeClass("autoButtonHide");
-		//$("#btAutoCheck").fadeIn("fast");
 		$("#btAutoCheck").unbind("click",chooseCheck);
 		$("#btAutoCheck").bind("click",chooseCheck);
 		$("#btAutoCheckOrFold").removeClass("autoButtonHide");
-		//$("#btAutoCheckOrFold").fadeIn("fast");
 		$("#btAutoCheckOrFold").unbind("click",chooseCheckOrFold);
 		$("#btAutoCheckOrFold").bind("click",chooseCheckOrFold);
 		$("#btAutoCallAny").removeClass("autoButtonHide");
-		//$("#btAutoCallAny").fadeIn("fast");
 		$("#btAutoCallAny").unbind("click",chooseCallAny);
 		$("#btAutoCallAny").bind("click",chooseCallAny);
 	
 	}
 	function disable_AutoButtons(){
+		console.log("disable autobuttons");
 		$("#btAutoCheck").addClass("autoButtonHide");
-		//$("#btAutoCheck").fadeOut("fast");
 		$("#btAutoCheck").unbind("click",chooseCheck);
 		$("#btAutoCheckOrFold").addClass("autoButtonHide");
-		//$("#btAutoCheckOrFold").fadeOut("fast");
 		$("#btAutoCheckOrFold").unbind("click",chooseCheckOrFold);
 		$("#btAutoCallAny").addClass("autoButtonHide");
-		//$("#btAutoCallAny").fadeOut("fast");
 		$("#btAutoCallAny").unbind("click",chooseCallAny);
+	}
+	function resetAutoButtons() {
+		if(flagCheck)
+			chooseCheck();
+		if(flagCheckOrFold)
+			chooseCheckOrFold()
+		if(flagCallAny)
+			chooseCallAny();
 	}
 	function chooseCheck(){
 		if(!flagCheck){
@@ -357,6 +365,7 @@
 	actionButton.send_action_stand = send_action_stand;
 	actionButton.enable_AutoButtons = enable_AutoButtons;
 	actionButton.disable_AutoButtons = disable_AutoButtons;
+	actionButton.resetAutoButtons = resetAutoButtons;
 	function unit_test(){
 		enable_buttons([2,3,4]);
 	}
