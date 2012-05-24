@@ -92,7 +92,9 @@ function create_room() {
 
 function initSetting() {
 	$("#backTo").bind(event_click,function(){
-		history.go(-1);
+		//self.history.go(-1);
+		//console.log(document.domain);
+		window.location = "http://" + document.domain + ":" + window.location.port + "/facebook/"
 	});
 	console.log("----------------------------------------------");
 	window.blindSliderBar = slider_bar();

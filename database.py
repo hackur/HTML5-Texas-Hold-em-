@@ -71,7 +71,7 @@ class MongoDocument(object):
 		if "_id" in kwarg and type(kwarg['_id']) != ObjectId:
 			kwarg['_id'] = ObjectId(kwarg['_id'])
 
-
+		print kwarg
 		db = DatabaseConnection()[Table.table_name]
 		document = db.find_one(kwarg)
 		if document:
@@ -108,8 +108,49 @@ class Room(MongoDocument):
 	def __repr__(self):
 		return "<Room('%s','%s','%s')>" % (self._id, self.exchange,self.roomType)
 
+class Commodity(MongoDocument):
+	table_name	= "commodity"
+	@staticmethod
+	def new(commodity_id, title, description, price, image_url, money):
+		commodity = Commodity()
+		commodity.commodity_id	= commodity_id
+		commodity.title			= title
+		commodity.description	= description
+		commodity.price			= price
+		commodity.image_url		= image_url
+		commodity.money			= money
+		if commodity.insert():
+			return commodity
+		return None
+	def __repr__(self):
+		return "<Commodity('%s', '%s', '%s', %d, '%s')>" % (self._id, self.title, self.description, self.price, self.image_url)
 
 
+class PurchaseOrder(MongoDocument):
+	table_name	= "purchase_order"
+	@staticmethod
+	def new(status, user_id, update_time, ref_order_id, order_id, items, app, time_placed, currency, amount, receiver, buyer, data, properties):
+		order				= PurchaseOrder()
+		order.status		= status
+		order.user_id		= user_id
+		order.update_time	= update_time
+		order.ref_order_id	= ref_order_id
+		order.order_id		= order_id
+		order.items			= items
+		order.app			= app
+		order.time_placed	= time_placed
+		order.currency		= currency
+		order.amount		= amount
+		order.receiver		= receiver
+		order.buyer			= buyer
+		order.data			= data
+		order.properties	= properties
+		if order.insert():
+			return order
+		return None
+
+	def __repr__(self):
+		return "<PurchaseOrder('%s', %d, %d, %d, %d)>" % (self._id, self.order_id, self.user_id, self.update_time, self.time_placed)
 
 class DealerInfo(MongoDocument):
 	table_name	= "dealer_info"
@@ -254,6 +295,12 @@ if __name__ == "__main__":
 
 
 	#room		= Room(exchange="dealer_exchange_1",blind=10,max_player=9)
+	item		= Commodity.new( 201201, "1000 chips", "1000 chips", 1, "NONE", 1000)
+	item		= Commodity.new( 201202, "2000 chips", "2000 chips", 2, "NONE", 2000)
+	item		= Commodity.new( 201203, "5000 chips", "5000 chips", 5, "NONE", 5000)
+	item		= Commodity.new( 201204, "10000 chips", "10000 chips", 10, "NONE", 10000)
+	item		= Commodity.new( 201205, "20000 chips", "20000 chips", 20, "NONE", 20000)
+	item		= Commodity.new( 201206, "50000 chips", "50000 chips", 50, "NONE", 50000)
 	ting		= User.new(username="ting", password=hashlib.md5("123").hexdigest())
 	mile		= User.new(username="mile", password=hashlib.md5("123").hexdigest())
 	mamingcao   = User.new(username="mamingcao", password=hashlib.md5("123").hexdigest())

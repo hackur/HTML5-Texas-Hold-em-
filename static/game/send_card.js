@@ -4,18 +4,26 @@
 	var playerHC  = [];
 
 
-	function _deal(seat_no,degree, finishCallback){
+	function _deal(seat_no,degree, finishCallback,noAnimation){
 
 		var seat = SeatList[seat_no];
-		var backCard = $('<img class="backcard" src="./pokers/back.png" />').appendTo($("#container"));
+		var backCard ;
+		if(noAnimation){
+		 	backCard = $('<img class="backcard-noanima" src="./pokers/back.png" />').appendTo($("#container"));
+			console.log("!@!@!#!@#!@#!@00000000000000000000");
+		}
+		else{
+		 	backCard = $('<img class="backcard" src="./pokers/back.png" />').appendTo($("#container"));
+			console.log(["!@!@!#!@#!@#!@1111l",noAnimation]);
+		}
 
 		var seatOffset = window.SeatList[seat.pos].getSeatDIV().offset();
 		var containerOffset = $("#container").offset();
 		var cur_cardpos = {};
+
 		cur_cardpos.left = seatOffset.left - containerOffset.left; 
 		cur_cardpos.top = seatOffset.top - containerOffset.top; 
-
-		var nextcard = function(){
+		var finish = function(){
 			if(seat.userid == user_info.id){
 				var cid = playerHC.pop();
 				console.log(cid);
@@ -25,8 +33,8 @@
 				$("#cards_in_hand2").fadeIn();
 			}
 		};
-
-		send_back_card(cur_cardpos.left, cur_cardpos.top, degree,backCard, nextcard);
+		send_back_card(cur_cardpos.left, cur_cardpos.top, 
+				degree,backCard, finish);
 		back_cards.push(backCard);
 
 	};
@@ -43,11 +51,15 @@
 			},timeOut += 200);
 		});
 	};
+	function show_back_card(seatID){
+		console.log("!@#!@_____________________$$$$$$$$$$$$$$$$$$");
+		_deal(seatID,10,undefined,1);
+		_deal(seatID,-10,undefined,1);
+	}
 	function set_hc(hc){
 		playerHC = hc;
 	}
 	function send_back_card(left_cor, top_cor, degree, card, callback) {
-		setTimeout(function(){
 		var i = 0;
 		degree = degree + 720;
 		if(callback){
@@ -63,7 +75,6 @@
 		card.css("-o-transform", "rotate(" + degree + "deg)" );
 		card.css("transform", "rotate(" + degree + "deg)" );
 
-		},1);
 		return;
 
 	};
@@ -86,5 +97,6 @@
 	dealCard.clear = clear;
 	dealCard.set_hc = set_hc;
 	dealCard.send_public_card = send_public_card;
+	dealCard.show_back_card = show_back_card;
 
 }(window.dealCard = window.dealCard || {} ,jQuery));

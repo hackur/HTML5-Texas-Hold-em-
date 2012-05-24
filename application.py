@@ -10,6 +10,7 @@ from user_controller import *
 from archive_controller import *
 from chat_controller import *
 from config_controller import *
+from facebook_controller import *
 from database import *
 from thread_pool import thread_pool_init
 from pika.adapters.tornado_connection import TornadoConnection
@@ -135,7 +136,9 @@ if __name__ == '__main__':
         (r"/weibologin",SinaWeiboLogin),
         (r"/weibologinCallback/?",SinaWeiboLoginBack),
 		(r"/facebook/",FaceBookLogin),
-        (r"/refill",BotRefillHandler),
+		(r"/facebook/channel.html", FaceBookChannelHandler),
+        (r"/facebook/purchase/",FaceBookPurchaseHandler),
+		(r"/refill",BotRefillHandler),
 		(r"/uploads/(.*)", tornado.web.StaticFileHandler, dict(path=settings['uploaded_image_path'])),
 		], **settings)
 	http_server = tornado.httpserver.HTTPServer(application)

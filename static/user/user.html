@@ -1,32 +1,53 @@
 <!doctype html>
-<html>
+<html xmlns:fb="http://www.facebook.com/2008/fbml" xmlns:og="http://opengraphprotocol.org/schema/" xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr" dir="ltr">
 	<head>
 		<title>person information</title>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" type="text/css" href="../style.css">
-		<link rel="stylesheet" type="text/css" href="perinfo.css">
-		<link rel="stylesheet" type="text/css" href="bigFrame1.css">
-		<link rel="stylesheet" type="text/css" href="bigFrame2.css">
-		<link rel="stylesheet" type="text/css" href="bigFrame3.css">
-		<link rel="stylesheet" type="text/css" href="bigFrame4.css">
-		<link rel="stylesheet" type="text/css" href="bigFrame5.css">
-		<link rel="stylesheet" type="text/css" href="rightFrame.css">
-		<link rel="stylesheet" type="text/css" href="user.css">
-		<link rel="stylesheet" type="text/css" href="../game/sliderbar_dialog.css">
-		<script src="../jquery.min.js"></script>
-		<script src="../jquery.mobile-1.1.0.min.js"></script>
-		<script src="../util.js"></script>
-		<script src="../game/sliderbar_dialog.js"></script>
-		<script src="jquery.form.js"></script>
-		<script src="perinfo.js"></script>
-		<script src="recharge.js"></script>
-		<script src="email.js"></script>
-		<script src="awardDialogAndNickSettingDialog.js"></script>
+		<meta property="og:description" content="Your site's description" />
+		<link rel="stylesheet" type="text/css" href="/static/style.css">
+		<link rel="stylesheet" type="text/css" href="/static/user/perinfo.css">
+		<link rel="stylesheet" type="text/css" href="/static/user/bigFrame1.css">
+		<link rel="stylesheet" type="text/css" href="/static/user/bigFrame2.css">
+		<link rel="stylesheet" type="text/css" href="/static/user/bigFrame3.css">
+		<link rel="stylesheet" type="text/css" href="/static/user/bigFrame4.css">
+		<link rel="stylesheet" type="text/css" href="/static/user/bigFrame5.css">
+		<link rel="stylesheet" type="text/css" href="/static/user/rightFrame.css">
+		<link rel="stylesheet" type="text/css" href="/static/user/user.css">
+		<link rel="stylesheet" type="text/css" href="/static/game/sliderbar_dialog.css">
+		<script src="/static/jquery.min.js"></script>
+		<script src="/static/jquery.mobile-1.1.0.min.js"></script>
+		<script src="/static/util.js"></script>
+		<script src="/static/game/sliderbar_dialog.js"></script>
+		<script src="/static/user/jquery.form.js"></script>
+		<script src="/static/user/perinfo.js"></script>
+		<script src="/static/user/recharge.js"></script>
+		<script src="/static/user/email.js"></script>
+		<script src="/static/user/awardDialogAndNickSettingDialog.js"></script>
 		<script type="text/javascript">
-			$(info_init);
+		$(info_init);
 		</script>
 	</head>
 	<body>
+		<div id="fb-root"></div>
+		<script>
+			window.fbAsyncInit = function() {
+				FB.init({
+					appId      : '231740453606973',
+					channelUrl : "//gigiduck.com:8888/facebook/channel.html",
+					status     : true,
+					cookie     : true,
+					xfbml      : true
+				});
+			};
+			$(document).ready(function(){
+				var d	= document;
+				var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+				if (d.getElementById(id)) {return;}
+				js = d.createElement('script'); js.id = id; js.async = true;
+				js.src = "//connect.facebook.net/en_US/all.js";
+				ref.parentNode.insertBefore(js, ref);
+			});
+		</script>
 		<div id="background">
 			<div id="btFrame">
 				<div id="info" class="frame-header">
@@ -197,41 +218,11 @@
 		</div>
 
 		<div id="recharge_frame" class="bigFrame" style="display:none;">
-			<div id="convert1">
-				1RMB=1钻石
-			</div>
-			<div id="rpurchase1" class="rpurchase">
-				购 买
-			</div>
-			<div id="convert2">
-				5RMB=5钻石
-			</div>
-			<div id="rpurchase2" class="rpurchase">
-				购 买
-			</div>
-			<div id="convert3">
-				20RMB=20钻石
-			</div>
-			<div id="rpurchase3" class="rpurchase">
-				购 买
-			</div>
-			<div id="convert4">
-				其他金额购买
-			</div>
-			<div id="rpurchase4" class="rpurchase">
-				购 买
-			</div>
-
 			<!--<div id="rrunway"></div>-->
 			<!--<div id="rrunner"></div>-->
 			<div id="rechargeSliderbar"></div>
-			<span id="min">0</span>
-			<span id="max">10,000</span>
-			<span id="current">0</span>
-			<span id="notation">您当前有X钻石   （1钻石=10000金豆）</span>
-			<div id="exchange">
-				兑 换
-			</div>
+			<div id="line1" class="line"></div>
+			<div id="line2" class="line"></div>
 			<div id="line3" class="line"></div>
 			<div id="line4" class="line"></div>
 			<div id="line5" class="line"></div>

@@ -146,6 +146,7 @@ class GameRoom(object):
 		result['max_stake'] = self.max_stake
 		result['blind']     = self.blind
 		result['timestamp'] = self.msg_count
+		result['action_time'] = self.action_timeout
 		if self.status == GameRoom.GAME_PLAY:
 			seat = self.get_seat(user_id)
 			if seat:
@@ -156,6 +157,17 @@ class GameRoom(object):
 				self.last_next_message["to"] = self.next_timeout_time - time.time()
 				result['next'] = self.last_next_message
 
+			pot_info = [ (users,info) for users,info in self.pot.iteritems() ]
+			result['pot'] = {'msgType':GameRoom.MSG_POT,'pot':pot_info}
+
+		if self.t:
+			second =  self.t.deadline - time.time()
+			msg		= {'msgType':GameRoom.MSG_START, 'to':second }
+			result['start'] = msg
+
+
+		#TODO
+		#second left until start game
 
 		return result
 
@@ -263,8 +275,6 @@ class GameRoom(object):
 			return (False, "Seat Occupied")
 
 		if hand_stake > player.asset or hand_stake < self.min_stake:
-			print "stake ", hand_stake
-			print "player asset", player.asset
 			return (False, "invalid stake amount.")
 
 		self.user_seat[player.id] = seat_no
@@ -314,7 +324,8 @@ class GameRoom(object):
 				msg_sent["seat_id"] = seat.seat_id
 				self.direct_message(msg_sent,self.bot_key,GameRoom.MSG_BOTCARD)
 
-		self.broadcast({"seat_list":seat_list,'dealer':self.current_dealer},GameRoom.MSG_BHC) # HC for Have Card
+		self.broadcast({"seat_list":seat_list,'dealer':self.current_dealer},\
+				GameRoom.MSG_BHC) # HC for Have Card
 
 		# bet in big blind and small blind by default
 		print self.seats[self.small_blind].player_stake
@@ -327,7 +338,9 @@ class GameRoom(object):
 		print self.seats[self.current_dealer].get_user().username
 
 		seat = self.seats[self.small_blind]
-		broadcast_msg = {'action':GameRoom.A_SMALLBLIND, 'seat_no':seat.seat_id,'stake':seat.player_stake,'table':seat.table_amount}
+		broadcast_msg = {'action':GameRoom.A_SMALLBLIND, 'seat_no':seat.seat_id,\
+				'stake':seat.player_stake,'table':seat.table_amount}
+
 		self.broadcast(broadcast_msg,GameRoom.MSG_ACTION)
 
 		seat = self.seats[self.big_blind]
