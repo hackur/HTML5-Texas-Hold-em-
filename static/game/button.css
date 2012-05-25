@@ -122,13 +122,13 @@
 /*	font-weight: bolder;*/
 }
 .checkButton:active {
-		-moz-box-shadow:
+	-moz-box-shadow:
 		5px 6px 3px rgba(000,000,000,0.0),
 		inset 0px 0px 0px rgba(255,255,255,0.6);
 	-webkit-box-shadow:
 		5px 6px 3px rgba(000,000,000,0.0),
 		inset 0px 0px 0px rgba(255,255,255,0.6);
-		/*
+	/*
 	margin-top: 5px;
 	margin-left: 5px;
 	*/

@@ -77,8 +77,8 @@ function msg_winner(data){
 		SeatList[i].hideBackCard();
 	}
 	actionButton.disable_all();
-	actionButton.disable_AutoButtons();
 	actionButton.resetAutoButtons();
+	actionButton.disable_AutoButtons();
 	window.user_info.userIsPlay = false;
     function distribute(){
         /* We have to wait for while here 

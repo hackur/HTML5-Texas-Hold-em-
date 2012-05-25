@@ -298,67 +298,103 @@
 	function enable_AutoButtons(){
 		//resetAutoButtons();
 		$("#btAutoCheck").removeClass("autoButtonHide");
-		$("#btAutoCheck").unbind("click",chooseCheck);
-		$("#btAutoCheck").bind("click",chooseCheck);
+		$("#btAutoCheck").unbind("vclick",chooseCheck);
+		$("#btAutoCheck").bind("vclick",chooseCheck);
 		$("#btAutoCheckOrFold").removeClass("autoButtonHide");
-		$("#btAutoCheckOrFold").unbind("click",chooseCheckOrFold);
-		$("#btAutoCheckOrFold").bind("click",chooseCheckOrFold);
+		$("#btAutoCheckOrFold").unbind("vclick",chooseCheckOrFold);
+		$("#btAutoCheckOrFold").bind("vclick",chooseCheckOrFold);
 		$("#btAutoCallAny").removeClass("autoButtonHide");
-		$("#btAutoCallAny").unbind("click",chooseCallAny);
-		$("#btAutoCallAny").bind("click",chooseCallAny);
+		$("#btAutoCallAny").unbind("vclick",chooseCallAny);
+		$("#btAutoCallAny").bind("vclick",chooseCallAny);
 	
 	}
 	function disable_AutoButtons(){
 		console.log("disable autobuttons");
 		$("#btAutoCheck").addClass("autoButtonHide");
-		$("#btAutoCheck").unbind("click",chooseCheck);
+		$("#btAutoCheck").unbind("vclick",chooseCheck);
 		$("#btAutoCheckOrFold").addClass("autoButtonHide");
-		$("#btAutoCheckOrFold").unbind("click",chooseCheckOrFold);
+		$("#btAutoCheckOrFold").unbind("vclick",chooseCheckOrFold);
 		$("#btAutoCallAny").addClass("autoButtonHide");
-		$("#btAutoCallAny").unbind("click",chooseCallAny);
+		$("#btAutoCallAny").unbind("vclick",chooseCallAny);
 	}
 	function resetAutoButtons() {
-		if(flagCheck)
-			chooseCheck();
-		if(flagCheckOrFold)
-			chooseCheckOrFold()
-		if(flagCallAny)
-			chooseCallAny();
-	}
-	function chooseCheck(){
-		if(!flagCheck){
-			$("#cbAutoCheck").removeClass("noCheck");
-			$("#cbAutoCheck").addClass("check");
-			flagCheck = 1;
-		} else {
+		if(flagCheck){
 			$("#cbAutoCheck").removeClass("check");
 			$("#cbAutoCheck").addClass("noCheck");
 			flagCheck = 0;
 		}
-	}
-	function chooseCheckOrFold(){
-		if(!flagCheckOrFold){
-			$("#cbAutoCheckOrFold").removeClass("noCheck");
-			$("#cbAutoCheckOrFold").addClass("check");
-			flagCheckOrFold = 1;
-		} else {
+		if(flagCheckOrFold) {
 			$("#cbAutoCheckOrFold").removeClass("check");
 			$("#cbAutoCheckOrFold").addClass("noCheck");
 			flagCheckOrFold = 0;
 		}
-	}
-	function chooseCallAny(){
-		if(!flagCallAny){
-			$("#cbAutoCallAny").removeClass("noCheck");
-			$("#cbAutoCallAny").addClass("check");
-			flagCallAny = 1;
-		} else {
+		if(flagCallAny){
 			$("#cbAutoCallAny").removeClass("check");
 			$("#cbAutoCallAny").addClass("noCheck");
 			flagCallAny = 0;
 		}
 	}
-	
+	function chooseCheck(){
+		
+		if(!flagCheck){
+			$("#cbAutoCheck").removeClass("noCheck");
+			$("#cbAutoCheck").addClass("check");
+			HideButtons("btAutoCheckOrFold","btAutoCallAny");
+			flagCheck = 1;
+		} else {
+			$("#cbAutoCheck").removeClass("check");
+			$("#cbAutoCheck").addClass("noCheck");
+			ShowButtons("btAutoCheckOrFold","btAutoCallAny");
+			flagCheck = 0;
+		}
+	}
+	var autofun = {
+		'btAutoCheck':chooseCheck,
+		'btAutoCheckOrFold':chooseCheckOrFold,
+		'btAutoCallAny':chooseCallAny
+	};
+	function chooseCheckOrFold(){
+
+		if(!flagCheckOrFold){
+			$("#cbAutoCheckOrFold").removeClass("noCheck");
+			$("#cbAutoCheckOrFold").addClass("check");
+			HideButtons("btAutoCheck","btAutoCallAny");
+			flagCheckOrFold = 1;
+		} else {
+			$("#cbAutoCheckOrFold").removeClass("check");
+			$("#cbAutoCheckOrFold").addClass("noCheck");
+			ShowButtons("btAutoCheck","btAutoCallAny");
+			flagCheckOrFold = 0;
+		}
+	}
+	function chooseCallAny(){
+
+		if(!flagCallAny){
+			$("#cbAutoCallAny").removeClass("noCheck");
+			$("#cbAutoCallAny").addClass("check");
+			HideButtons("btAutoCheck","btAutoCheckOrFold");
+			flagCallAny = 1;
+		} else {
+			$("#cbAutoCallAny").removeClass("check");
+			$("#cbAutoCallAny").addClass("noCheck");
+			ShowButtons("btAutoCheck","btAutoCheckOrFold");
+			flagCallAny = 0;
+		}
+	}
+	function HideButtons(){
+		var i = 0;
+		for(i = 0; i < arguments.length; i ++) {
+			var button = "#" + arguments[i];
+			$(button).unbind("vclick",autofun[arguments[i]]);
+		}
+	}
+	function ShowButtons(){
+		var i = 0;
+		for(i = 0; i < arguments.length; i ++) {
+			var button = "#" + arguments[i];
+			$(button).bind("vclick",autofun[arguments[i]]);
+		}
+	}
 	
 	actionButton.enable_buttons = enable_buttons;
 	actionButton.disable_all = disable_all;
