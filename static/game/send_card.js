@@ -4,20 +4,18 @@
 	var playerHC  = [];
 
 
-	function _deal(seat_no,degree, finishCallback,noAnimation){
+	function _deal(seat_no,degree, noAnimation){
 
 		var seat = SeatList[seat_no];
 		var backCard ;
 		if(noAnimation){
 		 	backCard = $('<img class="backcard-noanima" src="./pokers/back.png" />').appendTo($("#container"));
-			console.log("!@!@!#!@#!@#!@00000000000000000000");
 		}
 		else{
 		 	backCard = $('<img class="backcard" src="./pokers/back.png" />').appendTo($("#container"));
-			console.log(["!@!@!#!@#!@#!@1111l",noAnimation]);
 		}
 
-		var seatOffset = window.SeatList[seat.pos].getSeatDIV().offset();
+		var seatOffset = seat.getSeatDIV().offset();
 		var containerOffset = $("#container").offset();
 		var cur_cardpos = {};
 
@@ -33,8 +31,10 @@
 				$("#cards_in_hand2").fadeIn();
 			}
 		};
+
 		send_back_card(cur_cardpos.left, cur_cardpos.top, 
 				degree,backCard, finish);
+        seat.pushBackCard(backCard);
 		back_cards.push(backCard);
 
 	};
@@ -52,9 +52,8 @@
 		});
 	};
 	function show_back_card(seatID){
-		console.log("!@#!@_____________________$$$$$$$$$$$$$$$$$$");
-		_deal(seatID,10,undefined,1);
-		_deal(seatID,-10,undefined,1);
+		_deal(seatID,10,1);
+		_deal(seatID,-10,1);
 	}
 	function set_hc(hc){
 		playerHC = hc;
@@ -81,6 +80,9 @@
 	function clear(){
 		$.each(back_cards,function(index,card){
 			card.remove();
+		});
+		$.each(SeatList,function(index,seat){
+            seat.clearBackCard();
 		});
 	};
 	function send_public_card(cards) {

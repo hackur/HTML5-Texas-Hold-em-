@@ -204,7 +204,7 @@ function msg_action(data){
 	 * */
 	//*document.getElementById("money" + data.seat_no).innerHTML = data.stake;*/
 	SeatList[data.seat_no].setStake(data.stake,data.table);
-	SeatList[data.seat_no].showAction(actionName[(data.action).toString()])
+	SeatList[data.seat_no].showAction(actionName[(data.action).toString()],data.action)
 	SeatList[data.seat_no].removeCountdown(data.seat_no);
 	
 	//send_chips(data.seat_no, data.table);
