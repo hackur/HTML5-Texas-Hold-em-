@@ -176,7 +176,7 @@ class User(MongoDocument):
 	(USER_TYPE_NORMAL,USER_TYPE_SINA_WEIBO, USER_TYPE_FACEBOOK) = (0,1,2)
 
 	@staticmethod
-	def new(username, password="",asset = 3000, accountType=0,accountID=0):
+	def new(username, password="",asset = 3000, accountType=0,accountID=0,access_token = ''):
 		user = User()
 		user.username			= username
 		user.password			= password
@@ -190,6 +190,7 @@ class User(MongoDocument):
 		user.asset				= asset
 		user.accountType		= accountType
 		user.accountID			= accountID
+		user.access_token		= access_token
 		user.screen_name		= username
 		user.gender				= 'N/A'
 		user.headPortrait_path	= None

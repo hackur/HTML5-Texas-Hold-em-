@@ -19,9 +19,10 @@ from database import *
 facebook_app_id		= "231740453606973"
 facebook_app_secret	= "17a7bf50f0cdbfc143cb3eb63b33a874"
 facebook_graph		= "https://graph.facebook.com/%s?fields=id,name,picture,gender,username"
-facebook_feed		= "https://graph.facebook.com/%s/feed"
+facebook_permission_url	= "https://graph.facebook.com/%s/permissions?access_token=%s"
+facebook_feed		= "https://graph.facebook.com/me/feed?access_token=%s"
 canvas_page			= "http://gigiduck.com:8888/facebook/"
-#auth_url			= "https://www.facebook.com/dialog/oauth?client_id="+facebook_app_id+"&redirect_uri="+urllib.pathname2url(canvas_page)
+auth_url			= "https://www.facebook.com/dialog/oauth?client_id="+facebook_app_id+"&redirect_uri="+urllib.pathname2url(canvas_page)+"&scope=user_status,publish_actions,publish_stream"
 
 def _base64_url_decode(inp):
 	padding_factor = (4 - len(inp) % 4) % 4
@@ -64,14 +65,30 @@ class FaceBookLogin(tornado.web.RequestHandler):
 			if "user_id" not in data:
 				self.finish("<script>top.location.href='" + auth_url + "'</script>")
 			else:
-				user  = User.verify_user_openID(accountType = User.USER_TYPE_FACEBOOK,
-												accountID	= data["user_id"])
-				if not user:
-					self.get_user_info(data)
-				else:
-					self._login_user(user)
+				self.access_token	= data[u'oauth_token']
+				self.payload		= data
+				self._check_permission(data)
 
+	def _check_permission(self, data):
+		permission_url	= facebook_permission_url % (data["user_id"], self.access_token)
+		http_client	= AsyncHTTPClient()
+		http_client.fetch(	permission_url,
+							self._handle_check_permission,
+							method	= 'GET',
+							headers	= None,
+							body	= None)
 
+	def	_handle_check_permission(self, response):
+		permissions	= json.loads(response.body)["data"][0]
+		if permissions["user_status"]==1 and  permissions["publish_actions"] == 1 and  permissions["publish_stream"] == 1:
+			user  = User.verify_user_openID(accountType = User.USER_TYPE_FACEBOOK,
+											accountID	= self.payload["user_id"])
+			if not user:
+				self.get_user_info(self.payload)
+			else:
+				self._login_user(user)
+		else:
+			self.finish("<script>top.location.href='" + auth_url + "'</script>")
 
 	def get_user_info(self, data):
 		graph_url	= facebook_graph % (data["user_id"])
@@ -87,7 +104,8 @@ class FaceBookLogin(tornado.web.RequestHandler):
 		uid		= content["id"]
 		user	= User.new(	username	= "%s_%s" % (User.USER_TYPE_FACEBOOK, uid),
 							accountType	= User.USER_TYPE_FACEBOOK,
-							accountID	= uid)
+							accountID	= uid,
+							access_token= self.access_token)
 		if content["gender"] == "mail":
 			user.gender = "M"
 		elif content["gender"] == "femail":
@@ -96,10 +114,10 @@ class FaceBookLogin(tornado.web.RequestHandler):
 			user.gender	= "N/A"
 		user.screen_name		= content["name"]
 		user.headPortrait_url	= content["picture"]
+		self._update_facebook_feed(user);
 		self._login_user(user)
 
 	def _login_user(self, user):
-		self._update_facebook_feed(user);
 		if user.last_login == None:
 			user.bonus_notification = 1
 		else:
@@ -110,22 +128,22 @@ class FaceBookLogin(tornado.web.RequestHandler):
 		user.last_login	= int(time.time())
 		self.session['user_id'] = user.id
 		self.render("static/user/user.html")
-#		self.redirect("/static/user/user.html")
 
 	def _update_facebook_feed(self, user):
-		feed_url		= facebook_feed % (user.accountID)
+		feed_url		= facebook_feed % (self.access_token)
+		body			= {}
 		body["message"]	= "I am playing Texas Holdem."
 		body["link"]	= "http://apps.facebook.com/seres_texas_holdem"
 		http_client	= AsyncHTTPClient()
 		http_client.fetch(	feed_url,
-							self._handle_facebook_fedd,
+							self._handle_facebook_feed,
 							method	= 'POST',
 							headers	= None,
-							body	= body)
+							body	= urllib.urlencode(body))
 
-	def _handle_facebook_feed(response):
+	def _handle_facebook_feed(self,response):
 		print "facebook feed response[start]"
-		print response
+		print response.body
 		print "facebook feed response[end]"
 
 class FaceBookPurchaseHandler(tornado.web.RequestHandler):
