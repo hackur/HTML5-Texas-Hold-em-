@@ -337,65 +337,43 @@
 	function chooseCheck(){
 		
 		if(!flagCheck){
+			resetAutoButtons();
 			$("#cbAutoCheck").removeClass("noCheck");
 			$("#cbAutoCheck").addClass("check");
-			HideButtons("btAutoCheckOrFold","btAutoCallAny");
 			flagCheck = 1;
 		} else {
 			$("#cbAutoCheck").removeClass("check");
 			$("#cbAutoCheck").addClass("noCheck");
-			ShowButtons("btAutoCheckOrFold","btAutoCallAny");
 			flagCheck = 0;
 		}
 	}
-	var autofun = {
-		'btAutoCheck':chooseCheck,
-		'btAutoCheckOrFold':chooseCheckOrFold,
-		'btAutoCallAny':chooseCallAny
-	};
 	function chooseCheckOrFold(){
 
 		if(!flagCheckOrFold){
+			resetAutoButtons();
 			$("#cbAutoCheckOrFold").removeClass("noCheck");
 			$("#cbAutoCheckOrFold").addClass("check");
-			HideButtons("btAutoCheck","btAutoCallAny");
 			flagCheckOrFold = 1;
 		} else {
 			$("#cbAutoCheckOrFold").removeClass("check");
 			$("#cbAutoCheckOrFold").addClass("noCheck");
-			ShowButtons("btAutoCheck","btAutoCallAny");
 			flagCheckOrFold = 0;
 		}
 	}
 	function chooseCallAny(){
 
 		if(!flagCallAny){
+			resetAutoButtons();
 			$("#cbAutoCallAny").removeClass("noCheck");
 			$("#cbAutoCallAny").addClass("check");
-			HideButtons("btAutoCheck","btAutoCheckOrFold");
 			flagCallAny = 1;
 		} else {
 			$("#cbAutoCallAny").removeClass("check");
 			$("#cbAutoCallAny").addClass("noCheck");
-			ShowButtons("btAutoCheck","btAutoCheckOrFold");
 			flagCallAny = 0;
 		}
 	}
-	function HideButtons(){
-		var i = 0;
-		for(i = 0; i < arguments.length; i ++) {
-			var button = "#" + arguments[i];
-			$(button).unbind("vclick",autofun[arguments[i]]);
-		}
-	}
-	function ShowButtons(){
-		var i = 0;
-		for(i = 0; i < arguments.length; i ++) {
-			var button = "#" + arguments[i];
-			$(button).bind("vclick",autofun[arguments[i]]);
-		}
-	}
-	
+
 	actionButton.enable_buttons = enable_buttons;
 	actionButton.disable_all = disable_all;
 	actionButton.send_action_stand = send_action_stand;
