@@ -5,6 +5,7 @@ import json
 import tornado.ioloop
 import tornado.httpserver
 import tornado.web
+import tornado.escape
 from authenticate import *
 from datetime import datetime
 from pika_channel import *
@@ -17,7 +18,7 @@ class SentChatMessageHandler(tornado.web.RequestHandler):
 		message["method"]	= "chat"
 		message["seat"]		= int(self.get_argument("seat"))
 		message["user"]		= user.id
-		message["content"]	= self.get_argument("message")
+		message["content"]	= tornado.escape.xhtml_escape(self.get_argument("message"))
 		message["room"]		= user.room_id
 		self.channel		= Channel(self.application.channel, exchange)
 		self.channel.publish_message("dealer", json.dumps(message))
