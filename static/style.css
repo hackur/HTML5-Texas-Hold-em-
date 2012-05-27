@@ -9,7 +9,6 @@
 }
 
 .view {
-	display: none;
 	overflow: hidden;
 	height: 640px;
 	width: 960px;
@@ -24,16 +23,19 @@ body{
     margin:0px auto;
 	left:0px;
 	overflow:hidden;
+    font-family: 'Nunito', sans-serif;
 }
 
 .generalBtnActive{
 	height:57px;
 	width:125px;
 	background-image: url(./images/button_active.png);
-	font-size: 24px;
+	font-size: 20px;
+    top:5px;
 	color: #FFFFFF;
 	text-align:center;
-	line-height:170%;
+    vertical-align:center;
+	line-height:240%;
 }
 .generalBtnActive:active{
 	height:57px;

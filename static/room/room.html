@@ -14,20 +14,26 @@
 		<link rel="stylesheet" type="text/css" href="/static/game/message_box.css" />
 		<link rel="stylesheet" type="text/css" href="/static/style.css" />
 		<script src="/static/game/message_box.js"></script>
+        <link href='http://fonts.googleapis.com/css?family=Nunito:700,400,300' rel='stylesheet' type='text/css'>
 	</head>
 	<body>
         <div id="container">
             <div id="header">
                 <div id="backTo"></div>
+                <!--
                 <div id="createroom" class="generalBtnActive">创建房间</div>
                 <div id="refresh" class="generalBtnActive">刷新</div>
                 <div id="hallName">游戏大厅</div>
+                -->
+                <div id="createroom" class="generalBtnActive">{{_("New Room") }} </div>
+                <div id="refresh" class="generalBtnActive">{{ _("Refresh") }} </div>
+                <div id="hallName">{{ _("Lobby") }}</div>
             </div>
             <div id = "smalltitles">
-            	<label id = "roomID">ID/房号</label>
-            	<label id = "maxminBlind">大/小盲注</label>
-            	<label id = "maxminTake">最小/最大携带</label>
-            	<label id = "onlineNum">在玩人数</label>
+            	<label id = "roomID">ID</label>
+                <label id = "maxminBlind">{{ _("Small/Big Blind") }}</label>
+                <label id = "maxminTake">{{ _("Min/max take") }}</label>
+                <label id = "onlineNum">{{ _("Playing") }} </label>
             </div>
             <div id="grid">
                 <ul id="normalroomcontent">
@@ -54,13 +60,13 @@
             </div>
         <div id="settingDialog">
         	<div id="settingTitle">
-        		设置
+                {{_("Settings")}}
         	</div>
         	<div id="closeButton">X</div>
         	<div id="settingTextArea">
         		<p>
         		<div id="blindAmount">
-        			盲注
+                {{_("Blind")}}
         		</div>
         		<div id="curBlind">
         			3
@@ -71,7 +77,7 @@
         		</p>
         		<p>
         		<div id="personNum">
-        			人数
+                    {{_("Players")}}
         		</div>
         		<div id="personNumShow">
         			2
@@ -82,26 +88,28 @@
         		</p>
         	</div>
         	<div id=confirmBtn class="generalBtnActive">
-        		确定
+                {{_("Confirm")}}
         	</div>
         	<div id="cancelBtn" class="generalBtnActive">
-        		取消
+                {{_("Cancel")}}
         	</div>
         </div> 
             <div id="room">
                 <ul id="tablist">
                     <li class="normalroom" onclick="nTabs(this,0);">
                         <img class="roomhover" src="img/lefthover.png"/>
-                        <img src="img/normalroom.png"/>
+                        <span id="beginner">Beginner</span>
                     </li>  
                     <li class="advancedroom" onclick="nTabs(this,1);">
                         <img class="roomhover" src="img/middlehover.png"/>
-                        <img src="img/advancedroom.png"/>
+                        <!-- <img src="img/advancedroom.png"/> -->
+                        <span id="intermediate">Intermediate</span>
                     </li>  
                     <li class="responseroom" onclick="nTabs(this,2);">
                         <img class="roomhover" src="img/middlehover.png"/>
-                        <img src="img/responseroom.png"/>
+                        <span id="advance">Advance</span>
                     </li>  
+                    <!--
                     <li class="competitionroom" onclick="nTabs(this,3);">
                         <img class="roomhover" src="img/middlehover.png"/>
                         <img src="img/competitionroom.png"/>
@@ -110,6 +118,7 @@
                         <img class="roomhover" src="img/righthover.png"/>
                         <img src="img/familybattleroom.png"/>
                     </li>  
+                    -->
                 </ul>
             </div>
             

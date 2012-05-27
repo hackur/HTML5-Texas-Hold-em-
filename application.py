@@ -15,13 +15,10 @@ from database import *
 from thread_pool import thread_pool_init
 from pika.adapters.tornado_connection import TornadoConnection
 from thread_pool import thread_pool_init
+from filehandler import HTMLFileHandler
 PORT = 8888
 
 
-class UIIndexTestHandler(tornado.web.RequestHandler):
-    @authenticate
-    def get(self):
-        self.render("static/game/game.html")
 
 class LoginPageHandler(tornado.web.RequestHandler):
     def get(self):
@@ -98,13 +95,16 @@ if __name__ == '__main__':
     # Set our pika.log options
     pika.log.setup(color=debug)
     pika.log.info("Starting Tornado HTTPServer on port %i" % PORT)
+    tornado.locale.load_translations("translation")
+
     application = tornado.web.Application([
         (r"/?$", IndexPageHandler),
         (r"/listen-board-message", BoardListenMessageHandler),
         (r"/post-board-message", BoardActionMessageHandler),
-        (r"/static/game/game.html", UIIndexTestHandler),
-        (r"/static/index/index.html", LoginPageHandler),
-        (r"/static/user/user.html", UserPageHandler),
+        (r"/static/(game/game.html)$", HTMLFileHandler),
+        (r"/static/(index/index.html)$", HTMLFileHandler),
+        (r"/static/(user/user.html)$", HTMLFileHandler),
+        (r"/static/(room/room.html)$", HTMLFileHandler),
         (r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path2'])),
         (r"/sk",BoardListenMessageSocketHandler ),
 

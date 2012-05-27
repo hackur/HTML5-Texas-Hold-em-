@@ -68,7 +68,8 @@ function Seat(id,pos){
 	seatObj.showWinCardName = function(public_cards){
 		var name = window.getHandCardName( window.identifyCard(public_cards));
 		$('#card-name-'+position).remove();
-		divSeat.append($("<div class='card-name-win' id='card-name-"+position+"'>" + name + "赢!</div>"));
+		divSeat.append($("<div class='card-name-win' id='card-name-"+position+"'>" 
+                + name + " " + window.text_win +  "!</div>"));
 	};
 	seatObj.getIsSat = function() {
 			return IsSat;
@@ -379,10 +380,11 @@ function seatInit(){
 	var head_portrait	= $('<img id="player_head_portrait" style="width: 102px; height: 126px;" />');
 	var add_friend_btn	= $('<div id="add_friend_btn"><div id="add_friend_text">加为好友</div></div>');
 	var send_stake_btn	= $('<div id="send_stake_btn"><div id="send_stake_text">赠送好友</div></div>');
-	var info_text		= $('<div id="info_text">信   息</div>')
+	var info_text		= $('<div id="info_text"></div>')
 	var send_val		= $('<span id="send_amount"></span>');
-	var closeBtn 		= $('<span class="closeBtn">X</span>');
+	var closeBtn 		= $('<div class="closeBtn">X</div>');
 
+	closeBtn.appendTo(dialog_content);
 	portrait_box.appendTo(dialog_content);
 	info_text.appendTo(dialog_content);
 	username.appendTo(dialog_content);
@@ -397,23 +399,25 @@ function seatInit(){
 	total_games.appendTo(dialog_content);
 	// won_games.appendTo(dialog_content);
 	last_login.appendTo(dialog_content);
-	closeBtn.appendTo(dialog_content);
 	head_portrait.appendTo(portrait_box);
 
-	add_friend_btn.appendTo(dialog_bottom);
-	send_stake_btn.appendTo(dialog_bottom);
-	send_val.appendTo(dialog_content);
+	//add_friend_btn.appendTo(dialog_bottom);
+	//send_stake_btn.appendTo(dialog_bottom);
+	//send_val.appendTo(dialog_content);
 	var presentBar = slider_bar();
-	
-			
-	dialog_content.appendTo(dialog);
-	dialog_bottom.appendTo(dialog);
-	
-	dialog.init = function(){
+
+    closeBtn.bind("vclick",function(e) {
+        dialog.hide();
+    });
+
+    dialog_content.appendTo(dialog);
+    dialog_bottom.appendTo(dialog);
+
+    dialog.init = function(){
 		dialog.appendTo($('#container'));
 		presentBar.setVar(changeNum);
 		presentBar.setPosition(170,363);
-		presentBar.create(dialog_content,1,100,1);
+		//presentBar.create(dialog_content,1,100,1);
 		
 	};
 	function changeNum(num) {
@@ -428,18 +432,20 @@ function seatInit(){
 		dialog_content.css("display","block");
 		dialog_bottom.css("display","block");
 		head_portrait.attr('src', player.head_portrait);
-		username.text('ID名称：'+player.username);	
-		family.text('家族：'+player.family);	
-		position.text('职位：'+player.position);	
-		level.text('等级：'+player.level);	
-		asset.text('资产：'+player.asset);	
-		family_score.text('家族积分：'+player.family_score);
-		family_glory.text('家族荣誉：'+player.family_glory);
-		percentage.text('胜率：'+player.percentage);
-		max_reward.text('赢得最大赌注：'+player.max_reward);
-		total_games.text('胜利局数/总局数：'+player.total_game+"/"+player.won_game);
+        info_text.text(textDict["UInfo"]);
+
+		username.text(textDict["id"] + ': '+player.username);	
+//		family.text('家族：'+player.family);	
+//		position.text('职位：'+player.position);	
+		level.text(textDict["rank"] + ": "  +player.level);	
+		asset.text(textDict["property"] + ": "+player.asset);	
+//		family_score.text('家族积分：'+player.family_score);
+//		family_glory.text('家族荣誉：'+player.family_glory);
+		percentage.text(textDict["winRate"] + ': '+player.percentage);
+		max_reward.text(textDict["winBiggestStake"]+ ": " + player.max_reward);
+		//total_games.text('胜利局数/总局数：'+player.total_game+"/"+player.won_game);
 		// won_games.text('胜利局数：'+player.won_games);
-		last_login.text('最近上线时间：'+player.last_login);
+//		last_login.text('最近上线时间：'+player.last_login);
 		dialog.addClass(display_css);
 		presentBar.setVar(function(value){
 			send_val.html("$" + value);

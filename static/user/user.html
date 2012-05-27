@@ -47,30 +47,57 @@
 				js.src = "//connect.facebook.net/en_US/all.js";
 				ref.parentNode.insertBefore(js, ref);
 			});
-		</script>
+            window.textDict = {
+                {{ 
+                """
+                'id': '%s',
+                'rank': '%s',
+                'property': '%s',
+                'winRate': '%s',
+                'winBiggestStake': '%s',
+                'totalInnings': '%s',
+                'victoryInnings': '%s',
+                'latestOnline': '%s',
+                'idiograph': '%s'
+                """ % ( _("Name"), _("Level"), _("Asset"), 
+                _("Winning Rate"),_("Max reward"), _("Total games"), _("Wins"),
+                 _("last login"), _("Signature") )
+                }}
+            };
+        </script>
 		<div id="background">
 			<div id="btFrame">
 				<div id="info" class="frame-header">
-					个人信息
+                    <!-- 	个人信息 -->
+                    {{ _("Personal") }}
 				</div>
+                <!--
 				<div id="email" class="frame-header">
-					邮 箱
+                     邮 箱 
+
+                    {{ _("Email") }}
+                    
 				</div>
 				<div id="market" class="frame-header">
 					商 城
 				</div>
+                -->
 				<div id="recharge" class="frame-header">
-					充 值
+                    <!-- 充 值 -->
+                    {{ _("Coins") }}
 				</div>
+                <!--
 				<div id="friend" class="frame-header">
 					好 友
 				</div>
+                -->
 			</div>
 
 			<div id="info_frame" class="bigFrame" style="display:none;">
 				<div id="portrait_box">
 					<img id="image1" />
 				</div>
+                <!--
 				<div id="change_por">
 					<span id="row1">更 改 头 像</span>
 					<span id="row2">性别：</span>
@@ -90,7 +117,6 @@
 					<div id="divtest" style="top:215px;left:100px;position:absolute">
 						<form action="../../head-portrait-upload" method="post" enctype="multipart/form-data">
 							<label id="label1">头像：</label>
-							<!-- <input id="input1" name="head-portrait" type="input"/> -->
 							<input type="file" name="head_portrait">
 							</br>
 							<input type="submit" value="上传" >
@@ -98,23 +124,25 @@
 					</div>
 					<div id="status" style="top:215px;left:360px;position:absolute"></div>
 				</div>
-				<span id="ID">ID名称：</span>
+                -->
+                <span id="ID"> {{_("Name")}}:</span>
 				<!--<span id="family">家族：</span> -->
-				<span id="rank">等级：</span>
+                <span id="rank">{{_("Level")}} :</span>
 				<!--<span id="pos">职位：</span> -->
-				<span id="property">资产：</span>
-				<span id="winRate">胜率：</span>
-				<span id="winBiggestStake">赢得最大赌注：</span>
-				<span id="totalInnings">总局数：</span>
-				<span id="victoryInnings">胜利局数：</span>
-				<span id="latestOnline">最近上线时间：</span>
-				<span id="idiograph">个性签名：</span>
+				<span id="property"></span>
+				<span id="winRate"></span>
+				<span id="winBiggestStake"></span>
+				<span id="totalInnings"></span>
+				<span id="victoryInnings"></span>
+                <span id="latestOnline"></span>
+				<span id="idiograph"></span>
 			</div>
 			<div class="awardDialog">
 				<div class="awardLight">
 					<div class="awardMoney"></div>
 				</div>
 			</div>
+            <!--
 			<div class = "settingNickDialog">
 				<div id = "closeButton">X</div>
 				<div class = "dialogTitle">
@@ -142,7 +170,9 @@
 					</div>
 				</div>
 			</div>
+            -->
 		</div>
+        <!--
 		<div id="bigFrame2" class="bigFrame" style="display:none;">
 			<span id="sender">发件人：</span>
 			<span id="time">时间：</span>
@@ -216,6 +246,7 @@
 				购 买
 			</div>
 		</div>
+        -->
 
 		<div id="recharge_frame" class="bigFrame" style="display:none;">
 			<!--<div id="rrunway"></div>-->
@@ -229,43 +260,6 @@
 			<div id="line6" class="line"></div>
 		</div>
 
-		<div id="friend_frame" class="bigFrame" style="display:none;">
-			<div id="rightInfo">
-				<div id="por_box">
-					<img id="image3" src="">
-				</div>
-				<!--
-				<div id="fspace">好友空间</div>
-				-->
-				<div id="fsend">
-					发送邮件
-				</div>
-				<div id="fdelete">
-					删除好友
-				</div>
-				<span id="fID">昵称：</span>
-				<!--
-				<span id="ffamily">家族：</span>
-				<span id="fpos">职位：</span>
-				-->
-				<span id="frank">等级：</span>
-				<span id="fpro">资产：</span>
-			</div>
-			<div id="name0" class="name"></div>
-			<div id="name1" class="name"></div>
-			<div id="name2" class="name"></div>
-			<div id="name3" class="name"></div>
-			<div id="name4" class="name"></div>
-			<div id="name5" class="name"></div>
-			<div id="name6" class="name"></div>
-
-			<div id="line7" class="line"></div>
-			<div id="line8" class="line"></div>
-			<div id="line9" class="line"></div>
-			<div id="line10" class="line"></div>
-			<div id="line11" class="line"></div>
-			<div id="line12" class="line"></div>
-		</div>
 
 		<div id="smallFrame"></div>
 
@@ -274,13 +268,13 @@
 			<span id="span1">当 前 在 玩 人 数 ：100,000</span>
 			-->
 			<div id="logout" class="GeneralBtn">
-				<span>登 出</span>
+                <span> {{ _("Logout") }}</span>
 			</div>
 			<div id="lobby" class="GeneralBtn">
-				<span>游 戏 大 厅</span>
+                <span>{{ _("Lobby") }} </span>
 			</div>
 			<div id="quick_acc" class="GeneralBtn">
-				<span>快 速 进 入</span>
+                <span>{{ _("Fast enter")}}</span>
 			</div>
 			<!--
 			<div id="help" class="GeneralBtn">

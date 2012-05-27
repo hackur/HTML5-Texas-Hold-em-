@@ -76,6 +76,24 @@ body .ui-page.ui-body-c.ui-page-active{
     position: absolute;
 }
 
+#room li span {
+    position: absolute;
+    top: 5px;
+    margin:0 0 0 0;
+	font-size: 22px;
+	color: #FFFFFF;
+	font-size: 20px;
+    font-family: 'Nunito', sans-serif;
+}
+#beginner{
+    left: 9px;
+}
+#advance{
+    left: 9px;
+}
+#intermediate{
+    left: -9px;
+}
 #room .roomhover{
     left:-33px;
     top:-16px;
@@ -117,13 +135,13 @@ body .ui-page.ui-body-c.ui-page-active{
 	
 }
 #maxminBlind {
-	margin-left: 109px;
+	margin-left: 150px;
 }
 #maxminTake {
-	margin-left: 135px;
+	margin-left: 109px;
 }
 #onlineNum {
-	margin-left: 120px;
+	margin-left: 145px;
 }
 #grid {
     height:457px;
