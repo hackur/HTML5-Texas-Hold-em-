@@ -75,6 +75,9 @@
 #convert6:hover {
 	background-image: url(./image/pitch1.png);
 }
+.oprice{
+	padding-left:40px;
+}
 .rpurchase {
 	width: 124px;
 	height: 54px;

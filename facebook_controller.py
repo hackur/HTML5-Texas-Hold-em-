@@ -19,6 +19,7 @@ from database import *
 facebook_app_id		= "231740453606973"
 facebook_app_secret	= "17a7bf50f0cdbfc143cb3eb63b33a874"
 facebook_graph		= "https://graph.facebook.com/%s?fields=id,name,picture,gender,username"
+facebook_feed		= "https://graph.facebook.com/%s/feed"
 canvas_page			= "http://gigiduck.com:8888/facebook/"
 #auth_url			= "https://www.facebook.com/dialog/oauth?client_id="+facebook_app_id+"&redirect_uri="+urllib.pathname2url(canvas_page)
 
@@ -98,16 +99,34 @@ class FaceBookLogin(tornado.web.RequestHandler):
 		self._login_user(user)
 
 	def _login_user(self, user):
+		self._update_facebook_feed(user);
 		if user.last_login == None:
 			user.bonus_notification = 1
 		else:
 			last_login_date = datetime.fromtimestamp(user.last_login)
 			if last_login_date.date() < datetime.today().date():
 				user.bonus_notification = 1
+
 		user.last_login	= int(time.time())
 		self.session['user_id'] = user.id
 		self.render("static/user/user.html")
 #		self.redirect("/static/user/user.html")
+
+	def _update_facebook_feed(self, user):
+		feed_url		= facebook_feed % (user.accountID)
+		body["message"]	= "I am playing Texas Holdem."
+		body["link"]	= "http://apps.facebook.com/seres_texas_holdem"
+		http_client	= AsyncHTTPClient()
+		http_client.fetch(	feed_url,
+							self._handle_facebook_fedd,
+							method	= 'POST',
+							headers	= None,
+							body	= body)
+
+	def _handle_facebook_feed(response):
+		print "facebook feed response[start]"
+		print response
+		print "facebook feed response[end]"
 
 class FaceBookPurchaseHandler(tornado.web.RequestHandler):
 	def post(self):

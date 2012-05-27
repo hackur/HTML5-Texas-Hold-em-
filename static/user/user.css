@@ -101,6 +101,15 @@ top:142px;
 z-index:9;
 display:none;
 }
+.awardTitle {
+	position: absolute;
+	width: 100%;
+	top: 15px;
+	color: rgba(0, 66, 139, 1);
+	height: 60px;
+	font-size: 20px;
+	font-weight: bold;
+}
 .awardLight {
 position:relative;
 background: url(./image/awardLight.png);

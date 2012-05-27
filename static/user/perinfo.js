@@ -232,10 +232,7 @@ var dailyBonus = function() {
 		url:  "/dailybonus",
 		data: {},
 		success: function(data) {
-			console.log("daily bonus====");
-			console.log(data);
 			if(data.status == 'success'){
-				console.log("success");
 				window.awardDialog.show();
 			}else{
 				console.log("failed");
