@@ -47,6 +47,7 @@
 			console.log("order callback [start]");
 			console.log(entity.info);
 			if (data['order_id']){
+				window.reloadUserInfo();
 				console.log("order done.");
 			}else{
 				console.log("order cancel.");

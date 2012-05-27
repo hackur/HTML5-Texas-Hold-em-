@@ -290,4 +290,4 @@ var bindSendFriendEmail = function(){
 		console.log("fsend end");
 	});
 }
-
+window.reloadUserInfo = getUserImage;
