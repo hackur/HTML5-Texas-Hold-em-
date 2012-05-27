@@ -11,7 +11,7 @@ import sys
 import random
 import time
 import pika
-
+import random
 (A_ALLIN,A_CALLSTAKE,A_RAISESTAKE,A_CHECK,A_DISCARDGAME,A_BIGBLIND,A_SMALLBLIND,A_STANDUP) = (1,2,3,4,5,6,7,8)
 class Seat:
     def __init__(self, seat_id = -1, stake = 0, table = 0):
@@ -562,13 +562,15 @@ class Robot:
 
         print "List Room Handle[start]"
         content = json.loads(response.body)
-        available_list = filter(lambda x: x[2] > 0 and x[2] < x[3],content["rooms"])
+        available_list = filter(lambda x: x[2] < x[3] and x[4] < self.asset,content["rooms"])
         print available_list
         if len(available_list) > 0:
-            available_list.sort(sorter)
-            self.room = available_list[0][0]
+			available_list.sort(sorter)
+			room_index= random.randrange(0, len(available_list))
+			self.room = available_list[room_index][0]
         else:
-            self.room = content["rooms"][0][0]
+			print "not available room"
+            #self.room = content["rooms"][0][0]
 
         self.enter()
         print "List Room Hanlde[end]"
