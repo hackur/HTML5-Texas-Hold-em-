@@ -146,11 +146,11 @@ var getUserImage = function() {
 			$("#totalInnings").html(textDict["totalInnings"] + " : "+ data.total_games);
 			$("#victoryInnings").html(textDict["victoryInnings"] + " : "+ data.won_games);
 			$("#latestOnline").html(textDict["latestOnline"]+ " : " + data.last_login);
-			if(data.gender == 'N/A'){
                 /*
+			if(data.gender == 'N/A'){
 				window.settingNickDialog.show();
-                */
 			}
+                */
 		},
 		dataType: "json"
 	});

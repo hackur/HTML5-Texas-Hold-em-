@@ -5,6 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		<meta property="og:description" content="Your site's description" />
 		<link rel="stylesheet" type="text/css" href="/static/style.css">
+        {% if debug %}
 		<link rel="stylesheet" type="text/css" href="/static/user/perinfo.css">
 		<link rel="stylesheet" type="text/css" href="/static/user/bigFrame1.css">
 		<link rel="stylesheet" type="text/css" href="/static/user/bigFrame2.css">
@@ -13,16 +14,21 @@
 		<link rel="stylesheet" type="text/css" href="/static/user/bigFrame5.css">
 		<link rel="stylesheet" type="text/css" href="/static/user/rightFrame.css">
 		<link rel="stylesheet" type="text/css" href="/static/user/user.css">
+        {% else %}
+		<link rel="stylesheet" type="text/css" href="/static/user/a.css">
+        {% end %}
 		<link rel="stylesheet" type="text/css" href="/static/game/sliderbar_dialog.css">
-		<script src="/static/jquery.min.js"></script>
-		<script src="/static/jquery.mobile-1.1.0.min.js"></script>
-		<script src="/static/util.js"></script>
-		<script src="/static/game/sliderbar_dialog.js"></script>
-		<script src="/static/user/jquery.form.js"></script>
-		<script src="/static/user/perinfo.js"></script>
-		<script src="/static/user/recharge.js"></script>
-		<script src="/static/user/email.js"></script>
-		<script src="/static/user/awardDialogAndNickSettingDialog.js"></script>
+            <script src="/static/jquery.min.js"></script>
+            <script src="/static/jquery.mobile-1.1.0.min.js"></script>
+            <script src="/static/util.js"></script>
+            <script src="/static/user/script.js"></script>
+        <!--
+            <script src="/static/game/sliderbar_dialog.js"></script>
+            <script src="/static/user/perinfo.js"></script>
+            <script src="/static/user/recharge.js"></script>
+            <script src="/static/user/email.js"></script>
+            <script src="/static/user/awardDialogAndNickSettingDialog.js"></script>
+        -->
 		<script type="text/javascript">
 		$(info_init);
 		</script>

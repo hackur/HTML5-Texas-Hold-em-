@@ -6,7 +6,7 @@
 		{index:3, description:"5000 chips", order_info: 201203, orginal_price:"50 Credits", price: "46 Credits"},
 		{index:4, description:"10000 chips", order_info:201204, orginal_price:"100 Credits", price: "90 Credits"},
 		{index:5, description:"20000 chips", order_info:201205, orginal_price:"200 Credits", price: "175 Credits"},
-		{index:6, description:"50000 chips", order_info:201206, orginal_price:"500 Credits", price: "440 Credits"},
+		{index:6, description:"50000 chips", order_info:201206, orginal_price:"500 Credits", price: "440 Credits"}
 	];
 	var commodities = [];
 
