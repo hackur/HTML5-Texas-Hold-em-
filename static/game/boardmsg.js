@@ -292,14 +292,6 @@ var funs = {
 	'chat':		msg_chat
 };
 
-var actionName = {
-	"1": "全下",
-	"2": "跟注",
-	"3": "加注",
-	"4": "看牌",
-	"5": "弃牌",
-	"8": "站起"
-};
 
 function _board_msg_handler(data){
 	if(funs[data.msgType])

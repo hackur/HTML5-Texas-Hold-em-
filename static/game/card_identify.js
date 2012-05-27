@@ -218,28 +218,7 @@
 		return {score:score, kicker:kicker}
 	}
 	function getHandCardName(handCard){
-		switch(handCard.score){
-			case 0:
-				return "高牌";
-			case 1:
-				return "一对";
-			case 2:
-				return "两对";
-			case 3:
-				return "三条";
-			case 4:
-				return "顺子";
-			case 5:
-				return "同花";
-			case 6:
-				return "满堂红";
-			case 7:
-				return "四條";
-			case 8:
-				return "同花顺";
-			case 9:
-				return "皇家同花顺";
-		}
+        return handCardName[handCard.score];
 	}
 	window.identifyCard 	= identifyCard;
 	window.getHandCardName	= getHandCardName;

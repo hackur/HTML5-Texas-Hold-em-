@@ -22,14 +22,16 @@ var info_init = function() {
 	initCommodity();
 	/* viewEmail(); */
 	bindSendFriendEmail();
-	window.bigframe = [	{header:"#info",	content:"#info_frame", background:"url(./image/left.png)"},
-						{header:"#email",	content:"#mail_list_frame", background:"url(./image/middle.png)"},
-						{header:"#market",	content:"#market_frame", background:"url(./image/middle.png)"},
-						{header:"#recharge",content:"#recharge_frame", background:"url(./image/middle.png)"},
-						{header:"#friend",	content:"#friend_frame", background:"url(./image/right.png)"}];
+	window.bigframe = [	
+    {header:"#info",	content:"#info_frame", background:      "url(/static/user/image/left.png)"},
+    {header:"#email",	content:"#mail_list_frame", background: "url(/static/user/image/middle.png)"},
+    {header:"#market",	content:"#market_frame", background:    "url(/static/user/image/middle.png)"},
+    {header:"#recharge",content:"#recharge_frame", background:  "url(/static/user/image/middle.png)"},
+    {header:"#friend",	content:"#friend_frame", background:    "url(/static/user/image/right.png)"}];
 
 	$(bigframe[0].content).css("display", "block");
-	$(bigframe[0].header).css("background-image", "url(./image/left.png)");
+	$(bigframe[0].header).css("background-image", "url(/static/user/image/left.png)");
+    /*
 	$("#portrait_box").bind("vclick", function() {
 		$("#change_por")[0].style.display = "block";
 		uploadImage();
@@ -37,6 +39,7 @@ var info_init = function() {
 			$("#change_por")[0].style.display = "none";
 		});
 	});
+    */
 	$("#reply").bind("vclick", function() {
 		$("#receiver").text("收件人ID："+window.SelectedEmail.senderName);
 		$("#replyFrame textarea").unbind("keyup");
@@ -123,15 +126,6 @@ var uploadImage = function() {
 		}
 	});
 };
-var textDict = {'id': 'ID名称：',
-				'rank': '等级：',
-				'property': '资产：',
-				'winRate': '胜率：',
-				'winBiggestStake': '赢得最大赌注：',
-				'totalInnings': '总局数：',
-				'victoryInnings': '胜利局数：',
-				'latestOnline': '最近上线时间：',
-				'idiograph': '个性签名：'};
 var getUserImage = function() {
 	$.ajax({
 		type: "post",
@@ -141,19 +135,21 @@ var getUserImage = function() {
 			console.log(data);
 			var url = data.head_portrait;
 			$("#image1").attr("src", url);
-			$("#ID").html(textDict["id"] + data.name);
-			$("#rank").html(textDict["rank"] + data.level);
-			$("#property").html(textDict["property"] + data.asset);
+			$("#ID").html(textDict["id"] + " : " + data.name);
+			$("#rank").html(textDict["rank"] + " : "+ data.level);
+			$("#property").html(textDict["property"] + " : "+ data.asset);
 		//	$("#family").html(textDict["family"] + data.family);
-			$("#winRate").html(textDict["winRate"] + data.percentage);
-			$("#winBiggestStake").html(textDict["winBiggestStake"] + data.max_reward);
+			$("#winRate").html(textDict["winRate"] + " : "+ data.percentage);
+			$("#winBiggestStake").html(textDict["winBiggestStake"] + " : "+ data.max_reward);
 		//	$("#pos").html(textDict["pos"] + data.position);
-			$("#idiograph").html(textDict["idiograph"] + data.signature);
-			$("#totalInnings").html(textDict["totalInnings"] + data.total_games);
-			$("#victoryInnings").html(textDict["victoryInnings"] + data.won_games);
-			$("#latestOnline").html(textDict["latestOnline"] + data.last_login);
+			$("#idiograph").html(textDict["idiograph"] + " : "+ data.signature);
+			$("#totalInnings").html(textDict["totalInnings"] + " : "+ data.total_games);
+			$("#victoryInnings").html(textDict["victoryInnings"] + " : "+ data.won_games);
+			$("#latestOnline").html(textDict["latestOnline"]+ " : " + data.last_login);
 			if(data.gender == 'N/A'){
+                /*
 				window.settingNickDialog.show();
+                */
 			}
 		},
 		dataType: "json"

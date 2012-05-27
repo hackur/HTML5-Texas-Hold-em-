@@ -94,7 +94,8 @@ function initSetting() {
 	$("#backTo").bind(event_click,function(){
 		//self.history.go(-1);
 		//console.log(document.domain);
-		window.location = "http://" + document.domain + ":" + window.location.port + "/facebook/"
+		//window.location = "http://" + document.domain + ":" + window.location.port + "/facebook/"
+		window.location = "../user/user.html"
 	});
 	console.log("----------------------------------------------");
 	window.blindSliderBar = slider_bar();

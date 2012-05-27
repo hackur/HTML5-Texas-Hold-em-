@@ -4,6 +4,7 @@
 		<title>Game</title>
 		<meta charset="UTF-8">
 
+		<link rel="stylesheet" type="text/css" href="/static/style.css" />
 		<link rel="stylesheet" type="text/css" href="/static/game/style.css" />
 		<link rel="stylesheet" type="text/css" href="/static/game/button.css" />
 		<link rel="stylesheet" type="text/css" href="/static/game/sliderbar_dialog.css" />
@@ -23,6 +24,12 @@
 		<script src="/static/game/chat.js"></script>
 		<script src="/static/game/card_identify.js"></script>
 		<script>
+            function show_no_enough_money(user_info,room_info){
+                        message_box.showMessage( "{{_("You have: ") }}$" +user_info.asset,2);
+						message_box.showMessage("{{_("Minimun: ") }}$" + room_info.min_stake,2);
+                        message_box.showMessage(
+                        "{{_("No enough money ^_^") }}" ,2);
+            }
 			function init(){
 				table_init();
 				fetch_user_info();
@@ -30,25 +37,71 @@
 				chat_dialog.init();
 				player_info.init();
 				sit_down_dialog_init();
-
-
 				
-			}
+			};
+            /*
+                "1": "全下",
+                "2": "跟注",
+                "3": "加注",
+                "4": "看牌",
+                "5": "弃牌",
+                "8": "站起"
+                */
+            window.actionName = {
+                "1": "{{ _("All in") }} ",
+                "2": "{{ _("Call") }} ",
+                "3": "{{ _("Raise") }} ",
+                "4": "{{ _("Check") }} ",
+                "5": "{{ _("Fold") }} ",
+                "8": "{{ _("Stand") }} ",
+            };
+            window.handCardName = {
+                0: "{{ _("High Card")}}",
+                1: "{{ _("Pair")}}",
+                2: "{{ _("Two Pair")}}",
+                3: "{{ _("Three of a Kind")}}",
+                4: "{{ _("Straight")}}",
+                5: "{{ _("Flush")}}",
+                6: "{{ _("Full House")}}",
+                7: "{{ _("Four of a Kind")}}",
+                8: "{{ _("Straight Flush")}}",
+                9: "{{ _("Royal Flush")}}",
+            }
+            window.textDict = {
+                {{ 
+                """
+                'id': '%s',
+                'rank': '%s',
+                'property': '%s',
+                'winRate': '%s',
+                'winBiggestStake': '%s',
+                'totalInnings': '%s',
+                'victoryInnings': '%s',
+                'latestOnline': '%s',
+                'idiograph': '%s',
+                'UInfo': '%s',
+                'Sit': '%s'
+                """ % ( _("Name"), _("Level"), _("Asset"), 
+                _("Winning Rate"),_("Max Reward"), _("Total games"), _("Wins"),
+                _("last login"), _("Signature"), _("User information"), _("Sit")
+                )
+                }}
+            };
 		function sit_down_dialog_init() {
 			sit_down_dialog = slider_bar_dialog();	
 			sit_down_dialog.init();
-			sit_down_dialog.slider_bar_setTitle("购买坐下");
-			
+			/* sit_down_dialog.slider_bar_setTitle("购买坐下");*/
+            sit_down_dialog.slider_bar_setTitle("{{ _("Sit down") }}");
 		}
-			$(init);
-		</script>
-		<script src="action_button.js"></script>
+        window.text_win = "{{ _("win") }}";
+        $(init);
+    </script>
+    <script src="action_button.js"></script>
 		<script src="boardmsg.js"></script>
 		<!-- <script src="animation.js"></script> -->
 		<script src="game_control.js"></script>
 		<script src="send_card.js"></script>
 		<script src="message_box.js"></script>
-		<!-- The plugin works on Safari, Chrome, Webkit, Firefox 3.5+, IE9+, and Opera 11+. -->
 	</head>
 	<body id="bd">
 		<div id="container" class="view">
@@ -84,39 +137,39 @@
 			
 
 			<div id="buttonWraper">
-				<div id="btFold" class="button">Fold</div>
-				<div id="btCall" class="button">Call</div>
+                <div id="btFold" class="button">{{ _("Fold") }} </div>
+                <div id="btCall" class="button">{{ _("Call") }}</div>
 				<div id="btRaise" class="button">
-					<div id="btRaiseText">Raise</div>
+                    <div id="btRaiseText">{{ _("Raise") }}</div>
 					<div id="raise_slider" >
 						<div id="raise_amount"> 100 </div>
 						<div id="raise_slider_button"></div>
 					</div>
 				</div>
-				<div id="btAllin" class="button">All-IN</div>
-				<div id="btCheck" class="button buttonHide">Check</div>
+                <div id="btAllin" class="button">{{ _("All IN") }}</div>
+                <div id="btCheck" class="button buttonHide">{{ _("Check") }}</div>
 				<div id="btAutoCheck" class="checkButton autoButtonHide">
 					<div id="cbAutoCheck" class="noCheck"></div>
-					<div id="lbAutoCheck">Check</div>
+					<div id="lbAutoCheck">{{ _("Check") }}</div>
 				</div>
 				<div id="btAutoCheckOrFold" class="checkButton autoButtonHide">
 					<div id="cbAutoCheckOrFold" class="noCheck"></div>
-					<div id="lbAutoCheckOrFold">Check/Fold</div>
+                    <div id="lbAutoCheckOrFold">{{ _("Check/Fold") }}</div>
 				</div>
 				<div id="btAutoCallAny" class="checkButton autoButtonHide">
 					<div id="cbAutoCallAny" class="noCheck"></div>
-					<div id="lbAutoCallAny">Call Any</div>
+                    <div id="lbAutoCallAny">{{ _("Call Any") }}</div>
 				</div>
 			</div>
 
 			<div id="chat-dialog">
 				<div id="chat-history" class="chat-history-collapse"></div>
 				<div id="chat-input-container" >
-					<div id="chat-history-btn">E</div>
+                    <div id="chat-history-btn">{{ _("log") }}</div>
 					<div id="chat-input-wrapper" >
 						<input id="chat-input" type="text"/>
 					</div>
-					<div id="chat-send-btn" >Send</div>
+                    <div id="chat-send-btn" >{{ _("Send") }}</div>
 				</div>
 			</div>
 		</div>

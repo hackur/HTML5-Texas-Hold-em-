@@ -261,9 +261,7 @@ var take_place = function(seatID, seatObj) {
 					user_info.id	=data.id;
 					hide_loading();
 					if(user_info.asset < window.room_info.min_stake){
-						message_box.showMessage("您只有:" +user_info.asset,2);
-						message_box.showMessage("最少携带:" + room_info.min_stake,2);
-						message_box.showMessage("你木有足够的钱'_'",2);
+                        show_no_enough_money(user_info,room_info);
 					}
 					else{
 						sit_down_dialog.show(seatObj);
@@ -287,12 +285,6 @@ var take_place = function(seatID, seatObj) {
 			}
 			window.SelectedSeat = seatObj;
 			seatObj.player.show(seatObj.player);
-			console.log(".............");
-			console.log(window.SelectedSeat);
-			var closeBtn = $(".closeBtn");
-			closeBtn.click(function(e) {
-				seatObj.player.hide();	
-			});
 //			var info_hide = function(e) {
 //				var infoWindow = $(".closeBtn");
 //				var infoWindowPosition = infoWindow.offset();
