@@ -21,7 +21,7 @@ facebook_app_secret	= "17a7bf50f0cdbfc143cb3eb63b33a874"
 facebook_graph		= "https://graph.facebook.com/%s?fields=id,name,picture,gender,username"
 facebook_permission_url	= "https://graph.facebook.com/%s/permissions?access_token=%s"
 facebook_feed		= "https://graph.facebook.com/me/feed?access_token=%s"
-canvas_page			= "http://gigiduck.com:8888/facebook/"
+canvas_page			= "http://gigiduck.com:8001/facebook/"
 auth_url			= "https://www.facebook.com/dialog/oauth?client_id="+facebook_app_id+"&redirect_uri="+urllib.pathname2url(canvas_page)+"&scope=user_status,publish_actions,publish_stream"
 
 def _base64_url_decode(inp):
@@ -38,12 +38,11 @@ class FaceBookChannelHandler(tornado.web.RequestHandler):
 		self.render("./channel.html")
 
 class FaceBookLogin(tornado.web.RequestHandler):
-	@tornado.web.asynchronous
 	def get(self):
 		#args['code']			= self.get_argument('code')
 		#args['client_secret']	= facebook_app_secret
 		if "user_id" in self.session:
-			self.render("static/user/user.html")
+			self.redirect("/static/user/user.html")
 
 	@tornado.web.asynchronous
 	def post(self):
@@ -80,7 +79,9 @@ class FaceBookLogin(tornado.web.RequestHandler):
 
 	def	_handle_check_permission(self, response):
 		permissions	= json.loads(response.body)["data"][0]
-		if permissions["user_status"]==1 and  permissions["publish_actions"] == 1 and  permissions["publish_stream"] == 1:
+		if	"user_status" in permissions and permissions["user_status"] == 1 and \
+			"publish_actions" in permissions and permissions["publish_actions"] == 1 and \
+			"publish_stream" in permissions and permissions["publish_stream"] == 1:
 			user  = User.verify_user_openID(accountType = User.USER_TYPE_FACEBOOK,
 											accountID	= self.payload["user_id"])
 			if not user:
@@ -127,7 +128,7 @@ class FaceBookLogin(tornado.web.RequestHandler):
 
 		user.last_login	= int(time.time())
 		self.session['user_id'] = user.id
-		self.render("static/user/user.html")
+		self.redirect("/static/user/user.html")
 
 	def _update_facebook_feed(self, user):
 		feed_url		= facebook_feed % (self.access_token)
