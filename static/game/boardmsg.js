@@ -23,6 +23,7 @@ function msg_sit(data){
 			SeatList[i].removeSeatdownbg();
 		}
 		SeatList[data.seat_no].showStand();
+		window.chat_dialog.display();
 	}
 	SeatList[data.seat_no].removeSeatdownbg();
 }
@@ -269,6 +270,7 @@ function msg_standup(data){
 				window.user_info.sit_no = undefined;
 				actionButton.disable_all();
 				actionButton.disable_AutoButtons();
+				window.chat_dialog.hide();
 			}
 		}
 	});

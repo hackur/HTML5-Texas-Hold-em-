@@ -23,6 +23,12 @@
 		});
 		console.log("init sit dialog end");
 	}
+	obj.display	= function(){
+		$('#chat-dialog').css("display","block");
+	};
+	obj.hide	= function(){
+		$('#chat-dialog').css("display","none");
+	}
 	obj.maximize= function(){
 		$('#chat-history').removeClass("chat-history-collapse");
 		$('#chat-history').addClass("chat-history-expand");
@@ -58,8 +64,8 @@
 		var temp_msg_id		= "temp-message-" + data.timestamp;
 		var temp_message	= $("<div class='temp-message' id='"+temp_msg_id+"'>" + data.content + "</div>"); 
 		$('#chat-history').append("<div class='chat-message'>" + username + ": " + data.content + "</div>");
-		console.log(data);
-		console.log(SeatList[data.seat])
+		//console.log(data);
+		//console.log(SeatList[data.seat])
 		SeatList[data.seat].appendMessage(temp_message);
 		setTimeout(
 			function(){
