@@ -4,6 +4,7 @@
     <head>
 		<title>Main Room</title>
 		<meta charset="UTF-8">
+        {% if debug %}
 		<link rel="stylesheet" type="text/css" href="/static/room/css/room.css"/>
 		<link rel="stylesheet" type="text/css" href="/static/game/sliderbar_dialog.css"/>
 		<script src="/static/jquery.min.js"></script>
@@ -15,6 +16,19 @@
 		<link rel="stylesheet" type="text/css" href="/static/style.css" />
 		<script src="/static/game/message_box.js"></script>
         <link href='https://fonts.googleapis.com/css?family=Nunito:700,400,300' rel='stylesheet' type='text/css'>
+        {% else  %}
+		<link rel="stylesheet" type="text/css" href="https://seressoft.appspot.com/static/room/css/room.css"/>
+		<link rel="stylesheet" type="text/css" href="https://seressoft.appspot.com/static/game/sliderbar_dialog.css"/>
+		<script src="https://seressoft.appspot.com/static/jquery.min.js"></script>
+		<script src="https://seressoft.appspot.com/static/jquery.mobile-1.1.0.min.js"> </script>
+		<script src="https://seressoft.appspot.com/static/util.js"></script>
+		<script src="https://seressoft.appspot.com/static/room/room.js"></script>
+		<script src="https://seressoft.appspot.com/static/game/sliderbar_dialog.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://seressoft.appspot.com/static/game/message_box.css" />
+		<link rel="stylesheet" type="text/css" href="https://seressoft.appspot.com/static/style.css" />
+		<script src="https://seressoft.appspot.com/static/game/message_box.js"></script>
+        <link href='https://fonts.googleapis.com/css?family=Nunito:700,400,300' rel='stylesheet' type='text/css'>
+        {% end %}
 	</head>
 	<body>
         <div id="container">
