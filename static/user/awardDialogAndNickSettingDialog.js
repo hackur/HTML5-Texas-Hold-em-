@@ -2,6 +2,7 @@
 	var awardDialog = {};
 	awardDialog.show = function() {
 		$(".awardDialog").show();
+		$("#screen-overlay").addClass("screen-cover");
 	}
 	window.awardDialog = awardDialog;
 })($);
@@ -16,6 +17,7 @@
 $(function(){
 $(".awardDialog").click(function(){
 	$(".awardDialog").hide();
+	$("#screen-overlay").removeClass("screen-cover");
 	//$(".awardDialog").fadeOut()
 	});
 });

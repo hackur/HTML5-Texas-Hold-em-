@@ -15,6 +15,7 @@ window.get_event_position = function(e){
 }
 
 var info_init = function() {
+	window.awardDialog.show();
 	dailyBonus();
 	getUserImage();
 	listEmail(1);

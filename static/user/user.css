@@ -126,6 +126,44 @@ height:207px;
 left:56px;
 top:65px;
 }
+.awardOK {
+	background-attachment: scroll;
+	background-clip: border-box;
+	background-color: #408EBC;
+	background-image: -webkit-gradient(linear, 0% 100%, 0% 0%, from( #408EBC), to( #56A3D0));
+	background-origin: padding-box;
+	border-bottom-width: 3px;
+	border-radius:5px;
+	color: white;
+	cursor: auto;
+	display: block;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	height: 16px;
+	padding-bottom: 10px;
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-top: 10px;
+	text-align: center;
+	text-decoration: none;
+	text-shadow: rgba(0, 0, 0, 0.296875) 0px -1px 0px;
+	margin:0 18px;
+	width: 90%;
+	position: absolute;
+	top: 244px;
+}
+.screen-cover{
+position: absolute;
+width: 100%;
+top: 0px;
+left: 0px;
+right: 0px;
+bottom: 0px;
+background: white;
+z-index:9;
+opacity: 0.5;
+}
 /*Setting Nick Dialog CSS*/
 .settingNickDialog {
 color:#fff;
