@@ -165,7 +165,6 @@
 	color: white;
 	text-align: center;
 	line-height: 60px;
-	font-weight: bold;
 }
 .chat-message{
 	color: white;
@@ -358,13 +357,15 @@
 
 
 .backcard-noanima{ 
-	position: absolute; left:480px; top:100px; 
+	position: absolute; 
+    left:480px; top:100px; 
 	height:40px; 
 	width:30px;
 
 }
 .backcard{ 
-	position: absolute; left:480px; top:100px; 
+	position: absolute; 
+    left:480px; top:100px; 
 	height:40px; 
 	width:30px;
 	-moz-transition: all 1s; 
@@ -457,7 +458,6 @@
 	position: absolute;
 	width: 102px;
 	height: 126px;
-	position: absolute;
 	left: 8px;
 	top:6px;
 }
@@ -826,6 +826,7 @@ p.actionBox:after
 	-webkit-box-shadow: 1px 1px 2px -1px #fcf7fc;
 	box-shadow: 1px 1px 2px -1px #fcf7fc;*/
 	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #49bffa), color-stop(1, #0d82bd));
+    /* @alternate */
 	background:-moz-linear-gradient(center top, #49bffa 5%, #0d82bd 100%);
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#49bffa', endColorstr='#0d82bd');
 	background-color:#49bffa;
@@ -845,6 +846,7 @@ p.actionBox:after
 }
 .closeBtn:hover {
 	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #0d82bd), color-stop(1, #49bffa));
+    /* @alternate */
 	background:-moz-linear-gradient(center top, #0d82bd 5%, #49bffa 100%);
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#0d82bd', endColorstr='#49bffa');
 	background-color:#0d82bd;
