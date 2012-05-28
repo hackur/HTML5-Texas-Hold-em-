@@ -296,12 +296,12 @@ if __name__ == "__main__":
 
 
 	#room		= Room(exchange="dealer_exchange_1",blind=10,max_player=9)
-	item		= Commodity.new( 201201, "1000 chips", "1000 chips", 10, "NONE", 1000)
-	item		= Commodity.new( 201202, "2000 chips", "2000 chips", 19, "NONE", 2000)
-	item		= Commodity.new( 201203, "5000 chips", "5000 chips", 46, "NONE", 5000)
-	item		= Commodity.new( 201204, "10000 chips", "10000 chips", 90, "NONE", 10000)
-	item		= Commodity.new( 201205, "20000 chips", "20000 chips", 175, "NONE", 20000)
-	item		= Commodity.new( 201206, "50000 chips", "50000 chips", 440, "NONE", 50000)
+	item		= Commodity.new( 201201, "1000 chips", "1000 chips", 10, "./static/chips_icon.png", 1000)
+	item		= Commodity.new( 201202, "2000 chips", "2000 chips", 19, "./static/chips_icon.png", 2000)
+	item		= Commodity.new( 201203, "5000 chips", "5000 chips", 46, "./static/chips_icon.png", 5000)
+	item		= Commodity.new( 201204, "10000 chips", "10000 chips", 90, "./static/chips_icon.png", 10000)
+	item		= Commodity.new( 201205, "20000 chips", "20000 chips", 175, "./static/chips_icon.png", 20000)
+	item		= Commodity.new( 201206, "50000 chips", "50000 chips", 440, "./static/chips_icon.png", 50000)
 	ting		= User.new(username="ting", password=hashlib.md5("123").hexdigest())
 	mile		= User.new(username="mile", password=hashlib.md5("123").hexdigest())
 	mamingcao   = User.new(username="mamingcao", password=hashlib.md5("123").hexdigest())

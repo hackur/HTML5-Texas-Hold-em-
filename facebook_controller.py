@@ -174,8 +174,8 @@ class FaceBookPurchaseHandler(tornado.web.RequestHandler):
 			item		= Commodity.find(commodity_id = int(item_id))
 			itemInfo	= {}
 			itemInfo['item_id']		= item_id
-			itemInfo['title']	= item.title
-			itemInfo['price']	= item.price
+			itemInfo['title']		= item.title
+			itemInfo['price']		= item.price
 			itemInfo['description']	= item.description
 			itemInfo['image_url']	= item.image_url
 			response	= {"content":[itemInfo], "method":request_type}
