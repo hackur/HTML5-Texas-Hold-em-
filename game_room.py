@@ -703,6 +703,8 @@ class GameRoom(object):
 													}
 						seat.get_user().update_attr('asset',winner_dict[seat])
 						seat.get_user().update_attr('won_games', 1)
+						if seat.get_user().max_reward < winner_dict[seat]:
+							seat.get_user().max_reward = winner_dict[seat]
 					else:
 						msg_dict[seat._user.id] = {	"isWin": False,
 													"stake": seat.player_stake,
@@ -716,6 +718,8 @@ class GameRoom(object):
 				winner.player_stake			+= reward
 				winner.get_user().update_attr('asset',reward)
 				winner.get_user().update_attr('won_games', 1)
+				if winner.get_user().max_reward < reward:
+					winner.get_user().max_reward = reward
 				msg_dict[winner._user.id] = {	"isWin": True,
 												"earned": reward,
 												"pot": pot,
