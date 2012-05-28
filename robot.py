@@ -766,7 +766,7 @@ class Robot:
                 self.min_raise    = data["amount_limits"]['3'][0]
                 self.max_raise    = data["amount_limits"]['3'][1]
             self.rights = data["rights"]
-            time.sleep(random.randint(2,5))
+            #time.sleep(random.randint(2,5))
             self.send_post_message()
 
         pika.log.info( "Handle next [End]")

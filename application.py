@@ -69,6 +69,7 @@ if __name__ == '__main__':
     parser.add_argument('--debug-mode','-D',default=1,type=int)
     parser.add_argument('--processes','-N',default=1,type=int)
     parser.add_argument('--port','-P',default=8888,type=int)
+    parser.add_argument('--ssl','-S',default=0,type=int)
     args = parser.parse_args()
     PORT = args.port
 
@@ -78,6 +79,17 @@ if __name__ == '__main__':
         num_of_process = 1
     else:
         debug = False
+
+    print args
+    if args.ssl == 0:
+        ssl_options = None
+    else:
+        ssl_options={
+            "certfile":  "/root/cert/seressoft_com.crt",
+            "keyfile": "/root/cert/myserver.key"
+        }
+        PORT = 443
+
 
     settings = {
             "debug": debug,
@@ -140,7 +152,8 @@ if __name__ == '__main__':
         (r"/refill",BotRefillHandler),
         (r"/uploads/(.*)", tornado.web.StaticFileHandler, dict(path=settings['uploaded_image_path'])),
         ], **settings)
-    http_server = tornado.httpserver.HTTPServer(application)
+    http_server = tornado.httpserver.HTTPServer(application,ssl_options=ssl_options)
+
     http_server.bind(PORT)
     #http_server.start(8)
     http_server.start(num_of_process)
