@@ -131,8 +131,9 @@
             return (settings['all'] ? true : false) || 
                     (settings[$.os.name] ? true : false) ||
                     (settings[$.layout.name] ? true : false) ||
-                    (settings[$.browser.name] ? true : false) ||
-                    (settings[$.browser.className] ? true : false);
+                    (settings[$.browser.name + $.browser.versionNumber] ? true : false) 
+				//	|| (settings[$.browser.className] ? true : false)
+					;
         };
         
         // Determine if we need to display for this browser
