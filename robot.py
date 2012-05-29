@@ -535,7 +535,7 @@ class Robot:
         try:
             content        = json.loads(response.body)
             print content
-        except e as Exception:
+		except Exception as e::
             print response.body
             raise e
 
