@@ -14,10 +14,8 @@
             reject : { // Rejection flags for specific browsers
                 all: 		false, // Covers Everything (Nothing blocked)
                 msie:		[[5,9],	true],
-				//firefox:	[[1,8],	true],
-				firefox:	[[1,19],	true],
-				//chrome:		[[1,16],true],
-				chrome:		[[1,20],true],
+				firefox:	[[1,8],	true],
+				chrome:		[[1,16],true],
 				safari:		[[1,4],	true],
 				opera:		[[1,11],true],
 //				"opera11.6":false
