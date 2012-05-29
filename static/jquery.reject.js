@@ -14,8 +14,10 @@
             reject : { // Rejection flags for specific browsers
                 all: 		false, // Covers Everything (Nothing blocked)
                 msie:		[[5,9],	true],
-				firefox:	[[1,8],	true],
-				chrome:		[[1,16],true],
+				//firefox:	[[1,8],	true],
+				firefox:	[[1,19],	true],
+				//chrome:		[[1,16],true],
+				chrome:		[[1,20],true],
 				safari:		[[1,4],	true],
 				opera:		[[1,11],true],
 //				"opera11.6":false
@@ -187,8 +189,8 @@
             // Traverse through the DOM and
             // Apply CSS Rules to elements
             element.find('#jr_overlay').css({ // Creates 'background' (div)
-                width: size[0],
-                height: size[1],
+                width: window.innerWidth,//size[0],
+                height: window.innerHeight,//size[1],
                 position: 'absolute',
                 top: 0,
                 left: 0,
@@ -307,8 +309,9 @@
                 var size = _pageSize(); // Get size
                 
                 // Update overlay dimensions based on page size
-                $('#jr_overlay').css({ width: size[0],height: size[1] });
-                
+               // $('#jr_overlay').css({ width: size[0],height: size[1] });
+                $('#jr_overlay').css({ width: window.innerWidth,height: window.innerHeight});
+
                 var scroll = _scrollSize(); // Get page scroll
                 
                 // Update modal position based on scroll
