@@ -276,57 +276,57 @@ def init_database():
 	db_connection  = DatabaseConnection()
 
 if __name__ == "__main__":
-	import os
+    import os
 
-	db  = DatabaseConnection()
+    db  = DatabaseConnection()
 
-	for collection in db.collection_names():
-		try:
-			db.drop_collection(collection)
-		except Exception as e:
-			print e
-			pass
+    for collection in db.collection_names():
+        try:
+            db.drop_collection(collection)
+        except Exception as e:
+            print e
+            pass
 
-	User.create_index(db)
-	DealerInfo.create_index(db)
+    User.create_index(db)
+    DealerInfo.create_index(db)
 
-	for i in xrange(1,10):
-		bot		= User.new(username="human%s" % i, password=hashlib.md5("123321").hexdigest())
-		bot.isBot = True
+    for i in xrange(1,10):
+        bot     = User.new(username="human%s" % i, password=hashlib.md5("123321").hexdigest())
+        bot.isBot = True
 
 
-	#room		= Room(exchange="dealer_exchange_1",blind=10,max_player=9)
-	item		= Commodity.new( 201201, "1000 chips", "1000 chips", 10, "./static/chips_icon.png", 1000)
-	item		= Commodity.new( 201202, "2000 chips", "2000 chips", 19, "./static/chips_icon.png", 2000)
-	item		= Commodity.new( 201203, "5000 chips", "5000 chips", 46, "./static/chips_icon.png", 5000)
-	item		= Commodity.new( 201204, "10000 chips", "10000 chips", 90, "./static/chips_icon.png", 10000)
-	item		= Commodity.new( 201205, "20000 chips", "20000 chips", 175, "./static/chips_icon.png", 20000)
-	item		= Commodity.new( 201206, "50000 chips", "50000 chips", 440, "./static/chips_icon.png", 50000)
-	ting		= User.new(username="ting", password=hashlib.md5("123").hexdigest())
-	mile		= User.new(username="mile", password=hashlib.md5("123").hexdigest())
-	mamingcao   = User.new(username="mamingcao", password=hashlib.md5("123").hexdigest())
-	huaqin		= User.new(username="huaqin", password=hashlib.md5("123").hexdigest())
-	ting.level	= 12
-	ting.total_games= 100
-	ting.won_games	= 40
-	ting.max_reward	= 998
-	ting.last_login	= 0
-	ting.signature	= "software engineer"
-	ting.asset		= 12000
-	mile.asset		= 1000
-	mamingcao.asset	= 2000
-	timeStamp = time.mktime(datetime.strptime("2012-04-13 12:02:20", "%Y-%m-%d %H:%M:%S").timetuple())
-	email	= Email.new(from_user_id = ting._id,to_user_id=mile._id,\
-			send_date=timeStamp,
-			content="aassdd",status=0,sender_name = ting.screen_name)
+    #room		= Room(exchange="dealer_exchange_1",blind=10,max_player=9)
+    item        = Commodity.new( 201201, "1000 chips", "1000 chips", 10, "https://seressoft.appspot.com/static/chips_icon.png", 1000)
+    item        = Commodity.new( 201202, "2000 chips", "2000 chips", 19, "https://seressoft.appspot.com/static/chips_icon.png", 2000)
+    item        = Commodity.new( 201203, "5000 chips", "5000 chips", 46, "https://seressoft.appspot.com/static/chips_icon.png", 5000)
+    item        = Commodity.new( 201204, "10000 chips", "10000 chips", 90, "https://seressoft.appspot.com/static/chips_icon.png", 10000)
+    item        = Commodity.new( 201205, "20000 chips", "20000 chips", 175, "https://seressoft.appspot.com/static/chips_icon.png", 20000)
+    item        = Commodity.new( 201206, "50000 chips", "50000 chips", 440, "https://seressoft.appspot.com/static/chips_icon.png", 50000)
+    ting        = User.new(username="ting", password=hashlib.md5("123").hexdigest())
+    mile        = User.new(username="mile", password=hashlib.md5("123").hexdigest())
+    mamingcao   = User.new(username="mamingcao", password=hashlib.md5("123").hexdigest())
+    huaqin      = User.new(username="huaqin", password=hashlib.md5("123").hexdigest())
+    ting.level  = 12
+    ting.total_games= 100
+    ting.won_games	= 40
+    ting.max_reward	= 998
+    ting.last_login	= 0
+    ting.signature	= "software engineer"
+    ting.asset		= 12000
+    mile.asset		= 1000
+    mamingcao.asset	= 2000
+    timeStamp = time.mktime(datetime.strptime("2012-04-13 12:02:20", "%Y-%m-%d %H:%M:%S").timetuple())
+    email   = Email.new(from_user_id = ting._id,to_user_id=mile._id,\
+            send_date=timeStamp,
+            content="aassdd",status=0,sender_name = ting.screen_name)
 
-#	db_connection.addItem(email)
+#   db_connection.addItem(email)
 #
-	ting.friends = [mile._id, mamingcao._id]
-	mile.friends = [ting._id]
+    ting.friends = [mile._id, mamingcao._id]
+    mile.friends = [ting._id]
 #
 #
-#	db_connection.addItem(ting)
-#	db_connection.addItem(mile)
+#   db_connection.addItem(ting)
+#   db_connection.addItem(mile)
 #
-#	db_connection.commit_session()
+#   db_connection.commit_session()

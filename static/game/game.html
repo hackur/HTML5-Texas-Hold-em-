@@ -5,13 +5,13 @@
 		<meta charset="UTF-8">
 
 		<link rel="stylesheet" type="text/css" href="/static/style.css" />
-		<script src="/static/jquery.min.js"		> </script>
-        <script src="/static/jquery.mobile-1.1.0.min.js"	> </script>
-        <link rel="stylesheet"  href="/static/jquery.mobile-1.1.0.min.css" />  
-        <script src="/static/util.js"     		> </script>
+		<script src="https://seressoft.appspot.com/static/jquery.min.js"		> </script>
+        <script src="https://seressoft.appspot.com/static/jquery.mobile-1.1.0.min.js"	> </script>
+        <link rel="stylesheet"  href="https://seressoft.appspot.com/static/jquery.mobile-1.1.0.min.css" />  
         <link href='https://fonts.googleapis.com/css?family=Nunito:700,400,300' rel='stylesheet' type='text/css'>
 
         {% if debug %}
+            <script src="/static/util.js"     		> </script>
             <script src="/static/game/poker_lib.js"		> </script>
             <script src="/static/game/sit_transit.js"	> </script>
             <script src="/static/game/sliderbar_dialog.js"></script>
@@ -31,8 +31,9 @@
             <link rel="stylesheet" type="text/css" href="/static/game/seat.css" />
             <link rel="stylesheet" type="text/css" href="/static/game/message_box.css" />
         {% else  %}
-            <script src="/static/game/script.js"></script>
-            <link rel="stylesheet" type="text/css" href="/static/game/compiled.css" />
+            <script src="https://seressoft.appspot.com/static/util.js"     		> </script>
+            <script src="https://seressoft.appspot.com/static/game/script.js"></script>
+            <link rel="stylesheet" type="text/css" href="https://seressoft.appspot.com/static/game/compiled.css" />
         {% end %}
         <script>
             function show_no_enough_money(user_info,room_info){

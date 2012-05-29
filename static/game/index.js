@@ -187,7 +187,11 @@ function listenBoardMessageSocket(timestamp){
 	}
 	function setup_ws(){
 		var host = window.location.host;
-		ws = new WebSocket("ws://" + host +"/sk");
+        if(window.location.protocol == "https:"){
+            ws = new WebSocket("wss://" + host +"/sk");
+        }else{
+            ws = new WebSocket("ws://" + host +"/sk");
+        }
 		ws.onerror = onclose;
 		ws.onclose = onclose;
 		ws.onmessage = onmessage;
