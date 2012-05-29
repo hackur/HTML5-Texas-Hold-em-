@@ -47,7 +47,11 @@
 		setTimeout(function(){
 			coin.bind(eventTransitionEnd,function(){
 				coin.remove();
-				coinElement.css("background-image",img);
+                var url = /url\("?([^"]+)"?\)/;
+                console.log("---------------");
+                console.log(url.exec(img)[1]);
+                console.log(img);
+				coinElement.attr("src",url.exec(img)[1]);
 			});
 			chip.remove();
 			coin.css("left",destOffset.left +"px");
@@ -195,11 +199,11 @@
 			distribute(4,4);
 		},3000);
 	}
-	/*
+    /*
 	$(function(){
 		setTimeout(unit_test,10);
 	});
-	*/
+    */
 
 	pot_manager.update = update;
 	pot_manager.distribute = distribute;
