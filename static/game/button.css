@@ -47,10 +47,16 @@
 #raise_slider{
 	width:111px;
 	height:556px;
-	top:-556px;
+	top:-498px;
 	position:absolute;
 	background-image: url(./image/all_in_slider_bg.png);
 	display: none;
+	-moz-transform: scale(0.8);
+ 	-webkit-transform: scale(0.8);
+    -o-transform: scale(0.8);
+    -ms-transform: scale(0.8);
+    transform: scale(0.8);
+    
 }
 #raise_slider_button{
 	width:76px;

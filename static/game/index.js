@@ -38,6 +38,14 @@ var fetch_user_info = function(){
 	});
 };
 
+
+/** Set button wrapper's position **/
+$(function(){
+    if( document.body.clientHeight < 640 ){
+        $("#buttonWraper").css("top","86%");
+    }
+});
+
 $(function(){
 	$("#backBtn").bind("vclick",function(){
 		if(window.user_info.userIsSat){
