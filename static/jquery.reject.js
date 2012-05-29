@@ -13,51 +13,12 @@
         var opts = $.extend(true,{
             reject : { // Rejection flags for specific browsers
                 all: 		false, // Covers Everything (Nothing blocked)
-                msie5:		true,
-                msie6:		true,
-                msie7:		true,
-                msie8:		true,
-				msie9:		true,
-				firefox1:	true,
-				firefox2:	true,
-				firefox3:	true,
-				firefox4:	true,
-				firefox5:	true,
-				firefox6:	true,
-				firefox7:	true,
-				firefox8:	true,
-				chrome1:	true,
-				chrome2:	true,
-				chrome3:	true,
-				chrome4:	true,
-				chrome5:	true,
-				chrome6:	true,
-				chrome7:	true,
-				chrome8:	true,
-				chrome9:	true,
-				chrome10:	true,
-				chrome11:	true,
-				chrome12:	true,
-				chrome13:	true,
-				chrome14:	true,
-				chrome15:	true,
-				chrome16:	true,
-				safari1:	true,
-				safari2:	true,
-				safari3:	true,
-				safari4:	true,
-				opera1:		true,
-				opera2:		true,
-				opera3:		true,
-				opera4:		true,
-				opera5:		true,
-				opera6:		true,
-				opera7:		true,
-				opera8:		true,
-				opera9:		true,
-				opera10:	true,
-				opera11:	true,
-				"opera11.6":false
+                msie:		[[5,9],	true],
+				firefox:	[[1,8],	true],
+				chrome:		[[1,16],true],
+				safari:		[[1,4],	true],
+				opera:		[[1,11],true],
+//				"opera11.6":false
 //				opera12:  false,
 
 				//msie5: true,
@@ -128,12 +89,17 @@
             // Check 3: Rendering engine (eg. 'webkit', 'gecko', 'trident')
             // Check 4: Browser name (eg. 'firefox','msie','chrome')
             // Check 5: Browser+major version (eg. 'firefox3','msie7','chrome4')
+			var browserVersionRange = settings[$.browser.name];
+			checkBrowserVersion = false;
+			if ($.browser.versionNumber >= browserVersionRange[0][0] && $.browser.versionNumber <= browserVersionRange[0][1]){
+				checkBrowserVersion = browserVersionRange[1];
+			}
             return (settings['all'] ? true : false) || 
                     (settings[$.os.name] ? true : false) ||
                     (settings[$.layout.name] ? true : false) ||
-                    (settings[$.browser.name + $.browser.versionNumber] ? true : false) 
+                	checkBrowserVersion;
+				//   (settings[$.browser.name]$.browser.versionNumber ? true : false) 
 				//	|| (settings[$.browser.className] ? true : false)
-					;
         };
         
         // Determine if we need to display for this browser
