@@ -129,6 +129,7 @@ var enter = function(){
 				if(data.room.hc){
 					poker_lib.setCard(data.room.hc[0], '#cards_in_hand1');
 					poker_lib.setCard(data.room.hc[1], '#cards_in_hand2');
+					window.user_info.userIsPlay = true;
 					$("#cards_in_hand1").fadeIn();
 					$("#cards_in_hand2").fadeIn();
 				}

@@ -49,7 +49,6 @@ function msg_phc(data){
 	SeatList[seatId].cards.push(poker_lib.evaluateCard(data.cards[1]));
 	
 	dealCard.set_hc(['#cards_in_hand1','#cards_in_hand2']);
-	
 /*
 	dealCard.deal(window.user_info.sit_no,
 				["#cards_in_hand1","#cards_in_hand2"]);
@@ -188,6 +187,7 @@ function msg_next(data){
 		if(window.user_info.userIsPlay){
 			actionButton.disable_AutoButtons();
 		}
+		window.user_info.userIsPlay = true;
 		actionButton.enable_buttons(data.rights,data.amount_limits);
 	}
 	else{

@@ -107,6 +107,10 @@
 		linear, left top, left bottom, 
 		from(#42aaff),
 		to(#003366));
+	background: -moz-linear-gradient(
+		top,
+		#42aaff 0%,
+		#003366);
 	border-radius: 10px;
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 10px;

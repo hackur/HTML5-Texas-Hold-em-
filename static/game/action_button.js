@@ -92,8 +92,8 @@
 		//var steps = (max - min) / 1;
 		//console.log("height" + height + " maxHeight" + maxHeight);
 		var position = minMaxPosition(min,max);
-		console.log(min + " " + max + "minmax");
-		console.log(position[0] + " " + position[1]);
+		//console.log(min + " " + max + "minmax");
+		//console.log(position[0] + " " + position[1]);
 		var SpaceNum = position[1] - position[0] + 1;
 		var SpaceLength = maxHeight / SpaceNum;
 		var whichSpace = Math.floor(height / SpaceLength);
@@ -153,10 +153,9 @@
 		var	maxTop = $("#raise_slider").offset().top 
 				+ $("#raise_slider").height()
 				- $("#raise_slider_button").height();
-		
 		var diffX = startY - down_pos;
 		var next_pos = down_slider_pos + diffX;
-
+		
 		if(next_pos >= minTop && next_pos <= maxTop){
 			$("#raise_slider_button").css("top",(next_pos - $("#raise_amount").offset().top ) + "px");
 		}

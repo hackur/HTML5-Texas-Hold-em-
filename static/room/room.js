@@ -136,6 +136,7 @@ function nTabs(thisObj, Num) {
 	if (thisObj.className == curStat) return;
 	var tabObj = thisObj.parentNode.id;
 	console.log(thisObj);
+	$("#settingDialog").css("display","none");
 	fetchRoom(Num);
 	curRoomType = Num;
 	console.log(Num);
