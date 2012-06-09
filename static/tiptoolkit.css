@@ -1,0 +1,82 @@
+.speech-bubble {
+	position: relative;
+	background-color: rgba(255,255,0,0.8);
+	width: 200px;
+	height: 50px;
+	line-height: 50px; 
+	color: black;
+	text-align: center;
+	border-width:2px;
+	border-radius: 10px;
+	border-color: black;
+	-mox-border-radius: 10px;
+	-webkit-border-radius : 10px;
+	-moz-transition: all 0.5s; 
+	-webkit-transition: all 0.5s;  
+	-ms-transition: all 0.5s;  
+	-o-transition: all 0.5s;  
+	transition-timing-function: ease-out;
+	transition: all 0.5s; 
+	z-index:10;
+	display: none;
+}
+.speech-bubble:after {
+	content: '';
+	position: absolute;
+	width: 0px;
+	height: 0px;
+	border-color: black;
+	border: 5px solid;
+	border-color: transparent transparent transparent transparent;
+}
+
+/* Position the Arrow */
+
+.speech-bubble-top:after {
+	border-bottom-color: rgba(255,255,0,0.8);
+	left: 50%;
+	bottom: 100%;
+	margin-left: -15px;
+}
+.speech-bubble-right:after {
+	border-left-color: rgba(255,255,0,0.8);
+	left: 100%;
+	top: 50%;
+	margin-top: -15px;
+}
+
+.speech-bubble-bottom:after {
+	border-top-color: rgba(255,255,0,0.8);
+	top: 100%;
+	left: 50%;
+	margin-left: -15px;
+}
+
+.speech-bubble-left:after {
+	border-right-color: rgba(255,255,0,0.8);
+	top: 50%;
+	right: 100%;
+	margin-top: -15px;
+}
+#logoutTip {
+	left: -207px;
+	top: -140px;
+}
+#lobbyTip {
+	left: -207px;
+	top: 103px;
+}
+
+#quick_accTip {
+	left: -207px;
+	top: 112px;
+	
+}
+#backBtnTip {
+	left: 137px;
+	top:-72px;
+}
+#standTip {
+	left: 624px;
+	top:-5px;
+}

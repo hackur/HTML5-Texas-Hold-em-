@@ -109,6 +109,8 @@
 	width: 100%;
 	background-color: rgba(40, 40, 40, 0.4);
 	z-index: 10;
+	word-wrap: break-word;
+	word-break: break-all;
 	overflow-y: auto;
 	-moz-transition: all 0.4s;
 	-webkit-transition: all 0.4s;

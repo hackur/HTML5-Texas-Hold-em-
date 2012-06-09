@@ -8,7 +8,7 @@
 		<script src="https://seressoft.appspot.com/static/jquery.min.js"></script>
 		<script src="https://seressoft.appspot.com/static/jquery.mobile-1.1.0.min.js"></script>
 		<script src="/static/jquery.reject.js"></script>
-		<link rel="stylesheet" type="text/css" href="/static/style.css">
+		<link rel="stylesheet" type="text/css" href="/static/style.css">/>
 		{% if debug %}
 		<script src="/static/util.js"></script>
 		<link rel="stylesheet" type="text/css" href="/static/user/perinfo.css">
@@ -19,10 +19,12 @@
 		<link rel="stylesheet" type="text/css" href="/static/user/bigFrame5.css">
 		<link rel="stylesheet" type="text/css" href="/static/user/rightFrame.css">
 		<link rel="stylesheet" type="text/css" href="/static/user/user.css">
+		<link rel="stylesheet" type="text/css" href="/static/tiptoolkit.css">
 		<script src="/static/game/sliderbar_dialog.js"></script>
 		<script src="/static/user/perinfo.js"></script>
 		<script src="/static/user/recharge.js"></script>
 		<script src="/static/user/email.js"></script>
+		<script src="/static/tiptoolkit.js"></script>
 		<script src="/static/user/awardDialogAndNickSettingDialog.js"></script>
 		{% else %}
 		<script src="https://seressoft.appspot.com/static/util.js"></script>
@@ -279,12 +281,15 @@
 			<!--
 			<span id="span1">当 前 在 玩 人 数 ：100,000</span>
 			-->
+			<div id="logoutTip"></div>
 			<div id="logout" class="GeneralBtn">
                 <span> {{ _("Logout") }}</span>
 			</div>
+			<div id="lobbyTip"></div>
 			<div id="lobby" class="GeneralBtn">
                 <span>{{ _("Lobby") }} </span>
 			</div>
+			<div id="quick_accTip"></div>
 			<div id="quick_acc" class="GeneralBtn">
                 <span>{{ _("Fast enter")}}</span>
 			</div>
