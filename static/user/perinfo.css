@@ -2,6 +2,19 @@
 body {
 	text-align: center;
 }
+
+#grayframe{
+    position:absolute;
+    width:583px;
+    height:493px;
+    background-color:black;
+    opacity:0.5;
+    border-radius:15px;
+    border-width:20px;
+    left:26px;
+    top:82px;
+    box-shadow:3px 3px 4px black
+}
 div{
 	-moz-user-select: none; 
 	-khtml-user-select: none; 
@@ -14,7 +27,7 @@ div{
 	height: 640px;
 	width: 960px;
 	position: absolute;
-	background-image: url(./image/bg.jpg);
+	background-image: url(./image/background.png);
 }
 #btFrame {
 	top: 20px;
