@@ -27,14 +27,14 @@ div{
 	height: 640px;
 	width: 960px;
 	position: absolute;
-	background-image: url(./image/bj.jpg);
+	background-image: url(../user/image/background.png);
 }
 
 #gametable {
 	height: 445px;
 	width: 939px;
 	position: absolute;
-	background-image: url(./image/leathertable.gif);
+	/* background-image: url(./image/leathertable.gif);*/
 	top: 82px;
 	left: 26px;
 }
