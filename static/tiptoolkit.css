@@ -69,14 +69,24 @@
 
 #quick_accTip {
 	left: -207px;
-	top: 112px;
+	top: 246px;
 	
 }
 #backBtnTip {
-	left: 137px;
-	top:-72px;
+	left: 134px;
+	top:-71px;
+	width:289px;
 }
 #standTip {
-	left: 624px;
+	left: 625px;
 	top:-5px;
+}
+#chatTip {
+	left:49px;
+	top:360px;
+	width:240px;
+}
+#sitTip {
+	left:20px;
+	top:20px;
 }

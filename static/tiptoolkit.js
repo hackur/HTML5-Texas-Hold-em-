@@ -21,9 +21,7 @@ function poptip() {
 		divTipContent.append(content);
 		divTipContent.appendTo(divTip);	
 		divTip.appendTo(divToAdd);
-		//divToAdd.attr('id',divToAdd.attr('id')+"full");
-		//console.log(divTip);
-		setTimeout(Msg,2000);
+		setTimeout(Msg,1000);
 	}
 	function Msg() {
 		divTip.fadeIn();
@@ -39,11 +37,13 @@ function poptip() {
 init = function() {
 	var backBtnTip = poptip();
 	var standTip = poptip();
+	var quickStart = poptip();
+	//var sitDown = poptip();
 	backBtnTip.init($("#backBtnTip"), "backBtnTip", "Back to Previous Level", "left", 5);
 	standTip.init($("#standTip"), "standTip", "Stand Up", "right", 5);
-	
+	quickStart.init($("#quick_accTip"), "quick_accTip", "Quick Start Game", "right", 5);
+	//sitDown.init($("#sitTip"), "sitTip", "选择带的钱数，然后坐下 ","bottom", 100);
 } 
 
-
-
-$(init);
+//$(init);
+window.onload = init;
