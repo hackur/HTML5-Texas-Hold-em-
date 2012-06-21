@@ -22,7 +22,7 @@ facebook_graph		= "https://graph.facebook.com/%s?fields=id,name,picture,gender,u
 facebook_permission_url	= "https://graph.facebook.com/%s/permissions?access_token=%s"
 facebook_feed		= "https://graph.facebook.com/me/feed?access_token=%s"
 canvas_page			= "http://gigiduck.com:8001/facebook/"
-#auth_url			= "https://www.facebook.com/dialog/oauth?client_id="+facebook_app_id+"&redirect_uri="+urllib.pathname2url(canvas_page)+"&scope=user_status,publish_actions,publish_stream"
+auth_url			= "https://www.facebook.com/dialog/oauth?client_id="+facebook_app_id+"&redirect_uri="+urllib.pathname2url(canvas_page)+"&scope=user_status,publish_actions,publish_stream"
 
 def _base64_url_decode(inp):
 	padding_factor = (4 - len(inp) % 4) % 4

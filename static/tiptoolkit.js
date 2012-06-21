@@ -14,19 +14,20 @@ function poptip() {
 		remaintime = _remaintime;
 		divTip.attr('id',divID);
 		divTip.addClass("speech-bubble-"+direct);
-		divTipContent.append(content);
+		divTipContent.html(content);
 		divTipContent.appendTo(divTip);	
 		divTip.appendTo(divToAdd);
 		//setTimeout(Msg,1000);
-		Msg();
+		//Msg();
 	}
 	function ShowIn() {
 		divTip.fadeIn();
 	}
 	function ShowOut() {
-		divTip.fadeOut('slow', function() {
-			divTip.remove();
-		});
+		//divTip.fadeOut('fast', function() {
+		//	divTip.remove();
+		//});
+		divTip.remove();
 	}
 	function Msg() {
 		divTip.fadeIn();
@@ -38,6 +39,7 @@ function poptip() {
 	}
 	poptip.ShowIn = ShowIn;
 	poptip.ShowOut = ShowOut;
+	poptip.Msg = Msg;
 	return poptip;
 	
 };
@@ -50,6 +52,10 @@ init = function() {
 	standTip.init($("#standTip"), "standTip", "Stand Up", "right", 5);
 	quickStart.init($("#quick_accTip"), "quick_accTip", "Quick Start Game", "right", 5);
 	sitDown.init($("#sitTip"), "sitTip", "click one of the 9 seats to sit down ","bottom", 5);
+	backBtnTip.Msg();
+	standTip.Msg();
+	quickStart.Msg();
+	sitDown.Msg();
 }
 
 //$(init);
