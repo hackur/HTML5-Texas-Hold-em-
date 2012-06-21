@@ -1,9 +1,9 @@
 .speech-bubble {
-	position: relative;
+	position: absolute;
 	background-color: rgba(255,255,0,0.8);
 	width: 200px;
 	height: 50px;
-	line-height: 50px; 
+	line-height: 22px; 
 	color: black;
 	text-align: center;
 	border-width:2px;
@@ -69,17 +69,17 @@
 
 #quick_accTip {
 	left: -207px;
-	top: 246px;
+	top: 261px;
 	
 }
 #backBtnTip {
 	left: 134px;
-	top:-71px;
+	top:11px;
 	width:289px;
 }
 #standTip {
 	left: 625px;
-	top:-5px;
+	top:11px;
 }
 #chatTip {
 	left:49px;
@@ -87,6 +87,22 @@
 	width:240px;
 }
 #sitTip {
-	left:20px;
-	top:20px;
+	left:351px;
+	top:332px;
+	width:286px;
+	height:53px;
+}
+#sliderBtnTip {
+	left:190px;
+	top:259px;
+	width:263px;
+	height:49px;
+	z-index:11;
+}
+#sitBtnTip {
+	left:597px;
+	top:338px;
+	width:227px;
+	height:51px;
+	z-index:11;
 }
