@@ -7,7 +7,9 @@ function poptip() {
 	var divID;
 	var divTip = $('<div class = speech-bubble></div>');
 	var divTipContent = $('<p></p>');
-	poptip.init = function(divToAdd, _divID,  _content, _direct, _remaintime){
+	var divToAdd;
+	poptip.init = function(_divToAdd, _divID,  _content, _direct, _remaintime){
+		divToAdd = _divToAdd;
 		divID = _divID;
 		content = _content;
 		direct = _direct;
@@ -19,9 +21,11 @@ function poptip() {
 		divTip.appendTo(divToAdd);
 		//setTimeout(Msg,1000);
 		//Msg();
+		divToAdd.bind("vclick", ShowOut);
 	}
 	function ShowIn() {
 		divTip.fadeIn();
+		
 	}
 	function ShowOut() {
 		//divTip.fadeOut('fast', function() {

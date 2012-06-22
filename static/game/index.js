@@ -31,9 +31,6 @@ var table_init = function() {
 	    sitDown.Msg();
         localStorage['sitDown'] = 1;
     }
-    
-	
-	
 	//game_control.deal();
 };
 
