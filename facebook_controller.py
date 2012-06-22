@@ -135,7 +135,7 @@ class FaceBookLogin(tornado.web.RequestHandler):
     def _update_facebook_feed(self, user):
         feed_url        = facebook_feed % (self.access_token)
         body            = {}
-        body["message"]    = "I am playing Texas Holdem."
+        body["message"]    = "I am playing HTML5 Texas Holdem. Come and join me!"
         body["link"]    = "http://apps.facebook.com/seres_texas_holdem"
         http_client    = AsyncHTTPClient()
         http_client.fetch(    feed_url,
