@@ -13,6 +13,25 @@ var table_init = function() {
 	$.each(SeatList,function(index,seat){
 		take_place(seat.id, seat);
 	});
+	var backBtnTip = poptip();
+	var standTip = poptip();
+	var sitDown = poptip();
+	backBtnTip.init($("#backBtnTip"), "backBtnTip", "Back to Previous Level", "left", 5);
+	standTip.init($("#standTip"), "standTip", "Stand Up", "right", 5);
+	sitDown.init($("#sitTip"), "sitTip", "click one of the 9 seats to sit down ","bottom", 5);
+    if(!localStorage['backBtnTip']){
+	    backBtnTip.Msg();
+        localStorage['backBtnTip'] = 1;
+    }
+    if(!localStorage['standTip']){
+	    standTip.Msg();
+        localStorage['standTip'] = 1;
+    }
+    if(!localStorage['sitDown']){
+	    sitDown.Msg();
+        localStorage['sitDown'] = 1;
+    }
+    
 	
 	
 	//game_control.deal();

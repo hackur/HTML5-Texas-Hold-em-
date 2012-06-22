@@ -44,18 +44,11 @@ function poptip() {
 	
 };
 init = function() {
-	var backBtnTip = poptip();
-	var standTip = poptip();
-	var quickStart = poptip();
-	var sitDown = poptip();
-	backBtnTip.init($("#backBtnTip"), "backBtnTip", "Back to Previous Level", "left", 5);
-	standTip.init($("#standTip"), "standTip", "Stand Up", "right", 5);
-	quickStart.init($("#quick_accTip"), "quick_accTip", "Quick Start Game", "right", 5);
-	sitDown.init($("#sitTip"), "sitTip", "click one of the 9 seats to sit down ","bottom", 5);
-	backBtnTip.Msg();
+    /*
 	standTip.Msg();
 	quickStart.Msg();
 	sitDown.Msg();
+    */
 }
 
 //$(init);

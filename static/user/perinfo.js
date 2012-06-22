@@ -15,6 +15,13 @@ window.get_event_position = function(e){
 }
 
 var info_init = function() {
+	var quickStart = poptip();
+	quickStart.init($("#quick_accTip"), "quick_accTip", "Quick Start Game", "right", 5);
+    if(!localStorage['quickStart']){
+	    quickStart.Msg();
+        localStorage['quickStart'] = 1;
+    }
+
 	$.reject();
 	dailyBonus();
 	getUserImage();
