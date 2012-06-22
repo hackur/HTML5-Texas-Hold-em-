@@ -64,6 +64,7 @@ def on_connected(connection):
 
 
 import argparse
+import ssl
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Server...')
     parser.add_argument('--debug-mode','-D',default=1,type=int)
@@ -85,8 +86,10 @@ if __name__ == '__main__':
         ssl_options = None
     else:
         ssl_options={
-            "certfile":  "/root/cert/seressoft_com.crt",
-            "keyfile": "/root/cert/myserver.key"
+            "certfile":  "/root/cert/seressoft.com.ca-bundle",
+            "keyfile": "/root/cert/myserver.key",
+            #"cert_reqs":ssl.CERT_REQUIRED,
+           # "ca_certs":"/root/cert/seressoft.com.ca-bundle"
         }
         PORT = 443
 
