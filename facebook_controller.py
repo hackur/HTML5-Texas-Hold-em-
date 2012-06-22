@@ -72,15 +72,15 @@ class FaceBookLogin(tornado.web.RequestHandler):
     def _check_permission(self, data):
         permission_url    = facebook_permission_url % (data["user_id"], self.access_token)
         http_client    = AsyncHTTPClient()
-        http_client.fetch(    permission_url,
+        http_client.fetch(  permission_url,
                             self._handle_check_permission,
                             method    = 'GET',
                             headers    = None,
                             body    = None)
 
-    def    _handle_check_permission(self, response):
+    def _handle_check_permission(self, response):
         permissions    = json.loads(response.body)["data"][0]
-        if    "user_status" in permissions and permissions["user_status"] == 1 and \
+        if  "user_status" in permissions and permissions["user_status"] == 1 and \
             "publish_actions" in permissions and permissions["publish_actions"] == 1 and \
             "publish_stream" in permissions and permissions["publish_stream"] == 1:
             user  = User.verify_user_openID(accountType = User.USER_TYPE_FACEBOOK,
